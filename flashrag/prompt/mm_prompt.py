@@ -1,4 +1,6 @@
 import re
+import os
+from PIL import Image
 
 class MMPromptTemplate:
     BASE_USER_PROMPT = '{reference}\nBased on the above examples, answer the following question. Only give me the final choices.\nQuestion: {question}\nAnswer: '
@@ -6,30 +8,35 @@ class MMPromptTemplate:
         self.config = config
         self.system_prompt = system_prompt
         self.user_prompt = user_prompt if user_prompt is not None else self.BASE_USER_PROMPT
-    def get_string(self, item):
+    def get_string(self, item, config):
         question = item.question if item.question is not None else item.text
-        question_image = item.image
+        image_folder = config["image_path"]
+        image_filename = f"{item.image_id}.jpg"
+        full_image_path = os.path.join(image_folder, image_filename)
+        raw_image = Image.open(full_image_path)
+        question_image = raw_image.convert("RGB")
+
         # retrieval_result = item.retrieval_result
-        try:
-            retrieval_result = item.retrieval_result
-        except:
-            retrieval_result = []
+        # try:
+        #     retrieval_result = item.retrieval_result
+        # except:
+        #     retrieval_result = []
 
         messages = []
         if self.system_prompt is not None:
-            messages.append({"role": "system", "content": self.system_prompt})
-        reference_str = ""
+            messages.append({"role": "system", "content": self.system_prompt.format(input_question=question)})
+        # reference_str = ""
         content_list = []
-        for idx, item in enumerate(retrieval_result):
-            # item is multimodal data or raw text
-            if 'image' not in item:
-                # raw text item
-                reference_str += f'Example {idx+1}: {item["contents"]}\n'
-            else:
-                content_list.append({'type': 'image', 'image': item['image']})
-                reference_str += f'Example {idx+1}: {item["text"]}\n'
+        # for idx, item in enumerate(retrieval_result):
+        #     # item is multimodal data or raw text
+        #     if 'image' not in item:
+        #         # raw text item
+        #         reference_str += f'Example {idx+1}: {item["contents"]}\n'
+        #     else:
+        #         content_list.append({'type': 'image', 'image': item['image']})
+        #         reference_str += f'Example {idx+1}: {item["text"]}\n'
         content_list.append({'type': 'image', 'image': question_image})
-        content_list.append({'type': 'text', 'text': self.user_prompt.format(question=question, reference=reference_str)})
+        content_list.append({'type': 'text', 'text': self.user_prompt.format(input_question=question)})
         messages.append({"role": "user", "content": content_list})
         return messages
 

@@ -311,7 +311,8 @@ class BM25Retriever(BaseTextRetriever):
             import bm25s
 
             # query_tokens = self.tokenizer.tokenize([query], return_as="tuple", update_vocab=False)
-            query_tokens = bm25s.tokenize([query])
+            # Original :query_tokens = bm25s.tokenize([query])
+            query_tokens = bm25s.tokenize(query)
             results, scores = self.searcher.retrieve(query_tokens, k=num)
             results = list(results[0])
             scores = list(scores[0])

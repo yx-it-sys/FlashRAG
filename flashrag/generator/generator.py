@@ -358,7 +358,7 @@ class HFCausalLMGenerator(BaseGenerator):
     def generate(
         self,
         input_list: List[str],
-        batch_size=None,
+        batch_size=1,
         return_scores=False,
         return_dict=False,
         **params,

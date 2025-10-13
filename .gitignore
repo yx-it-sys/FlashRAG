@@ -1,4 +1,6 @@
 **/.history
+examples/scripts/indexes
+example/scripts/models
 *.pyc
 *.egg-info
 build/

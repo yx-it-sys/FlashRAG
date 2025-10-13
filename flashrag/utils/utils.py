@@ -14,7 +14,7 @@ def get_dataset(config):
     all_split = config["split"]
 
     split_dict = {split: None for split in all_split}
-
+    
     for split in all_split:
         exist_flag = 0
         for file_postfix in SUPPORT_FILES:

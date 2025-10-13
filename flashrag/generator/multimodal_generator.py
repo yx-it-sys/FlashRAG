@@ -77,8 +77,8 @@ class BaseInferenceEngine:
 
 class Qwen2VLInferenceEngine(BaseInferenceEngine):
     def _load_model(self):
-        from transformers import Qwen2VLForConditionalGeneration
-        self.model = Qwen2VLForConditionalGeneration.from_pretrained(
+        from transformers import Qwen2_5_VLProcessor, Qwen2_5_VLForConditionalGeneration
+        self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
             self.model_path,
             torch_dtype='auto',
             device_map='auto',
@@ -86,25 +86,34 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
         ).eval()
         min_pixels = 3136
         max_pixels = 12845056
-        self.processor = AutoProcessor.from_pretrained(self.model_path, trust_remote_code=True, min_pixels=min_pixels, max_pixels=max_pixels)
+        self.processor = Qwen2_5_VLProcessor.from_pretrained(self.model_path, trust_remote_code=True, min_pixels=min_pixels, max_pixels=max_pixels)
         self.processor.tokenizer.model_max_length = self.max_input_len
         self.tokenizer = self.processor.tokenizer
     @torch.inference_mode(mode=True)
     def generate(self, input_list, **params):
-        # convert image to base64
+        prompts = [self.tokenizer.apply_chat_template(
+            messages,
+            add_generation_prompt=True,
+            tokenize=False
+        )for messages in input_list]
+        images_list = []
         for messages in input_list:
+            conversation_images = []
             for message in messages:
                 if isinstance(message['content'], list):
                     for content_dict in message['content']:
                         if content_dict['type'] == 'image':
-                            content_dict['image'] = convert_image_to_base64(content_dict['image'])
+                            conversation_images.append(content_dict['image'])
+            images_list.append(conversation_images)
 
-        from qwen_vl_utils import process_vision_info
-        texts = [self.processor.apply_chat_template(messages, add_generation_prompt=True, tokenize=False) for messages in input_list]
-        image_inputs, video_inputs = process_vision_info(input_list)    
-        inputs = self.processor(text=texts, images=image_inputs, videos=video_inputs, padding=True, return_tensors="pt").to(self.model.device)
-        # print(inputs)
-        # print(inputs['input_ids'].shape,inputs['attention_mask'].shape,inputs['pixel_values'].shape,inputs['image_grid_thw'].shape)
+        inputs = self.processor(
+            text=prompts,
+            images=images_list,
+            padding=True,
+            return_tensors="pt"
+        ).to(self.model.device)
+
+        inputs.pop('return_dict', None)
         outputs = self.model.generate(
             **inputs,
             eos_token_id=self.tokenizer.eos_token_id,
@@ -113,6 +122,7 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
         )
         generated_ids_trimmed = [out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, outputs)]
         output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
+        print(f"Output text: {output_text}")
         return output_text
 
 class InternVL2InferenceEngine(BaseInferenceEngine):
@@ -367,7 +377,7 @@ class HFModelInferenceEngineFactory:
     }
 
     @staticmethod
-    def get_engine(model_path, device='cpu', **kwargs):
+    def get_engine(model_path, device='cuda', **kwargs):
         config_file_path = os.path.join(model_path, 'config.json')
         with open(config_file_path, "r") as f:
             model_config = json.load(f)
@@ -386,7 +396,6 @@ class HFMultiModalGenerator(BaseMultiModalGenerator):
         self.config = config
         self.model_name = config['generator_model']
         self.model_path = config['generator_model_path']
-        
         self.inference_engine = HFModelInferenceEngineFactory.get_engine(
             model_path=self.model_path,
             device=self.device,
@@ -407,6 +416,7 @@ class HFMultiModalGenerator(BaseMultiModalGenerator):
             batch_size = self.batch_size
         generation_params = deepcopy(self.generation_params)
         generation_params.update(params)
+        should_return_dict = generation_params.pop('return_dict', False)
         if 'temperature' not in generation_params:
             generation_params['temperature'] = 0
         if 'do_sample' not in generation_params:
@@ -444,7 +454,10 @@ class HFMultiModalGenerator(BaseMultiModalGenerator):
             torch.cuda.empty_cache()
             batch_prompts = input_list[idx: idx+batch_size]
             output_responses.extend(self.inference_engine.generate(batch_prompts, **generation_params))
-        return output_responses
+        if should_return_dict:
+            return {"responses": output_responses}
+        else:
+            return output_responses
 
 
 
