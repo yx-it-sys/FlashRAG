@@ -102,7 +102,7 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         self.generator = get_generator(config) if generator is None else generator
         self.retriever = get_retriever(config) if retriever is None else retriever
     
-    def iterative_infer(self, input_prompt):
+    def iterative_infer(self, input_prompt, query):
         response_dict = self.generator.generate([input_prompt], return_dict=True)
         response = response_dict["responses"][0]
         print(f"First Response: {response_dict}")
@@ -121,11 +121,13 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
                     .replace('"', "")
                     .replace(">", "")
                 )
-
-                search_text = self.retriever.search([query_txt], 1)
-                search_text = search_text[0]["contents"]
-                print(f"Retrieval result: {search_text}")
-
+                if query_txt is not None:
+                    search_text = self.retriever.search([query_txt], 1)
+                    search_text = search_text[0]["contents"]
+                    print(f"Retrieval result: {search_text}")
+                else:
+                    search_text = self.retriever.search([query], 2)
+                    print(f"Retrieval result: {search_text}")
                 contents = []
                 if search_text:
                     contents.append({'type': 'text', 'text': f"Contents of retrieved documents:\n{' '.join(search_text)}"})
@@ -177,8 +179,8 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
 
         pred_answer_list = []
         context_list = []
-        for input_prompt in input_prompts:
-            answer, context = self.iterative_infer(input_prompt)
+        for i, input_prompt in enumerate(input_prompts):
+            answer, context = self.iterative_infer(input_prompt, query_list[i])
             remove_image_context = context[2:]
             pred_answer_list.append(answer)
             context_list.append(remove_image_context)
@@ -200,3 +202,6 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         dataset.update_output("pred", pred_answer_list)
         dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
         return dataset
+    
+    def uncertainty(self, dataset):
+        pass

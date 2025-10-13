@@ -112,7 +112,8 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
             padding=True,
             return_tensors="pt"
         ).to(self.model.device)
-
+        params['temperature'] = 0.0
+        params['do_sample'] = False
         inputs.pop('return_dict', None)
         outputs = self.model.generate(
             **inputs,
@@ -122,7 +123,6 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
         )
         generated_ids_trimmed = [out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, outputs)]
         output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
-        print(f"Output text: {output_text}")
         return output_text
 
 class InternVL2InferenceEngine(BaseInferenceEngine):

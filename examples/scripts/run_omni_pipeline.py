@@ -40,7 +40,7 @@ def main(args):
 
 
     output_dataset = pipeline.run(test_data, do_eval=True)
-
+    # uncertainty = pipeline.uncertainty(test_data, do_eval=True)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the OmniSearch pipeline.")
