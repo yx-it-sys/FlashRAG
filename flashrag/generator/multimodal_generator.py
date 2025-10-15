@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 import os
 import json
 import importlib
@@ -32,7 +32,7 @@ class BaseMultiModalGenerator:
         self.config = config
         self.generation_params = config["generation_params"]
     
-    def generate(self, input_list: list) -> List[str]:
+    def generate(self, input_list: list):
         """
         input_list: A list contains of messages, each message is a list, like:
         [
@@ -90,7 +90,7 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
         self.processor.tokenizer.model_max_length = self.max_input_len
         self.tokenizer = self.processor.tokenizer
     @torch.inference_mode(mode=True)
-    def generate(self, input_list, **params):
+    def generate(self, input_list, get_hidden_states=False, **params):
         prompts = [self.tokenizer.apply_chat_template(
             messages,
             add_generation_prompt=True,
@@ -114,7 +114,6 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
         ).to(self.model.device)
         params['temperature'] = 0.0
         params['do_sample'] = False
-        inputs.pop('return_dict', None)
         outputs = self.model.generate(
             **inputs,
             eos_token_id=self.tokenizer.eos_token_id,
@@ -123,7 +122,32 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
         )
         generated_ids_trimmed = [out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, outputs)]
         output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
-        return output_text
+        output_dict = {}
+        # Get Hidden_states
+        if get_hidden_states == True:
+            full_sequence_ids = outputs
+            full_attention_mask = (full_sequence_ids != self.tokenizer.pad_token_id).long()
+            with torch.no_grad():
+                outputs_with_states = self.model(
+                    input_ids=full_sequence_ids,
+                    attention_mask=full_attention_mask,
+                    output_hidden_states=True
+                )
+            hidden_states = outputs_with_states.hidden_states
+            k=100
+            top_k_logits_values, top_k_indices = torch.topk(outputs_with_states.logits, k, dim=-1)
+            output_dict = {
+                "output_text": output_text,
+                "hidden_states": hidden_states,
+                "top_k_logits_values": top_k_logits_values,
+                "top_k_logits_indices": top_k_indices,
+                "full_sequence_ids": outputs
+            }
+        else:
+            output_dict =  {
+                "output_text": output_text
+            }
+        return output_dict
 
 class InternVL2InferenceEngine(BaseInferenceEngine):
     def _load_model(self):
@@ -453,7 +477,7 @@ class HFMultiModalGenerator(BaseMultiModalGenerator):
         for idx in trange(0, len(input_list), batch_size, desc='Generation process: '):
             torch.cuda.empty_cache()
             batch_prompts = input_list[idx: idx+batch_size]
-            output_responses.extend(self.inference_engine.generate(batch_prompts, **generation_params))
+            output_responses.append(self.inference_engine.generate(batch_prompts, **generation_params))
         if should_return_dict:
             return {"responses": output_responses}
         else:

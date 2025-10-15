@@ -3,6 +3,7 @@ from flashrag.utils import get_retriever, get_generator
 import re
 import os
 import json
+import torch
 
 class BasicMultiModalPipeline:
     """Base object of all multimodal pipelines. A pipeline includes the overall process of RAG.
@@ -102,32 +103,35 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         self.generator = get_generator(config) if generator is None else generator
         self.retriever = get_retriever(config) if retriever is None else retriever
     
-    def iterative_infer(self, input_prompt, query):
-        response_dict = self.generator.generate([input_prompt], return_dict=True)
-        response = response_dict["responses"][0]
-        print(f"First Response: {response_dict}")
+    def iterative_infer(self, input_prompt, query, get_hidden_states=False):
+        response_dict = self.generator.generate([input_prompt], get_hidden_states=get_hidden_states)[0]
+        response = response_dict["output_text"][0]
+        print(f"First Response: {response}")
         input_prompt.append({'role': 'assistant', 'content': response})
+        
         conversation_num, max_turns = 0, 5
-
         while conversation_num < max_turns:
             if "Final Answer" in response or "<Final Answer>" in response:
                 break
             need_txt_ret = "Text Retrieval" in response
             if need_txt_ret:
                 print("Start text retrieval...")
-                query_txt = (
-                    response.split("Text Retrieval")[-1]
-                    .replace(":", "")
-                    .replace('"', "")
-                    .replace(">", "")
-                )
-                if query_txt is not None:
-                    search_text = self.retriever.search([query_txt], 1)
+                pattern = r'Text Retrieval[:\s"]*(.*?)(?=<|$)'
+                match = re.search(pattern, response, re.DOTALL)
+                query_txt = ""
+                if match:
+                    query_txt = match.group(1).strip()
+                    print(f"Query Text: {query_txt}")
+                if query_txt == "":
+                    print(f"Query_txt is None")
+                    search_text = self.retriever.search([query["question"]], 2)
                     search_text = search_text[0]["contents"]
                     print(f"Retrieval result: {search_text}")
                 else:
-                    search_text = self.retriever.search([query], 2)
+                    search_text = self.retriever.search([query_txt], 1)
+                    search_text = search_text[0]["contents"]
                     print(f"Retrieval result: {search_text}")
+
                 contents = []
                 if search_text:
                     contents.append({'type': 'text', 'text': f"Contents of retrieved documents:\n{' '.join(search_text)}"})
@@ -137,17 +141,25 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
                 input_prompt.append({'role': 'user', 'content': contents})
 
                 try:
-                    response_dict = self.generator.generate([input_prompt], return_dict=True)
-                    response = response_dict["responses"][0]
-                    print(f"response dict: {response_dict}")
+                    response_dict = self.generator.generate([input_prompt], get_hidden_states=get_hidden_states)[0]
+                    response = response_dict["output_text"][0]
+                    print(f"response: {response}")
                     input_prompt.append({"role":"assistant", "content": response})
                 except Exception as e:
-                    print("Inference error:", e)
+                    print("Inference error, hidden states ignored:", e)
                     return response, input_prompt
             else:
                 conversation_num += 1
                 break
             conversation_num += 1
+        if get_hidden_states == True:
+            dict_to_save = response_dict.copy()
+            dict_to_save.pop('output_text', None)
+            file_path = f"{self.config['save_dir']}/hidden_states"
+            os.makedirs(file_path, exist_ok=True)
+            filename = f"{file_path}/hidden_states_{query['id']}.pth"
+            torch.save(dict_to_save, filename)
+            print(f"字典已成功保存到: {filename}")
         pattern = r'(?:<Final Answer>|Final Answer:)\s*(.*?)(?=<|$)'
         final_answer_match = re.search(pattern, response, re.DOTALL)
 
@@ -174,13 +186,16 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
                 self.prompt_template.get_string(item, self.config)
             )
             query_list.append(
-                item.question
+                {
+                    "id": item.id,
+                    "question": item.question
+                }
             )
 
         pred_answer_list = []
         context_list = []
         for i, input_prompt in enumerate(input_prompts):
-            answer, context = self.iterative_infer(input_prompt, query_list[i])
+            answer, context = self.iterative_infer(input_prompt, query_list[i], get_hidden_states=True)
             remove_image_context = context[2:]
             pred_answer_list.append(answer)
             context_list.append(remove_image_context)
