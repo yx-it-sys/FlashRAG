@@ -103,8 +103,8 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         self.generator = get_generator(config) if generator is None else generator
         self.retriever = get_retriever(config) if retriever is None else retriever
     
-    def iterative_infer(self, input_prompt, query, get_hidden_states=False):
-        response_dict = self.generator.generate([input_prompt], get_hidden_states=get_hidden_states)[0]
+    def iterative_infer(self, input_prompt, query, get_hidden_states=False, uncertainty_type=None):
+        response_dict = self.generator.generate([input_prompt], get_hidden_states=get_hidden_states, uncertainty_type=uncertainty_type)[0]
         response = response_dict["output_text"][0]
         print(f"First Response: {response}")
         input_prompt.append({'role': 'assistant', 'content': response})
@@ -141,17 +141,18 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
                 input_prompt.append({'role': 'user', 'content': contents})
 
                 try:
-                    response_dict = self.generator.generate([input_prompt], get_hidden_states=get_hidden_states)[0]
+                    response_dict = self.generator.generate([input_prompt], get_hidden_states=get_hidden_states, uncertainty_type=uncertainty_type)[0]
                     response = response_dict["output_text"][0]
                     print(f"response: {response}")
                     input_prompt.append({"role":"assistant", "content": response})
                 except Exception as e:
                     print("Inference error, hidden states ignored:", e)
-                    return response, input_prompt
+                    return response_dict, input_prompt
             else:
                 conversation_num += 1
                 break
             conversation_num += 1
+        
         if get_hidden_states == True:
             dict_to_save = response_dict.copy()
             dict_to_save.pop('output_text', None)
@@ -160,24 +161,26 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
             filename = f"{file_path}/hidden_states_{query['id']}.pth"
             torch.save(dict_to_save, filename)
             print(f"字典已成功保存到: {filename}")
-        pattern = r'(?:<Final Answer>|Final Answer:)\s*(.*?)(?=<|$)'
-        final_answer_match = re.search(pattern, response, re.DOTALL)
-
-        if final_answer_match:
-            final_answer = final_answer_match.group(1).strip()
-            final_answer = final_answer.replace('\n', '')
-            print(f"Final Answer: {final_answer}")
-            return final_answer, input_prompt
         else:
-            print(f"Warning: reached end of agent loop for item {conversation_num} without a 'Final Answer'. returning last response")
-            return response, input_prompt
+
+            pattern = r'(?:<Final Answer>|Final Answer:)\s*(.*?)(?=<|$)'
+            final_answer_match = re.search(pattern, response, re.DOTALL)
+
+            if final_answer_match:
+                final_answer = final_answer_match.group(1).strip()
+                final_answer = final_answer.replace('\n', '')
+                print(f"Final Answer: {final_answer}")
+                return final_answer, response_dict, input_prompt
+            else:
+                print(f"Warning: reached end of agent loop for item {conversation_num} without a 'Final Answer'. returning last response")
+                return response, response_dict, input_prompt
       
     def safe_write(self, file_path: str, data: dict):
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(data, ensure_ascii=False) + "\n")
             
-    def run(self, dataset, do_eval=True, pred_process_func=None):
+    def run(self, dataset, do_eval=True, pred_process_func=None, uncertainty_type=None):
         input_prompts = []
         query_list = []
         items_list = list(dataset)
@@ -194,22 +197,26 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
 
         pred_answer_list = []
         context_list = []
+        entropy_list = []
         for i, input_prompt in enumerate(input_prompts):
-            answer, context = self.iterative_infer(input_prompt, query_list[i], get_hidden_states=True)
+            answer, response_dict, context = self.iterative_infer(input_prompt, query_list[i], get_hidden_states=False, uncertainty_type=uncertainty_type)
+            print(f"response_dict: {response_dict}")
             remove_image_context = context[2:]
             pred_answer_list.append(answer)
+            entropy_list.append(response_dict["generation_entropy"])
             context_list.append(remove_image_context)
             # print(f"Answer: {answer}")
-
+        result_data = {}
         for i, item in enumerate(items_list):
-            result_data = {
-                "id": item.id,
-                "question": item.question,
-                "image_id": item.image_id,
-                "ans_full": item.golden_answers,
-                "prediction": pred_answer_list[i],
-                "context": context_list[i],
-            }
+            result_data["id"] = item.id
+            result_data["question"] = item.question
+            result_data["image_id"] = item.image_id
+            result_data["ans_full"] = item.golden_answers
+            result_data["prediction"] = pred_answer_list[i]
+            result_data["context"] = context_list[i]
+            if uncertainty_type == "entropy":
+                result_data["generation_entropy"] = entropy_list[i]
+            
             file_path = os.path.join(self.config["save_dir"], "output.jsonl")
             print(f"Saving to {file_path}")
             self.safe_write(file_path, result_data)
@@ -218,5 +225,3 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
         return dataset
     
-    def uncertainty(self, dataset):
-        pass

@@ -39,7 +39,7 @@ def main(args):
     pipeline = OmniSearchPipeline(config, prompt_template=prompt_templete)
 
 
-    output_dataset = pipeline.run(test_data, do_eval=True)
+    output_dataset = pipeline.run(test_data, do_eval=True, uncertainty_type="entropy")
     # uncertainty = pipeline.uncertainty(test_data, do_eval=True)
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ import importlib
 from copy import deepcopy
 import warnings
 import math
+import torch.nn.functional as F
 from tqdm import tqdm
 from tqdm.auto import trange
 import numpy as np
@@ -90,7 +91,7 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
         self.processor.tokenizer.model_max_length = self.max_input_len
         self.tokenizer = self.processor.tokenizer
     @torch.inference_mode(mode=True)
-    def generate(self, input_list, get_hidden_states=False, **params):
+    def generate(self, input_list, uncertainty_type=None, get_hidden_states=False, **params):
         prompts = [self.tokenizer.apply_chat_template(
             messages,
             add_generation_prompt=True,
@@ -112,43 +113,75 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
             padding=True,
             return_tensors="pt"
         ).to(self.model.device)
-        params['temperature'] = 0.0
-        params['do_sample'] = False
-        outputs = self.model.generate(
-            **inputs,
-            eos_token_id=self.tokenizer.eos_token_id,
-            pad_token_id=self.tokenizer.pad_token_id,
-            **params
-        )
-        generated_ids_trimmed = [out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, outputs)]
-        output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
-        output_dict = {}
-        # Get Hidden_states
-        if get_hidden_states == True:
-            full_sequence_ids = outputs
-            full_attention_mask = (full_sequence_ids != self.tokenizer.pad_token_id).long()
-            with torch.no_grad():
-                outputs_with_states = self.model(
-                    input_ids=full_sequence_ids,
-                    attention_mask=full_attention_mask,
-                    output_hidden_states=True
-                )
-            hidden_states = outputs_with_states.hidden_states
-            k=100
-            top_k_logits_values, top_k_indices = torch.topk(outputs_with_states.logits, k, dim=-1)
-            output_dict = {
-                "output_text": output_text,
-                "hidden_states": hidden_states,
-                "top_k_logits_values": top_k_logits_values,
-                "top_k_logits_indices": top_k_indices,
-                "full_sequence_ids": outputs
-            }
-        else:
-            output_dict =  {
-                "output_text": output_text
-            }
-        return output_dict
 
+        if uncertainty_type=="entropy":
+            params['return_dict_in_generate']=True
+            params['output_scores']=True
+            outputs_obj = self.model.generate(
+                **inputs,
+                eos_token_id=self.tokenizer.eos_token_id,
+                pad_token_id=self.tokenizer.pad_token_id,
+                **params
+            )
+            outputs = outputs_obj.sequences
+            generated_ids_trimmed = [out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, outputs)]
+            output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
+            output_dict = {}
+            scores = outputs_obj.scores
+            stacked_scores = torch.stack(scores, dim=0)
+            per_step_logits = stacked_scores.permute(1, 0, 2)
+            per_step_logits = F.softmax(per_step_logits, dim=-1)
+            step_entropies = torch.distributions.Categorical(probs=per_step_logits).entropy()
+            average_entropies = []
+            for i, gen_ids in enumerate(generated_ids_trimmed):
+                if len(gen_ids) > 0:
+                    valid_entropies = step_entropies[i, :len(gen_ids)]
+                    average_entropies.append(valid_entropies.mean().item())
+                else:
+                    average_entropies.append(0.0)
+            output_dict["generation_entropy"] = average_entropies[0] if len(average_entropies) == 1 else average_entropies
+            output_dict["output_text"] = output_text
+            
+            return output_dict
+
+        else:
+            params['temperature'] = 0.0
+            params['do_sample'] = False
+            outputs = self.model.generate(
+                **inputs,
+                eos_token_id=self.tokenizer.eos_token_id,
+                pad_token_id=self.tokenizer.pad_token_id,
+                **params
+            )
+            generated_ids_trimmed = [out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, outputs)]
+            output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
+            output_dict = {}
+            # Get Hidden_states
+            if get_hidden_states == True:
+                full_sequence_ids = outputs
+                full_attention_mask = (full_sequence_ids != self.tokenizer.pad_token_id).long()
+                with torch.no_grad():
+                    outputs_with_states = self.model(
+                        input_ids=full_sequence_ids,
+                        attention_mask=full_attention_mask,
+                        output_hidden_states=True
+                    )
+                hidden_states = outputs_with_states.hidden_states
+                k=100
+                top_k_logits_values, top_k_indices = torch.topk(outputs_with_states.logits, k, dim=-1)
+                output_dict = {
+                    "output_text": output_text,
+                    "hidden_states": hidden_states,
+                    "top_k_logits_values": top_k_logits_values,
+                    "top_k_logits_indices": top_k_indices,
+                    "full_sequence_ids": outputs
+                }
+            else:
+                output_dict =  {
+                    "output_text": output_text
+                }
+            return output_dict
+        
 class InternVL2InferenceEngine(BaseInferenceEngine):
     def _load_model(self):
         import torch
