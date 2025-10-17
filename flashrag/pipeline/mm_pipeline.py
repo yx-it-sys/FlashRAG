@@ -1,9 +1,13 @@
 from flashrag.evaluator import Evaluator
 from flashrag.utils import get_retriever, get_generator
+from flashrag.uncertainty import integrated_gradient_process
+from transformers import AutoTokenizer, AutoProcessor, AutoModelForVision2Seq
+from accelerate import Accelerator
 import re
 import os
 import json
 import torch
+from PIL import Image
 
 class BasicMultiModalPipeline:
     """Base object of all multimodal pipelines. A pipeline includes the overall process of RAG.
@@ -95,7 +99,7 @@ class MMSequentialPipeline(BasicMultiModalPipeline):
         dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)
 
         return dataset
-    
+
 class OmniSearchPipeline(BasicMultiModalPipeline):
     def __init__(self, config, prompt_template=None, retriever=None, generator=None):
         super().__init__(config, prompt_template)
@@ -103,11 +107,11 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         self.generator = get_generator(config) if generator is None else generator
         self.retriever = get_retriever(config) if retriever is None else retriever
     
-    def iterative_infer(self, input_prompt, query, get_hidden_states=False, uncertainty_type=None):
+    def iterative_infer(self, input_prompt, get_hidden_states=False, uncertainty_type=None):
         response_dict = self.generator.generate([input_prompt], get_hidden_states=get_hidden_states, uncertainty_type=uncertainty_type)[0]
         response = response_dict["output_text"][0]
         print(f"First Response: {response}")
-        input_prompt.append({'role': 'assistant', 'content': response})
+        input_prompt["input_prompt"].append({'role': 'assistant', 'content': response})
         
         conversation_num, max_turns = 0, 5
         while conversation_num < max_turns:
@@ -124,7 +128,7 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
                     print(f"Query Text: {query_txt}")
                 if query_txt == "":
                     print(f"Query_txt is None")
-                    search_text = self.retriever.search([query["question"]], 2)
+                    search_text = self.retriever.search(input_prompt["question"], 2)
                     search_text = search_text[0]["contents"]
                     print(f"Retrieval result: {search_text}")
                 else:
@@ -138,16 +142,16 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
                 else:
                     contents.append({'type': 'text', 'text': "No relevant information found."})    
 
-                input_prompt.append({'role': 'user', 'content': contents})
+                input_prompt["input_prompt"].append({'role': 'user', 'content': contents})
 
                 try:
                     response_dict = self.generator.generate([input_prompt], get_hidden_states=get_hidden_states, uncertainty_type=uncertainty_type)[0]
                     response = response_dict["output_text"][0]
                     print(f"response: {response}")
-                    input_prompt.append({"role":"assistant", "content": response})
+                    input_prompt["input_prompt"].append({"role":"assistant", "content": response})
                 except Exception as e:
                     print("Inference error, hidden states ignored:", e)
-                    return response_dict, input_prompt
+                    return response_dict, input_prompt["input_prompt"]
             else:
                 conversation_num += 1
                 break
@@ -158,7 +162,7 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
             dict_to_save.pop('output_text', None)
             file_path = f"{self.config['save_dir']}/hidden_states"
             os.makedirs(file_path, exist_ok=True)
-            filename = f"{file_path}/hidden_states_{query['id']}.pth"
+            filename = f"{file_path}/hidden_states_{input_prompt['id']}.pth"
             torch.save(dict_to_save, filename)
             print(f"字典已成功保存到: {filename}")
         else:
@@ -182,28 +186,28 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
             
     def run(self, dataset, do_eval=True, pred_process_func=None, uncertainty_type=None):
         input_prompts = []
-        query_list = []
         items_list = list(dataset)
         for item in dataset:
-            input_prompts.append(
-                self.prompt_template.get_string(item, self.config)
-            )
-            query_list.append(
-                {
-                    "id": item.id,
-                    "question": item.question
+            input_prompts.append({
+                "id": item.id,
+                "question": item.question,
+                "answers": item.golden_answers[0],
+                "input_prompt": self.prompt_template.get_string(item, self.config)
                 }
             )
-
         pred_answer_list = []
         context_list = []
-        entropy_list = []
+        uncertainty_score_list = []
+
         for i, input_prompt in enumerate(input_prompts):
-            answer, response_dict, context = self.iterative_infer(input_prompt, query_list[i], get_hidden_states=False, uncertainty_type=uncertainty_type)
+            answer, response_dict, context = self.iterative_infer(input_prompt, get_hidden_states=False, uncertainty_type=uncertainty_type)
             print(f"response_dict: {response_dict}")
             remove_image_context = context[2:]
             pred_answer_list.append(answer)
-            entropy_list.append(response_dict["generation_entropy"])
+            if uncertainty_type == "entropy":
+                uncertainty_score_list.append(response_dict["generation_entropy"])
+            elif uncertainty_type == "ig_text":
+                uncertainty_score_list.append(response_dict["ig_score"])
             context_list.append(remove_image_context)
             # print(f"Answer: {answer}")
         result_data = {}
@@ -215,8 +219,9 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
             result_data["prediction"] = pred_answer_list[i]
             result_data["context"] = context_list[i]
             if uncertainty_type == "entropy":
-                result_data["generation_entropy"] = entropy_list[i]
-            
+                result_data["generation_entropy"] = uncertainty_score_list[i]
+            elif uncertainty_type == "ig_text":
+                result_data["ig_text_entropy"] = uncertainty_score_list[i]
             file_path = os.path.join(self.config["save_dir"], "output.jsonl")
             print(f"Saving to {file_path}")
             self.safe_write(file_path, result_data)
@@ -224,4 +229,68 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         dataset.update_output("pred", pred_answer_list)
         dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
         return dataset
+    
+class OmniSearchIGPipeline(OmniSearchPipeline):
+    def __init__(self, config, prompt_template=None):
+        super().__init__(config, prompt_template)
+        self.config = config
+        self.model = AutoModelForVision2Seq.from_pretrained(
+            config["generator_model_path"],
+            torch_dtype=torch.float32,
+            device_map="auto",
+        )
+        self.processor = AutoProcessor.from_pretrained(config["generator_model_path"], local_files_only=True)
+        accelerator = Accelerator()
+        model, processor = accelerator.prepare(model, processor)
+        if hasattr(processor, "tokenizer"):
+            self.tokenizer = processor.tokenizer
+        else:
+            self.tokenizer = AutoTokenizer.from_pretrained(config["generator_model_path"], local_files_only=True)        
+
+    def run(self, dataset, do_eval=True, pred_process_func=None, uncertainty_type=None):
+        input_prompts = []
+        items_list = list(dataset)
+        for item in dataset:
+            input_prompts.append({
+                "id": item.id,
+                "question": item.question,
+                "answers": item.golden_answers[0],
+                "input_prompt": self.prompt_template.get_string(item, self.config)
+                }
+            )
+        pred_answer_list = []
+        messages_prompt_list = []
+        uncertainty_score_list = []
+        id_list = []
+
+        with open("output.jsonl", "r", encoding="utf-8") as f:
+            for line in f:
+                data = json.loads(line)
+                pred_answer_list.append(data.get("prediction"))
+                messages_prompt_list.append(data.get("context"))
+                id_list.append(data.get("id"))
+
+        for _id, (messages, pred_answer) in zip(id_list, zip(messages_prompt_list, pred_answer_list)):
+            image_path = os.path.join(self.config["image_path"], f"{_id}.jpg")
+            image = Image.open(image_path).convert('RGB')
+            attributions = integrated_gradient_process(self.model, self.processor, self.tokenizer, image, messages, pred_answer)
+
+        result_data = {}
+        for i, item in enumerate(items_list):
+            result_data["id"] = item.id
+            result_data["question"] = item.question
+            result_data["image_id"] = item.image_id
+            result_data["ans_full"] = item.golden_answers
+            result_data["prediction"] = pred_answer_list[i]
+            result_data["context"] = messages_prompt_list[i]
+            result_data["ig_text_entropy"] = uncertainty_score_list[i]
+            file_path = os.path.join(self.config["save_dir"], "output.jsonl")
+            print(f"Saving to {file_path}")
+            self.safe_write(file_path, result_data)
+        
+        dataset.update_output("pred", pred_answer_list)
+        dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
+        return dataset
+
+
     

@@ -2,8 +2,9 @@ import argparse
 import tomllib
 from flashrag.config import Config
 from flashrag.utils import get_dataset
-from flashrag.pipeline import OmniSearchPipeline
+from flashrag.pipeline import OmniSearchPipeline, OmniSearchIGPipeline
 from flashrag.prompt import MMPromptTemplate
+
 def load_prompt(prompt_name: str) -> str:
     with open("omni_prompt.toml", "rb") as f:
         prompts_data = tomllib.load(f)
@@ -25,7 +26,7 @@ def main(args):
 
     config = Config("my_config.yaml", config_dict=config_dict)
     all_split = get_dataset(config)
-    test_data = all_split["dev"]
+    test_data = all_split["test"]
 
     base_sys_prompt = load_prompt("multimodal_qa")
     
@@ -37,9 +38,9 @@ def main(args):
 
 
     pipeline = OmniSearchPipeline(config, prompt_template=prompt_templete)
+    pipeline = OmniSearchIGPipeline(config, prompt_templete)
 
-
-    output_dataset = pipeline.run(test_data, do_eval=True, uncertainty_type="entropy")
+    output_dataset = pipeline.run(test_data, do_eval=True, uncertainty_type="ig")
     # uncertainty = pipeline.uncertainty(test_data, do_eval=True)
 
 if __name__ == "__main__":

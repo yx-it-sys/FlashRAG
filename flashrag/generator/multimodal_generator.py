@@ -18,6 +18,7 @@ import importlib
 import base64
 from io import BytesIO
 from flashrag.generator.utils import convert_image_to_base64, process_image, resolve_max_tokens, process_image_pil
+from flashrag.uncertainty.integrated_gradient import integrated_gradient_process
 
 class BaseMultiModalGenerator:
     """`BaseMultiModalGenerator` is a base object of Generator model."""
@@ -72,7 +73,7 @@ class BaseInferenceEngine:
         pass
 
     @abstractmethod
-    @torch.inference_mode(mode=True)
+    # @torch.inference_mode(mode=True)
     def generate(self, input_list: list, batch_size=None, **params):
         pass
 
@@ -90,63 +91,80 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
         self.processor = Qwen2_5_VLProcessor.from_pretrained(self.model_path, trust_remote_code=True, min_pixels=min_pixels, max_pixels=max_pixels)
         self.processor.tokenizer.model_max_length = self.max_input_len
         self.tokenizer = self.processor.tokenizer
-    @torch.inference_mode(mode=True)
     def generate(self, input_list, uncertainty_type=None, get_hidden_states=False, **params):
-        prompts = [self.tokenizer.apply_chat_template(
-            messages,
-            add_generation_prompt=True,
-            tokenize=False
-        )for messages in input_list]
-        images_list = []
-        for messages in input_list:
-            conversation_images = []
-            for message in messages:
-                if isinstance(message['content'], list):
-                    for content_dict in message['content']:
-                        if content_dict['type'] == 'image':
-                            conversation_images.append(content_dict['image'])
-            images_list.append(conversation_images)
-
-        inputs = self.processor(
-            text=prompts,
-            images=images_list,
-            padding=True,
-            return_tensors="pt"
-        ).to(self.model.device)
-
-        if uncertainty_type=="entropy":
-            params['return_dict_in_generate']=True
-            params['output_scores']=True
-            outputs_obj = self.model.generate(
-                **inputs,
-                eos_token_id=self.tokenizer.eos_token_id,
-                pad_token_id=self.tokenizer.pad_token_id,
-                **params
-            )
-            outputs = outputs_obj.sequences
-            generated_ids_trimmed = [out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, outputs)]
-            output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
-            output_dict = {}
-            scores = outputs_obj.scores
-            stacked_scores = torch.stack(scores, dim=0)
-            per_step_logits = stacked_scores.permute(1, 0, 2)
-            per_step_logits = F.softmax(per_step_logits, dim=-1)
-            step_entropies = torch.distributions.Categorical(probs=per_step_logits).entropy()
-            average_entropies = []
-            for i, gen_ids in enumerate(generated_ids_trimmed):
-                if len(gen_ids) > 0:
-                    valid_entropies = step_entropies[i, :len(gen_ids)]
-                    average_entropies.append(valid_entropies.mean().item())
-                else:
-                    average_entropies.append(0.0)
-            output_dict["generation_entropy"] = average_entropies[0] if len(average_entropies) == 1 else average_entropies
-            output_dict["output_text"] = output_text
+        if uncertainty_type == "ig":
+            images_list = []
+            pure_input_list = []
+            for messages in input_list:
+                messages = messages[0]
+                messages = messages["input_prompt"]
+                pure_input_list.append(messages)
+                conversation_images = []
+                for message in messages:
+                    if isinstance(message['content'], list):
+                        for content_dict in message['content']:
+                            if content_dict['type'] == 'image':
+                                conversation_images.append(content_dict['image'])
+                images_list.append(conversation_images)
             
-            return output_dict
-
+            print(f"input list: {input_list}")
+            response = integrated_gradient_process(model_dir="models/Qwen2.5-VL-7B-Instruct", image=images_list[0], input_prompt=pure_input_list[0], answer=input_list[0][0]['answers'])
+            return response
         else:
-            params['temperature'] = 0.0
-            params['do_sample'] = False
+            prompts = [self.tokenizer.apply_chat_template(
+                messages[0]["input_prompt"],
+                add_generation_prompt=True,
+                tokenize=False
+            )for messages in input_list]
+            images_list = []
+            pure_input_list = []
+            for messages in input_list:
+                messages = messages[0]
+                messages = messages["input_prompt"]
+                pure_input_list.append(messages)
+                conversation_images = []
+                for message in messages:
+                    if isinstance(message['content'], list):
+                        for content_dict in message['content']:
+                            if content_dict['type'] == 'image':
+                                conversation_images.append(content_dict['image'])
+                images_list.append(conversation_images)
+
+            inputs = self.processor(
+                text=prompts,
+                images=images_list,
+                padding=True,
+                return_tensors="pt"
+            ).to(self.model.device)
+
+            output_dict = {}
+
+            if uncertainty_type=="entropy":
+                params['return_dict_in_generate']=True
+                params['output_scores']=True
+                outputs_obj = self.model.generate(
+                    **inputs,
+                    eos_token_id=self.tokenizer.eos_token_id,
+                    pad_token_id=self.tokenizer.pad_token_id,
+                    **params
+                )
+                outputs = outputs_obj.sequences
+                generated_ids_trimmed = [out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, outputs)]
+                output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
+                scores = outputs_obj.scores
+                stacked_scores = torch.stack(scores, dim=0)
+                per_step_logits = stacked_scores.permute(1, 0, 2)
+                per_step_logits = F.softmax(per_step_logits, dim=-1)
+                step_entropies = torch.distributions.Categorical(probs=per_step_logits).entropy()
+                average_entropies = []
+                for i, gen_ids in enumerate(generated_ids_trimmed):
+                    if len(gen_ids) > 0:
+                        valid_entropies = step_entropies[i, :len(gen_ids)]
+                        average_entropies.append(valid_entropies.mean().item())
+                    else:
+                        average_entropies.append(0.0)
+                output_dict["generation_entropy"] = average_entropies[0] if len(average_entropies) == 1 else average_entropies
+                
             outputs = self.model.generate(
                 **inputs,
                 eos_token_id=self.tokenizer.eos_token_id,
@@ -169,17 +187,12 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
                 hidden_states = outputs_with_states.hidden_states
                 k=100
                 top_k_logits_values, top_k_indices = torch.topk(outputs_with_states.logits, k, dim=-1)
-                output_dict = {
-                    "output_text": output_text,
-                    "hidden_states": hidden_states,
-                    "top_k_logits_values": top_k_logits_values,
-                    "top_k_logits_indices": top_k_indices,
-                    "full_sequence_ids": outputs
-                }
-            else:
-                output_dict =  {
-                    "output_text": output_text
-                }
+                output_dict["hidden_states"] = hidden_states
+                output_dict["top_k_logits_values"] = top_k_logits_values
+                output_dict["top_k_logits_indices"] = top_k_indices
+                output_dict["full_sequence_ids"] = outputs
+            
+            output_dict["output_text"] = output_text
             return output_dict
         
 class InternVL2InferenceEngine(BaseInferenceEngine):
@@ -459,7 +472,7 @@ class HFMultiModalGenerator(BaseMultiModalGenerator):
             max_input_len=self.max_input_len
         )
 
-    @torch.inference_mode(mode=True)
+    # @torch.inference_mode(mode=True)
     def generate(
         self,
         input_list: list,
@@ -500,6 +513,7 @@ class HFMultiModalGenerator(BaseMultiModalGenerator):
         # preprocess input list
         from PIL import Image
         for messages in input_list:
+            messages = messages[0]["input_prompt"]
             for message in messages:
                 if isinstance(message['content'], list):
                     for content_dict in message['content']:
