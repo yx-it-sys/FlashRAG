@@ -82,89 +82,75 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
         from transformers import Qwen2_5_VLProcessor, Qwen2_5_VLForConditionalGeneration
         self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
             self.model_path,
-            torch_dtype='auto',
+            torch_dtype=torch.bfloat16,
             device_map='auto',
             trust_remote_code=True
         ).eval()
+
         min_pixels = 3136
         max_pixels = 12845056
         self.processor = Qwen2_5_VLProcessor.from_pretrained(self.model_path, trust_remote_code=True, min_pixels=min_pixels, max_pixels=max_pixels)
         self.processor.tokenizer.model_max_length = self.max_input_len
         self.tokenizer = self.processor.tokenizer
     def generate(self, input_list, uncertainty_type=None, get_hidden_states=False, **params):
-        if uncertainty_type == "ig":
-            images_list = []
-            pure_input_list = []
-            for messages in input_list:
-                messages = messages[0]
-                messages = messages["input_prompt"]
-                pure_input_list.append(messages)
-                conversation_images = []
-                for message in messages:
-                    if isinstance(message['content'], list):
-                        for content_dict in message['content']:
-                            if content_dict['type'] == 'image':
-                                conversation_images.append(content_dict['image'])
-                images_list.append(conversation_images)
+        prompts = [self.tokenizer.apply_chat_template(
+            messages[0]["input_prompt"],
+            add_generation_prompt=True,
+            tokenize=False
+        )for messages in input_list]
+        images_list = []
+        pure_input_list = []
+        for messages in input_list:
+            messages = messages[0]
+            messages = messages["input_prompt"]
+            pure_input_list.append(messages)
+            conversation_images = []
+            for message in messages:
+                if isinstance(message['content'], list):
+                    for content_dict in message['content']:
+                        if content_dict['type'] == 'image':
+                            conversation_images.append(content_dict['image'])
+            images_list.append(conversation_images)
+
+        inputs = self.processor(
+            text=prompts,
+            images=images_list,
+            padding=True,
+            return_tensors="pt"
+        ).to(self.model.device)
+
+        output_dict = {}
+
+        if uncertainty_type=="entropy":
+            params['return_dict_in_generate']=True
+            params['output_scores']=True
+            outputs_obj = self.model.generate(
+                **inputs,
+                eos_token_id=self.tokenizer.eos_token_id,
+                pad_token_id=self.tokenizer.pad_token_id,
+                **params
+            )
+            outputs = outputs_obj.sequences
+            generated_ids_trimmed = [out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, outputs)]
+            scores = outputs_obj.scores
+            stacked_scores = torch.stack(scores, dim=0)
+            per_step_logits = stacked_scores.permute(1, 0, 2)
+            per_step_logits = F.softmax(per_step_logits, dim=-1)
+            step_entropies = torch.distributions.Categorical(probs=per_step_logits).entropy()
+            average_entropies = []
+            for i, gen_ids in enumerate(generated_ids_trimmed):
+                if len(gen_ids) > 0:
+                    valid_entropies = step_entropies[i, :len(gen_ids)]
+                    average_entropies.append(valid_entropies.mean().item())
+                else:
+                    average_entropies.append(0.0)
+            output_dict["generation_entropy"] = average_entropies[0] if len(average_entropies) == 1 else average_entropies
             
-            print(f"input list: {input_list}")
-            response = integrated_gradient_process(model_dir="models/Qwen2.5-VL-7B-Instruct", image=images_list[0], input_prompt=pure_input_list[0], answer=input_list[0][0]['answers'])
-            return response
-        else:
-            prompts = [self.tokenizer.apply_chat_template(
-                messages[0]["input_prompt"],
-                add_generation_prompt=True,
-                tokenize=False
-            )for messages in input_list]
-            images_list = []
-            pure_input_list = []
-            for messages in input_list:
-                messages = messages[0]
-                messages = messages["input_prompt"]
-                pure_input_list.append(messages)
-                conversation_images = []
-                for message in messages:
-                    if isinstance(message['content'], list):
-                        for content_dict in message['content']:
-                            if content_dict['type'] == 'image':
-                                conversation_images.append(content_dict['image'])
-                images_list.append(conversation_images)
+            generated_ids_trimmed = [out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, outputs_obj)]
+            output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
+            output_dict["output_text"] = output_text
 
-            inputs = self.processor(
-                text=prompts,
-                images=images_list,
-                padding=True,
-                return_tensors="pt"
-            ).to(self.model.device)
-
-            output_dict = {}
-
-            if uncertainty_type=="entropy":
-                params['return_dict_in_generate']=True
-                params['output_scores']=True
-                outputs_obj = self.model.generate(
-                    **inputs,
-                    eos_token_id=self.tokenizer.eos_token_id,
-                    pad_token_id=self.tokenizer.pad_token_id,
-                    **params
-                )
-                outputs = outputs_obj.sequences
-                generated_ids_trimmed = [out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, outputs)]
-                output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
-                scores = outputs_obj.scores
-                stacked_scores = torch.stack(scores, dim=0)
-                per_step_logits = stacked_scores.permute(1, 0, 2)
-                per_step_logits = F.softmax(per_step_logits, dim=-1)
-                step_entropies = torch.distributions.Categorical(probs=per_step_logits).entropy()
-                average_entropies = []
-                for i, gen_ids in enumerate(generated_ids_trimmed):
-                    if len(gen_ids) > 0:
-                        valid_entropies = step_entropies[i, :len(gen_ids)]
-                        average_entropies.append(valid_entropies.mean().item())
-                    else:
-                        average_entropies.append(0.0)
-                output_dict["generation_entropy"] = average_entropies[0] if len(average_entropies) == 1 else average_entropies
-                
+        else:   
             outputs = self.model.generate(
                 **inputs,
                 eos_token_id=self.tokenizer.eos_token_id,
@@ -191,9 +177,9 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
                 output_dict["top_k_logits_values"] = top_k_logits_values
                 output_dict["top_k_logits_indices"] = top_k_indices
                 output_dict["full_sequence_ids"] = outputs
-            
+        
             output_dict["output_text"] = output_text
-            return output_dict
+        return output_dict
         
 class InternVL2InferenceEngine(BaseInferenceEngine):
     def _load_model(self):
@@ -472,7 +458,7 @@ class HFMultiModalGenerator(BaseMultiModalGenerator):
             max_input_len=self.max_input_len
         )
 
-    # @torch.inference_mode(mode=True)
+    @torch.inference_mode(mode=True)
     def generate(
         self,
         input_list: list,

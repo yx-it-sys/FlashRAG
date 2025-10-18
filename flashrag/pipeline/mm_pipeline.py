@@ -230,24 +230,25 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
         return dataset
     
-class OmniSearchIGPipeline(OmniSearchPipeline):
+class OmniSearchIGPipeline(BasicMultiModalPipeline):
     def __init__(self, config, prompt_template=None):
         super().__init__(config, prompt_template)
         self.config = config
+        print(f"I'm going to initialize in OmniSearchIGPipeline.")
         self.model = AutoModelForVision2Seq.from_pretrained(
             config["generator_model_path"],
-            torch_dtype=torch.float32,
+            torch_dtype=torch.bfloat16,
             device_map="auto",
         )
         self.processor = AutoProcessor.from_pretrained(config["generator_model_path"], local_files_only=True)
         accelerator = Accelerator()
-        model, processor = accelerator.prepare(model, processor)
-        if hasattr(processor, "tokenizer"):
-            self.tokenizer = processor.tokenizer
+        self.model, self.processor = accelerator.prepare(self.model, self.processor)
+        if hasattr(self.processor, "tokenizer"):
+            self.tokenizer = self.processor.tokenizer
         else:
             self.tokenizer = AutoTokenizer.from_pretrained(config["generator_model_path"], local_files_only=True)        
 
-    def run(self, dataset, do_eval=True, pred_process_func=None, uncertainty_type=None):
+    def run(self, dataset, do_eval=True, pred_process_func=None, prompt_answer_path=None):
         input_prompts = []
         items_list = list(dataset)
         for item in dataset:
@@ -263,7 +264,7 @@ class OmniSearchIGPipeline(OmniSearchPipeline):
         uncertainty_score_list = []
         id_list = []
 
-        with open("output.jsonl", "r", encoding="utf-8") as f:
+        with open(prompt_answer_path, "r", encoding="utf-8") as f:
             for line in f:
                 data = json.loads(line)
                 pred_answer_list.append(data.get("prediction"))
@@ -274,6 +275,8 @@ class OmniSearchIGPipeline(OmniSearchPipeline):
             image_path = os.path.join(self.config["image_path"], f"{_id}.jpg")
             image = Image.open(image_path).convert('RGB')
             attributions = integrated_gradient_process(self.model, self.processor, self.tokenizer, image, messages, pred_answer)
+            uncertainty_score_list.append(attributions)
+            print(f"unceratinty IG: {uncertainty_score_list}")
 
         result_data = {}
         for i, item in enumerate(items_list):

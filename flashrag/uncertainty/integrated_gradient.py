@@ -1,9 +1,26 @@
 from torch.nn.functional import log_softmax
-from transformers import AutoTokenizer, AutoProcessor, AutoModelForVision2Seq
 import torch
-from accelerate import Accelerator
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-def apply_integrated_gradients(model, inputs_embeds, attention_mask, target_token_id, steps=50):
+def visualize_attributions(tokens, scores):
+    data = {"Token": tokens, "Importance": scores}
+    df = pd.DataFrame(data).T
+    df.columns = df.iloc[0]
+    df = df.drop("Token")
+    df = df.astype(float)
+
+    plt.figure(figsize=(20,2))
+    sns.heatmap(df, annot=True, fmt=".4f", cmap="viridis", cbar=False)
+    plt.title("Token Importances (Attributions)")
+    plt.xticks(rotation=45, ha="right")
+    plt.tight_layout()
+    # plt.show()
+    plt.savefig("token_attributions.png") # 保存为图片
+    print("Attribution visualization saved to token_attributions.png")
+
+def apply_integrated_gradients(model, inputs_embeds, attention_mask, target_token_id, steps=10):
     baseline = torch.zeros_like(inputs_embeds)
     total_grads = torch.zeros_like(inputs_embeds)
 
@@ -11,7 +28,7 @@ def apply_integrated_gradients(model, inputs_embeds, attention_mask, target_toke
         interpolated = baseline + alpha * (inputs_embeds - baseline)
         with torch.enable_grad():
             interpolated.requires_grad_(True)
-
+            interpolated.retain_grad()
             logits = model(inputs_embeds=interpolated, attention_mask=attention_mask).logits[0, -1]
             log_prob = log_softmax(logits, dim=-1)[target_token_id]
 
@@ -20,7 +37,13 @@ def apply_integrated_gradients(model, inputs_embeds, attention_mask, target_toke
 
         if interpolated.grad is not None:
             total_grads += interpolated.grad
-
+        else:
+            import warnings
+            warnings.warn("interpolated.grad is still None after retain_grad(). Check the computation graph.")
+    
+    del interpolated, logits, log_prob
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
     avg_grads = total_grads / steps
     return (inputs_embeds - baseline) * avg_grads
 
@@ -53,8 +76,21 @@ def integrated_gradient_process(model, processor, tokenizer, image, input_prompt
 
     attributions = apply_integrated_gradients(model, embeddings, attention_mask, answer_id)[0]
 
-    print(f"Attributions: {attributions}")
-    return attributions
+    # 计算每个Prompt Token嵌入的2范数
+    token_importance_scores = torch.norm(attributions, p=2, dim=1)
 
+    # 计算IG熵
+    total_ig_score = torch.sum(token_importance_scores)
+    if total_ig_score == 0:
+        ig_entropy = 0.0
+    else:
+        probabilities = token_importance_scores / total_ig_score
+        log_probs = torch.xlogy(probabilities, probabilities)
+
+        ig_entropy_tensor = torch.sum(log_probs)
+        ig_entropy = ig_entropy_tensor.item()
+    
+
+    return ig_entropy
 
 
