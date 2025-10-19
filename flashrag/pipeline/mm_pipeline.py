@@ -99,7 +99,7 @@ class MMSequentialPipeline(BasicMultiModalPipeline):
         dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)
 
         return dataset
-
+    
 class OmniSearchPipeline(BasicMultiModalPipeline):
     def __init__(self, config, prompt_template=None, retriever=None, generator=None):
         super().__init__(config, prompt_template)
@@ -201,8 +201,7 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
 
         for i, input_prompt in enumerate(input_prompts):
             answer, response_dict, context = self.iterative_infer(input_prompt, get_hidden_states=False, uncertainty_type=uncertainty_type)
-            print(f"response_dict: {response_dict}")
-            remove_image_context = context[2:]
+            remove_image_context = context['input_prompt'][2:]
             pred_answer_list.append(answer)
             if uncertainty_type == "entropy":
                 uncertainty_score_list.append(response_dict["generation_entropy"])
@@ -229,12 +228,53 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         dataset.update_output("pred", pred_answer_list)
         dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
         return dataset
-    
+
+    def naive_run(self, dataset, do_eval=True, pred_process_func=None, uncertainty_type=None):        
+        input_prompts = []
+        items_list = list(dataset)
+        for item in dataset:
+            input_prompts.append({
+                "id": item.id,
+                "question": item.question,
+                "answers": item.golden_answers[0],
+                "input_prompt": self.prompt_template.get_string(item, self.config)
+                }
+            )
+        pred_answer_list = []
+        uncertainty_score_list = []
+
+        for i, input_prompt in enumerate(input_prompts):
+            pred_answer = self.generator.generate([input_prompt], uncertainty_type=uncertainty_type)
+            pred_answer_list.append(pred_answer[0]['output_text'][0])
+            if uncertainty_type == "entropy":
+                uncertainty_score_list.append(pred_answer[0]["generation_entropy"])
+            elif uncertainty_type == "ig_text":
+                uncertainty_score_list.append(pred_answer[0]["ig_score"])
+        
+        result_data = {}
+        for i, item in enumerate(items_list):
+            result_data["id"] = item.id
+            result_data["question"] = item.question
+            result_data["image_id"] = item.image_id
+            result_data["ans_full"] = item.golden_answers
+            result_data["prediction"] = pred_answer_list[i]
+            if uncertainty_type == "entropy":
+                result_data["generation_entropy"] = uncertainty_score_list[i]
+            elif uncertainty_type == "ig_text":
+                result_data["ig_text_entropy"] = uncertainty_score_list[i]
+            file_path = os.path.join(self.config["save_dir"], "output.jsonl")
+            print(f"Saving to {file_path}")
+            self.safe_write(file_path, result_data)
+        
+        dataset.update_output("pred", pred_answer_list)
+        dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
+        return dataset
+
+        
 class OmniSearchIGPipeline(BasicMultiModalPipeline):
     def __init__(self, config, prompt_template=None):
         super().__init__(config, prompt_template)
         self.config = config
-        print(f"I'm going to initialize in OmniSearchIGPipeline.")
         self.model = AutoModelForVision2Seq.from_pretrained(
             config["generator_model_path"],
             torch_dtype=torch.bfloat16,
@@ -247,6 +287,43 @@ class OmniSearchIGPipeline(BasicMultiModalPipeline):
             self.tokenizer = self.processor.tokenizer
         else:
             self.tokenizer = AutoTokenizer.from_pretrained(config["generator_model_path"], local_files_only=True)        
+    
+    def naive_run(self, dataset, generated_answers_list=None, do_eval=True, pred_process_func=None):        
+        input_prompts = []
+        items_list = list(dataset)
+        for item in dataset:
+            input_prompts.append({
+                "id": item.id,
+                "question": item.question,
+                "answers": item.golden_answers[0],
+                "input_prompt": self.prompt_template.get_string(item, self.config)
+                }
+            )
+        uncertainty_score_list = []
+
+        for i, input_prompt in enumerate(input_prompts):
+            if generated_answers_list is None:
+                golden_answer = input_prompt["answers"]
+            else:
+                golden_answer = generated_answers_list[i]
+            attributions = integrated_gradient_process(self.model, self.processor, self.tokenizer, input_prompt, golden_answer)
+            
+            uncertainty_score_list.append(attributions)
+        
+        result_data = {}
+        for i, item in enumerate(items_list):
+            result_data["id"] = item.id
+            result_data["question"] = item.question
+            result_data["image_id"] = item.image_id
+            result_data["ans_full"] = item.golden_answers
+            result_data["ig_text_entropy"] = uncertainty_score_list[i]
+            file_path = os.path.join(self.config["save_dir"], "output.jsonl")
+            print(f"Saving to {file_path}")
+            self.safe_write(file_path, result_data)
+        
+        # dataset.update_output("pred", pred_answer_list)
+        # dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
+        # return dataset
 
     def run(self, dataset, do_eval=True, pred_process_func=None, prompt_answer_path=None):
         input_prompts = []
@@ -274,9 +351,8 @@ class OmniSearchIGPipeline(BasicMultiModalPipeline):
         for _id, (messages, pred_answer) in zip(id_list, zip(messages_prompt_list, pred_answer_list)):
             image_path = os.path.join(self.config["image_path"], f"{_id}.jpg")
             image = Image.open(image_path).convert('RGB')
-            attributions = integrated_gradient_process(self.model, self.processor, self.tokenizer, image, messages, pred_answer)
+            attributions = integrated_gradient_process(self.model, self.processor, self.tokenizer, messages, pred_answer)
             uncertainty_score_list.append(attributions)
-            print(f"unceratinty IG: {uncertainty_score_list}")
 
         result_data = {}
         for i, item in enumerate(items_list):
@@ -286,7 +362,7 @@ class OmniSearchIGPipeline(BasicMultiModalPipeline):
             result_data["ans_full"] = item.golden_answers
             result_data["prediction"] = pred_answer_list[i]
             result_data["context"] = messages_prompt_list[i]
-            result_data["ig_text_entropy"] = uncertainty_score_list[i]
+            result_data["ig_entropy"] = uncertainty_score_list[i]
             file_path = os.path.join(self.config["save_dir"], "output.jsonl")
             print(f"Saving to {file_path}")
             self.safe_write(file_path, result_data)
@@ -294,6 +370,11 @@ class OmniSearchIGPipeline(BasicMultiModalPipeline):
         dataset.update_output("pred", pred_answer_list)
         dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
         return dataset
+    
+    def safe_write(self, file_path: str, data: dict):
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(data, ensure_ascii=False) + "\n")
 
 
     

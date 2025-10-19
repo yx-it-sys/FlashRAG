@@ -92,6 +92,7 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
         self.processor = Qwen2_5_VLProcessor.from_pretrained(self.model_path, trust_remote_code=True, min_pixels=min_pixels, max_pixels=max_pixels)
         self.processor.tokenizer.model_max_length = self.max_input_len
         self.tokenizer = self.processor.tokenizer
+    
     def generate(self, input_list, uncertainty_type=None, get_hidden_states=False, **params):
         prompts = [self.tokenizer.apply_chat_template(
             messages[0]["input_prompt"],
@@ -146,7 +147,6 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
                     average_entropies.append(0.0)
             output_dict["generation_entropy"] = average_entropies[0] if len(average_entropies) == 1 else average_entropies
             
-            generated_ids_trimmed = [out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, outputs_obj)]
             output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
             output_dict["output_text"] = output_text
 

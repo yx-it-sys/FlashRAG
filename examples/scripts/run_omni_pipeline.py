@@ -1,12 +1,13 @@
 import argparse
 import tomllib
+import json
 from flashrag.config import Config
 from flashrag.utils import get_dataset
 from flashrag.pipeline import OmniSearchIGPipeline, OmniSearchPipeline
 from flashrag.prompt import MMPromptTemplate
 
 def load_prompt(prompt_name: str) -> str:
-    with open("omni_prompt.toml", "rb") as f:
+    with open("plain_prompt.toml", "rb") as f:
         prompts_data = tomllib.load(f)
     return prompts_data["system_prompts"][prompt_name]
 
@@ -36,13 +37,17 @@ def main(args):
         user_prompt= "This is the input image. Now, please start following your instructions to answer the original question: {input_question}",
     )
 
+    prediction_list = []
+    with open("result/mnt/data/okvqa_dummy_entropy_plain_run/output.jsonl", 'r', encoding='utf-8') as f:
+        for line in f:
+            data = json.loads(line)
+            prediction_list.append(data.get("prediction"))
 
-    pipeline = OmniSearchPipeline(config, prompt_template=prompt_templete)
-    # pipeline = OmniSearchIGPipeline(config, prompt_templete)
+    # pipeline = OmniSearchPipeline(config, prompt_template=prompt_templete)
+    pipeline = OmniSearchIGPipeline(config, prompt_templete)
     
-    output_dataset = pipeline.run(test_data, do_eval=True, uncertainty_type="entropy")
-    # output_dataset = pipeline.run(test_data, do_eval=True, prompt_answer_path="result/mnt/data/okvqa_dummy_100_2025_10_16_11_28_experiment/output1.jsonl")
-    # uncertainty = pipeline.uncertainty(test_data, do_eval=True)
+    output_dataset = pipeline.naive_run(test_data, do_eval=False, generated_answers_list=prediction_list)
+    # output_dataset = pipeline.run(test_data, do_eval=True, prompt_answer_path="result/mnt/data/okvqa_dummy_entropy_omni_run/output1.jsonl")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the OmniSearch pipeline.")
