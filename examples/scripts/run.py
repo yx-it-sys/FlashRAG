@@ -5,6 +5,7 @@ from flashrag.config import Config
 from flashrag.utils import get_dataset
 from flashrag.pipeline import OmniSearchIGPipeline, OmniSearchPipeline
 from flashrag.prompt import MMPromptTemplate
+from flashrag.uncertainty import DisturbImage
 
 def load_prompt(prompt_name: str) -> str:
     with open("plain_prompt.toml", "rb") as f:
@@ -44,11 +45,14 @@ def main(args):
             prediction_list.append(data.get("prediction"))
 
     # pipeline = OmniSearchPipeline(config, prompt_template=prompt_templete)
-    pipeline = OmniSearchIGPipeline(config, prompt_templete)
-    
-    output_dataset = pipeline.naive_run(test_data, do_eval=False, generated_answers_list=prediction_list)
+    # pipeline = OmniSearchIGPipeline(config, prompt_templete)
+    # output_dataset = pipeline.naive_run(test_data, do_eval=False, generated_answers_list=prediction_list)
     # output_dataset = pipeline.run(test_data, do_eval=True, prompt_answer_path="result/mnt/data/okvqa_dummy_entropy_omni_run/output1.jsonl")
 
+    uncertainty = DisturbImage(config, prompt_templete, method="cluster", threshold=0.7)
+    uncertainty.generate_answers(test_data, step=5)
+
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the OmniSearch pipeline.")
     parser.add_argument("--model_path", type=str, help="Path to config file")

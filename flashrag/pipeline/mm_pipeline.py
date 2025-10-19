@@ -185,10 +185,10 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
             f.write(json.dumps(data, ensure_ascii=False) + "\n")
             
     def run(self, dataset, do_eval=True, pred_process_func=None, uncertainty_type=None):
-        input_prompts = []
-        items_list = list(dataset)
+        data_items_list = []
+        data_list = list(dataset)
         for item in dataset:
-            input_prompts.append({
+            data_items_list.append({
                 "id": item.id,
                 "question": item.question,
                 "answers": item.golden_answers[0],
@@ -199,7 +199,7 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         context_list = []
         uncertainty_score_list = []
 
-        for i, input_prompt in enumerate(input_prompts):
+        for i, input_prompt in enumerate(data_items_list):
             answer, response_dict, context = self.iterative_infer(input_prompt, get_hidden_states=False, uncertainty_type=uncertainty_type)
             remove_image_context = context['input_prompt'][2:]
             pred_answer_list.append(answer)
@@ -210,7 +210,7 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
             context_list.append(remove_image_context)
             # print(f"Answer: {answer}")
         result_data = {}
-        for i, item in enumerate(items_list):
+        for i, item in enumerate(data_list):
             result_data["id"] = item.id
             result_data["question"] = item.question
             result_data["image_id"] = item.image_id

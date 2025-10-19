@@ -94,32 +94,18 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
         self.tokenizer = self.processor.tokenizer
     
     def generate(self, input_list, uncertainty_type=None, get_hidden_states=False, **params):
-        prompts = [self.tokenizer.apply_chat_template(
-            messages[0]["input_prompt"],
-            add_generation_prompt=True,
-            tokenize=False
-        )for messages in input_list]
-        images_list = []
-        pure_input_list = []
         for messages in input_list:
-            messages = messages[0]
-            messages = messages["input_prompt"]
-            pure_input_list.append(messages)
-            conversation_images = []
             for message in messages:
                 if isinstance(message['content'], list):
                     for content_dict in message['content']:
                         if content_dict['type'] == 'image':
-                            conversation_images.append(content_dict['image'])
-            images_list.append(conversation_images)
-
-        inputs = self.processor(
-            text=prompts,
-            images=images_list,
-            padding=True,
-            return_tensors="pt"
-        ).to(self.model.device)
-
+                            content_dict['image'] = convert_image_to_base64(content_dict['image'])
+        
+        from qwen_vl_utils import process_vision_info
+        texts = [self.processor.apply_chat_template(messages, add_generation_prompt=True, tokenize=False) for messages in input_list]
+        image_inputs, video_inputs = process_vision_info(input_list)    
+        inputs = self.processor(text=texts, images=image_inputs, videos=video_inputs, padding=True, return_tensors="pt").to(self.model.device)
+        
         output_dict = {}
 
         if uncertainty_type=="entropy":
