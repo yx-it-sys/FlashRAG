@@ -1,6 +1,7 @@
 import argparse
 import tomllib
 import json
+import os
 from flashrag.config import Config
 from flashrag.utils import get_dataset
 from flashrag.pipeline import OmniSearchIGPipeline, OmniSearchPipeline
@@ -29,7 +30,8 @@ def main(args):
     config = Config("my_config.yaml", config_dict=config_dict)
     all_split = get_dataset(config)
     test_data = all_split["dev"]
-
+    data = list(test_data)
+    print(f"ID type: {type(data[0].id)}, value: {data[0].id}")
     base_sys_prompt = load_prompt("multimodal_qa")
     
     prompt_templete = MMPromptTemplate(
@@ -38,11 +40,11 @@ def main(args):
         user_prompt= "This is the input image. Now, please start following your instructions to answer the original question: {input_question}",
     )
 
-    prediction_list = []
-    with open("result/mnt/data/okvqa_dummy_entropy_plain_run/output.jsonl", 'r', encoding='utf-8') as f:
-        for line in f:
-            data = json.loads(line)
-            prediction_list.append(data.get("prediction"))
+    # prediction_list = []
+    # with open("result/mnt/data/okvqa_dummy_entropy_plain_run/output.jsonl", 'r', encoding='utf-8') as f:
+    #     for line in f:
+    #         data = json.loads(line)
+    #         prediction_list.append(data.get("prediction"))
 
     # pipeline = OmniSearchPipeline(config, prompt_template=prompt_templete)
     # pipeline = OmniSearchIGPipeline(config, prompt_templete)
@@ -50,7 +52,16 @@ def main(args):
     # output_dataset = pipeline.run(test_data, do_eval=True, prompt_answer_path="result/mnt/data/okvqa_dummy_entropy_omni_run/output1.jsonl")
 
     uncertainty = DisturbImage(config, prompt_templete, method="cluster", threshold=0.7)
-    uncertainty.generate_answers(test_data, step=5)
+    chunk_size = 10
+
+    if os.path.exists('./results_disturb_images/gausian_blur/output.jsonl'):
+        with open('./results_disturb_images/gausian_blur/output.jsonl', 'r') as f:
+            done = {json.loads(line)["id"] for line in f}
+        data = [d for d in data if str(d.id) not in done]
+    
+    for i in range(0, len(data), chunk_size):
+        chunk = data[i: i+chunk_size]
+        uncertainty.generate_answers(chunk, step=5)
 
     
 if __name__ == "__main__":

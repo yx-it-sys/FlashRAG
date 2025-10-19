@@ -100,11 +100,10 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
                     for content_dict in message['content']:
                         if content_dict['type'] == 'image':
                             content_dict['image'] = convert_image_to_base64(content_dict['image'])
-        
-        from qwen_vl_utils import process_vision_info
+
         texts = [self.processor.apply_chat_template(messages, add_generation_prompt=True, tokenize=False) for messages in input_list]
-        image_inputs, video_inputs = process_vision_info(input_list)    
-        inputs = self.processor(text=texts, images=image_inputs, videos=video_inputs, padding=True, return_tensors="pt").to(self.model.device)
+        # image_inputs, video_inputs = process_vision_info(input_list)    
+        inputs = self.processor(text=texts, images=input_list[0][1]['content'][0]['image'], padding=True, return_tensors="pt").to(self.model.device)
         
         output_dict = {}
 
@@ -485,7 +484,6 @@ class HFMultiModalGenerator(BaseMultiModalGenerator):
         # preprocess input list
         from PIL import Image
         for messages in input_list:
-            messages = messages[0]["input_prompt"]
             for message in messages:
                 if isinstance(message['content'], list):
                     for content_dict in message['content']:

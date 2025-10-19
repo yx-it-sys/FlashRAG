@@ -8,6 +8,17 @@ class MMPromptTemplate:
         self.config = config
         self.system_prompt = system_prompt
         self.user_prompt = user_prompt if user_prompt is not None else self.BASE_USER_PROMPT
+    
+    def add_question_and_image(self, input_question, pil_image):
+        messages = []
+        if self.system_prompt is not None:
+            messages.append({"role": "system", "content": self.system_prompt.format(input_question=input_question)})
+        content_list = []
+        content_list.append({'type': 'image', 'image': pil_image})
+        content_list.append({'type': 'text', 'text': self.user_prompt.format(input_question=input_question)})
+        messages.append({"role": "user", "content": content_list})
+        return messages
+    
     def get_string(self, item, config):
         question = item.question if item.question is not None else item.text
         image_folder = config["image_path"]

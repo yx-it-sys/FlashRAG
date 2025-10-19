@@ -1,0 +1,2502 @@
+[
+    {
+        "id": "1777145",
+        "question": "What are the bright pieces of food?",
+        "image_id": "1777145",
+        "golden_answers": [
+            "carrots",
+            "carrots",
+            "carrots",
+            "carrots",
+            "carrots",
+            "carrots",
+            "carrotts",
+            "carrotts",
+            "vegetables",
+            "vegetables"
+        ],
+        "output": {
+            "pred": "Carrots",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "982615",
+        "question": "Name the bird family to which it belongs to shown in this picture?",
+        "image_id": "982615",
+        "golden_answers": [
+            "sparrow",
+            "sparrow",
+            "sparrow",
+            "sparrow",
+            "finch",
+            "finch",
+            "finch",
+            "finch",
+            "canary",
+            "canary"
+        ],
+        "output": {
+            "pred": "Finches",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "995925",
+        "question": "What is the person doing?",
+        "image_id": "995925",
+        "golden_answers": [
+            "flying kite",
+            "flying kite",
+            "flying kite",
+            "flying kite",
+            "flying kite",
+            "flying kite",
+            "kiting",
+            "kiting",
+            "kiting",
+            "kiting"
+        ],
+        "output": {
+            "pred": "Flying a kite",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5071715",
+        "question": "What is the board made of?",
+        "image_id": "5071715",
+        "golden_answers": [
+            "polyurethane",
+            "polyurethane",
+            "polyurethane",
+            "polyurethane",
+            "styrofoam",
+            "styrofoam",
+            "foam",
+            "foam",
+            "fiberglass",
+            "fiberglass"
+        ],
+        "output": {
+            "pred": "Foam",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5498825",
+        "question": "How many calories in this meal?",
+        "image_id": "5498825",
+        "golden_answers": [
+            "1000",
+            "1000",
+            "1000",
+            "1000",
+            "500",
+            "500",
+            "500",
+            "500",
+            "700",
+            "700"
+        ],
+        "output": {
+            "pred": "Approximately 600 calories",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "422795",
+        "question": "What is the name of the bird on top of the animal?",
+        "image_id": "422795",
+        "golden_answers": [
+            "zebra finches",
+            "zebra finches",
+            "bird",
+            "bird",
+            "parakeet",
+            "parakeet",
+            "finch",
+            "finch",
+            "zebra finch",
+            "zebra finch"
+        ],
+        "output": {
+            "pred": "Red-billed oxpecker",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "2052225",
+        "question": "What would you drink to go with this food?",
+        "image_id": "2052225",
+        "golden_answers": [
+            "coffee",
+            "coffee",
+            "coffee",
+            "coffee",
+            "coffee",
+            "coffee",
+            "milk",
+            "milk",
+            "tea",
+            "tea"
+        ],
+        "output": {
+            "pred": "Coffee",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "1431195",
+        "question": "Who won this years championship in this sport?",
+        "image_id": "1431195",
+        "golden_answers": [
+            "serena williams",
+            "serena williams",
+            "serena williams",
+            "serena williams",
+            "oprah",
+            "oprah",
+            "player",
+            "player",
+            "tennis professional",
+            "tennis professional"
+        ],
+        "output": {
+            "pred": "Not determinable from the image.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "4262415",
+        "question": "What type of show is playing on the tv?",
+        "image_id": "4262415",
+        "golden_answers": [
+            "game show",
+            "game show",
+            "game show",
+            "game show",
+            "news",
+            "news",
+            "who wants to be millionaire",
+            "who wants to be millionaire",
+            "competiton",
+            "competiton"
+        ],
+        "output": {
+            "pred": "Talk show",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "4779495",
+        "question": "What kind of flowers are these?",
+        "image_id": "4779495",
+        "golden_answers": [
+            "daisies",
+            "daisies",
+            "daisies",
+            "daisies",
+            "daisies",
+            "daisies",
+            "spring",
+            "spring",
+            "carnations",
+            "carnations"
+        ],
+        "output": {
+            "pred": "Dahlias and marigolds.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "450705",
+        "question": "What gait is the horse traveling at?",
+        "image_id": "450705",
+        "golden_answers": [
+            "slow",
+            "slow",
+            "slow",
+            "slow",
+            "canter",
+            "canter",
+            "10",
+            "10",
+            "trot",
+            "trot"
+        ],
+        "output": {
+            "pred": "Trot",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "3565315",
+        "question": "What is the woman wearing?",
+        "image_id": "3565315",
+        "golden_answers": [
+            "vest",
+            "vest",
+            "vest",
+            "vest",
+            "vest",
+            "vest",
+            "white vest and red shirt",
+            "white vest and red shirt",
+            "shirt",
+            "shirt"
+        ],
+        "output": {
+            "pred": "white shirt",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666666,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "1611125",
+        "question": "What piece of clothing is this boy putting on?",
+        "image_id": "1611125",
+        "golden_answers": [
+            "gloves",
+            "gloves",
+            "gloves",
+            "gloves",
+            "gloves",
+            "gloves",
+            "gloves",
+            "gloves",
+            "coat",
+            "coat"
+        ],
+        "output": {
+            "pred": "Coat",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "126705",
+        "question": "What activites make the place croweded?",
+        "image_id": "126705",
+        "golden_answers": [
+            "festival",
+            "festival",
+            "festival",
+            "festival",
+            "event",
+            "event",
+            "fair",
+            "fair",
+            "school",
+            "school"
+        ],
+        "output": {
+            "pred": "Event or festival",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "2767315",
+        "question": "What german city is this in?",
+        "image_id": "2767315",
+        "golden_answers": [
+            "berlin",
+            "berlin",
+            "berlin",
+            "berlin",
+            "dusseldorf",
+            "dusseldorf",
+            "zurich",
+            "zurich",
+            "drosselstrabe",
+            "drosselstrabe"
+        ],
+        "output": {
+            "pred": "Dresden",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "1586025",
+        "question": "What is the temperature like here?",
+        "image_id": "1586025",
+        "golden_answers": [
+            "cold",
+            "cold",
+            "cold",
+            "cold",
+            "frigid",
+            "frigid",
+            "below 0 f",
+            "below 0 f",
+            "arctic",
+            "arctic"
+        ],
+        "output": {
+            "pred": "Cold",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "1044945",
+        "question": "What is one item you can buy in this location pictured here?",
+        "image_id": "1044945",
+        "golden_answers": [
+            "bananas",
+            "bananas",
+            "bananas",
+            "bananas",
+            "lottery ticket",
+            "lottery ticket",
+            "banana",
+            "banana",
+            "lottery tickets",
+            "lottery tickets"
+        ],
+        "output": {
+            "pred": "Lottery tickets",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "2459965",
+        "question": "What type of walls was used in this washroom?",
+        "image_id": "2459965",
+        "golden_answers": [
+            "tile",
+            "tile",
+            "tile",
+            "tile",
+            "tile",
+            "tile",
+            "tile",
+            "tile",
+            "tiles",
+            "tiles"
+        ],
+        "output": {
+            "pred": "Grey tiles",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666666,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "4073555",
+        "question": "What is the term for the kind of furniture in front of the mirror?",
+        "image_id": "4073555",
+        "golden_answers": [
+            "ottoman",
+            "ottoman",
+            "ottoman",
+            "ottoman",
+            "ottaman",
+            "ottaman",
+            "foot rest",
+            "foot rest",
+            "futon",
+            "futon"
+        ],
+        "output": {
+            "pred": "ottoman",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "2864225",
+        "question": "How do people use this?",
+        "image_id": "2864225",
+        "golden_answers": [
+            "sail",
+            "sail",
+            "sail",
+            "sail",
+            "sailing",
+            "sailing",
+            "sailing",
+            "sailing",
+            "to sail",
+            "to sail"
+        ],
+        "output": {
+            "pred": "Sailboats are used for recreational sailing, fishing, or transportation on water.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.16666666666666669,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "4273765",
+        "question": "What in this image can you not park in front of?",
+        "image_id": "4273765",
+        "golden_answers": [
+            "fire hydrant",
+            "fire hydrant",
+            "fire hydrant",
+            "fire hydrant",
+            "fire hydrant",
+            "fire hydrant",
+            "fir hydrant",
+            "fir hydrant",
+            "hydrant",
+            "hydrant"
+        ],
+        "output": {
+            "pred": "Fire hydrant",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "2421005",
+        "question": "What are the natural enimies of these animals?",
+        "image_id": "2421005",
+        "golden_answers": [
+            "lions",
+            "lions",
+            "lions",
+            "lions",
+            "lions",
+            "lions",
+            "lions",
+            "lions",
+            "hyenas",
+            "hyenas"
+        ],
+        "output": {
+            "pred": "Lions, hyenas, and leopards.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "2668475",
+        "question": "Is this sport played on a natural or manmade surface?",
+        "image_id": "2668475",
+        "golden_answers": [
+            "natural",
+            "natural",
+            "natural",
+            "natural",
+            "natural",
+            "natural",
+            "manmade",
+            "manmade",
+            "manmade",
+            "manmade"
+        ],
+        "output": {
+            "pred": "natural",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "963515",
+        "question": "What brand vehicle is the blue white one?",
+        "image_id": "963515",
+        "golden_answers": [
+            "volkswagen",
+            "volkswagen",
+            "volkswagen",
+            "volkswagen",
+            "vw",
+            "vw",
+            "volks wagon",
+            "volks wagon",
+            "vw van",
+            "vw van"
+        ],
+        "output": {
+            "pred": "Volkswagen",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "4610175",
+        "question": "What is the plane going to do?",
+        "image_id": "4610175",
+        "golden_answers": [
+            "land",
+            "land",
+            "land",
+            "land",
+            "land",
+            "land",
+            "landing",
+            "landing",
+            "fly",
+            "fly"
+        ],
+        "output": {
+            "pred": "Land",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5071435",
+        "question": "How many people ride this mode of transportation in europe?",
+        "image_id": "5071435",
+        "golden_answers": [
+            "millions",
+            "millions",
+            "millions",
+            "millions",
+            "2",
+            "2",
+            "thousands",
+            "thousands",
+            "100 million",
+            "100 million"
+        ],
+        "output": {
+            "pred": "Millions",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "1083155",
+        "question": "What type of dog is pictured?",
+        "image_id": "1083155",
+        "golden_answers": [
+            "dalmation",
+            "dalmation",
+            "dalmation",
+            "dalmation",
+            "terrier",
+            "terrier",
+            "mix breed",
+            "mix breed",
+            "australian sheppard",
+            "australian sheppard"
+        ],
+        "output": {
+            "pred": "Dalmatian",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "5465845",
+        "question": "What type of fencing is being used?",
+        "image_id": "5465845",
+        "golden_answers": [
+            "chain link",
+            "chain link",
+            "chain link",
+            "chain link",
+            "metal",
+            "metal",
+            "invisible fence",
+            "invisible fence",
+            "wire",
+            "wire"
+        ],
+        "output": {
+            "pred": "Chain-link fence",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "1320015",
+        "question": "What device are these tools connected to?",
+        "image_id": "1320015",
+        "golden_answers": [
+            "computer",
+            "computer",
+            "computer",
+            "computer",
+            "computer",
+            "computer",
+            "computer",
+            "computer",
+            "computer",
+            "computer"
+        ],
+        "output": {
+            "pred": "Computer",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "1025945",
+        "question": "What holiday is it?",
+        "image_id": "1025945",
+        "golden_answers": [
+            "christmas",
+            "christmas",
+            "christmas",
+            "christmas",
+            "christmas",
+            "christmas",
+            "christmas",
+            "christmas",
+            "christmas",
+            "christmas"
+        ],
+        "output": {
+            "pred": "Christmas",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "2857425",
+        "question": "What decade was this picture taken?",
+        "image_id": "2857425",
+        "golden_answers": [
+            "1950's",
+            "1950's",
+            "1950's",
+            "1950's",
+            "20s",
+            "20s",
+            "60's",
+            "60's",
+            "1960's",
+            "1960's"
+        ],
+        "output": {
+            "pred": "1950s",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "2058345",
+        "question": "What breed of dog is this?",
+        "image_id": "2058345",
+        "golden_answers": [
+            "collie",
+            "collie",
+            "collie",
+            "collie",
+            "courier",
+            "courier",
+            "sheetland shepherd",
+            "sheetland shepherd",
+            "mutt",
+            "mutt"
+        ],
+        "output": {
+            "pred": "Australian Shepherd",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "5363755",
+        "question": "In what section of the store are these fruit typically kept?",
+        "image_id": "5363755",
+        "golden_answers": [
+            "produce",
+            "produce",
+            "produce",
+            "produce",
+            "produce",
+            "produce",
+            "produce",
+            "produce",
+            "produce",
+            "produce"
+        ],
+        "output": {
+            "pred": "produce",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "3275275",
+        "question": "Which object in the picture would protect you from a rainstorm?",
+        "image_id": "3275275",
+        "golden_answers": [
+            "umbrella",
+            "umbrella",
+            "umbrella",
+            "umbrella",
+            "umbrella",
+            "umbrella",
+            "umbrella",
+            "umbrella",
+            "umbrella",
+            "umbrella"
+        ],
+        "output": {
+            "pred": "Umbrella",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "1310185",
+        "question": "What is the person washing?",
+        "image_id": "1310185",
+        "golden_answers": [
+            "grapes",
+            "grapes",
+            "grapes",
+            "grapes",
+            "grapes",
+            "grapes",
+            "beans",
+            "beans",
+            "dishes",
+            "dishes"
+        ],
+        "output": {
+            "pred": "grapes",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "72815",
+        "question": "What are the horse breeds that the people are riding?",
+        "image_id": "72815",
+        "golden_answers": [
+            "arabian",
+            "arabian",
+            "arabian",
+            "arabian",
+            "mustang",
+            "mustang",
+            "mustang",
+            "mustang",
+            "palomino",
+            "palomino"
+        ],
+        "output": {
+            "pred": "Arabian",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "278975",
+        "question": "How can you tell this isn't really an old photo?",
+        "image_id": "278975",
+        "golden_answers": [
+            "train",
+            "train",
+            "train",
+            "train",
+            "train",
+            "train",
+            "dress styles",
+            "dress styles",
+            "clothes",
+            "clothes"
+        ],
+        "output": {
+            "pred": "The image is in black and white, which could be from an older photo, but the clarity and detail suggest it's a recent photograph.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "447325",
+        "question": "What kind of birds are these?",
+        "image_id": "447325",
+        "golden_answers": [
+            "blue jay",
+            "blue jay",
+            "hummingbird",
+            "hummingbird",
+            "sparrow",
+            "sparrow",
+            "finches",
+            "finches",
+            "sparrows",
+            "sparrows"
+        ],
+        "output": {
+            "pred": "Woodpecker and sparrow.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "3473905",
+        "question": "The tables in this room are made from what material?",
+        "image_id": "3473905",
+        "golden_answers": [
+            "wood",
+            "wood",
+            "wood",
+            "wood",
+            "wood",
+            "wood",
+            "testing",
+            "testing",
+            "plywood",
+            "plywood"
+        ],
+        "output": {
+            "pred": "wood",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "675325",
+        "question": "What breed are these two dogs?",
+        "image_id": "675325",
+        "golden_answers": [
+            "chihuahua",
+            "chihuahua",
+            "chihuahua",
+            "chihuahua",
+            "chihauhau",
+            "chihauhau",
+            "boxer and dachschund",
+            "boxer and dachschund",
+            "muts",
+            "muts"
+        ],
+        "output": {
+            "pred": "Chihuahua",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "3741115",
+        "question": "Is this a meal or snack?",
+        "image_id": "3741115",
+        "golden_answers": [
+            "meal",
+            "meal",
+            "meal",
+            "meal",
+            "meal",
+            "meal",
+            "meal",
+            "meal",
+            "snack",
+            "snack"
+        ],
+        "output": {
+            "pred": "Snack",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "4756605",
+        "question": "Where is this building located?",
+        "image_id": "4756605",
+        "golden_answers": [
+            "washington dc",
+            "washington dc",
+            "washington dc",
+            "washington dc",
+            "washington dc",
+            "washington dc",
+            "washington dc",
+            "washington dc",
+            "washington",
+            "washington"
+        ],
+        "output": {
+            "pred": "Washington, D.C.",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "186875",
+        "question": "What landmark is in the photo?",
+        "image_id": "186875",
+        "golden_answers": [
+            "tower",
+            "tower",
+            "tower",
+            "tower",
+            "church tower",
+            "church tower",
+            "big ben tower",
+            "big ben tower",
+            "park",
+            "park"
+        ],
+        "output": {
+            "pred": "Tivoli Gardens",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "3363845",
+        "question": "What is this plane about to do?",
+        "image_id": "3363845",
+        "golden_answers": [
+            "take off",
+            "take off",
+            "take off",
+            "take off",
+            "take off",
+            "take off",
+            "fly",
+            "fly",
+            "depart",
+            "depart"
+        ],
+        "output": {
+            "pred": "Take off",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "23885",
+        "question": "What is the purpose of this room?",
+        "image_id": "23885",
+        "golden_answers": [
+            "bathe",
+            "bathe",
+            "elimination and washing",
+            "elimination and washing",
+            "hygiene",
+            "hygiene",
+            "bathing",
+            "bathing",
+            "bathroom",
+            "bathroom"
+        ],
+        "output": {
+            "pred": "Bathroom",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "54765",
+        "question": "What age group plays this sport the most?",
+        "image_id": "54765",
+        "golden_answers": [
+            "all ages",
+            "all ages",
+            "20s",
+            "20s",
+            "teenager",
+            "teenager",
+            "teenage",
+            "teenage",
+            "20",
+            "20"
+        ],
+        "output": {
+            "pred": "Teenagers",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "2022755",
+        "question": "Which of these dogs will be the biggest when fully grown?",
+        "image_id": "2022755",
+        "golden_answers": [
+            "black 1",
+            "black 1",
+            "black 1",
+            "black 1",
+            "poodle",
+            "poodle",
+            "right",
+            "right",
+            "left",
+            "left"
+        ],
+        "output": {
+            "pred": "The dog on the left will be the biggest when fully grown.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.19999999999999998,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "1880675",
+        "question": "In this sport the person meant to protect the goal area is called a what?",
+        "image_id": "1880675",
+        "golden_answers": [
+            "goalie",
+            "goalie",
+            "goalie",
+            "goalie",
+            "goalie",
+            "goalie",
+            "goalie",
+            "goalie",
+            "goalkeeper",
+            "goalkeeper"
+        ],
+        "output": {
+            "pred": "goalkeeper",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "356725",
+        "question": "What breed is this dog?",
+        "image_id": "356725",
+        "golden_answers": [
+            "husky",
+            "husky",
+            "husky",
+            "husky",
+            "australian shepperd",
+            "australian shepperd",
+            "lab",
+            "lab",
+            "rotwiler",
+            "rotwiler"
+        ],
+        "output": {
+            "pred": "Dalmatian",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "2245675",
+        "question": "How do we know this is not summertime?",
+        "image_id": "2245675",
+        "golden_answers": [
+            "no leaves on trees",
+            "no leaves on trees",
+            "no leaves on trees",
+            "no leaves on trees",
+            "no leaves on trees",
+            "no leaves on trees",
+            "no leaves on tree",
+            "no leaves on tree",
+            "trees have no leaves",
+            "trees have no leaves"
+        ],
+        "output": {
+            "pred": "The trees are bare, indicating it's likely winter or early spring, not summertime.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.125,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "4374125",
+        "question": "What part of the world would this meal be from?",
+        "image_id": "4374125",
+        "golden_answers": [
+            "italy",
+            "italy",
+            "italy",
+            "italy",
+            "italy",
+            "italy",
+            "usa",
+            "usa",
+            "america",
+            "america"
+        ],
+        "output": {
+            "pred": "Italy",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "3265825",
+        "question": "How fast can these planes fly?",
+        "image_id": "3265825",
+        "golden_answers": [
+            "1000 mph",
+            "1000 mph",
+            "1000 mph",
+            "1000 mph",
+            "speed of sound",
+            "speed of sound",
+            "very fast",
+            "very fast",
+            "50 mph",
+            "50 mph"
+        ],
+        "output": {
+            "pred": "Mach 2+",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "1180515",
+        "question": "What kind of place is this?",
+        "image_id": "1180515",
+        "golden_answers": [
+            "office",
+            "office",
+            "office",
+            "office",
+            "office",
+            "office",
+            "office",
+            "office",
+            "cubicle",
+            "cubicle"
+        ],
+        "output": {
+            "pred": "Office cubicle",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666666,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "1125735",
+        "question": "How do we know that these are not polar bears?",
+        "image_id": "1125735",
+        "golden_answers": [
+            "color",
+            "color",
+            "color",
+            "color",
+            "their color",
+            "their color",
+            "they are not white",
+            "they are not white",
+            "they are brown",
+            "they are brown"
+        ],
+        "output": {
+            "pred": "The bears in the image have brown fur, which is characteristic of grizzly bears, not polar bears. Polar bears are typically white.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.24999999999999997,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "2025625",
+        "question": "Where are they going?",
+        "image_id": "2025625",
+        "golden_answers": [
+            "on trip",
+            "on trip",
+            "on trip",
+            "on trip",
+            "on trip",
+            "on trip",
+            "vacation",
+            "vacation",
+            "vacation",
+            "vacation"
+        ],
+        "output": {
+            "pred": "Unknown",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "2134575",
+        "question": "From what source does the yellow glean on the snow come from?",
+        "image_id": "2134575",
+        "golden_answers": [
+            "sun",
+            "sun",
+            "sun",
+            "sun",
+            "sun",
+            "sun",
+            "sun",
+            "sun",
+            "people",
+            "people"
+        ],
+        "output": {
+            "pred": "The skier's jacket.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "203075",
+        "question": "Is this bicycle for males or females?",
+        "image_id": "203075",
+        "golden_answers": [
+            "females",
+            "females",
+            "females",
+            "females",
+            "females",
+            "females",
+            "females",
+            "females",
+            "both",
+            "both"
+        ],
+        "output": {
+            "pred": "Females",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "3230005",
+        "question": "Should we go or stop?",
+        "image_id": "3230005",
+        "golden_answers": [
+            "go",
+            "go",
+            "go",
+            "go",
+            "go",
+            "go",
+            "go",
+            "go",
+            "go",
+            "go"
+        ],
+        "output": {
+            "pred": "Go",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5247425",
+        "question": "What media was used to paint this artwork?",
+        "image_id": "5247425",
+        "golden_answers": [
+            "spray paint",
+            "spray paint",
+            "spray paint",
+            "spray paint",
+            "spray paint",
+            "spray paint",
+            "spraypaint",
+            "spraypaint",
+            "paint",
+            "paint"
+        ],
+        "output": {
+            "pred": "Graffiti paint",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666666,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5153915",
+        "question": "What is the knot on this man's tie called?",
+        "image_id": "5153915",
+        "golden_answers": [
+            "knot",
+            "knot",
+            "knot",
+            "knot",
+            "windsor",
+            "windsor",
+            "neck tie",
+            "neck tie",
+            "regular",
+            "regular"
+        ],
+        "output": {
+            "pred": "Windsor knot",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666666,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5346735",
+        "question": "What decade is this vehicle from?",
+        "image_id": "5346735",
+        "golden_answers": [
+            "1960's",
+            "1960's",
+            "70",
+            "70",
+            "1970s",
+            "1970s",
+            "60's",
+            "60's",
+            "60s",
+            "60s"
+        ],
+        "output": {
+            "pred": "1960s",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5194605",
+        "question": "What is the most healthy item in this picture?",
+        "image_id": "5194605",
+        "golden_answers": [
+            "lettuce",
+            "lettuce",
+            "lettuce",
+            "lettuce",
+            "salad",
+            "salad",
+            "salad",
+            "salad",
+            "tomato",
+            "tomato"
+        ],
+        "output": {
+            "pred": "Salad",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "3891745",
+        "question": "What season is it?",
+        "image_id": "3891745",
+        "golden_answers": [
+            "fall",
+            "fall",
+            "fall",
+            "fall",
+            "fall",
+            "fall",
+            "fall",
+            "fall",
+            "autumn",
+            "autumn"
+        ],
+        "output": {
+            "pred": "Fall",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "3238885",
+        "question": "Name the type of architecture?",
+        "image_id": "3238885",
+        "golden_answers": [
+            "art deco",
+            "art deco",
+            "art deco",
+            "art deco",
+            "nouveau",
+            "nouveau",
+            "spherical",
+            "spherical",
+            "arch",
+            "arch"
+        ],
+        "output": {
+            "pred": "Art Deco",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "4269175",
+        "question": "Where is this bus headed to?",
+        "image_id": "4269175",
+        "golden_answers": [
+            "acton",
+            "acton",
+            "acton",
+            "acton",
+            "acton",
+            "acton",
+            "london",
+            "london",
+            "high street",
+            "high street"
+        ],
+        "output": {
+            "pred": "Acton High Street",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.8,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5725745",
+        "question": "Name the place where you can see the duck swiming in this picture?",
+        "image_id": "5725745",
+        "golden_answers": [
+            "pond",
+            "pond",
+            "pond",
+            "pond",
+            "pond",
+            "pond",
+            "stream",
+            "stream",
+            "lake",
+            "lake"
+        ],
+        "output": {
+            "pred": "pond",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "4314395",
+        "question": "What cutting device is shown?",
+        "image_id": "4314395",
+        "golden_answers": [
+            "scissors",
+            "scissors",
+            "scissors",
+            "scissors",
+            "scissors",
+            "scissors",
+            "scissors",
+            "scissors",
+            "scissors",
+            "scissors"
+        ],
+        "output": {
+            "pred": "Scissors",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "4189445",
+        "question": "Name the hair dryer brand name shown in this picture?",
+        "image_id": "4189445",
+        "golden_answers": [
+            "conair",
+            "conair",
+            "conair",
+            "conair",
+            "revlon",
+            "revlon",
+            "revlon",
+            "revlon",
+            "beauty",
+            "beauty"
+        ],
+        "output": {
+            "pred": "Koibi",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "3832095",
+        "question": "What electronic device is this?",
+        "image_id": "3832095",
+        "golden_answers": [
+            "television",
+            "television",
+            "television",
+            "television",
+            "television",
+            "television",
+            "tv",
+            "tv",
+            "tv",
+            "tv"
+        ],
+        "output": {
+            "pred": "Television",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "962885",
+        "question": "What activity is this?",
+        "image_id": "962885",
+        "golden_answers": [
+            "hiking",
+            "hiking",
+            "hiking",
+            "hiking",
+            "hiking",
+            "hiking",
+            "hiking",
+            "hiking",
+            "hiking",
+            "hiking"
+        ],
+        "output": {
+            "pred": "Hiking",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "977905",
+        "question": "What kind of airplanes are those?",
+        "image_id": "977905",
+        "golden_answers": [
+            "fighter jets",
+            "fighter jets",
+            "fighter jets",
+            "fighter jets",
+            "fighter jets",
+            "fighter jets",
+            "fighters",
+            "fighters",
+            "jet prop planes",
+            "jet prop planes"
+        ],
+        "output": {
+            "pred": "F-16 and P-51 Mustang",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "3321595",
+        "question": "What kind of omen is the cat on the right considered?",
+        "image_id": "3321595",
+        "golden_answers": [
+            "bad",
+            "bad",
+            "bad",
+            "bad",
+            "death",
+            "death",
+            "black",
+            "black",
+            "bad luck",
+            "bad luck"
+        ],
+        "output": {
+            "pred": "Bad omen",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666666,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5196915",
+        "question": "How much does this truck weigh?",
+        "image_id": "5196915",
+        "golden_answers": [
+            "2 tons",
+            "2 tons",
+            "2 tons",
+            "2 tons",
+            "1 tonne",
+            "1 tonne",
+            "32 metric tons",
+            "32 metric tons",
+            "10000 lbs",
+            "10000 lbs"
+        ],
+        "output": {
+            "pred": "Cannot determine from image.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "5601115",
+        "question": "Where do these vehicles stop?",
+        "image_id": "5601115",
+        "golden_answers": [
+            "train station",
+            "train station",
+            "train station",
+            "train station",
+            "train station",
+            "train station",
+            "station",
+            "station",
+            "at train stops",
+            "at train stops"
+        ],
+        "output": {
+            "pred": "Train station",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5758345",
+        "question": "What kind of lights are in this refrigerator?",
+        "image_id": "5758345",
+        "golden_answers": [
+            "led",
+            "led",
+            "led",
+            "led",
+            "led",
+            "led",
+            "led",
+            "led",
+            "blue",
+            "blue"
+        ],
+        "output": {
+            "pred": "LED lights",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666666,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "361965",
+        "question": "Who might fly this jet?",
+        "image_id": "361965",
+        "golden_answers": [
+            "pilot",
+            "pilot",
+            "pilot",
+            "pilot",
+            "air force pilot",
+            "air force pilot",
+            "any pilot",
+            "any pilot",
+            "fighter pilot",
+            "fighter pilot"
+        ],
+        "output": {
+            "pred": "Pilot",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5073135",
+        "question": "What sort of trees are these?",
+        "image_id": "5073135",
+        "golden_answers": [
+            "oak",
+            "oak",
+            "oak",
+            "oak",
+            "oak",
+            "oak",
+            "evergreen",
+            "evergreen",
+            "beech",
+            "beech"
+        ],
+        "output": {
+            "pred": "Deciduous trees.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "2448225",
+        "question": "What is the outside temperature?",
+        "image_id": "2448225",
+        "golden_answers": [
+            "70 degrees",
+            "70 degrees",
+            "70 degrees",
+            "70 degrees",
+            "80 degrees",
+            "80 degrees",
+            "warm",
+            "warm",
+            "85 degrees f",
+            "85 degrees f"
+        ],
+        "output": {
+            "pred": "Cannot determine from the image.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "751735",
+        "question": "How do you pay for parking here?",
+        "image_id": "751735",
+        "golden_answers": [
+            "quarters",
+            "quarters",
+            "quarters",
+            "quarters",
+            "meter",
+            "meter",
+            "you don't",
+            "you don't",
+            "booth",
+            "booth"
+        ],
+        "output": {
+            "pred": "Use the parking meter.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "3833395",
+        "question": "What time of day is it?",
+        "image_id": "3833395",
+        "golden_answers": [
+            "sunset",
+            "sunset",
+            "sunset",
+            "sunset",
+            "sunset",
+            "sunset",
+            "evening",
+            "evening",
+            "dusk",
+            "dusk"
+        ],
+        "output": {
+            "pred": "Dusk",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "237745",
+        "question": "What is needed to drive this vehicle?",
+        "image_id": "237745",
+        "golden_answers": [
+            "license",
+            "license",
+            "license",
+            "license",
+            "license",
+            "license",
+            "key",
+            "key",
+            "keys",
+            "keys"
+        ],
+        "output": {
+            "pred": "License",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "543405",
+        "question": "What do you call a baby version of this animal?",
+        "image_id": "543405",
+        "golden_answers": [
+            "kitten",
+            "kitten",
+            "kitten",
+            "kitten",
+            "kitten",
+            "kitten",
+            "kitten",
+            "kitten",
+            "kittens",
+            "kittens"
+        ],
+        "output": {
+            "pred": "Kitten",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "2230935",
+        "question": "What type of shadow appears to be cast upon the building?",
+        "image_id": "2230935",
+        "golden_answers": [
+            "tree",
+            "tree",
+            "tree",
+            "tree",
+            "tree",
+            "tree",
+            "tree",
+            "tree",
+            "trees",
+            "trees"
+        ],
+        "output": {
+            "pred": "Tree shadow",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666666,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "2787495",
+        "question": "What compass terminology do you see?",
+        "image_id": "2787495",
+        "golden_answers": [
+            "west",
+            "west",
+            "west",
+            "west",
+            "west",
+            "west",
+            "west",
+            "west",
+            "west",
+            "west"
+        ],
+        "output": {
+            "pred": "West",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "4535845",
+        "question": "What is painted on the bench?",
+        "image_id": "4535845",
+        "golden_answers": [
+            "coca cola",
+            "coca cola",
+            "coca cola",
+            "coca cola",
+            "coca cola",
+            "coca cola",
+            "cocacola",
+            "cocacola",
+            "coco cola",
+            "coco cola"
+        ],
+        "output": {
+            "pred": "Coca-Cola logo",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666666,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5085385",
+        "question": "What group do these boys belong to?",
+        "image_id": "5085385",
+        "golden_answers": [
+            "skaters",
+            "skaters",
+            "skaters",
+            "skaters",
+            "youth",
+            "youth",
+            "skateboarders",
+            "skateboarders",
+            "punks",
+            "punks"
+        ],
+        "output": {
+            "pred": "Skateboarders",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "635635",
+        "question": "Why would you need warm clothes?",
+        "image_id": "635635",
+        "golden_answers": [
+            "cold",
+            "cold",
+            "cold",
+            "cold",
+            "cold",
+            "cold",
+            "winter",
+            "winter",
+            "snow",
+            "snow"
+        ],
+        "output": {
+            "pred": "To stay warm in cold weather.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2857142857142857,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "3772355",
+        "question": "What time of day is it?",
+        "image_id": "3772355",
+        "golden_answers": [
+            "noon",
+            "noon",
+            "noon",
+            "noon",
+            "morning",
+            "morning",
+            "morning",
+            "morning",
+            "afternoon",
+            "afternoon"
+        ],
+        "output": {
+            "pred": "Afternoon",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5184405",
+        "question": "What fruit is that?",
+        "image_id": "5184405",
+        "golden_answers": [
+            "melon",
+            "melon",
+            "melon",
+            "melon",
+            "tomato",
+            "tomato",
+            "strawberry and peach",
+            "strawberry and peach",
+            "mango",
+            "mango"
+        ],
+        "output": {
+            "pred": "Peaches and watermelon.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3333333333333333,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "1054325",
+        "question": "Where are the birds migrating to?",
+        "image_id": "1054325",
+        "golden_answers": [
+            "south",
+            "south",
+            "south",
+            "south",
+            "south",
+            "south",
+            "south",
+            "south",
+            "warmer place",
+            "warmer place"
+        ],
+        "output": {
+            "pred": "South",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "825765",
+        "question": "What kind of boat is this?",
+        "image_id": "825765",
+        "golden_answers": [
+            "canoe",
+            "canoe",
+            "canoe",
+            "canoe",
+            "gondola",
+            "gondola",
+            "sailboat",
+            "sailboat",
+            "boat",
+            "boat"
+        ],
+        "output": {
+            "pred": "Longtail boat",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666666,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "2183625",
+        "question": "What time is it?",
+        "image_id": "2183625",
+        "golden_answers": [
+            "17:58",
+            "17:58",
+            "17:58",
+            "17:58",
+            "17:58",
+            "17:58",
+            "5:58 pm",
+            "5:58 pm",
+            "5",
+            "5"
+        ],
+        "output": {
+            "pred": "10:39",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "4960815",
+        "question": "What food does the animal eat?",
+        "image_id": "4960815",
+        "golden_answers": [
+            "hay",
+            "hay",
+            "hay",
+            "hay",
+            "hay",
+            "hay",
+            "grass",
+            "grass",
+            "grass",
+            "grass"
+        ],
+        "output": {
+            "pred": "Grass",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "3346145",
+        "question": "What prevents these animals from climbing well?",
+        "image_id": "3346145",
+        "golden_answers": [
+            "hooves",
+            "hooves",
+            "hooves",
+            "hooves",
+            "hooves",
+            "hooves",
+            "fence",
+            "fence",
+            "legs",
+            "legs"
+        ],
+        "output": {
+            "pred": "fence",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "2533625",
+        "question": "Where would you find this animal?",
+        "image_id": "2533625",
+        "golden_answers": [
+            "farm",
+            "farm",
+            "farm",
+            "farm",
+            "field",
+            "field",
+            "on plate or farm",
+            "on plate or farm",
+            "new york state",
+            "new york state"
+        ],
+        "output": {
+            "pred": "Farm",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "1534555",
+        "question": "What indoor activity are the people doing?",
+        "image_id": "1534555",
+        "golden_answers": [
+            "wii",
+            "wii",
+            "wii",
+            "wii",
+            "video gaming",
+            "video gaming",
+            "video games",
+            "video games",
+            "playing wii",
+            "playing wii"
+        ],
+        "output": {
+            "pred": "Playing video game",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "3694705",
+        "question": "What is the purpose of the meters?",
+        "image_id": "3694705",
+        "golden_answers": [
+            "parking",
+            "parking",
+            "parking",
+            "parking",
+            "to collect revenue",
+            "to collect revenue",
+            "money",
+            "money",
+            "to keep time of parking",
+            "to keep time of parking"
+        ],
+        "output": {
+            "pred": "To collect parking fees.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5714285714285715,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "4837225",
+        "question": "Which kind of train is seen in this photo?",
+        "image_id": "4837225",
+        "golden_answers": [
+            "subway",
+            "subway",
+            "subway",
+            "subway",
+            "transportation",
+            "transportation",
+            "commuter",
+            "commuter",
+            "lightrail",
+            "lightrail"
+        ],
+        "output": {
+            "pred": "Local train",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "5789845",
+        "question": "What type of water is this?",
+        "image_id": "5789845",
+        "golden_answers": [
+            "salt",
+            "salt",
+            "salt",
+            "salt",
+            "salt",
+            "salt",
+            "sea",
+            "sea",
+            "ocean",
+            "ocean"
+        ],
+        "output": {
+            "pred": "Ocean",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5668235",
+        "question": "What musical instrument does this bus remind you of?",
+        "image_id": "5668235",
+        "golden_answers": [
+            "accordion",
+            "accordion",
+            "accordion",
+            "accordion",
+            "accordian",
+            "accordian",
+            "xylophone",
+            "xylophone",
+            "trumpet",
+            "trumpet"
+        ],
+        "output": {
+            "pred": "Piano",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    }
+]
