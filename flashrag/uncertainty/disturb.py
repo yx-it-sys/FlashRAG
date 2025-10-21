@@ -57,7 +57,16 @@ class DisturbImage():
 
             noisy_image = Image.fromarray(noisy_image)
             image_pil_list.append(noisy_image)
-
+        
+        # save blurred images to disk
+        out_dir = os.path.join('/mnt/data/results_disturb_images', 'pepper')
+        os.makedirs(out_dir, exist_ok=True)
+        for idx, img in enumerate(image_pil_list, start=1):
+            path = os.path.join(out_dir, f'pepper_{idx}.jpg')
+            try:
+                img.save(path, format='JPEG')
+            except Exception:
+                img.convert('RGB').save(path, format='JPEG')
         return image_pil_list
     
     def consistency(self, answers_list, method, threshold):
@@ -98,8 +107,8 @@ class DisturbImage():
                 id = data['id']
                 image_path = os.path.join(self.config["image_path"], f"{data['id']}.jpg")
                 image_pil = Image.open(image_path).convert('RGB')
-                # image_pil_list = self.add_salt_and_pepper_noise_numpy(image_pil, step)
-                image_pil_list = self.Guasian_blurring(image_pil=image_pil, step=step)
+                image_pil_list = self.add_salt_and_pepper_noise_numpy(image_pil, step)
+                # image_pil_list = self.Guasian_blurring(image_pil=image_pil, step=step)
                 question = data['question']
                 golden_answers = data['answers']
                 question_d_i_list.append({

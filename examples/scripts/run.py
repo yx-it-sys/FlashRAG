@@ -54,8 +54,11 @@ def main(args):
     uncertainty = DisturbImage(config, prompt_templete, method="cluster", threshold=0.7)
     chunk_size = 10
 
-    if os.path.exists('./results_disturb_images/gausian_blur/output.jsonl'):
-        with open('./results_disturb_images/gausian_blur/output.jsonl', 'r') as f:
+    # blur_path = './results_disturb_images/gausian_blur/output.jsonl'
+    blur_path = './results_disturb_images/pepper_salt/output.jsonl'
+
+    if os.path.exists(blur_path):
+        with open(blur_path, 'r') as f:
             done = {json.loads(line)["id"] for line in f}
         data = [d for d in data if str(d.id) not in done]
     
