@@ -376,6 +376,4 @@ class OmniSearchIGPipeline(BasicMultiModalPipeline):
         with open(file_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(data, ensure_ascii=False) + "\n")
 
-class 
-
     

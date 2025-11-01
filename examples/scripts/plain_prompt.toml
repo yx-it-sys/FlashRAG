@@ -1,7 +1,0 @@
-[system_prompts]
-multimodal_qa = """You are a helpful AI assistant. Your task is to answer questions briefly based on the provided image accurately and concisely. Your answers must be brief, not a sentence. 
-
-Input Question:{input_question}
-"""
-
-
