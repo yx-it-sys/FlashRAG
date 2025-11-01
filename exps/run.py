@@ -9,7 +9,7 @@ from flashrag.prompt import MMPromptTemplate
 from flashrag.uncertainty import DisturbImage
 
 def load_prompt(prompt_name: str) -> str:
-    with open("plain_prompt.toml", "rb") as f:
+    with open("omni_prompt.toml", "rb") as f:
         prompts_data = tomllib.load(f)
     return prompts_data["system_prompts"][prompt_name]
 
@@ -20,7 +20,7 @@ def main(args):
         "index_path": "indexes/bm25",
         "corpus_path": "indexes/bm25/corpus.jsonl",
         "generator_model": "Qwen2.5-VL-7B-Instruct",
-        "generator_model_path": args.model_path,
+        # "generator_model_path": "data",
         "retrieval_method": "bm25",
         "metrics": ["em", "f1", "acc"],
         "retrieval_topk": 1,
