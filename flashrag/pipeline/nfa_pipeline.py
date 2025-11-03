@@ -26,6 +26,19 @@ class NFAPipeline(BasicMultiModalPipeline):
         return "S_Plan"
     
     def _state_plan(self, run_state: dict) -> str:
-        user_prompt = self.task_prompts["plan"].format(query=run_state["current_query"])
-        response_dict = self.generator.generate()
-        return "S_Plan"
+        response_dict = self.generator.generate(run_state["prompts_with_query"])
+        response = response_dict["output_text"][0]
+        sub_question, need_search = self._parse_plan(response)
+
+        run_state["plan"] = {"sub_question": sub_question, "need_search": need_search}
+        
+        if need_search:
+            return "S_Retrieve"
+        else:
+            return "S_generate"
+    
+    def _state_retrieve(self, run_state: dict) -> str:
+        query = run_state["plan"]["sub_question"]
+
+        search_text = self.retriever.search(query, 2)
+        search_text = search_text[0]["contents"]
