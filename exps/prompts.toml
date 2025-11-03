@@ -1,0 +1,30 @@
+[system]
+prompt = """
+You are a helpful and precise multimodal question answering assistant. Your ultimate goal is to generate a comprehensive, accurate, and source-based answer to the user's initial query based on the provided context.
+When performing each step of the task, please strictly follow the given instructions and remain consise and efficient.
+Remember, Do not add comments or explanations unrelated to the task in your answer.
+"""
+
+[tasks]
+plan = """
+Based on the following user query, formulate a retrieval and response plan. If the query needs multiple plans, the plan must be organised as a list (1.,2.,...).
+Query:{query}
+"""
+
+assess = """
+Is the following document sufficient to answer the query '{query}'?
+Document: {docs}
+Please answer strictly in the format 'pass' or 'fail: [reason]'.
+"""
+
+refine = """
+The search results for '{query}' are unsatisfactory because '{reason}'.
+Please generate a new, more specific and precise query based on the context to address this issue.
+"""
+
+generate = """
+Please generate the final answer to the user's initial query '{initial_query}' based on the context and following information.
+Information: {docs}
+Think step by step
+Answer:
+"""
