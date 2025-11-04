@@ -53,8 +53,8 @@ method2index:
 
 # ----Environment Settings----
 gpu_id: "0"
-dataset_name: "okvqa_dummy_100"
-split: ["dev",'test']
+dataset_name: "okvqa"
+split: ['validation']
 
 # Sampling configurations for testing
 test_sample_num: 100
@@ -64,9 +64,9 @@ save_intermediate_data: True
 seed: 2024
 
 # Directory paths for data and outputs
-data_dir: "datasets/"
+data_dir: "data/datasets/"
 #save_dir: "/data00/jiajie_jin/test_project/output"
-save_dir: "result/mnt/data"
+save_dir: "result/"
 
 # ----Retrieval Settings----
 retrieval_method: "bm25" # name or path of the retrieval model
@@ -113,4 +113,4 @@ metric_setting:
 save_metric_score: True #　whether to save the metric score into txt file
 
 # DFA Config
-dfa_prompt_path: "prompts.toml"
+dfa_prompt_path: "/root/FlashRAG/exps/prompts.toml"

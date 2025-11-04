@@ -9,7 +9,7 @@ Initial Query: {input_question}
 
 [tasks]
 plan = """
-Based on the following user's query and image, generate a "sub-question" that must be solved first. The sub-question must be solved only in one step. Then determine if it is neccessary to use "Search" to state what additional context or information is needed to provide a precise answer to the "sub-question". Use the format below strictly:
+Based on the following user's query, image, and further analysis, generate a "sub-question" that must be solved first. The sub-question must be solved only in one step. Then determine if it is neccessary to use "Search" to state what additional context or information is needed to provide a precise answer to the "sub-question". Use the format below strictly:
 
 <sub-question>
 Your generated sub-question

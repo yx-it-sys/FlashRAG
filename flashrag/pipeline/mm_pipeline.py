@@ -190,7 +190,7 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
             data_items_list.append({
                 "id": item.id,
                 "question": item.question,
-                "answers": item.golden_answers[0],
+                "answers": item.golden_answers,
                 "input_prompt": self.prompt_template.get_string(item, self.config)
                 }
             )

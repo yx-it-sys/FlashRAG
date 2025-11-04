@@ -11,6 +11,7 @@ def get_dataset(config):
     SUPPORT_FILES = ["jsonl", "json", "parquet"]
 
     dataset_path = config["dataset_path"]
+    print(dataset_path)
     all_split = config["split"]
 
     split_dict = {split: None for split in all_split}

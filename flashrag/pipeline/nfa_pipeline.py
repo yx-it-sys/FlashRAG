@@ -62,18 +62,20 @@ class NFAPipeline(BasicMultiModalPipeline):
 
     def _state_plan(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="plan", run_state=run_state)
+        if run_state['further_analysis'] is not None:
+            input_prompt.append({"role": "assistant", "content": run_state['further_analysis']})
         response_dict = self.generator.generate([input_prompt])
-        response = response_dict["output_text"][0]
+        response = response_dict[0]["output_text"][0]
         sub_question, need_search = self._parse_plan(response)
 
         run_state["plan"] = {"sub_question": sub_question, "need_search": need_search}
         run_state["record"].append({"state": "plan", "response": response, "result": run_state["plan"]})
         self.dfa_print(run_state['record'])
 
-        if need_search:
+        if need_search.lower().strip() == "true":
             return "S_Retrieve"
         else:
-            return "S_generate"
+            return "S_Generate"
     
     def _state_retrieve(self, run_state: dict) -> str:
         query = run_state["plan"]["sub_question"]
@@ -101,7 +103,7 @@ class NFAPipeline(BasicMultiModalPipeline):
     def _state_assess(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="assess", run_state=run_state)
         response_dict = self.generator.generate([input_prompt])
-        response = response_dict["output_text"][0]
+        response = response_dict[0]["output_text"][0]
         assess, reason = self._parse_assess(response)
         
         run_state["record"].append({"state": "assess", "response": response, "result": {"assessment_result": assess, "reason": reason}})
@@ -142,13 +144,13 @@ class NFAPipeline(BasicMultiModalPipeline):
     def _state_generate(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="generate", run_state=run_state)
         response_dict = self.generator.generate([input_prompt])
-        response = response_dict['output_text'][0]
+        response = response_dict[0]['output_text'][0]
 
         mark, answer = self._parse_generate(response)
         run_state["record"].append({"state": "generate", "response": response, "result": {"mark": mark, "answer": answer}})
         self.dfa_print(run_state['record'])
 
-        if mark == "Final Answer":
+        if mark == "Final_Answer":
             run_state['final_answer'] = answer
             return "S_Final"
         elif mark == "Further Analysis":
@@ -171,19 +173,21 @@ class NFAPipeline(BasicMultiModalPipeline):
     
     def run(self, dataset, do_eval=True, pred_process_func=None, uncertainty_type=None):
         data_items_list = []
-        for item in dataset:
+        for i, item in enumerate(dataset):
+            if i > 10:
+                break
             data_items_list.append({
                 "id": item.id,
                 "question": item.question,
-                "answers": item.golden_answers[0],
+                "golden_answers": item.golden_answers,
                 }
             )
         pred_answer_list = []
         for item in data_items_list:
             run_state = {
-                "initial_query": item.question,
-                "current_query": item.question,
-                "id": item.id,
+                "initial_query": item['question'],
+                "current_query": item['question'],
+                "id": item['id'],
                 "plan": None,
                 "retrieved_docs": [],
                 "assessment_result": None,
@@ -194,7 +198,7 @@ class NFAPipeline(BasicMultiModalPipeline):
             }
 
             state_handlers = {
-                "S_initial": self._state_initial,
+                "S_Initial": self._state_initial,
                 "S_Plan": self._state_plan,
                 "S_Retrieve": self._state_retrieve,
                 "S_Assess": self._state_assess,
@@ -209,7 +213,8 @@ class NFAPipeline(BasicMultiModalPipeline):
                 current_state = next_state
             
             result_data = self._state_final(run_state)
-            result_data['golden_answers'] = item.golden_answers
+            print(item)
+            result_data['golden_answers'] = item['golden_answers']
             pred_answer_list.append(result_data['prediction'])           
             file_path = os.path.join(self.config["save_dir"], "output.jsonl")
             self.safe_write(file_path, result_data)

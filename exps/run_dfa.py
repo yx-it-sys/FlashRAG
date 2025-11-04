@@ -6,12 +6,12 @@ from flashrag.prompt import MMPromptTemplate
 
 def main():
     config_dict = {
-        "data_dir": "lmms-lab/OK-VQA",
-        # "image_path": "data/",
-        "index_path": "indexes/bm25",
-        "corpus_path": "indexes/bm25/corpus.jsonl",
-        "generator_model": "Qwen2.5-VL-7B-Instruct",
-        # "generator_model_path": "data",
+        "dataset_path": "data/datasets/okvqa/annotations",
+        "image_path": "data/datasets/okvqa/images/val2014",
+        "index_path": "data/indexes/bm25",
+        "corpus_path": "data/indexes/bm25/corpus.jsonl",
+        # "generator_model": "Qwen2.5-VL-7B-Instruct",
+        "generator_model_path": "data/models/Qwen2.5-VL-7B-Instruct",
         "retrieval_method": "bm25",
         "metrics": ["em", "f1", "acc"],
         "retrieval_topk": 1,
@@ -20,8 +20,7 @@ def main():
 
     config = Config("my_config.yaml", config_dict=config_dict)
     all_split = get_dataset(config)
-    test_data = all_split["dev"]
-    data = list(test_data)
+    test_data = all_split["validation"]
     
     prompt_templete = MMPromptTemplate(
         config=config

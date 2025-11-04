@@ -54,7 +54,7 @@ class MMPromptTemplate:
     def get_string_for_nfa(self, config, prompt, state_type, run_state: dict):
         question = run_state['initial_query']
         image_folder = config["image_path"]
-        image_filename = f"{run_state['image_id']}.jpg"
+        image_filename = f"{run_state['id']}.jpg"
         full_image_path = os.path.join(image_folder, image_filename)
         raw_image = Image.open(full_image_path)
         question_image = raw_image.convert("RGB")
@@ -63,10 +63,10 @@ class MMPromptTemplate:
         content_list = []
         content_list.append({'type': 'image', 'image': question_image})
         if state_type == "plan":
-            content_list.append({'type': 'text', 'text': prompt["tasks"][state_type].format(query=run_state['orginal_query'])})
+            content_list.append({'type': 'text', 'text': prompt["tasks"][state_type].format(query=run_state['initial_query'])})
         elif state_type == "assess":
             query = run_state['current_query']
-            docs = run_state['docs']
+            docs = run_state['retrieved_docs']
             content_list.append({'type': 'text', 'text': prompt["tasks"][state_type].format(query=query, docs='\n'.join(docs))})
         elif state_type == "refine":
             query = run_state['current_query']
@@ -74,7 +74,7 @@ class MMPromptTemplate:
             content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(query=query, reason=reason)})
         elif state_type == "generate":
             initial_query = question
-            docs = run_state["docs"]
+            docs = run_state["retrieved_docs"]
             content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(initial_query=initial_query, docs='\n'.join(docs))})
         messages.append({'role': 'user', 'content': content_list})
         return messages
