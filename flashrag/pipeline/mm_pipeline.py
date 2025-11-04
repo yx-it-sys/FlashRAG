@@ -166,7 +166,6 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
             torch.save(dict_to_save, filename)
             print(f"字典已成功保存到: {filename}")
         else:
-
             pattern = r'(?:<Final Answer>|Final Answer:)\s*(.*?)(?=<|$)'
             final_answer_match = re.search(pattern, response, re.DOTALL)
 

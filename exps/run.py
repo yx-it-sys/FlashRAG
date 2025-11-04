@@ -31,7 +31,6 @@ def main(args):
     all_split = get_dataset(config)
     test_data = all_split["dev"]
     data = list(test_data)
-    print(f"ID type: {type(data[0].id)}, value: {data[0].id}")
     base_sys_prompt = load_prompt("multimodal_qa")
     
     prompt_templete = MMPromptTemplate(

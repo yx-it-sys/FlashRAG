@@ -50,8 +50,35 @@ class MMPromptTemplate:
         content_list.append({'type': 'text', 'text': self.user_prompt.format(input_question=question)})
         messages.append({"role": "user", "content": content_list})
         return messages
-
-
+    
+    def get_string_for_nfa(self, config, prompt, state_type, run_state: dict):
+        question = run_state['initial_query']
+        image_folder = config["image_path"]
+        image_filename = f"{run_state['image_id']}.jpg"
+        full_image_path = os.path.join(image_folder, image_filename)
+        raw_image = Image.open(full_image_path)
+        question_image = raw_image.convert("RGB")
+        messages = []
+        messages.append({'role': "system", 'content': prompt["system"]["prompt"].format(input_question=question)})
+        content_list = []
+        content_list.append({'type': 'image', 'image': question_image})
+        if state_type == "plan":
+            content_list.append({'type': 'text', 'text': prompt["tasks"][state_type].format(query=run_state['orginal_query'])})
+        elif state_type == "assess":
+            query = run_state['current_query']
+            docs = run_state['docs']
+            content_list.append({'type': 'text', 'text': prompt["tasks"][state_type].format(query=query, docs='\n'.join(docs))})
+        elif state_type == "refine":
+            query = run_state['current_query']
+            reason = run_state['reason']
+            content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(query=query, reason=reason)})
+        elif state_type == "generate":
+            initial_query = question
+            docs = run_state["docs"]
+            content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(initial_query=initial_query, docs='\n'.join(docs))})
+        messages.append({'role': 'user', 'content': content_list})
+        return messages
+    
 class GAOKAOMMPromptTemplate(MMPromptTemplate):
     BASE_USER_PROMPT = "请你做一道{subject}选择题\n请你结合文字和图片一步一步思考,并将思考过程写在【解析】和<eoe>之间。{instruction}\n例如：{example}\n请你严格按照上述格式作答。\n你可以参考一些知识: {reference}。题目如下：{question}"
     INSTRUCTION_DICT = {

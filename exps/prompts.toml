@@ -3,6 +3,8 @@ prompt = """
 You are a helpful and precise multimodal question answering assistant. Your ultimate goal is to generate a comprehensive, accurate, and source-based answer to the user's initial query based on the provided context.
 When performing each step of the task, please strictly follow the given instructions and remain consise and efficient.
 Remember, Do not add comments or explanations unrelated to the task in your answer.
+Think Step by Step.
+Initial Query: {input_question}
 """
 
 [tasks]
@@ -28,12 +30,22 @@ Please answer strictly in the format 'pass' or 'fail: [reason]'.
 
 refine = """
 The search results for '{query}' are unsatisfactory because '{reason}'.
-Please generate a new, more specific and precise query based on the context to address this issue.
+Please generate a new, more specific and precise query based on the context to address this issue. Only generate the refined query.
 """
 
 generate = """
-Please generate the final answer to the user's initial query '{initial_query}' based on the context and following information.
+Please generate the next-stage answer to the user's initial query '{initial_query}' based on the context and following information. If the answer is sufficient enough to answer the initial query, then generate a consise and brief final answer using the format below strictly:
+<Final_Answer>
+Final Answer
+</Final_Answer>
+
+Otherwise, Generate further meaningful responses to answer the user's question, using the format below strictly:
+<Further_Analysis>
+Further Analysis
+</Further_Analysis>
+
+Here are complementary materials, Reply strictly in accordance with the following materials：
 Information: {docs}
-Think step by step
+
 Answer:
 """

@@ -112,3 +112,5 @@ metric_setting:
   tokenizer_name: 'gpt-4'
 save_metric_score: True #　whether to save the metric score into txt file
 
+# DFA Config
+dfa_prompt_path: "prompts.toml"
