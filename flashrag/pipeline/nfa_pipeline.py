@@ -163,8 +163,8 @@ class NFAPipeline(BasicMultiModalPipeline):
             print(f"_parse_generate: 未找到匹配项。{response}")
             return "Final_Answer", response
 
-    def _state_generate(self, run_state: dict) -> str:
-        input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="generate", run_state=run_state)
+    def _state_generate_search(self, run_state: dict) -> str:
+        input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="generate_search", run_state=run_state)
         response_dict = self.generator.generate([input_prompt])
         response = response_dict[0]['output_text'][0]
 
@@ -186,6 +186,29 @@ class NFAPipeline(BasicMultiModalPipeline):
             run_state['further_analysis'] = answer
             return "S_Plan"
         
+    def _state_generate_no_search(self, run_state: dict) -> str:
+        input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="generate_no_search", run_state=run_state)
+        response_dict = self.generator.generate([input_prompt])
+        response = response_dict[0]['output_text'][0]
+
+        reasoning_content, mark, answer = self._parse_generate(response)
+        run_state["record"].append({"state": "generate", "response": response, "result": {"mark": mark, "answer": answer}})
+        self.dfa_print(run_state['record'])
+
+        if mark == "Further_Analysis":
+            if run_state['generate_plan_loop_counter'] >= 5:
+                return "S_Fail"
+            else:
+                run_state['generate_plan_loop_counter'] += 1
+                run_state['further_analysis'] = f"Resoning: {reasoning_content}\nConclusion: {answer}"
+                return "S_Plan"
+        elif mark == "Final_Answer":
+            run_state['final_answer'] = answer
+            return "S_Final"
+        else:
+            run_state['further_analysis'] = answer
+            return "S_Plan"
+
     def _state_final(self, run_state: dict) -> str:
         result_data = {
             "id": run_state['id'],
@@ -241,7 +264,8 @@ class NFAPipeline(BasicMultiModalPipeline):
                 "S_Retrieve": self._state_retrieve,
                 "S_Assess": self._state_assess,
                 "S_Refine": self._state_refine,
-                "S_Generate": self._state_generate,
+                "S_Generate_search": self._state_generate_search,
+                "S_Generate_no_search": self._state_generate_no_search,
                 "S_Fail": self._state_fail
             }
 

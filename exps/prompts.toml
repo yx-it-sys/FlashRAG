@@ -95,11 +95,61 @@ The search results for '{query}' are unsatisfactory because '{reason}'.
 Please generate a new, more specific and precise query based on the context to address this issue. Only generate the refined query.
 """
 
-generate = """
+generate_search = """
 # GOAL: In this stage, your goal is to determine if the provided "Information" is sufficient to answer the "User Query". Based on this determination, you must generate a response in one of two strict formats.
 
 # INSTRUCTIONS:
 1.  First, think step-by-step inside the `<reasoning>` tags. Explicitly state whether the information is sufficient and why.
+2.  Based on your reasoning, choose ONE of the two formats below.
+3.  If the information is sufficient, you MUST use the `<Final_Answer>` format. The answer should be brief and directly extracted or synthesized from the information.
+4.  If the information is NOT sufficient, you MUST use the `<Further_Analysis>` format. Briefly explain what information is missing.
+5.  Your entire output MUST start with `<reasoning>` and be followed by EITHER `<Final_Answer>` OR `<Further_Analysis>`. There are no other valid outputs.
+
+---
+# EXAMPLES:
+
+**Example 1: Sufficient Information**
+**User Query:** "What is the primary function of a surfboard lock?"
+**Information:** "A surfboard lock is a device or a mechanism for securing a surfboard to prevent theft or loss."
+**Your Output:**
+<reasoning>
+The provided information directly and completely answers the user's query about the function of a surfboard lock. Therefore, the context is sufficient.
+</reasoning>
+<Final_Answer>Securing a surfboard to prevent theft or loss</Final_Answer>
+
+---
+**Example 2: Insufficient Information**
+**User Query:** "What is the exact height of the Burj Khalifa in meters?"
+**Information:** "The Burj Khalifa is the world's tallest skyscraper, located in Dubai."
+**Your Output:**
+<reasoning>
+The information confirms that the Burj Khalifa is a tall skyscraper, but it does not contain the specific height in meters as requested by the user. Therefore, the context is insufficient.
+</reasoning>
+<Further_Analysis>The context is missing the specific height of the Burj Khalifa in meters.</Further_Analysis>
+
+---
+**Example 3: No Relevant Information**
+**User Query:** "Who is the CEO of OpenAI?"
+**Information:** "A surfboard is an elongated platform used in surfing."
+**Your Output:**
+<reasoning>
+The provided information is about surfboards and is completely irrelevant to the user's query about the CEO of OpenAI. Therefore, the context is insufficient.
+</reasoning>
+<Further_Analysis>The provided context is completely irrelevant and does not contain any information about OpenAI or its CEO.</Further_Analysis>
+
+---
+# TASK TO COMPLETE:
+
+**User Query:** "{initial_query}"
+**Information:** "{docs}"
+**Your Output:**
+"""
+
+generate_no_search = """
+# GOAL: In this stage, your goal is to generate a response in one of two strict formats.
+
+# INSTRUCTIONS:
+1.  First, think step-by-step inside the `<reasoning>` tags.
 2.  Based on your reasoning, choose ONE of the two formats below.
 3.  If the information is sufficient, you MUST use the `<Final_Answer>` format. The answer should be brief and directly extracted or synthesized from the information.
 4.  If the information is NOT sufficient, you MUST use the `<Further_Analysis>` format. Briefly explain what information is missing.

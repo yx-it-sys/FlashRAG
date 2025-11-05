@@ -72,10 +72,14 @@ class MMPromptTemplate:
             query = run_state['current_query']
             reason = run_state['reason']
             content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(query=query, reason=reason)})
-        elif state_type == "generate":
+        elif state_type == "generate_search":
             initial_query = question
             docs = run_state["retrieved_docs"]
             content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(initial_query=initial_query, docs='\n'.join(docs))})
+        elif state_type == "generate_no_search":
+            query = question
+            content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(query=query)})
+        
         messages.append({'role': 'user', 'content': content_list})
         return messages
     
