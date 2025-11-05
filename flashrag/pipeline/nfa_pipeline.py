@@ -119,22 +119,26 @@ class NFAPipeline(BasicMultiModalPipeline):
 
 
     def _state_assess(self, run_state: dict) -> str:
-        input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="assess", run_state=run_state)
-        response_dict = self.generator.generate([input_prompt])
-        response = response_dict[0]["output_text"][0]
-        print(f"response: {response}")
-        assess, reason = self._parse_assess(response)
-        
-        run_state["record"].append({"state": "assess", "response": response, "result": {"assessment_result": assess, "reason": reason if reason is not None else ""}})
-        self.dfa_print(run_state["record"])
-
-        if assess == 'pass':
-            run_state['assessment_result'] = assess
-            return "S_Generate"
+        if run_state['retrieval_assess_refine_loop_counter'] >= 5:
+            return "S_Fail"
         else:
-            run_state['assessment_result'] = assess
-            run_state['reason'] = reason
-            return "S_Refine"
+            run_state['retrieval_assess_refine_loop_counter'] += 1
+            input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="assess", run_state=run_state)
+            response_dict = self.generator.generate([input_prompt])
+            response = response_dict[0]["output_text"][0]
+            print(f"response: {response}")
+            assess, reason = self._parse_assess(response)
+            
+            run_state["record"].append({"state": "assess", "response": response, "result": {"assessment_result": assess, "reason": reason if reason is not None else ""}})
+            self.dfa_print(run_state["record"])
+
+            if assess == 'pass':
+                run_state['assessment_result'] = assess
+                return "S_Generate"
+            else:
+                run_state['assessment_result'] = assess
+                run_state['reason'] = reason
+                return "S_Refine"
         
     def _state_refine(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="refine", run_state=run_state)
@@ -171,8 +175,12 @@ class NFAPipeline(BasicMultiModalPipeline):
         self.dfa_print(run_state['record'])
 
         if mark == "Further_Analysis":
-            run_state['further_analysis'] = f"Resoning: {reasoning_content}\nConclusion: {answer}"
-            return "S_Plan"
+            if run_state['generate_plan_loop_counter'] >= 5:
+                return "S_Fail"
+            else:
+                run_state['generate_plan_loop_counter'] += 1
+                run_state['further_analysis'] = f"Resoning: {reasoning_content}\nConclusion: {answer}"
+                return "S_Plan"
         elif mark == "Final_Answer":
             run_state['final_answer'] = answer
             return "S_Final"
@@ -185,6 +193,15 @@ class NFAPipeline(BasicMultiModalPipeline):
             "id": run_state['id'],
             "question": run_state['initial_query'],
             "prediction": run_state['final_answer'],
+            "record": run_state['record']
+        }
+        return result_data
+    
+    def _state_fail(self, run_state: dict) -> str:
+        result_data = {
+            "id": run_state['id'],
+            "question": run_state['initial_query'],
+            "prediction": "I don't know.",
             "record": run_state['record']
         }
         return result_data
@@ -218,6 +235,8 @@ class NFAPipeline(BasicMultiModalPipeline):
                 "final_answer": None,
                 "further_analysis": None,
                 "record": [],
+                "generate_plan_loop_counter": 0,
+                "retrieval_assess_refine_loop_counter": 0
             }
 
             state_handlers = {
@@ -226,7 +245,8 @@ class NFAPipeline(BasicMultiModalPipeline):
                 "S_Retrieve": self._state_retrieve,
                 "S_Assess": self._state_assess,
                 "S_Refine": self._state_refine,
-                "S_Generate": self._state_generate
+                "S_Generate": self._state_generate,
+                "S_Fail": self._state_fail
             }
 
             current_state = "S_Initial"
