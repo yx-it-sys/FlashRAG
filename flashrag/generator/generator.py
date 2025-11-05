@@ -128,7 +128,7 @@ class EncoderDecoderGenerator(BaseGenerator):
         generation_params = resolve_max_tokens(params, generation_params, prioritize_new_tokens=True)
 
         responses = []
-        for idx in trange(0, len(input_list), batch_size, desc="Generation process: "):
+        for idx in range(0, len(input_list), batch_size):
             batched_prompts = input_list[idx : idx + batch_size]
             if self.fid:
                 # assume each input in input_list is a list, contains K string

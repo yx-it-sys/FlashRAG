@@ -63,7 +63,7 @@ class MMPromptTemplate:
         content_list = []
         content_list.append({'type': 'image', 'image': question_image})
         if state_type == "plan":
-            content_list.append({'type': 'text', 'text': prompt["tasks"][state_type].format(query=run_state['initial_query'])})
+            content_list.append({'type': 'text', 'text': prompt["tasks"][state_type].format(query=run_state['initial_query'], further_analysis=run_state['further_analysis'] if run_state['further_analysis'] is not None else "No complementary materials.")})
         elif state_type == "assess":
             query = run_state['current_query']
             docs = run_state['retrieved_docs']

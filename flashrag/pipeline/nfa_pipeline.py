@@ -49,24 +49,36 @@ class NFAPipeline(BasicMultiModalPipeline):
         return "S_Plan"
     
     def _parse_plan(self, response: str):
-        pattern = re.compile(r"<sub-question>(.*?)</sub-question>\s*<need_search>(.*?)</need_search>", re.DOTALL)
+        pattern = re.compile(
+            r"<reasoning>(?P<reasoning>.*?)\s*"
+            r"<sub-question>(?P<sub_question>.*?)\s*"
+            r"<need_search>(?P<need_search>.*)", 
+            re.DOTALL
+        )
 
-        match = pattern.search(response)
+        match = pattern.search(response.strip())
         if match:
-            sub_question = match.group(1).strip()
-            need_search = match.group(2).strip()
-            return sub_question, need_search
+            reasoning = match.group('reasoning').strip()
+            sub_question = match.group('sub_question').strip()
+            need_search_raw = match.group('need_search').strip()
+            end_tag_pos = need_search_raw.rfind('</')
+            if end_tag_pos != -1:
+                need_search = need_search_raw[:end_tag_pos].strip()
+            else:
+                need_search = need_search_raw
+            
+            return reasoning, sub_question, need_search
         else:
-            print("未找到匹配项。")
-            return None, None
+            print("_parse_plan: 未找到匹配项。")
+            return None, None, None
 
     def _state_plan(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="plan", run_state=run_state)
-        if run_state['further_analysis'] is not None:
-            input_prompt.append({"role": "assistant", "content": run_state['further_analysis']})
+
         response_dict = self.generator.generate([input_prompt])
         response = response_dict[0]["output_text"][0]
-        sub_question, need_search = self._parse_plan(response)
+        print(response)
+        reasoning, sub_question, need_search = self._parse_plan(response)
 
         run_state["plan"] = {"sub_question": sub_question, "need_search": need_search}
         run_state["record"].append({"state": "plan", "response": response, "result": run_state["plan"]})
@@ -80,9 +92,15 @@ class NFAPipeline(BasicMultiModalPipeline):
     def _state_retrieve(self, run_state: dict) -> str:
         query = run_state["plan"]["sub_question"]
 
-        search_text = self.retriever.search(query, 2)
-        search_text = search_text[0]["contents"]
-        run_state["retrieved_docs"] = f"Contents of retrieved documents:\n{' '.join(search_text)}"
+        search_results = self.retriever.search(query, 3)
+        print(search_results)
+        search_text_list = []
+
+        for result in search_results:
+            search_text_list.append(result['contents'])
+
+        search_texts = "\n\n".join(search_text_list)
+        run_state["retrieved_docs"] = f"Contents of retrieved documents:\n{search_texts}"
         run_state["record"].append({"state": "retrieve", "result": run_state["retrieved_docs"]})
         self.dfa_print(run_state["record"])
 
@@ -90,13 +108,13 @@ class NFAPipeline(BasicMultiModalPipeline):
     
     def _parse_assess(self, response: str):
         if "pass" in response:
-            return "pass"
+            return "pass", None
         elif response.startswith("fail:"):
             parts = response.split(':', 1)
             if len(parts) > 1:
-                return parts[1].strip()
+                return parts[0].strip(), parts[1].strip()
         else:
-            print("未找到匹配项。")
+            print("_parse_assess: 未找到匹配项。")
             return None
 
 
@@ -104,9 +122,10 @@ class NFAPipeline(BasicMultiModalPipeline):
         input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="assess", run_state=run_state)
         response_dict = self.generator.generate([input_prompt])
         response = response_dict[0]["output_text"][0]
+        print(f"response: {response}")
         assess, reason = self._parse_assess(response)
         
-        run_state["record"].append({"state": "assess", "response": response, "result": {"assessment_result": assess, "reason": reason}})
+        run_state["record"].append({"state": "assess", "response": response, "result": {"assessment_result": assess, "reason": reason if reason is not None else ""}})
         self.dfa_print(run_state["record"])
 
         if assess == 'pass':
@@ -129,34 +148,38 @@ class NFAPipeline(BasicMultiModalPipeline):
     
     def _parse_generate(self, response: str):
         pattern = re.compile(
-            r"<(?P<tag>Final_Answer|Further_Analysis)>(?P<content>.*?)</(?P=tag)>", re.DOTALL
+            r"<reasoning>(?P<reasoning_content>.*?)</reasoning>\s*<(?P<tag>Final_Answer|Further_Analysis)>(?P<content>.*?)</(?P=tag)>", re.DOTALL
         )
         match = pattern.search(response.strip())
 
         if match:
+            reasoning_content = match.group('reasoning_content').strip()
             tag_name = match.group('tag')
             content = match.group('content').strip()
-            return tag_name, content
+            return reasoning_content, tag_name, content
         else:
-            print("未找到匹配项。")
-            return None, None
+            print("_parse_generate: 未找到匹配项。")
+            return "Final_Answer", response
 
     def _state_generate(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="generate", run_state=run_state)
         response_dict = self.generator.generate([input_prompt])
         response = response_dict[0]['output_text'][0]
 
-        mark, answer = self._parse_generate(response)
+        reasoning_content, mark, answer = self._parse_generate(response)
         run_state["record"].append({"state": "generate", "response": response, "result": {"mark": mark, "answer": answer}})
         self.dfa_print(run_state['record'])
 
-        if mark == "Final_Answer":
+        if mark == "Further_Analysis":
+            run_state['further_analysis'] = f"Resoning: {reasoning_content}\nConclusion: {answer}"
+            return "S_Plan"
+        elif mark == "Final_Answer":
             run_state['final_answer'] = answer
             return "S_Final"
-        elif mark == "Further Analysis":
+        else:
             run_state['further_analysis'] = answer
             return "S_Plan"
-
+        
     def _state_final(self, run_state: dict) -> str:
         result_data = {
             "id": run_state['id'],
@@ -213,7 +236,6 @@ class NFAPipeline(BasicMultiModalPipeline):
                 current_state = next_state
             
             result_data = self._state_final(run_state)
-            print(item)
             result_data['golden_answers'] = item['golden_answers']
             pred_answer_list.append(result_data['prediction'])           
             file_path = os.path.join(self.config["save_dir"], "output.jsonl")

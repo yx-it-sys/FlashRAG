@@ -9,17 +9,79 @@ Initial Query: {input_question}
 
 [tasks]
 plan = """
-Based on the following user's query, image, and further analysis, generate a "sub-question" that must be solved first. The sub-question must be solved only in one step. Then determine if it is neccessary to use "Search" to state what additional context or information is needed to provide a precise answer to the "sub-question". Use the format below strictly:
+Identify the single most crucial first step needed to answer the user's query. The sub-question must be a specific, fine-grained query, NOT a repetition of the original question.
 
+Here are complementary materials:
+{further_analysis}
+
+---
+# INSTRUCTIONS:
+1.  First, think step-by-step inside the `<reasoning>` tags. Analyze what information is given and what information is missing to answer the user's complete query.
+2.  Based on your reasoning, determine if a search is needed. The `<need_search>` flag MUST be `True` if you do not possess the required knowledge internally. This refers to the overall user query, not just the sub-question.
+3.  Formulate a precise, searchable `<sub-question>`. It should be a query that, when answered, provides the first piece of missing information.
+4.  The search engine CANNOT see images. If the query involves an image, your first step is to internally identify the object, and then formulate a sub-question about that object to search for the information needed.
+
+---
+# FORMAT:
+<reasoning>
+[Your step-by-step analysis of the user query, identifying knowns and unknowns.]
+</reasoning>
 <sub-question>
-Your generated sub-question
+[The single, specific, searchable sub-question.]
 </sub-question>
 <need_search>
-True/False
+[True or False, based on your reasoning about the overall query.]
 </need_search>
 
-Here is the query: {query}
-Your Answer:
+---
+# EXAMPLES:
+
+**Example 1:**
+**User Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
+**Your Output:**
+<reasoning>
+The user wants to know the CEO of a company. To find the CEO, I first need to identify the company that developed 'Cyberpunk 2077'. I do not have this information internally. Therefore, a search is required. The first logical search is to find the developer company.
+</reasoning>
+<sub-question>
+developer of 'Cyberpunk 2077'
+</sub-question>
+<need_search>
+True
+</need_search>
+
+---
+**Example 2:**
+**User Query:** "Which building is taller, the Burj Khalifa or the Shanghai Tower?"
+**Your Output:**
+<reasoning>
+The user wants to compare the heights of two buildings. I do not have the exact, up-to-date height data for both buildings stored internally. To perform the comparison, I need to search for this information. A logical first step is to find the height of one of the buildings.
+</reasoning>
+<sub-question>
+height of the Burj Khalifa
+</sub-question>
+<need_search>
+True
+</need_search>
+
+---
+**Example 3 (Corrected):**
+**User Query:** "Based on this image of a golden retriever, what is the average lifespan of this dog breed?"
+**Your Output:**
+<reasoning>
+The user wants to know the average lifespan of a dog breed. I can identify the dog in the image as a 'golden retriever' using my internal vision capabilities. However, I do not have the precise, statistical data for its average lifespan. This information must be retrieved from an external source. Therefore, a search is required. The sub-question should be about finding this specific missing data point.
+</reasoning>
+<sub-question>
+average lifespan of a golden retriever
+</sub-question>
+<need_search>
+True
+</need_search>
+
+---
+# TASK:
+
+**User Query:** {query}
+**Your Output:**
 """
 
 assess = """
@@ -34,18 +96,51 @@ Please generate a new, more specific and precise query based on the context to a
 """
 
 generate = """
-Please generate the next-stage answer to the user's initial query '{initial_query}' based on the context and following information. If the answer is sufficient enough to answer the initial query, then generate a consise and brief final answer using the format below strictly:
-<Final_Answer>
-Final Answer
-</Final_Answer>
+# GOAL: In this stage, your goal is to determine if the provided "Information" is sufficient to answer the "User Query". Based on this determination, you must generate a response in one of two strict formats.
 
-Otherwise, Generate further meaningful responses to answer the user's question, using the format below strictly:
-<Further_Analysis>
-Further Analysis
-</Further_Analysis>
+# INSTRUCTIONS:
+1.  First, think step-by-step inside the `<reasoning>` tags. Explicitly state whether the information is sufficient and why.
+2.  Based on your reasoning, choose ONE of the two formats below.
+3.  If the information is sufficient, you MUST use the `<Final_Answer>` format. The answer should be brief and directly extracted or synthesized from the information.
+4.  If the information is NOT sufficient, you MUST use the `<Further_Analysis>` format. Briefly explain what information is missing.
+5.  Your entire output MUST start with `<reasoning>` and be followed by EITHER `<Final_Answer>` OR `<Further_Analysis>`. There are no other valid outputs.
 
-Here are complementary materials, Reply strictly in accordance with the following materials：
-Information: {docs}
+---
+# EXAMPLES:
 
-Answer:
+**Example 1: Sufficient Information**
+**User Query:** "What is the primary function of a surfboard lock?"
+**Information:** "A surfboard lock is a device or a mechanism for securing a surfboard to prevent theft or loss."
+**Your Output:**
+<reasoning>
+The provided information directly and completely answers the user's query about the function of a surfboard lock. Therefore, the context is sufficient.
+</reasoning>
+<Final_Answer>Securing a surfboard to prevent theft or loss</Final_Answer>
+
+---
+**Example 2: Insufficient Information**
+**User Query:** "What is the exact height of the Burj Khalifa in meters?"
+**Information:** "The Burj Khalifa is the world's tallest skyscraper, located in Dubai."
+**Your Output:**
+<reasoning>
+The information confirms that the Burj Khalifa is a tall skyscraper, but it does not contain the specific height in meters as requested by the user. Therefore, the context is insufficient.
+</reasoning>
+<Further_Analysis>The context is missing the specific height of the Burj Khalifa in meters.</Further_Analysis>
+
+---
+**Example 3: No Relevant Information**
+**User Query:** "Who is the CEO of OpenAI?"
+**Information:** "A surfboard is an elongated platform used in surfing."
+**Your Output:**
+<reasoning>
+The provided information is about surfboards and is completely irrelevant to the user's query about the CEO of OpenAI. Therefore, the context is insufficient.
+</reasoning>
+<Further_Analysis>The provided context is completely irrelevant and does not contain any information about OpenAI or its CEO.</Further_Analysis>
+
+---
+# TASK TO COMPLETE:
+
+**User Query:** "{initial_query}"
+**Information:** "{docs}"
+**Your Output:**
 """
