@@ -69,12 +69,11 @@ class NFAPipeline(BasicMultiModalPipeline):
             
             return reasoning, sub_question, need_search
         else:
-            print("_parse_plan: 未找到匹配项。")
+            print(f"_parse_plan: 未找到匹配项。{response}")
             return None, None, None
 
     def _state_plan(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="plan", run_state=run_state)
-
         response_dict = self.generator.generate([input_prompt])
         response = response_dict[0]["output_text"][0]
         print(response)
@@ -93,7 +92,6 @@ class NFAPipeline(BasicMultiModalPipeline):
         query = run_state["plan"]["sub_question"]
 
         search_results = self.retriever.search(query, 3)
-        print(search_results)
         search_text_list = []
 
         for result in search_results:
@@ -114,7 +112,7 @@ class NFAPipeline(BasicMultiModalPipeline):
             if len(parts) > 1:
                 return parts[0].strip(), parts[1].strip()
         else:
-            print("_parse_assess: 未找到匹配项。")
+            print(f"_parse_assess: 未找到匹配项。{response}")
             return None
 
 
@@ -143,7 +141,7 @@ class NFAPipeline(BasicMultiModalPipeline):
     def _state_refine(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="refine", run_state=run_state)
         response_dict = self.generator.generate([input_prompt])
-        refined_query = response_dict['output_text'][0]
+        refined_query = response_dict[0]['output_text'][0]
         run_state['current_query'] = refined_query
         run_state["record"].append({"state": "refine", "response": refined_query, "result": refined_query})
         self.dfa_print(run_state['record'])
@@ -162,7 +160,7 @@ class NFAPipeline(BasicMultiModalPipeline):
             content = match.group('content').strip()
             return reasoning_content, tag_name, content
         else:
-            print("_parse_generate: 未找到匹配项。")
+            print(f"_parse_generate: 未找到匹配项。{response}")
             return "Final_Answer", response
 
     def _state_generate(self, run_state: dict) -> str:
@@ -214,8 +212,6 @@ class NFAPipeline(BasicMultiModalPipeline):
     def run(self, dataset, do_eval=True, pred_process_func=None, uncertainty_type=None):
         data_items_list = []
         for i, item in enumerate(dataset):
-            if i > 10:
-                break
             data_items_list.append({
                 "id": item.id,
                 "question": item.question,
@@ -250,12 +246,17 @@ class NFAPipeline(BasicMultiModalPipeline):
             }
 
             current_state = "S_Initial"
-            while current_state != "S_Final":
+            while current_state != "S_Final" and current_state != "S_Fail":
                 handler = state_handlers[current_state]
                 next_state = handler(run_state)
                 current_state = next_state
+            if current_state == "S_Final":
+                result_data = self._state_final(run_state)
+            elif current_state == "S_Fail":
+                result_data = self._state_fail(run_state)
+            else:
+                print("ERROR! current state is not any of 'S_Fail' or 'S_Final'!")
             
-            result_data = self._state_final(run_state)
             result_data['golden_answers'] = item['golden_answers']
             pred_answer_list.append(result_data['prediction'])           
             file_path = os.path.join(self.config["save_dir"], "output.jsonl")

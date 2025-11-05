@@ -29,7 +29,7 @@ def get_dataset(config):
             continue
         else:
             print(f"Loading {split} dataset from: {split_path}...")
-        if split in ["test", "val", "dev", "train"]:
+        if split in ["test", "val", "dev", "train", "validation"]:
             split_dict[split] = Dataset(
                 config, split_path, sample_num=config["test_sample_num"], random_sample=config["random_sample"]
             )

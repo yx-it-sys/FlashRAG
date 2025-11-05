@@ -11,7 +11,7 @@ Initial Query: {input_question}
 plan = """
 Identify the single most crucial first step needed to answer the user's query. The sub-question must be a specific, fine-grained query, NOT a repetition of the original question.
 
-Here are complementary materials:
+Complementary materials:
 {further_analysis}
 
 ---

@@ -19,7 +19,7 @@ def main():
 
     config = Config("my_config.yaml", config_dict=config_dict)
     all_split = get_dataset(config)
-    test_data = all_split["validation"]
+    test_data = all_split["test"]
     
     prompt_templete = MMPromptTemplate(
         config=config

@@ -54,10 +54,10 @@ method2index:
 # ----Environment Settings----
 gpu_id: "0"
 dataset_name: "okvqa"
-split: ['validation']
+split: ['validation','test']
 
 # Sampling configurations for testing
-test_sample_num: 100
+test_sample_num: 1000
 random_sample: False
 save_intermediate_data: True
 # Seed for reproducibility
@@ -94,7 +94,7 @@ rerank_batch_size: 256
 # ----Generator Settings----
 framework: hf # inference frame work of LLM, supporting: 'hf','vllm','fschat'
 generator_model: "Qwen2.5-VL-7B-Instruct"  # name or path of the generator
-generator_max_input_len: 4096
+generator_max_input_len: 32768
 generator_batch_size: 4
 generation_params:
   do_sample: False
