@@ -515,6 +515,174 @@ class HFCausalLMGenerator(BaseGenerator):
         else:
             return responses
 
+    def generate_for_dfa_qa(
+        self,
+        input_list: List[str],
+        batch_size=1,
+        return_scores=False,
+        return_dict=False,
+        **params,
+    ):
+        """Generate batches one by one. The generated content needs to exclude input."""
+
+        if isinstance(input_list, str):
+            input_list = [input_list]
+        if batch_size is None:
+            batch_size = self.batch_size
+
+        generation_params = deepcopy(self.generation_params)
+        generation_params.update(params)
+
+        # deal stop params
+        stop_sym = None
+        if "stop" in generation_params:
+            from flashrag.generator.stop_word_criteria import StopWordCriteria
+
+            stop_sym = generation_params.pop("stop")
+            stopping_criteria = [
+                StopWordCriteria(
+                    tokenizer=self.tokenizer,
+                    prompts=input_list,
+                    stop_words=stop_sym,
+                )
+            ]
+            generation_params["stopping_criteria"] = stopping_criteria
+
+        generation_params = resolve_max_tokens(params, generation_params, prioritize_new_tokens=True)
+
+        # set eos token for llama
+        if "llama" in self.model_name.lower():
+            extra_eos_tokens = [
+                self.tokenizer.eos_token_id,
+                self.tokenizer.convert_tokens_to_ids("<|eot_id|>"),
+            ]
+            if "eos_token_id" in generation_params:
+                generation_params["eos_token_id"].extend(extra_eos_tokens)
+            else:
+                generation_params["eos_token_id"] = extra_eos_tokens
+
+        responses = []
+        scores = []
+        generated_token_ids = []
+        generated_token_logits = []
+
+        import torch
+        for idx in trange(0, len(input_list), batch_size, desc="Generation process: "):
+            with torch.inference_mode():
+                torch.cuda.empty_cache()
+                batched_prompts = input_list[idx : idx + batch_size]
+                formatted_batched_prompts = [
+                    self.tokenizer.apply_chat_template(
+                        prompt,
+                        tokenize=False,
+                        add_generation_prompt=True
+                    )
+                    for prompt in batched_prompts
+                ]
+                inputs = self.tokenizer(
+                    formatted_batched_prompts,
+                    return_tensors="pt",
+                    padding=True,
+                    truncation=True,
+                    max_length=self.max_input_len,
+                ).to(self.model.device)
+                outputs = self.model.generate(
+                    **inputs,
+                    output_scores=True,
+                    return_dict_in_generate=True,
+                    **generation_params,
+                )
+
+                generated_ids = outputs.sequences
+                logits = torch.stack(outputs.scores, dim=1).softmax(-1)
+                generated_ids = generated_ids[:, inputs["input_ids"].shape[-1] :]
+                gen_score = torch.gather(logits, 2, generated_ids[:, :, None]).squeeze(-1).cpu().tolist()
+                scores.extend(gen_score)
+
+            # get additinoal info
+            if return_dict:
+                batch_generated_token_ids = generated_ids.detach().cpu()
+                batch_generated_token_logits = (
+                    torch.cat(
+                        [token_scores.unsqueeze(1) for token_scores in outputs.scores],
+                        dim=1,
+                    )
+                    .detach()
+                    .cpu()
+                )
+                if batch_generated_token_ids.shape[1] < generation_params["max_new_tokens"]:
+                    real_batch_size, num_generated_tokens = batch_generated_token_ids.shape
+                    padding_length = generation_params["max_new_tokens"] - num_generated_tokens
+                    padding_token_ids = torch.zeros(
+                        (real_batch_size, padding_length),
+                        dtype=batch_generated_token_ids.dtype,
+                    ).fill_(self.tokenizer.pad_token_id)
+                    padding_token_logits = torch.zeros(
+                        (
+                            real_batch_size,
+                            padding_length,
+                            batch_generated_token_logits.shape[-1],
+                        ),
+                        dtype=batch_generated_token_logits.dtype,
+                    )
+                    batch_generated_token_ids = torch.cat([batch_generated_token_ids, padding_token_ids], dim=1)
+                    batch_generated_token_logits = torch.cat(
+                        [batch_generated_token_logits, padding_token_logits],
+                        dim=1,
+                    )
+                generated_token_ids.append(batch_generated_token_ids)
+                generated_token_logits.append(batch_generated_token_logits)
+
+            for i, generated_sequence in enumerate(outputs.sequences):
+                input_ids = inputs["input_ids"][i]
+                text = self.tokenizer.decode(
+                    generated_sequence,
+                    skip_special_tokens=True,
+                    clean_up_tokenization_spaces=False,
+                )
+                if input_ids is None:
+                    prompt_length = 0
+                else:
+                    prompt_length = len(
+                        self.tokenizer.decode(
+                            input_ids,
+                            skip_special_tokens=True,
+                            clean_up_tokenization_spaces=False,
+                        )
+                    )
+                new_text = text[prompt_length:]
+
+                if stop_sym is not None:
+                    strip_stopword = True
+                    # Find the first occurrence of any stop word
+                    lower_stop_index = len(new_text)  # Default to end of text
+                    for sym in stop_sym:
+                        stop_index = new_text.find(sym)
+                        if stop_index != -1:
+                            # Adjust stop index based on whether we're stripping the stop word
+                            stop_index += 0 if strip_stopword else len(sym)
+                            lower_stop_index = min(stop_index, lower_stop_index)
+
+                    # Cut the text at the first stop word found (if any)
+                    new_text = new_text[:lower_stop_index]
+
+                responses.append(new_text.strip())
+
+        if return_dict:
+            generated_token_ids = torch.cat(generated_token_ids, dim=0)
+            generated_token_logits = torch.cat(generated_token_logits, dim=0)
+            return {
+                "generated_token_ids": generated_token_ids,
+                "generated_token_logits": generated_token_logits,
+                "responses": responses,
+                "scores": scores,
+            }
+
+        if return_scores:
+            return responses, scores
+        else:
+            return responses
+
 
     def cal_gen_probs(self, prev, next):
         import torch

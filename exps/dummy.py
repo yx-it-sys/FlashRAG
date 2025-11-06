@@ -8,16 +8,16 @@ seed = 42
 full_dataset = load_dataset("RUC-NLPIR/FlashRAG_datasets", "2wikimultihopqa", split='dev')
 full_dataset = full_dataset.shuffle(seed=seed)
 # dummy_subset = full_dataset.select(range(num_samples))
-annotations_dir = os.path.dirname("data/datasets/okvqa/annotations/")
+annotations_dir = os.path.dirname("data/datasets/2wikimultihopqa")
 
 os.makedirs(annotations_dir, exist_ok=True)
 
 processed_data = []
 for item in full_dataset:
     clean_item = {
-        "id": item["question_id"],
+        "id": item["id"],
         "question": item["question"],
-        "golden_answers": item["answers"]
+        "golden_answers": item["golden_answers"]
     }
     processed_data.append(clean_item)
 

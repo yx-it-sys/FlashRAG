@@ -53,8 +53,8 @@ method2index:
 
 # ----Environment Settings----
 gpu_id: "0"
-dataset_name: "okvqa"
-split: ['validation','test']
+dataset_name: "2wikimultihopqa"
+split: ['validation','test','dev']
 
 # Sampling configurations for testing
 test_sample_num: 1000
@@ -93,7 +93,7 @@ rerank_batch_size: 256
 
 # ----Generator Settings----
 framework: hf # inference frame work of LLM, supporting: 'hf','vllm','fschat'
-generator_model: "Qwen2.5-VL-7B-Instruct"  # name or path of the generator
+generator_model: "Qwen2.5-7B-Instruct"  # name or path of the generator
 generator_max_input_len: 32768
 generator_batch_size: 4
 generation_params:
@@ -114,4 +114,4 @@ save_metric_score: True #　whether to save the metric score into txt file
 
 # DFA Config
 dfa_vqa_prompt_path: "/root/FlashRAG/exps/dfa_vqa_prompts.toml"
-dfa_qa_prompt_path: "/rrot/FlashRAG/exps/dfa_prompts.toml"
+dfa_qa_prompt_path: "/root/FlashRAG/exps/dfa_qa_prompts.toml"

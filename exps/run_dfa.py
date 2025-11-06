@@ -6,11 +6,11 @@ from flashrag.prompt import MMPromptTemplate, PromptTemplate
 
 def main():
     config_dict = {
-        "dataset_path": "data/datasets/okvqa/annotations",
+        "dataset_path": "data/datasets/2wikimultihopqa",
         "image_path": "data/datasets/okvqa/images/val2014",
         "index_path": "data/indexes/bm25",
         "corpus_path": "data/indexes/wiki18_100w.jsonl",
-        "generator_model_path": "data/models/Qwen2.5-VL-7B-Instruct",
+        "generator_model_path": "data/models/Qwen2.5-7B-Instruct",
         "retrieval_method": "bm25",
         "metrics": ["em", "f1", "acc"],
         "retrieval_topk": 1,
@@ -19,7 +19,7 @@ def main():
 
     config = Config("my_config.yaml", config_dict=config_dict)
     all_split = get_dataset(config)
-    test_data = all_split["validation"]
+    test_data = all_split["dev"]
     
     vqa_prompt_templete = MMPromptTemplate(
         config=config
@@ -29,7 +29,7 @@ def main():
         config=config
     )
 
-    pipeline = NFAPipeline(config, prompt_template=vqa_prompt_templete)
+    # pipeline = NFAPipeline(config, prompt_template=vqa_prompt_templete)
     pipeline = DFAQAPipeline(config, prompt_template=qa_prompt_pipeline)
     output_dataset = pipeline.run(test_data, do_eval=True)
 

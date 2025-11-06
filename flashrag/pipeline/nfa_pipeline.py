@@ -1,6 +1,6 @@
 from typing import List
 from flashrag.prompt import MMPromptTemplate, PromptTemplate
-from flashrag.pipeline import BasicMultiModalPipeline, BasicPipeline
+from flashrag.pipeline import BasicMultiModalPipeline
 from flashrag.utils import get_retriever, get_generator
 import re
 import os
@@ -305,7 +305,7 @@ class NFAPipeline(BasicMultiModalPipeline):
     
 
 
-class DFAQAPipeline(BasicPipeline):
+class DFAQAPipeline(NFAPipeline):
     def __init__(self, config, prompt_template=None, retriever=None, generator=None):
         super().__init__(config, prompt_template)
         
@@ -372,8 +372,10 @@ class DFAQAPipeline(BasicPipeline):
 
     def _state_plan(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_dfa(config=self.config, prompt=self.prompt, state_type="plan", run_state=run_state)
-        response_dict = self.generator.generate([input_prompt])
-        response = response_dict[0]["output_text"][0]
+        # print(f"input_prompt: {input_prompt}")
+        response_dict = self.generator.generate_for_dfa_qa([input_prompt])
+        # print(f"Response Dict: {response_dict}")
+        response = response_dict[0]
         reasoning, sub_question, need_search = self._parse_plan(response)
         run_state["plan"] = {"sub_question": sub_question, "need_search": need_search}
         run_state["record"].append({"state": "plan", "response": response, "result": run_state["plan"]})
@@ -434,8 +436,8 @@ class DFAQAPipeline(BasicPipeline):
         else:
             run_state['generate_plan_loop_counter'] += 1
             input_prompt = self.prompt_template.get_string_for_dfa(config=self.config, prompt=self.prompt, state_type="judge", run_state=run_state)
-            response_dict = self.generator.generate([input_prompt])
-            response = response_dict[0]["output_text"][0]
+            response_dict = self.generator.generate_for_dfa_qa([input_prompt])
+            response = response_dict[0]
             reasoning, tag, content = self._parse_judge(response)
 
             run_state["record"].append({"state": "judge", "response": response, "result": {"reasoning": reasoning, "tag": tag, "content": content}})
@@ -461,8 +463,8 @@ class DFAQAPipeline(BasicPipeline):
         else:
             run_state['retrieval_assess_refine_loop_counter'] += 1
             input_prompt = self.prompt_template.get_string_for_dfa(config=self.config, prompt=self.prompt, state_type="assess", run_state=run_state)
-            response_dict = self.generator.generate([input_prompt])
-            response = response_dict[0]["output_text"][0]
+            response_dict = self.generator.generate_for_dfa_qa([input_prompt])
+            response = response_dict[0]
             assess, reason = self._parse_assess(response)
             
             run_state["record"].append({"state": "assess", "response": response, "result": {"assessment_result": assess, "reason": reason if reason is not None else ""}})
@@ -478,8 +480,8 @@ class DFAQAPipeline(BasicPipeline):
         
     def _state_refine(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_dfa(config=self.config, prompt=self.prompt, state_type="refine", run_state=run_state)
-        response_dict = self.generator.generate([input_prompt])
-        refined_query = response_dict[0]['output_text'][0]
+        response_dict = self.generator.generate_for_dfa_qa([input_prompt])
+        refined_query = response_dict[0]
         run_state['current_query'] = refined_query
         run_state["record"].append({"state": "refine", "response": refined_query, "result": refined_query})
         self.dfa_print(run_state['record'])
@@ -503,8 +505,8 @@ class DFAQAPipeline(BasicPipeline):
 
     def _state_generate(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_dfa(config=self.config, prompt=self.prompt, state_type="generate", run_state=run_state)
-        response_dict = self.generator.generate([input_prompt])
-        response = response_dict[0]['output_text'][0]
+        response_dict = self.generator.generate_for_dfa_qa([input_prompt])
+        response = response_dict[0]
 
         reasoning_content, response_content = self._parse_generate(response)
         run_state["record"].append({"state": "generate", "response": response, "result": {"reasoning": reasoning_content, "response": response_content}})
