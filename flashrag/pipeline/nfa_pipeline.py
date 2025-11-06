@@ -115,8 +115,43 @@ class NFAPipeline(BasicMultiModalPipeline):
             print(f"_parse_assess: 未找到匹配项。{response}")
             return None
 
+    def _parse_judge(self, response: str):
+        pattern = re.compile(
+                    r"<reasoning>\s*(?P<reasoning_content>.*?)\s*</reasoning>\s*"
+                    r"<(?P<tag>Final_Answer|Further_Analysis)>"
+                    r"\s*(?P<content>.*?)\s*"
+                    r"(?:</(?P=tag)>|$)",
+                    re.DOTALL
+                )
+
+        match = pattern.search(response.strip())
+
+        if match:
+            reasoning_content = match.group('reasoning').strip()
+            tag = match.group('tag')
+            content = match.group('content').strip()
+            return reasoning, tag, content
+    
     def _state_judge(self, run_state: dict) -> str:
-        pass
+        if run_state['generate_plan_loop_counter'] >= 5:
+            return "S_Fail"
+        else:
+            run_state['generate_plan_loop_counter'] += 1
+            input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="judge", run_state=run_state)
+            response_dict = self.generator.generate([input_prompt])
+            response = response_dict[0]["output_text"][0]
+            reasoning, tag, content = self._parse_judge(response)
+
+            run_state["record"].append({"state": "judge", "response": response, "result": {"reasoning": reasoning, "tag": tag, "content": content}})
+            self.dfa_print(run_state["record"])
+
+            if tag == "Final_Answer":
+                run_state["judgement_result"] = tag
+                return "S_Final"
+            elif tag == "Further_Analysis":
+                run_state["judgment_result"] = tag
+                return "S_plan"
+    
     def _state_assess(self, run_state: dict) -> str:
         if run_state['retrieval_assess_refine_loop_counter'] >= 5:
             return "S_Fail"
@@ -125,7 +160,6 @@ class NFAPipeline(BasicMultiModalPipeline):
             input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="assess", run_state=run_state)
             response_dict = self.generator.generate([input_prompt])
             response = response_dict[0]["output_text"][0]
-            print(f"response: {response}")
             assess, reason = self._parse_assess(response)
             
             run_state["record"].append({"state": "assess", "response": response, "result": {"assessment_result": assess, "reason": reason if reason is not None else ""}})
@@ -151,41 +185,31 @@ class NFAPipeline(BasicMultiModalPipeline):
     
     def _parse_generate(self, response: str):
         pattern = re.compile(
-            r"<reasoning>(?P<reasoning_content>.*?)</reasoning>\s*<(?P<tag>Final_Answer|Further_Analysis)>(?P<content>.*?)</(?P=tag)>", re.DOTALL
+            r"<reasoning>(?P<reasoning_content>.*?)(?=</reasoning>|$)\s*<Response>(?P<response_content>.*?)(?=</Response>|$)", re.DOTALL
         )
         match = pattern.search(response.strip())
 
         if match:
             reasoning_content = match.group('reasoning_content').strip()
-            tag_name = match.group('tag')
-            content = match.group('content').strip()
-            return reasoning_content, tag_name, content
+            response_content = match.group('response_content').strip()
+            return reasoning_content, response_content
         else:
             print(f"_parse_generate: 未找到匹配项。{response}")
-            return "Final_Answer", response
+            return None, response
 
     def _state_generate(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_nfa(config=self.config, prompt=self.prompt, state_type="generate", run_state=run_state)
         response_dict = self.generator.generate([input_prompt])
         response = response_dict[0]['output_text'][0]
 
-        reasoning_content, mark, answer = self._parse_generate(response)
-        run_state["record"].append({"state": "generate", "response": response, "result": {"mark": mark, "answer": answer}})
+        reasoning_content, response_content = self._parse_generate(response)
+        run_state["record"].append({"state": "generate", "response": response, "result": {"reasoning": reasoning_content, "response": response_content}})
         self.dfa_print(run_state['record'])
 
-        if mark == "Further_Analysis":
-            if run_state['generate_plan_loop_counter'] >= 5:
-                return "S_Fail"
-            else:
-                run_state['generate_plan_loop_counter'] += 1
-                run_state['further_analysis'] = f"Resoning: {reasoning_content}\nConclusion: {answer}"
-                return "S_Plan"
-        elif mark == "Final_Answer":
-            run_state['final_answer'] = answer
-            return "S_Final"
-        else:
-            run_state['further_analysis'] = answer
-            return "S_Plan"
+        run_state['s_generate_response'] = response_content
+        run_state['s_generate_reasoning'] = reasoning_content
+
+        return "S_Judge"
         
     def _state_final(self, run_state: dict) -> str:
         result_data = {

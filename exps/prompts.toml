@@ -9,38 +9,46 @@ Initial Query: {input_question}
 
 [tasks]
 plan = """
+# GOAL: In this stage, your goal is to analyse the user's query and any previous steps to formulate the single most logical and specific next sub-question needed to reach the final answer.
+
+
 Identify the single most crucial first step needed to answer the user's query. The sub-question must be a specific, fine-grained query, NOT a repetition of the original question.
 
-Complementary materials:
-{further_analysis}
+# CONTEXT & LOGIC:
+You are part of an iterative process. You must determine if this is the first step or a subsequent step.
+- IF "Previous Step Analysis" is EMPTY: This is the **first step**. Your task is to generate the initial sub-question based on the "User Query".
+- IF "Previous Step Analysis" is PROVIDED: This is a **subsequent step**. You MUST use this analysis to generate the *next* logical sub-question, avoiding repetition and moving closer to the final answer.
 
 ---
-# INSTRUCTIONS:
-1.  First, think step-by-step inside the `<reasoning>` tags. Analyze what information is given and what information is missing to answer the user's complete query.
-2.  Based on your reasoning, determine if a search is needed. The `<need_search>` flag MUST be `True` if you do not possess the required knowledge internally. This refers to the overall user query, not just the sub-question.
-3.  Formulate a precise, searchable `<sub-question>`. It should be a query that, when answered, provides the first piece of missing information.
-4.  The search engine CANNOT see images. If the query involves an image, your first step is to internally identify the object, and then formulate a sub-question about that object to search for the information needed.
+# RULES:
+1.  **Reasoning First**: You MUST start your output with `<reasoning>` tags, explaining your analysis of the query and the context.
+2.  **Determine Search Need**: Based on your reasoning, you MUST determine if a search is required to answer the overall "User Query". Output this in the `<need_search>` tag.
+3.  **Formulate Sub-question**: You MUST formulate a precise, fine-grained sub-question in the `<sub-question>` tag. It must NOT be a simple repetition of the user's query.
+4.  **Image Constraint**: You MUST remember the search engine is blind. If the user's query involves an image, your sub-question MUST describe the content of the image in text, replacing any pronouns (e.g., "it", "this scene", "in the image").
 
 ---
-# FORMAT:
+# OUTPUT FORMAT (Strict):
 <reasoning>
-[Your step-by-step analysis of the user query, identifying knowns and unknowns.]
+[Your step-by-step analysis here.]
 </reasoning>
 <sub-question>
-[The single, specific, searchable sub-question.]
+[Your specific, searchable sub-question here.]
 </sub-question>
 <need_search>
-[True or False, based on your reasoning about the overall query.]
+[True or False]
 </need_search>
 
 ---
 # EXAMPLES:
 
-**Example 1:**
+**Example 1: First Step, Search Needed**
+
 **User Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
+**Previous Step Analysis:** ""
+
 **Your Output:**
 <reasoning>
-The user wants to know the CEO of a company. To find the CEO, I first need to identify the company that developed 'Cyberpunk 2077'. I do not have this information internally. Therefore, a search is required. The first logical search is to find the developer company.
+This is the first step. The user's query is about the CEO of a specific company. To answer this, I first need to identify the company that developed 'Cyberpunk 2077'. I do not have this information internally, so a search is required. The most logical first sub-question is to find the developer.
 </reasoning>
 <sub-question>
 developer of 'Cyberpunk 2077'
@@ -50,37 +58,45 @@ True
 </need_search>
 
 ---
-**Example 2:**
-**User Query:** "Which building is taller, the Burj Khalifa or the Shanghai Tower?"
+**Example 2: Subsequent Step, Further Search Needed**
+
+**User Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
+**Previous Step Analysis:** "The developer is CD Projekt Red, but the CEO's name is still missing and needs to be searched for."
+
 **Your Output:**
 <reasoning>
-The user wants to compare the heights of two buildings. I do not have the exact, up-to-date height data for both buildings stored internally. To perform the comparison, I need to search for this information. A logical first step is to find the height of one of the buildings.
+This is a subsequent step. The previous analysis confirms the developer is 'CD Projekt Red' but also states that the CEO's name is still missing. My next logical step is to use the company name I now have and search for its CEO. This information is not in my internal knowledge.
 </reasoning>
 <sub-question>
-height of the Burj Khalifa
+current CEO of CD Projekt Red
 </sub-question>
 <need_search>
 True
 </need_search>
 
 ---
-**Example 3 (Corrected):**
-**User Query:** "Based on this image of a golden retriever, what is the average lifespan of this dog breed?"
+**Example 3: First Step, Image Query**
+
+**User Query:** "Based on this image of a cat playing with a red ball, what are some common materials used to make cat toys like this one?"
+**Previous Step Analysis:** ""
+
 **Your Output:**
 <reasoning>
-The user wants to know the average lifespan of a dog breed. I can identify the dog in the image as a 'golden retriever' using my internal vision capabilities. However, I do not have the precise, statistical data for its average lifespan. This information must be retrieved from an external source. Therefore, a search is required. The sub-question should be about finding this specific missing data point.
+This is the first step. The user's query is about the materials used in cat toys, prompted by an image of a cat playing with a red ball. The search engine cannot see the image. I must first describe the key object in the query textually. The object is a "red ball cat toy". My sub-question will be about the materials used for such toys. This information requires external knowledge.
 </reasoning>
 <sub-question>
-average lifespan of a golden retriever
+common materials used for red ball cat toys
 </sub-question>
 <need_search>
 True
 </need_search>
 
 ---
-# TASK:
+# TASK TO COMPLETE:
 
 **User Query:** {query}
+**Previous Step Analysis:** {further_analysis}
+
 **Your Output:**
 """
 
