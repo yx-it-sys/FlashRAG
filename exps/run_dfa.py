@@ -1,8 +1,8 @@
 import argparse
 from flashrag.config import Config
 from flashrag.utils import get_dataset
-from flashrag.pipeline import NFAPipeline
-from flashrag.prompt import MMPromptTemplate
+from flashrag.pipeline import NFAPipeline, DFAQAPipeline
+from flashrag.prompt import MMPromptTemplate, PromptTemplate
 
 def main():
     config_dict = {
@@ -19,13 +19,18 @@ def main():
 
     config = Config("my_config.yaml", config_dict=config_dict)
     all_split = get_dataset(config)
-    test_data = all_split["test"]
+    test_data = all_split["validation"]
     
-    prompt_templete = MMPromptTemplate(
+    vqa_prompt_templete = MMPromptTemplate(
         config=config
     )
 
-    pipeline = NFAPipeline(config, prompt_template=prompt_templete)
+    qa_prompt_pipeline = PromptTemplate(
+        config=config
+    )
+
+    pipeline = NFAPipeline(config, prompt_template=vqa_prompt_templete)
+    pipeline = DFAQAPipeline(config, prompt_template=qa_prompt_pipeline)
     output_dataset = pipeline.run(test_data, do_eval=True)
 
     

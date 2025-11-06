@@ -163,7 +163,41 @@ class PromptTemplate:
                 input += previous_gen
 
         return self.truncate_prompt(input)
-
+    
+    def get_string_for_dfa(self, prompt, state_type, run_state: dict):
+        question = run_state['initial_query']
+        messages = []
+        messages.append({'role': "system", 'content': prompt["system"]["prompt"].format(input_question=question)})
+        content_list = []
+        if state_type == "plan":
+            if run_state['further_analysis'] is not None:
+                further_analysis = run_state['further_analysis']
+            else:
+                further_analysis = ""
+            content_list.append({'type': 'text', 'text': prompt["tasks"][state_type].format(query=run_state['initial_query'], further_analysis=further_analysis)})
+        elif state_type == "assess":
+            query = run_state['current_query']
+            docs = run_state['retrieved_docs']
+            content_list.append({'type': 'text', 'text': prompt["tasks"][state_type].format(query=query, docs='\n'.join(docs))})
+        elif state_type == "refine":
+            query = run_state['current_query']
+            reason = run_state['s_assessment_reason']
+            content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(query=query, reason=reason)})
+        elif state_type == "generate":
+            initial_query = question
+            docs = run_state["retrieved_docs"]
+            if len(docs) > 0:
+                content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(current_query=initial_query, docs='\n'.join(docs))})
+            else:
+                content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(current_query=initial_query, docs='')})
+        elif state_type == "judge":
+            query = question
+            answer = run_state['s_generate_response']
+            content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(initial_query=query, generated_answer=answer)})
+        
+        messages.append({'role': 'user', 'content': content_list})
+        return messages
+    
     def get_string_with_varying_examplars(
         self,
         question,
