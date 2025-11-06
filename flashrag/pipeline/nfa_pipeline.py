@@ -306,9 +306,7 @@ class NFAPipeline(BasicMultiModalPipeline):
 
 
 class DFAQAPipeline(NFAPipeline):
-    def __init__(self, config, prompt_template=None, retriever=None, generator=None):
-        super().__init__(config, prompt_template)
-        
+    def __init__(self, config, prompt_template=None, retriever=None, generator=None):        
         self.config = config
         prompt_path = self.config['dfa_qa_prompt_path']
         with open(prompt_path, "rb") as f:

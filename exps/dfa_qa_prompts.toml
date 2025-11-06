@@ -147,7 +147,7 @@ The user is asking a basic arithmetic question. I do not need external informati
 """
 
 judge = """
-# GOAL: In this stage, you are a judge. Your task is to determine if the "Answer Generated So Far" is sufficient to fully answer the user's "Initial Query".
+# GOAL: In this stage, you are a judge. Your task is to determine if the "Answer Generated So Far" is sufficient to fully answer the user's "Initial Query". Follow the following format strictly.
 
 # INSTRUCTIONS:
 1.  Compare the "Initial Query" with the "Answer Generated So Far".

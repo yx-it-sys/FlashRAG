@@ -21,9 +21,9 @@ def main():
     all_split = get_dataset(config)
     test_data = all_split["dev"]
     
-    vqa_prompt_templete = MMPromptTemplate(
-        config=config
-    )
+    # vqa_prompt_templete = MMPromptTemplate(
+    #     config=config
+    # )
 
     qa_prompt_pipeline = PromptTemplate(
         config=config
