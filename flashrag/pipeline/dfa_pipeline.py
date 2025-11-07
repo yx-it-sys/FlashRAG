@@ -634,10 +634,14 @@ class DFAQAPipeline(BasicMultiModalPipeline):
         return result_data
     
     def _state_fail(self, run_state: dict) -> str:
+        if run_state['s_generate_response'] is None:
+            prediction = "I can't answer."
+        else:
+            prediction = f"The Answer maybe {run_state['s_generate_response']}."
         result_data = {
             "id": run_state['id'],
             "question": run_state['initial_query'],
-            "prediction": "I can't answer",
+            "prediction": prediction,
             "record": run_state['record']
         }
         return result_data
