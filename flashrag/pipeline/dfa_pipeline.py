@@ -5,9 +5,10 @@ from flashrag.utils import get_retriever, get_generator
 import re
 import os
 import json
+from json_repair import repair_json
 import tomllib
 
-class NFAPipeline(BasicMultiModalPipeline):
+class DFAVQAPipeline(BasicMultiModalPipeline):
     def __init__(self, config, prompt_template=None, retriever=None, generator=None):
         super().__init__(config, prompt_template)
         
@@ -71,7 +72,7 @@ class NFAPipeline(BasicMultiModalPipeline):
         else:
             print(f"_parse_plan: 未找到匹配项。{response}")
             return None, None, None
-
+    
     def _state_plan(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_dfa(config=self.config, prompt=self.prompt, state_type="plan", run_state=run_state)
         response_dict = self.generator.generate([input_prompt])
@@ -305,7 +306,7 @@ class NFAPipeline(BasicMultiModalPipeline):
     
 
 
-class DFAQAPipeline(NFAPipeline):
+class DFAQAPipeline(DFAVQAPipeline):
     def __init__(self, config, prompt_template=None, retriever=None, generator=None):        
         self.config = config
         prompt_path = self.config['dfa_qa_prompt_path']
@@ -318,6 +319,20 @@ class DFAQAPipeline(NFAPipeline):
         if prompt_template is None:
             prompt_template = PromptTemplate(config)
         self.prompt_template = prompt_template
+
+    def _parse_output_json(self, response: str):
+        try:
+            return json.loads(response)
+        except json.JSONDecodeError:
+            pass
+
+        print("Direct parsing failed, attempting repairing...")
+        try:
+            repaired_json = repair_json(response)
+            return json.loads(repaired_json)
+        except (ValueError, json.JSONDecodeError) as e:
+            print(f"'json-repair' 修复失败: {e}")
+            return None
 
     def dfa_print(self, record: List[dict]):
         """Pretty print the state transitions and their results."""
@@ -373,10 +388,19 @@ class DFAQAPipeline(NFAPipeline):
         # print(f"input_prompt: {input_prompt}")
         response_dict = self.generator.generate_for_dfa_qa([input_prompt])
         # print(f"Response Dict: {response_dict}")
-        response = response_dict[0]
-        reasoning, sub_question, need_search = self._parse_plan(response)
+        output = response_dict[0]
+        response = self._parse_output_json(output)
+        
+        if response is None:
+            run_state["record"].append({"state": "plan", "response": output, "result": "Fail to parse llm's output!"})
+            self.dfa_print(run_state["record"])
+            return "S_Fail"
+        
+        sub_question = response['sub_question']
+        need_search = response['need_search']
         run_state["plan"] = {"sub_question": sub_question, "need_search": need_search}
-        run_state["record"].append({"state": "plan", "response": response, "result": run_state["plan"]})
+        run_state["record"].append({"state": "plan", "response": output, "result": run_state["plan"]})
+        
         self.dfa_print(run_state['record'])
 
         if need_search.lower().strip() == "true":
@@ -410,7 +434,7 @@ class DFAQAPipeline(NFAPipeline):
         else:
             print(f"_parse_assess: 未找到匹配项。{response}")
             return None
-
+        
     def _parse_judge(self, response: str):
         pattern = re.compile(
                     r"<reasoning>\s*(?P<reasoning_content>.*?)\s*</reasoning>\s*"
@@ -427,7 +451,7 @@ class DFAQAPipeline(NFAPipeline):
             tag = match.group('tag')
             content = match.group('content').strip()
             return reasoning_content, tag, content
-    
+        
     def _state_judge(self, run_state: dict) -> str:
         if run_state['generate_plan_loop_counter'] >= 5:
             return "S_Fail"
@@ -435,10 +459,33 @@ class DFAQAPipeline(NFAPipeline):
             run_state['generate_plan_loop_counter'] += 1
             input_prompt = self.prompt_template.get_string_for_dfa(config=self.config, prompt=self.prompt, state_type="judge", run_state=run_state)
             response_dict = self.generator.generate_for_dfa_qa([input_prompt])
-            response = response_dict[0]
-            reasoning, tag, content = self._parse_judge(response)
+            output = response_dict[0]
+            response = self._parse_output_json(output)
+            
+            if response is None:
+                run_state["record"].append({"state": "judge", "response": output, "result": "Fail to parse llm's output!"})
+                self.dfa_print(run_state["record"])
+                return "S_Fail"
 
-            run_state["record"].append({"state": "judge", "response": response, "result": {"reasoning": reasoning, "tag": tag, "content": content}})
+            keys = list(response.keys())
+            tag = None
+            for key in keys:
+                if key == "final_answer":
+                    tag = "Final_Answer"
+                elif key == "further_analysis":
+                    tag = "Further_Analysis"
+                else:
+                    continue
+            
+            if tag is None:
+                run_state["record"].append({"state": "judge", "response": output, "result": "Fail to parse llm's output!"})
+                self.dfa_print(run_state["record"])
+                return "S_Fail"
+            
+            reasoning = response['reasoning']
+            content = response[tag]
+
+            run_state["record"].append({"state": "judge", "response": output, "result": {"reasoning": reasoning, "tag": tag, "content": content}})
             self.dfa_print(run_state["record"])
 
             if tag == "Final_Answer":
@@ -452,7 +499,6 @@ class DFAQAPipeline(NFAPipeline):
                 former_question = run_state['plan']['sub_question']
                 further_analysis = f"Former sub-question:\n{former_question}\nAnswer:\n{response_content}\nReason:\n{reasoning_content}"
                 run_state['further_analysis'] = further_analysis
-                
                 return "S_Plan"
     
     def _state_assess(self, run_state: dict) -> str:
@@ -504,10 +550,17 @@ class DFAQAPipeline(NFAPipeline):
     def _state_generate(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_dfa(config=self.config, prompt=self.prompt, state_type="generate", run_state=run_state)
         response_dict = self.generator.generate_for_dfa_qa([input_prompt])
-        response = response_dict[0]
+        output = response_dict[0]
+        response = self._parse_output_json(output)
 
-        reasoning_content, response_content = self._parse_generate(response)
-        run_state["record"].append({"state": "generate", "response": response, "result": {"reasoning": reasoning_content, "response": response_content}})
+        if response is None:
+            run_state["record"].append({"state": "generate", "response": output, "result": "Fail to parse llm's output!"})
+            self.dfa_print(run_state["record"])
+            return "S_Fail"
+        
+        reasoning_content = response['reasoning']
+        response_content = response['response']
+        run_state["record"].append({"state": "generate", "response": output, "result": {"reasoning": reasoning_content, "response": response_content}})
         self.dfa_print(run_state['record'])
 
         run_state['s_generate_response'] = response_content

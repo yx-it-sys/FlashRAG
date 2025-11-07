@@ -1,7 +1,7 @@
 import argparse
 from flashrag.config import Config
 from flashrag.utils import get_dataset
-from flashrag.pipeline import NFAPipeline, DFAQAPipeline
+from flashrag.pipeline import DFAVQAPipeline, DFAQAPipeline
 from flashrag.prompt import MMPromptTemplate, PromptTemplate
 
 def main():
@@ -29,7 +29,7 @@ def main():
         config=config
     )
 
-    # pipeline = NFAPipeline(config, prompt_template=vqa_prompt_templete)
+    # pipeline = DFAVQAPipeline(config, prompt_template=vqa_prompt_templete)
     pipeline = DFAQAPipeline(config, prompt_template=qa_prompt_pipeline)
     output_dataset = pipeline.run(test_data, do_eval=True)
 
