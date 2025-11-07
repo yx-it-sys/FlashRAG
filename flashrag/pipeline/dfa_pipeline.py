@@ -370,6 +370,59 @@ class DFAQAPipeline(BasicMultiModalPipeline):
         except (ValueError, json.JSONDecodeError) as e:
             print(f"'json-repair' 修复失败: {e}")
             return None
+        
+    def _parse_plan(self, response: str):
+        pattern = re.compile(
+            r"<reasoning>(?P<reasoning>.*?)\s*"
+            r"<sub-question>(?P<sub_question>.*?)\s*"
+            r"<need_search>(?P<need_search>.*)", 
+            re.DOTALL
+        )
+
+        match = pattern.search(response.strip())
+        if match:
+            reasoning = match.group('reasoning').strip()
+            sub_question = match.group('sub_question').strip()
+            need_search_raw = match.group('need_search').strip()
+            end_tag_pos = need_search_raw.rfind('</')
+            if end_tag_pos != -1:
+                need_search = need_search_raw[:end_tag_pos].strip()
+            else:
+                need_search = need_search_raw
+            
+            return reasoning, sub_question, need_search
+        else:
+            print(f"_parse_plan: 未找到匹配项。{response}")
+            return None, None, None
+    
+    def _parse_assess(self, response: str):
+        if "pass" in response:
+            return "pass", None
+        elif response.startswith("fail:"):
+            parts = response.split(':', 1)
+            if len(parts) > 1:
+                return parts[0].strip(), parts[1].strip()
+        else:
+            print(f"_parse_assess: 未找到匹配项。{response}")
+            return None, None
+        
+    def _parse_judge(self, response: str):
+        pattern = re.compile(
+                    r"<reasoning>\s*(?P<reasoning_content>.*?)\s*</reasoning>\s*"
+                    r"<(?P<tag>Final_Answer|Further_Analysis)>"
+                    r"\s*(?P<content>.*?)\s*"
+                    r"(?:</(?P=tag)>|$)",
+                    re.DOTALL
+                )
+
+        match = pattern.search(response.strip())
+
+        if match:
+            reasoning_content = match.group('reasoning_content').strip()
+            tag = match.group('tag')
+            content = match.group('content').strip()
+            return reasoning_content, tag, content
+        
 
     def dfa_print(self, record: List[dict]):
         """Pretty print the state transitions and their results."""
@@ -396,30 +449,6 @@ class DFAQAPipeline(BasicMultiModalPipeline):
     def _state_initial(self, run_state: dict) -> str:
         return "S_Plan"
     
-    def _parse_plan(self, response: str):
-        pattern = re.compile(
-            r"<reasoning>(?P<reasoning>.*?)\s*"
-            r"<sub-question>(?P<sub_question>.*?)\s*"
-            r"<need_search>(?P<need_search>.*)", 
-            re.DOTALL
-        )
-
-        match = pattern.search(response.strip())
-        if match:
-            reasoning = match.group('reasoning').strip()
-            sub_question = match.group('sub_question').strip()
-            need_search_raw = match.group('need_search').strip()
-            end_tag_pos = need_search_raw.rfind('</')
-            if end_tag_pos != -1:
-                need_search = need_search_raw[:end_tag_pos].strip()
-            else:
-                need_search = need_search_raw
-            
-            return reasoning, sub_question, need_search
-        else:
-            print(f"_parse_plan: 未找到匹配项。{response}")
-            return None, None, None
-
     def _state_plan(self, run_state: dict) -> str:
         input_prompt = self.prompt_template.get_string_for_dfa(config=self.config, prompt=self.prompt, state_type="plan", run_state=run_state)
         # print(f"input_prompt: {input_prompt}")
@@ -453,8 +482,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             return "S_Generate"
     
     def _state_retrieve(self, run_state: dict) -> str:
-        query = run_state["plan"]["sub_question"]
-
+        query = run_state['current_query']
         # search_results = self.retriever.search(query, 3)
         search_results = self._fine_search(query)
         search_text_list = []
@@ -470,34 +498,6 @@ class DFAQAPipeline(BasicMultiModalPipeline):
 
         return "S_Assess"
     
-    def _parse_assess(self, response: str):
-        if "pass" in response:
-            return "pass", None
-        elif response.startswith("fail:"):
-            parts = response.split(':', 1)
-            if len(parts) > 1:
-                return parts[0].strip(), parts[1].strip()
-        else:
-            print(f"_parse_assess: 未找到匹配项。{response}")
-            return None, None
-        
-    def _parse_judge(self, response: str):
-        pattern = re.compile(
-                    r"<reasoning>\s*(?P<reasoning_content>.*?)\s*</reasoning>\s*"
-                    r"<(?P<tag>Final_Answer|Further_Analysis)>"
-                    r"\s*(?P<content>.*?)\s*"
-                    r"(?:</(?P=tag)>|$)",
-                    re.DOTALL
-                )
-
-        match = pattern.search(response.strip())
-
-        if match:
-            reasoning_content = match.group('reasoning_content').strip()
-            tag = match.group('tag')
-            content = match.group('content').strip()
-            return reasoning_content, tag, content
-        
     def _state_judge(self, run_state: dict) -> str:
         if run_state['generate_plan_loop_counter'] >= 3:
             return "S_Fail"
@@ -518,8 +518,10 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             for key in keys:
                 if key == "final_answer":
                     tag = "final_answer"
+                    content = response.get(tag, '')
                 elif key == "further_analysis":
                     tag = "further_analysis"
+                    content = f"The answer to {run_state['current_query']} is {run_state['s_generate_response']}. {response.get(tag, '')}"
                 else:
                     continue
             
@@ -529,7 +531,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
                 return "S_Fail"
             
             reasoning = response.get('reasoning', '')
-            content = response.get(tag, '')
+            
             
             if (reasoning is None) or (content is None):
                 run_state["record"].append({"state": "judge", "response": output, "result": "Fail to parse llm's output!"})
@@ -663,10 +665,10 @@ class DFAQAPipeline(BasicMultiModalPipeline):
         pred_answer_list = []
         for item in data_items_list:
             run_state = {
+                "id": item['id'],
+                "plan": None,                
                 "initial_query": item['question'],
                 "current_query": item['question'],
-                "id": item['id'],
-                "plan": None,
                 "retrieved_docs": [],
                 "assessment_result": None,
                 's_assessment_reason': None,
