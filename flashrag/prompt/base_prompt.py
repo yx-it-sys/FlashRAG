@@ -184,12 +184,12 @@ class PromptTemplate:
             reason = run_state['s_assessment_reason']
             content = prompt['tasks'][state_type].format(query=query, reason=reason)
         elif state_type == "generate":
-            initial_query = question
+            query = run_state['current_query']
             docs = run_state["retrieved_docs"]
             if len(docs) > 0:
-                content = prompt['tasks'][state_type].format(current_query=initial_query, docs='\n'.join(docs))
+                content = prompt['tasks'][state_type].format(current_query=query, docs='\n'.join(docs))
             else:
-                content = prompt['tasks'][state_type].format(current_query=initial_query, docs='')
+                content = prompt['tasks'][state_type].format(current_query=query, docs='')
         elif state_type == "judge":
             query = question
             answer = run_state['s_generate_response']

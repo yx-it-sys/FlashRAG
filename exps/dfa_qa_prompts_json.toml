@@ -4,7 +4,6 @@ You are a helpful and precise question answering assistant. Your ultimate goal i
 When performing each step of the task, please strictly follow the given instructions and remain consise and efficient.
 Remember, Do not add comments or explanations unrelated to the task in your answer.
 Think Step by Step.
-Initial Query: {input_question}
 """
 
 [tasks]
@@ -23,16 +22,16 @@ You are part of an iterative process. You must determine if this is the first st
 # JSON SCHEMA
 You must generate a SINGLE, valid JSON object as your output. MUST conform to the following structure:
 
-{
+{{
   "reasoning": "string",
   "need_search": "string",
   "sub_question": "string"
-}
+}}
 
 ---
 # KEY DEFINITIONS
 1. `reasoning` (string): Your step-by-step analysis of the user's query. Explain your analysis of the user's query and context.
-2. `sub-question` (string): Precise and fine-grind sub-question. 
+2. `sub_question` (string): Precise and fine-grind sub-question. 
     * The question is a query that can be understood by search engine. Do NOT add any references (pronouns) in the sub-question.
     * Do NOT simply repeat the user's query.  
 3. `need_search` (string): Based on your reasoning, is an external search required to answer the sub-question? This MUST be a Just the STRING form of "True" or "False".
@@ -47,12 +46,12 @@ You must generate a SINGLE, valid JSON object as your output. MUST conform to th
 **Previous Step Analysis:** ""
 
 **Your Output:**
-{
+{{
     "reasoning": "This is the first step. The user's query is about the CEO of a specific company. To answer this, I first need to identify the company that developed 'Cyberpunk 2077'. I do not have this information internally, so a search is required. The most logical first sub-question is to find the developer.",
-    "sub-question": "developer of 'Cyberpunk 2077'",
+    "sub_question": "developer of 'Cyberpunk 2077'",
     "need_search": "True"
 
-}
+}}
 
 ---
 **Example 2: Subsequent Step, Further Search Needed**
@@ -61,11 +60,11 @@ You must generate a SINGLE, valid JSON object as your output. MUST conform to th
 **Previous Step Analysis:** "The developer is CD Projekt Red, but the CEO's name is still missing and needs to be searched for."
 
 **Your Output:**
-{
+{{
     "reasoning": "This is a subsequent step. The previous analysis confirms the developer is 'CD Projekt Red' but also states that the CEO's name is still missing. My next logical step is to use the company name I now have and search for its CEO. This information is not in my internal knowledge.",
-    "sub-question": "current CEO of CD Projekt Red",
+    "sub_question": "current CEO of CD Projekt Red",
     "need_search": "True"
-}
+}}
 
 ---
 # TASK TO COMPLETE:
@@ -94,10 +93,10 @@ generate = """
 ---
 # JSON SCHEMA
 You must generate a SINGLE, valid JSON object as your output. MUST conform to the following structure:
-{
+{{
   "reasoning": "string",
   "response": "string"
-}
+}}
 
 ---
 # KEY DEFINITIONS
@@ -114,10 +113,10 @@ You must generate a SINGLE, valid JSON object as your output. MUST conform to th
 **Information:** "A surfboard lock is a device or a mechanism for securing a surfboard to prevent theft or loss. They typically attach to some part of the surfboard, such as the leash plug or center fin box slot."
 
 **Your Output:**
-{
+{{
     "reasoning": "The user is asking for the main purpose of a surfboard lock. The provided information directly states that its function is 'securing a surfboard to prevent theft or loss'. I will extract this phrase as the answer.",
     "response": "A surfboard lock is used for securing a surfboard to prevent theft or loss."
-}
+}}
 
 ---
 **Example 2: Synthesized Answering with Information**
@@ -126,10 +125,10 @@ You must generate a SINGLE, valid JSON object as your output. MUST conform to th
 **Information:** "Document 1: The video game 'Cyberpunk 2077' was developed by the team at CD Projekt Red. Document 2: CD Projekt is a leading Polish company in the video game industry, with its headquarters in Warsaw."
 
 **Your Output:**
-{
+{{
     "reasoning": "The user wants to know the developer of 'Cyberpunk 2077' and their location. Document 1 identifies the developer as 'CD Projekt Red'. Document 2 states that CD Projekt is a Polish company based in Warsaw. I will combine these two pieces of information to form a complete answer.",
     "response": "Cyberpunk 2077 was developed by CD Projekt Red, which is based in Warsaw, Poland."
-}
+}}
 
 ---
 **Example 3: Generative Answering without Information**
@@ -138,10 +137,10 @@ You must generate a SINGLE, valid JSON object as your output. MUST conform to th
 **Information:** ""
 
 **Your Output:**
-{
+{{
     "reasoning": "The user is asking a basic arithmetic question. I do not need external information to answer this. I will use my internal knowledge to calculate the result. The sum of 2 and 2 is 4.",
     "response": "4"
-}
+}}
 ---
 
 # TASK TO COMPLETE:
@@ -158,17 +157,17 @@ judge = """
 ---
 # JSON SCHEMA
 You must generate a SINGLE, valid JSON object as your output. MUST conform to one of the following structures:
-{
+{{
   "reasoning": "string",
   "final_answer": "string"
-}
+}}
 
 or
 
-{
+{{
     "reasoning": "string",
     "further_analysis": "string"
-}
+}}
 
 ---
 # INSTRUCTIONS:
@@ -185,20 +184,20 @@ or
 **Initial Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
 **Answer Generated So Far:** "Cyberpunk 2077 was developed by CD Projekt Red."
 **Your Output:**
-{
+{{
     "reasoning": "The answer so far correctly identifies the developer company. However, the initial query asks for the CEO, which is still unknown. Therefore, the answer is not sufficient.",
     "further_analysis": "The developer is CD Projekt Red, but the CEO's name is still missing and needs to be searched for."
-}
+}}
 
 ---
 **Example 2: Multi-Step Completion**
 **Initial Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
 **Answer Generated So Far:** "The current CEO of CD Projekt Red is Adam Kiciński."
 **Your Output:**
-{
+{{
     "reasoning": "The answer so far provides the CEO's name. This information fully satisfies the user's initial query. The answer is sufficient.",
     "final_answer": "Adam Kiciński"
-}
+}}
 
 ---
 # TASK TO COMPLETE:

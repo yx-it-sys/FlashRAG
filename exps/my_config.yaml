@@ -57,7 +57,7 @@ dataset_name: "2wikimultihopqa"
 split: ['validation','test','dev']
 
 # Sampling configurations for testing
-test_sample_num: 1000
+test_sample_num: 100
 random_sample: False
 save_intermediate_data: True
 # Seed for reproducibility

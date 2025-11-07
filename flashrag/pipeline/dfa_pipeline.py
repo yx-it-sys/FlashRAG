@@ -7,6 +7,13 @@ import os
 import json
 from json_repair import repair_json
 import tomllib
+from mimetypes import guess_type
+import base64
+import time
+from io import BytesIO
+import requests
+from serpapi import GoogleSearch
+
 
 class DFAVQAPipeline(BasicMultiModalPipeline):
     def __init__(self, config, prompt_template=None, retriever=None, generator=None):
@@ -306,9 +313,13 @@ class DFAVQAPipeline(BasicMultiModalPipeline):
     
 
 
-class DFAQAPipeline(DFAVQAPipeline):
-    def __init__(self, config, prompt_template=None, retriever=None, generator=None):        
+class DFAQAPipeline(BasicMultiModalPipeline):    
+    def __init__(self, config, prompt_template=None, retriever=None, generator=None):
+        super().__init__(config, prompt_template)        
         self.config = config
+        self.API_KEY = "7aa8ce7907a044e9eb0a7d7ced6eaeb176da938af233512d15ecf7d11832617c"
+        self.retry_attempt = 3
+
         prompt_path = self.config['dfa_qa_prompt_path']
         with open(prompt_path, "rb") as f:
             self.prompt = tomllib.load(f)
@@ -319,6 +330,32 @@ class DFAQAPipeline(DFAVQAPipeline):
         if prompt_template is None:
             prompt_template = PromptTemplate(config)
         self.prompt_template = prompt_template
+    
+    def _fine_search(self, query):
+        params = {
+            "engine": "google",
+            "q": query,
+            "api_key": self.API_KEY,
+            "num": 2,
+        }
+        for i in range(self.retry_attempt):
+            try:
+                search = GoogleSearch(params)
+                results = search.get_dict()
+                results =  results.get("organic_results", [])
+            except Exception as e:
+                print(f"Attempt {i+1} failed: {e}")
+                if i < self.retry_attempt - 1:
+                    time.sleep(2)
+                else:
+                    print("All retries failed.")
+                    results = []
+
+        if results is not None:
+            texts = [f"{item.get('title','')}" + item.get("snippet","") for item in results]
+        else:
+            texts = "No Retrieval Results."
+        return texts
 
     def _parse_output_json(self, response: str):
         try:
@@ -326,7 +363,7 @@ class DFAQAPipeline(DFAVQAPipeline):
         except json.JSONDecodeError:
             pass
 
-        print("Direct parsing failed, attempting repairing...")
+        print(f"{response}\nDirect parsing failed, attempting repairing...")
         try:
             repaired_json = repair_json(response)
             return json.loads(repaired_json)
@@ -396,8 +433,15 @@ class DFAQAPipeline(DFAVQAPipeline):
             self.dfa_print(run_state["record"])
             return "S_Fail"
         
-        sub_question = response['sub_question']
-        need_search = response['need_search']
+        sub_question = response.get('sub_question', '')
+        need_search = response.get('need_search', '')
+
+        if (sub_question is None) or (need_search is None):
+            run_state["record"].append({"state": "plan", "response": output, "result": "Fail to parse llm's output!"})
+            self.dfa_print(run_state["record"])
+            return "S_Fail"
+        
+        run_state['current_query'] = sub_question
         run_state["plan"] = {"sub_question": sub_question, "need_search": need_search}
         run_state["record"].append({"state": "plan", "response": output, "result": run_state["plan"]})
         
@@ -411,11 +455,13 @@ class DFAQAPipeline(DFAVQAPipeline):
     def _state_retrieve(self, run_state: dict) -> str:
         query = run_state["plan"]["sub_question"]
 
-        search_results = self.retriever.search(query, 3)
+        # search_results = self.retriever.search(query, 3)
+        search_results = self._fine_search(query)
         search_text_list = []
 
         for result in search_results:
-            search_text_list.append(result['contents'])
+            # search_text_list.append(result['contents'])
+            search_text_list.append(result)
 
         search_texts = "\n\n".join(search_text_list)
         run_state["retrieved_docs"] = f"Contents of retrieved documents:\n{search_texts}"
@@ -433,7 +479,7 @@ class DFAQAPipeline(DFAVQAPipeline):
                 return parts[0].strip(), parts[1].strip()
         else:
             print(f"_parse_assess: 未找到匹配项。{response}")
-            return None
+            return None, None
         
     def _parse_judge(self, response: str):
         pattern = re.compile(
@@ -453,7 +499,7 @@ class DFAQAPipeline(DFAVQAPipeline):
             return reasoning_content, tag, content
         
     def _state_judge(self, run_state: dict) -> str:
-        if run_state['generate_plan_loop_counter'] >= 5:
+        if run_state['generate_plan_loop_counter'] >= 3:
             return "S_Fail"
         else:
             run_state['generate_plan_loop_counter'] += 1
@@ -471,9 +517,9 @@ class DFAQAPipeline(DFAVQAPipeline):
             tag = None
             for key in keys:
                 if key == "final_answer":
-                    tag = "Final_Answer"
+                    tag = "final_answer"
                 elif key == "further_analysis":
-                    tag = "Further_Analysis"
+                    tag = "further_analysis"
                 else:
                     continue
             
@@ -482,17 +528,22 @@ class DFAQAPipeline(DFAVQAPipeline):
                 self.dfa_print(run_state["record"])
                 return "S_Fail"
             
-            reasoning = response['reasoning']
-            content = response[tag]
-
+            reasoning = response.get('reasoning', '')
+            content = response.get(tag, '')
+            
+            if (reasoning is None) or (content is None):
+                run_state["record"].append({"state": "judge", "response": output, "result": "Fail to parse llm's output!"})
+                self.dfa_print(run_state["record"])
+                return "S_Fail"
+            
             run_state["record"].append({"state": "judge", "response": output, "result": {"reasoning": reasoning, "tag": tag, "content": content}})
             self.dfa_print(run_state["record"])
 
-            if tag == "Final_Answer":
+            if tag == "final_answer":
                 run_state["judgement_result"] = tag
                 run_state['final_answer'] = content
                 return "S_Final"
-            elif tag == "Further_Analysis":
+            elif tag == "further_analysis":
                 run_state["judgment_result"] = tag
                 response_content = run_state['s_generate_response']
                 reasoning_content = run_state['s_generate_reasoning']
@@ -502,7 +553,7 @@ class DFAQAPipeline(DFAVQAPipeline):
                 return "S_Plan"
     
     def _state_assess(self, run_state: dict) -> str:
-        if run_state['retrieval_assess_refine_loop_counter'] >= 5:
+        if run_state['retrieval_assess_refine_loop_counter'] >= 3:
             return "S_Fail"
         else:
             run_state['retrieval_assess_refine_loop_counter'] += 1
@@ -552,14 +603,19 @@ class DFAQAPipeline(DFAVQAPipeline):
         response_dict = self.generator.generate_for_dfa_qa([input_prompt])
         output = response_dict[0]
         response = self._parse_output_json(output)
-
         if response is None:
             run_state["record"].append({"state": "generate", "response": output, "result": "Fail to parse llm's output!"})
             self.dfa_print(run_state["record"])
             return "S_Fail"
         
-        reasoning_content = response['reasoning']
-        response_content = response['response']
+        reasoning_content = response.get('reasoning', '')
+        response_content = response.get('response', '')
+
+        if (reasoning_content is None) or (response_content is None):
+            run_state["record"].append({"state": "generate", "response": output, "result": "Fail to parse llm's output!"})
+            self.dfa_print(run_state["record"])
+            return "S_Fail"
+
         run_state["record"].append({"state": "generate", "response": output, "result": {"reasoning": reasoning_content, "response": response_content}})
         self.dfa_print(run_state['record'])
 
@@ -581,7 +637,7 @@ class DFAQAPipeline(DFAVQAPipeline):
         result_data = {
             "id": run_state['id'],
             "question": run_state['initial_query'],
-            "prediction": "I don't know.",
+            "prediction": "I can't answer",
             "record": run_state['record']
         }
         return result_data
