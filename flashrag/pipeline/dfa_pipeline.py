@@ -161,7 +161,7 @@ class DFAVQAPipeline(BasicMultiModalPipeline):
                 reasoning_content = run_state['s_generate_reasoning']
                 former_question = run_state['plan']['sub_question']
                 further_analysis = f"Former sub-question:\n{former_question}\nAnswer:\n{response_content}\nReason:\n{reasoning_content}"
-                run_state['further_analysis'] = further_analysis
+                run_state['further_analysis'].append(further_analysis)
                 
                 return "S_Plan"
     
@@ -269,7 +269,7 @@ class DFAVQAPipeline(BasicMultiModalPipeline):
                 "assessment_result": None,
                 's_assessment_reason': None,
                 "final_answer": None,
-                'further_analysis': None,
+                'further_analysis': [],
                 "s_generate_response": None,
                 "s_generate_reasoning": None,
                 "record": [],
@@ -462,24 +462,41 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             self.dfa_print(run_state["record"])
             return "S_Fail"
         
-        sub_question = response.get('sub_question', '')
-        need_search = response.get('need_search', '')
-
-        if (sub_question is None) or (need_search is None):
+        action = response.get('action', '')
+        if action not in['sub_question', 'generate_final_answer']:
             run_state["record"].append({"state": "plan", "response": output, "result": "Fail to parse llm's output!"})
             self.dfa_print(run_state["record"])
             return "S_Fail"
         
-        run_state['current_query'] = sub_question
-        run_state["plan"] = {"sub_question": sub_question, "need_search": need_search}
-        run_state["record"].append({"state": "plan", "response": output, "result": run_state["plan"]})
-        
-        self.dfa_print(run_state['record'])
+        if action == "sub_question":
+            sub_question = response.get('sub_question', '')
+            need_search = response.get('need_search', '')
 
-        if need_search.lower().strip() == "true":
-            return "S_Retrieve"
+            if (sub_question is None) or (need_search is None):
+                run_state["record"].append({"state": "plan", "response": output, "result": "Fail to parse llm's output!"})
+                self.dfa_print(run_state["record"])
+                return "S_Fail"
+            
+            run_state['current_query'] = sub_question
+            run_state["plan"] = {"sub_question": sub_question, "need_search": need_search}
+            run_state["record"].append({"state": "plan", "response": output, "result": run_state["plan"]})
+        
+            self.dfa_print(run_state['record'])
+
+            if need_search.lower().strip() == "true":
+                return "S_Retrieve"
+            else:
+                return "S_Generate"
         else:
-            return "S_Generate"
+            final_answer = response.get('final_answer', '')
+            if final_answer is None:
+                if run_state['current_query'] is not None:
+                    final_answer['final_answer'] = run_state['current_query']
+                else:
+                    return "S_Fail"
+            else:
+                run_state['final_answer'] = final_answer
+                return "S_Final"
     
     def _state_retrieve(self, run_state: dict) -> str:
         query = run_state['current_query']
@@ -551,7 +568,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
                 reasoning_content = run_state['s_generate_reasoning']
                 former_question = run_state['plan']['sub_question']
                 further_analysis = f"Former sub-question:\n{former_question}\nAnswer:\n{response_content}\nReason:\n{reasoning_content}"
-                run_state['further_analysis'] = further_analysis
+                run_state['further_analysis'].append(further_analysis)
                 return "S_Plan"
     
     def _state_assess(self, run_state: dict) -> str:
@@ -673,7 +690,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
                 "assessment_result": None,
                 's_assessment_reason': None,
                 "final_answer": None,
-                'further_analysis': None,
+                'further_analysis': [],
                 "s_generate_response": None,
                 "s_generate_reasoning": None,
                 "record": [],

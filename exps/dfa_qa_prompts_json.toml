@@ -8,34 +8,28 @@ Think Step by Step.
 
 [tasks]
 plan = """
-# GOAL: In this stage, your goal is to analyse the user's query and any previous steps to formulate the single most logical and specific next sub-question needed to reach the final answer.
+# GOAL: In this stage, your goal is to analyse the user's query and any previous steps to decide the single next action: either decompose the user's query or generate the final answer
 
+# OUTPUT INSTRUCTIONS:
+Your output MUST be a single, valid JSON object.
+Based on the "Previous Step Analysis", decide if the "User Query" can be fully answered.
+**IF information is INSUFFICIENT** (e.g., "Previous Step Analysis" is empty or incomplete), your JSON must be:
+  {{
+    "action": "sub_question",
+    "sub_question": "The specific, fine-grained question to search for.",
+    "need_search": "This MUST be a Just the STRING form of 'True' or 'False' to determine whether external knowledge is needed to answer this sub-question"
+  }}
 
-Identify the single most crucial first step needed to answer the user's query. The sub-question must be a specific, fine-grained query, NOT a repetition of the original question.
-
-# CONTEXT & LOGIC:
-You are part of an iterative process. You must determine if this is the first step or a subsequent step.
-- IF "Previous Step Analysis" is EMPTY: This is the **first step**. Your task is to generate the initial sub-question based on the "User Query".
-- IF "Previous Step Analysis" is PROVIDED: This is a **subsequent step**. You MUST use this analysis to generate the *next* logical sub-question, avoiding repetition and moving closer to the final answer.
-
----
-# JSON SCHEMA
-You must generate a SINGLE, valid JSON object as your output. MUST conform to the following structure:
-
+IF information is SUFFICIENT, your JSON must be:
 {{
-  "reasoning": "string",
-  "need_search": "string",
-  "sub_question": "string"
+  "action": "generate_final_answer",
+  "final_answer": "Your final answer to the 'User Query'."
 }}
 
----
-# KEY DEFINITIONS
-1. `reasoning` (string): Your step-by-step analysis of the user's query. Explain your analysis of the user's query and context.
-2. `sub_question` (string): Precise and fine-grind sub-question. 
-    * The question is a query that can be understood by search engine. Do NOT add any references (pronouns) in the sub-question.
-    * Do NOT simply repeat the user's query.  
-3. `need_search` (string): Based on your reasoning, is an external search required to answer the sub-question? This MUST be a Just the STRING form of "True" or "False".
-4. **NOTE**: The keys of JSON can only be the above three, and no others can be generated.
+# NOTE:
+- Think carefully.
+- The sub-question is a query that can be understood by search engine. Do NOT add any references (pronouns) in the sub-question.
+- Do NOT simply repeat the user's query.  
 
 ---
 # EXAMPLES:
@@ -47,10 +41,9 @@ You must generate a SINGLE, valid JSON object as your output. MUST conform to th
 
 **Your Output:**
 {{
-    "reasoning": "This is the first step. The user's query is about the CEO of a specific company. To answer this, I first need to identify the company that developed 'Cyberpunk 2077'. I do not have this information internally, so a search is required. The most logical first sub-question is to find the developer.",
+    "action": "sub_question",
     "sub_question": "developer of 'Cyberpunk 2077'",
     "need_search": "True"
-
 }}
 
 ---
@@ -61,9 +54,22 @@ You must generate a SINGLE, valid JSON object as your output. MUST conform to th
 
 **Your Output:**
 {{
-    "reasoning": "This is a subsequent step. The previous analysis confirms the developer is 'CD Projekt Red' but also states that the CEO's name is still missing. My next logical step is to use the company name I now have and search for its CEO. This information is not in my internal knowledge.",
+    "action": "sub_question",
     "sub_question": "current CEO of CD Projekt Red",
     "need_search": "True"
+}}
+
+---
+**Example 3: Can Answer Now**
+
+**User Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
+**Previous Step Analysis:** "The previous search has confirmed that the developer of 'Cyberpunk 2077' is CD Projekt Red. A subsequent search found that as of late 2024, the joint CEOs of CD Projekt Red are Adam Badowski and Michał Nowakowski."
+
+**Your Output:**
+{{
+  "reasoning": "The 'Previous Step Analysis' explicitly states the names of the joint CEOs of CD Projekt Red, which is the developer of the game. This information directly and completely answers the user's original query. Therefore, no more searching is needed, and the next action should be to generate the final answer.",
+  "action": "generate_final_answer",
+  "final_answer": "[The name of joint CEOs]"
 }}
 
 ---
@@ -152,7 +158,7 @@ You must generate a SINGLE, valid JSON object as your output. MUST conform to th
 
 
 judge = """
-# GOAL: In this stage, you are a judge. Your task is to determine if the "Answer Generated So Far" is sufficient to fully answer the user's "Initial Query". Follow the following format strictly.
+# GOAL: In this stage, you are a judge. Your task is to determine if the "Answer Generated So Far" to the "Current Query" is sufficient to fully answer the user's "Initial Query". Follow the following format strictly.
 
 ---
 # JSON SCHEMA
@@ -181,6 +187,7 @@ or
 # EXAMPLES:
 
 **Example 1: Multi-Step Continuation**
+**Current Query:** Which company developed the game 'Cyberpunk 2077'?
 **Initial Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
 **Answer Generated So Far:** "Cyberpunk 2077 was developed by CD Projekt Red."
 **Your Output:**
@@ -191,6 +198,7 @@ or
 
 ---
 **Example 2: Multi-Step Completion**
+**Current Query:** Who is the CEO of CD Projekt Red?
 **Initial Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
 **Answer Generated So Far:** "The current CEO of CD Projekt Red is Adam Kiciński."
 **Your Output:**
@@ -203,6 +211,7 @@ or
 # TASK TO COMPLETE:
 
 **Initial Query:** "{initial_query}"
+**Current Query:** "{current_query}"
 **Answer Generated So Far:** "{generated_answer}"
 **Your Output:**
 """
