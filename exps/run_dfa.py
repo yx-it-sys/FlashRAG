@@ -6,21 +6,20 @@ from flashrag.prompt import MMPromptTemplate, PromptTemplate
 
 def main():
     config_dict = {
-        "dataset_path": "data/datasets/2wikimultihopqa",
+        "dataset_path": "data/datasets/hotpotqa",
         "image_path": "data/datasets/okvqa/images/val2014",
-        "index_path": "data/indexes/e5_flat_inner.index",
+        "index_path": "data/indexes/bm25",
         "corpus_path": "data/indexes/wiki18_100w.jsonl",
-        "model2path": {"e5": "data/models/e5-base-v2"},
         "generator_model_path": "data/models/Qwen2.5-7B-Instruct",
-        "retrieval_method": "e5",
+        "retrieval_method": "bm25",
         "metrics": ["em", "f1", "acc"],
-        "retrieval_topk": 1,
+        "retrieval_topk": 2,
         "save_intermediate_data": True,
     }
 
     config = Config("my_config.yaml", config_dict=config_dict)
     all_split = get_dataset(config)
-    test_data = all_split["test"]
+    test_data = all_split["dev"]
     
     # vqa_prompt_templete = MMPromptTemplate(
     #     config=config

@@ -5,10 +5,10 @@ from tqdm import tqdm
 
 # num_samples = 1000
 seed = 42
-full_dataset = load_dataset("RUC-NLPIR/FlashRAG_datasets", "2wikimultihopqa", split='dev')
+full_dataset = load_dataset("RUC-NLPIR/FlashRAG_datasets", "hotpotqa", split='dev')
 full_dataset = full_dataset.shuffle(seed=seed)
 # dummy_subset = full_dataset.select(range(num_samples))
-annotations_dir = os.path.dirname("data/datasets/2wikimultihopqa")
+annotations_dir = os.path.dirname("data/datasets/hotpotqa")
 
 os.makedirs(annotations_dir, exist_ok=True)
 
