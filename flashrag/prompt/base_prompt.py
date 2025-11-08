@@ -170,23 +170,35 @@ class PromptTemplate:
         messages.append({'role': "system", 'content': prompt["system"]["prompt"].format(input_question=question)})
         content = None
         if state_type == "plan":
+            # run_state['further_analysis'].append({"sub_question": run_state['current_query'], "reasoning": reasoning_content, "answer": response_content})
             if len(run_state['further_analysis']) > 0:
                 further_analysis = run_state['further_analysis']
-                further_analysis_text = ""
+                further_analysis_text = "## Analysis Record:\n"
                 for i, analysis in enumerate(further_analysis, 1):
-                    further_analysis_text += f"Analysis Record {i}:\n{analysis}\n\n"
+                    sub_question = analysis['sub_question']
+                    reasoning = analysis['reasoning']
+                    answer = analysis['answer']
+                    record = f"**sub_question:** {sub_question}\n**reasoning:** {reasoning}\n**answer:** {answer}"
+                    further_analysis_text += f"Analysis Record {i}:\n{record}\n\n"
                 further_analysis_text = further_analysis_text.strip()
             else:
                 further_analysis_text = ""
+            
+            if run_state['s_judgement_reason'] is not None:
+                further_analysis_text += f"## Evaluation of analysis records:\n{run_state['s_judgement_reason']}"
+            
             content = prompt["tasks"][state_type].format(query=run_state['initial_query'], further_analysis=further_analysis_text)
+        
         elif state_type == "assess":
             query = run_state['current_query']
             docs = run_state['retrieved_docs']
             content = prompt["tasks"][state_type].format(query=query, docs='\n'.join(docs))
+        
         elif state_type == "refine":
             query = run_state['current_query']
             reason = run_state['s_assessment_reason']
             content = prompt['tasks'][state_type].format(query=query, reason=reason)
+        
         elif state_type == "generate":
             query = run_state['current_query']
             docs = run_state["retrieved_docs"]
@@ -194,11 +206,34 @@ class PromptTemplate:
                 content = prompt['tasks'][state_type].format(current_query=query, docs='\n'.join(docs))
             else:
                 content = prompt['tasks'][state_type].format(current_query=query, docs='')
+        
         elif state_type == "judge":
             initial_query = question
-            current_query = run_state['current_query']
-            answer = run_state['s_generate_response']
-            content = prompt['tasks'][state_type].format(initial_query=initial_query, current_query=current_query, generated_answer=answer)
+            further_analysis = run_state['further_analysis']
+            further_analysis_text = "## Analysis Record:\n"
+            for i, analysis in enumerate(further_analysis, 1):
+                sub_question = analysis['sub_question']
+                reasoning = analysis['reasoning']
+                answer = analysis['answer']
+                record = f"**sub_question:** {sub_question}\n**reasoning:** {reasoning}\n**answer:** {answer}"
+                further_analysis_text += f"Analysis Record {i}:\n{record}\n\n"
+                further_analysis_text = further_analysis_text.strip()
+
+            content = prompt['tasks'][state_type].format(initial_query=initial_query, further_analysis=further_analysis_text)
+        
+        elif state_type == 'final_answer':
+            initial_query = run_state['initial_query']
+            further_analysis = run_state['further_analysis']
+            further_analysis_text = "## Analysis Record:\n"
+            for i, analysis in enumerate(further_analysis, 1):
+                sub_question = analysis['sub_question']
+                reasoning = analysis['reasoning']
+                answer = analysis['answer']
+                record = f"**sub_question:** {sub_question}\n**reasoning:** {reasoning}\n**answer:** {answer}"
+                further_analysis_text += f"Analysis Record {i}:\n{record}\n\n"
+                further_analysis_text = further_analysis_text.strip()
+
+            content = prompt["tasks"][state_type].format(initial_query=initial_query, further_analysis=further_analysis_text)
         
         messages.append({'role': 'user', 'content': content})
         return messages

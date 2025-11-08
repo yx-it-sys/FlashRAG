@@ -8,84 +8,67 @@ Think Step by Step.
 
 [tasks]
 plan = """
-# GOAL: In this stage, your goal is to analyse the user's query and any previous steps to decide the single next action: either decompose the user's query or generate the final answer
+# GOAL: 
+In this stage, your goal is to analyse the user's query and any previous analysis to formulate the single most logical and specific next sub-question needed to reach the final answer.
+Concisely understand the meaning expressed in the "User Query". Identify the single most crucial first step needed to answer the user's query. The sub-question must be a specific, fine-grained query, NOT a repetition of the original question.
 
-# OUTPUT INSTRUCTIONS:
-Your output MUST be a single, valid JSON object.
-Based on the "Previous Step Analysis", decide if the "User Query" can be fully answered.
-**IF information is INSUFFICIENT** (e.g., "Previous Step Analysis" is empty or incomplete), your JSON must be:
-  {{
-    "action": "sub_question",
-    "sub_question": "The specific, fine-grained question to search for.",
-    "need_search": "This MUST be a Just the STRING form of 'True' or 'False' to determine whether external knowledge is needed to answer this sub-question"
-  }}
+# CONTEXT & LOGIC:
+You are part of an iterative process. You must determine if this is the first step or a subsequent step.
+- **IF "Previous Step Analysis" is EMPTY:** This is the first step. Your task is to generate the initial sub-question based on the "User Query".
+- **IF "Previous Step Analysis" is PROVIDED:** This is a subsequent step. You MUST use this analysis to generate the next logical sub-question, avoiding repetition and moving closer to the final answer.
 
-IF information is SUFFICIENT, your JSON must be:
+# JSON SCHEMA:
+You must generate a SINGLE, valid JSON object as your output. MUST conform to the following structure:
 {{
-  "action": "generate_final_answer",
-  "final_answer": "Your final answer to the 'User Query'."
+  "reasoning": "string",
+  "need_search": "string",
+  "sub_question": "string"
 }}
 
-# NOTE:
-- Think carefully.
-- The sub-question is a query that can be understood by search engine. Do NOT add any references (pronouns) in the sub-question.
-- Do NOT simply repeat the user's query.  
+# KEY DEFINITIONS
+- reasoning (string): Your step-by-step analysis of the user's query. Explain your analysis of the user's query and context.
+- sub_question (string): Precise and fine-grind sub-question.
+    - The question is a query that can be understood by search engine. Do NOT add any references (pronouns) in the sub-question.
+    - Do NOT simply repeat the user's query.
+- need_search (string): Based on your reasoning, is an external search required to answer the sub-question? This MUST be a Just the STRING form of "True" or "False".
+
+# NOTE: 
+The keys of JSON can only be the above three, and no others can be generated.
 
 ---
 # EXAMPLES:
-
-**Example 1: First Step, Search Needed**
-
+**Example 1:** First Step, Search Needed
 **User Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
 **Previous Step Analysis:** ""
-
 **Your Output:**
 {{
-    "action": "sub_question",
-    "sub_question": "developer of 'Cyberpunk 2077'",
-    "need_search": "True"
+  "reasoning": "This is the first step. The user's query is about the CEO of a specific company. To answer this, I first need to identify the company that developed 'Cyberpunk 2077'. I do not have this information internally, so a search is required. The most logical first sub-question is to find the developer.",
+  "sub_question": "developer of 'Cyberpunk 2077'",
+  "need_search": "True"
 }}
 
----
-**Example 2: Subsequent Step, Further Search Needed**
 
+**Example 2:** Subsequent Step, Further Search Needed
 **User Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
 **Previous Step Analysis:** "The developer is CD Projekt Red, but the CEO's name is still missing and needs to be searched for."
-
 **Your Output:**
 {{
-    "action": "sub_question",
-    "sub_question": "current CEO of CD Projekt Red",
-    "need_search": "True"
-}}
-
----
-**Example 3: Can Answer Now**
-
-**User Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
-**Previous Step Analysis:** "The previous search has confirmed that the developer of 'Cyberpunk 2077' is CD Projekt Red. A subsequent search found that as of late 2024, the joint CEOs of CD Projekt Red are Adam Badowski and Michał Nowakowski."
-
-**Your Output:**
-{{
-  "reasoning": "The 'Previous Step Analysis' explicitly states the names of the joint CEOs of CD Projekt Red, which is the developer of the game. This information directly and completely answers the user's original query. Therefore, no more searching is needed, and the next action should be to generate the final answer.",
-  "action": "generate_final_answer",
-  "final_answer": "[The name of joint CEOs]"
+  "reasoning": "This is a subsequent step. The previous analysis confirms the developer is 'CD Projekt Red' but also states that the CEO's name is still missing. My next logical step is to use the company name I now have and search for its CEO. This information is not in my internal knowledge.",
+  "sub_question": "current CEO of CD Projekt Red",
+  "need_search": "True"
 }}
 
 ---
 # TASK TO COMPLETE:
-
 **User Query:** {query}
 **Previous Step Analysis:** {further_analysis}
-
 **Your Output:**
 """
-
 
 assess = """
 Is the following document sufficient to answer the query '{query}'?
 Document: {docs}
-Please answer strictly in the format 'pass' or 'fail: [reason]'.
+Please answer strictly in the format "'pass' or 'fail': [reason]'".
 """
 
 refine = """
@@ -156,62 +139,34 @@ You must generate a SINGLE, valid JSON object as your output. MUST conform to th
 **Your Output:**
 """
 
-
 judge = """
-# GOAL: In this stage, you are a judge. Your task is to determine if the "Answer Generated So Far" to the "Current Query" is sufficient to fully answer the user's "Initial Query". Follow the following format strictly.
-
----
-# JSON SCHEMA
-You must generate a SINGLE, valid JSON object as your output. MUST conform to one of the following structures:
-{{
-  "reasoning": "string",
-  "final_answer": "string"
-}}
-
-or
-
-{{
-    "reasoning": "string",
-    "further_analysis": "string"
-}}
-
----
-# INSTRUCTIONS:
-1. Compare the "Initial Query" with the "Answer Generated So Far".
-2. `reasoning` (string): Your step-by-step analysis of the task. 
-3. `final_answer` (string): If the answer is sufficient, use the "final_answer" key to include the complete final answer. Simplify the final_answer into a concise phrase without losing key information.
-4. `further_analysis` (string): If not sufficient, use the "further_analysis" key to explain what is still missing.
-5. **NOTE**: The keys of JSON can only be the above three, and no others can be generated.
-
----
-# EXAMPLES:
-
-**Example 1: Multi-Step Continuation**
-**Current Query:** Which company developed the game 'Cyberpunk 2077'?
-**Initial Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
-**Answer Generated So Far:** "Cyberpunk 2077 was developed by CD Projekt Red."
-**Your Output:**
-{{
-    "reasoning": "The answer so far correctly identifies the developer company. However, the initial query asks for the CEO, which is still unknown. Therefore, the answer is not sufficient.",
-    "further_analysis": "The developer is CD Projekt Red, but the CEO's name is still missing and needs to be searched for."
-}}
-
----
-**Example 2: Multi-Step Completion**
-**Current Query:** Who is the CEO of CD Projekt Red?
-**Initial Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
-**Answer Generated So Far:** "The current CEO of CD Projekt Red is Adam Kiciński."
-**Your Output:**
-{{
-    "reasoning": "The answer so far provides the CEO's name. This information fully satisfies the user's initial query. The answer is sufficient.",
-    "final_answer": "Adam Kiciński"
-}}
+# GOAL: In this stage, you are a judge. Your task is to determine if the "Analysis Generated So Far" is sufficient to fully answer the user's "User Query".
+Please answer strictly in the format "'pass' or 'fail': [reason]'".
 
 ---
 # TASK TO COMPLETE:
 
-**Initial Query:** "{initial_query}"
-**Current Query:** "{current_query}"
-**Answer Generated So Far:** "{generated_answer}"
+**User Query:** "{initial_query}"
+**Analysis Generated So Far:** "{further_analysis}"
+**Your Output:**
+"""
+
+final_answer = """
+# GOAL: In this stage, You have finished the entire analysis process. Now you need to generate the final answer to the "User Query" based on "Analysis Records". The response should be concise and accurate, and try to generate a phrase rather than a whole sentence.
+
+---
+# JSON SCHEMA
+You must generate a SINGLE, valid JSON object as your output. MUST conform to the following structure:
+{{
+  "reasoning": "Your reasoning process for generating the answer.",
+  "final_answer": "Your generated final answer."
+}}
+
+**NOTE**: The keys of JSON can only be the above two, and no others can be generated.
+
+---
+# TASK TO COMPLETE:
+**User Query:** "{initial_query}"
+**Analysis Records:** "{further_analysis}"
 **Your Output:**
 """
