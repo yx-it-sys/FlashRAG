@@ -171,13 +171,13 @@ class DFAQAPipeline(BasicMultiModalPipeline):
 
     def _state_retrieve(self, run_state: dict) -> str:
         query = run_state['current_query']
-        # search_results = self.retriever.search(query, 3)
-        search_results = self._fine_search(query)
+        search_results = self.retriever.search(query, 3)
+        # search_results = self._fine_search(query)
         search_text_list = []
 
         for result in search_results:
-            # search_text_list.append(result['contents'])
-            search_text_list.append(result)
+            search_text_list.append(result['contents'])
+            # search_text_list.append(result)
 
         search_texts = "\n\n".join(search_text_list)
         run_state["retrieved_docs"] = f"Contents of retrieved documents:\n{search_texts}"
