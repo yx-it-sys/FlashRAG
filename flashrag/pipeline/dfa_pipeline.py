@@ -118,7 +118,10 @@ class DFAQAPipeline(BasicMultiModalPipeline):
         
         if "response" in last_record:
             print(f"Response:\n{last_record['response']}\n")
-            
+
+        if "further_analysis" in last_record:
+            print(f"Further Analysis:\n {last_record['further_analysis']}")
+
         if "result" in last_record:
             print("Result:")
             if isinstance(last_record["result"], dict):
@@ -150,7 +153,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
         sub_question = response.get('sub_question', '')
 
         plan = {"reasoning": reasoning, "need_search": need_search, "sub_question": sub_question}
-        run_state["record"].append({"state": "plan", "response": output, "result": plan})
+        run_state["record"].append({"state": "plan", "response": output, "further_analysis": run_state['further_analysis'], "result": plan})
         self.dfa_print(run_state['record'])
         
         run_state['current_query'] = sub_question
@@ -184,7 +187,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
         return "S_Assess"
     
     def _state_judge(self, run_state: dict) -> str:
-        if run_state['generate_plan_loop_counter'] >= 1000:
+        if run_state['generate_plan_loop_counter'] >= 5:
             return "S_Fail"
         else:
             run_state['generate_plan_loop_counter'] += 1
@@ -193,7 +196,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             output = response_dict[0]
             judgement, reason = self._parse_assess(output)
             
-            run_state["record"].append({"state": "judge", "response": output, "result": {"judgement_result": judgement, "reason": reason if reason is not None else ""}})
+            run_state["record"].append({"state": "judge", "response": output, "further_analysis": run_state['further_analysis'], "result": {"judgement_result": judgement, "reason": reason if reason is not None else ""}})
             self.dfa_print(run_state["record"])
 
             if judgement == 'complete':
@@ -207,7 +210,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             
 
     def _state_assess(self, run_state: dict) -> str:
-        if run_state['retrieval_assess_refine_loop_counter'] >= 1000:
+        if run_state['retrieval_assess_refine_loop_counter'] >= 5:
             return "S_Fail"
         else:
             run_state['retrieval_assess_refine_loop_counter'] += 1
@@ -286,7 +289,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
         final_answer = response.get('final_answer', '')
 
         if (response is None) or (final_answer == ''):
-            run_state["record"].append({"state": "final", "response": output, "result": "Fail to parse llm's output!"})
+            run_state["record"].append({"state": "final", "response": output, "further_analysis": run_state["further_analysis"], "result": "Fail to parse llm's output!"})
             self.dfa_print(run_state["record"])
             return "S_Fail"
         
