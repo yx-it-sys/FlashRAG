@@ -66,9 +66,37 @@ The keys of JSON can only be the above three, and no others can be generated.
 """
 
 assess = """
-Is the following document sufficient to answer the query '{query}'?
-Document: {docs}
-Please answer strictly in the format "sufficient: [reason]" or "insufficient: [reason]".
+# GOAL: You are a strict assessor. Your sole task is to determine if the provided 'Document' contains ALL the necessary information to fully and definitely answer the 'Query'.
+
+# OUTPUT FORMAT & DEFINITIONS:
+Your output MUST strictly be in one of two formats: "complete: [reason]" or "incomplete: [reason]".
+
+- `complete`: Use this **only if ALL parts** of the Query can be answered using *only* the information within the provided Document.
+- `incomplete`: Use this if **ANY part** of the Query cannot be answered by the Document.
+
+---
+# EXAMPLES:
+
+**Example 1: Incomplete Information**
+
+**Query:** "What are the capitals of Spain and Japan?"
+**Document:** "Madrid is the vibrant capital of Spain, known for its rich history and art. The city is a major European cultural center."
+**Your Output:**
+incomplete: The document provides the capital of Spain (Madrid), but it contains no information about the capital of Japan.
+
+**Example 2: Complete Information**
+
+**Query:** "Who wrote the play Hamlet?"
+**Document:** "Hamlet, one of the most influential tragedies in English literature, was written by William Shakespeare around 1600. It is his longest play."
+**Your Output:**
+complete: The document explicitly states that William Shakespeare wrote Hamlet, which fully answers the query.
+
+---
+# TASK TO COMPLETE:
+
+**Query:** "{query}"
+**Document:** "{docs}"
+**Your Output:**
 """
 
 refine = """
@@ -140,29 +168,29 @@ You must generate a SINGLE, valid JSON object as your output. MUST conform to th
 """
 
 judge = """
-# GOAL: In this stage, you are a judge. Your task is to determine if the "Analysis Generated So Far" is sufficient to fully answer the user's "User Query".
+# GOAL: In this stage, you are a judge. Your task is to determine if the "Analysis Generated So Far" is complete to fully answer the user's "User Query".
 
 # OUTPUT FORMAT & DEFINITIONS:
-Your output MUST strictly be in one of two formats: "sufficient: [reason]" or "insufficient: [reason]".
+Your output MUST strictly be in one of two formats: "complet: [reason]" or "incomplete: [reason]".
 
-- `sufficient`: Use this **only if ALL parts** of the User Query have been definitively answered by the analysis. The process can stop.
-- `insufficient`: Use this if **ANY part** of the User Query is still unanswered or requires more information. The process must continue.
+- `complete`: Use this **only if ALL parts** of the User Query have been definitively answered by the analysis. The process can stop.
+- `incomplete`: Use this if **ANY part** of the User Query is still unanswered or requires more information. The process must continue.
 
 ---
 # EXAMPLES:
-**Example 1: Insufficient Analysis**
+**Example 1: Incomplete Analysis**
 
 **User Query:** "Where is current monarch of the United Kingdom born?"
 **Analysis Generated So Far:** "The current monarch of the United Kingdom is King Charles III."
 **Your Output:**
-insufficient: The analysis identifies the monarch, King Charles III, but does not provide the city of his birth, which is required to fully answer the query.
+incomplete: The analysis identifies the monarch, King Charles III, but does not provide the city of his birth, which is required to fully answer the query.
 
-**Example 2: Sufficient Analysis**
+**Example 2: Complete Analysis**
 
 **User Query:** "Where is the highest mountain on Earth located in?"
 **Analysis Generated So Far:** "Mount Everest is the highest mountain on Earth, with its peak at 8,848.86 meters above sea level. It is located in China"
 **Your Output:**
-sufficient: The analysis states that Mount Everest is the highest mountain, located in China, which is a direct and full answer to the user's question.
+complete: The analysis states that Mount Everest is the highest mountain, located in China, which is a direct and full answer to the user's question.
 
 ---
 # TASK TO COMPLETE:

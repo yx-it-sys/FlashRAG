@@ -97,9 +97,9 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             return None, None, None
     
     def _parse_assess(self, response: str):
-        if response.startswith("sufficient:"):
-            return "sufficient", None
-        elif response.startswith("insufficient:"):
+        if response.startswith("complete:"):
+            return "complete", None
+        elif response.startswith("incomplete:"):
             parts = response.split(':', 1)
             if len(parts) > 1:
                 return parts[0].strip(), parts[1].strip()
@@ -196,7 +196,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             run_state["record"].append({"state": "judge", "response": output, "result": {"judgement_result": judgement, "reason": reason if reason is not None else ""}})
             self.dfa_print(run_state["record"])
 
-            if judgement == 'sufficient':
+            if judgement == 'complete':
                 run_state['judgement_result'] = judgement
                 return "S_Final"
             else:
@@ -219,7 +219,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             run_state["record"].append({"state": "assess", "response": response, "result": {"assessment_result": assess, "reason": reason if reason is not None else ""}})
             self.dfa_print(run_state["record"])
 
-            if assess == 'sufficient':
+            if assess == 'complete':
                 run_state['assessment_result'] = assess
                 return "S_Generate"
             else:
