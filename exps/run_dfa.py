@@ -1,7 +1,7 @@
 import argparse
 from flashrag.config import Config
 from flashrag.utils import get_dataset
-from flashrag.pipeline import DFAVQAPipeline, DFAQAPipeline
+from flashrag.pipeline import DFAQAPipeline
 from flashrag.prompt import MMPromptTemplate, PromptTemplate
 
 def main():
@@ -19,7 +19,7 @@ def main():
 
     config = Config("my_config.yaml", config_dict=config_dict)
     all_split = get_dataset(config)
-    test_data = all_split["dev"]
+    test_data = all_split["test"]
     
     # vqa_prompt_templete = MMPromptTemplate(
     #     config=config

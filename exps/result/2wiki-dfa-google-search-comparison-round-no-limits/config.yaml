@@ -50,7 +50,7 @@ method2index:
     bge: null
     bge-m3: null
 data_dir: data/datasets/
-save_dir: result/2wikimultihopqa_2025_11_07_14_46_experiment
+save_dir: result/2wikimultihopqa_2025_11_08_13_11_experiment
 gpu_id: '0'
 dataset_name: 2wikimultihopqa
 split:

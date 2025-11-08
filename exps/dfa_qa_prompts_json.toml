@@ -9,12 +9,12 @@ Think Step by Step.
 [tasks]
 plan = """
 # GOAL: 
-In this stage, your goal is to analyse the user's query and any previous analysis to formulate the single most logical and specific next sub-question needed to reach the final answer.
+In this stage, your goal is to analyse the user's query and any previous analysis to DECOMPOSE "User Query" and formulate the single most logical and specific next sub-question needed to reach the final answer.
 Concisely understand the meaning expressed in the "User Query". Identify the single most crucial first step needed to answer the user's query. The sub-question must be a specific, fine-grained query, NOT a repetition of the original question.
 
 # CONTEXT & LOGIC:
 You are part of an iterative process. You must determine if this is the first step or a subsequent step.
-- **IF "Previous Step Analysis" is EMPTY:** This is the first step. Your task is to generate the initial sub-question based on the "User Query".
+- **IF "Previous Step Analysis" is EMPTY:** This is the first step. Your task is to generate the sub-question based on the "User Query".
 - **IF "Previous Step Analysis" is PROVIDED:** This is a subsequent step. You MUST use this analysis to generate the next logical sub-question, avoiding repetition and moving closer to the final answer.
 
 # JSON SCHEMA:
@@ -68,7 +68,7 @@ The keys of JSON can only be the above three, and no others can be generated.
 assess = """
 Is the following document sufficient to answer the query '{query}'?
 Document: {docs}
-Please answer strictly in the format "'pass' or 'fail': [reason]'".
+Please answer strictly in the format "sufficient: [reason]" or "insufficient: [reason]".
 """
 
 refine = """
@@ -141,7 +141,28 @@ You must generate a SINGLE, valid JSON object as your output. MUST conform to th
 
 judge = """
 # GOAL: In this stage, you are a judge. Your task is to determine if the "Analysis Generated So Far" is sufficient to fully answer the user's "User Query".
-Please answer strictly in the format "'pass' or 'fail': [reason]'".
+
+# OUTPUT FORMAT & DEFINITIONS:
+Your output MUST strictly be in one of two formats: "sufficient: [reason]" or "insufficient: [reason]".
+
+- `sufficient`: Use this **only if ALL parts** of the User Query have been definitively answered by the analysis. The process can stop.
+- `insufficient`: Use this if **ANY part** of the User Query is still unanswered or requires more information. The process must continue.
+
+---
+# EXAMPLES:
+**Example 1: Insufficient Analysis**
+
+**User Query:** "Where is current monarch of the United Kingdom born?"
+**Analysis Generated So Far:** "The current monarch of the United Kingdom is King Charles III."
+**Your Output:**
+insufficient: The analysis identifies the monarch, King Charles III, but does not provide the city of his birth, which is required to fully answer the query.
+
+**Example 2: Sufficient Analysis**
+
+**User Query:** "Where is the highest mountain on Earth located in?"
+**Analysis Generated So Far:** "Mount Everest is the highest mountain on Earth, with its peak at 8,848.86 meters above sea level. It is located in China"
+**Your Output:**
+sufficient: The analysis states that Mount Everest is the highest mountain, located in China, which is a direct and full answer to the user's question.
 
 ---
 # TASK TO COMPLETE:

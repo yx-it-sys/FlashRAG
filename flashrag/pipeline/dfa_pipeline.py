@@ -97,9 +97,9 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             return None, None, None
     
     def _parse_assess(self, response: str):
-        if "pass" in response:
-            return "pass", None
-        elif response.startswith("fail:"):
+        if response.startswith("sufficient:"):
+            return "sufficient", None
+        elif response.startswith("insufficient:"):
             parts = response.split(':', 1)
             if len(parts) > 1:
                 return parts[0].strip(), parts[1].strip()
@@ -184,7 +184,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
         return "S_Assess"
     
     def _state_judge(self, run_state: dict) -> str:
-        if run_state['generate_plan_loop_counter'] >= 3:
+        if run_state['generate_plan_loop_counter'] >= 1000:
             return "S_Fail"
         else:
             run_state['generate_plan_loop_counter'] += 1
@@ -196,7 +196,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             run_state["record"].append({"state": "judge", "response": output, "result": {"judgement_result": judgement, "reason": reason if reason is not None else ""}})
             self.dfa_print(run_state["record"])
 
-            if judgement == 'pass':
+            if judgement == 'sufficient':
                 run_state['judgement_result'] = judgement
                 return "S_Final"
             else:
@@ -207,7 +207,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             
 
     def _state_assess(self, run_state: dict) -> str:
-        if run_state['retrieval_assess_refine_loop_counter'] >= 3:
+        if run_state['retrieval_assess_refine_loop_counter'] >= 1000:
             return "S_Fail"
         else:
             run_state['retrieval_assess_refine_loop_counter'] += 1
@@ -219,7 +219,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             run_state["record"].append({"state": "assess", "response": response, "result": {"assessment_result": assess, "reason": reason if reason is not None else ""}})
             self.dfa_print(run_state["record"])
 
-            if assess == 'pass':
+            if assess == 'sufficient':
                 run_state['assessment_result'] = assess
                 return "S_Generate"
             else:
@@ -274,6 +274,8 @@ class DFAQAPipeline(BasicMultiModalPipeline):
         self.dfa_print(run_state['record'])
 
         run_state['further_analysis'].append({"sub_question": run_state['current_query'], "reasoning": reasoning_content, "answer": response_content})
+        print(f"further_analysis: {run_state['further_analysis']}")
+        
         return "S_Judge"
         
     def _state_final(self, run_state: dict) -> str:
