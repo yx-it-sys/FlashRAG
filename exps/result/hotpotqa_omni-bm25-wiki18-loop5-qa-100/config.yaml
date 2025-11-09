@@ -50,7 +50,7 @@ method2index:
     bge: null
     bge-m3: null
 data_dir: data/datasets/
-save_dir: result/hotpotqa_2025_11_08_20_40_experiment
+save_dir: result/hotpotqa_2025_11_09_10_35_experiment
 gpu_id: '0'
 dataset_name: hotpotqa
 split:
@@ -159,8 +159,9 @@ metric_setting:
     tokenizer_name: gpt-4
 save_metric_score: true
 vllm_gpu_memory_utilization: 0.95
-dfa_vqa_prompt_path: /root/FlashRAG/exps/dfa_vqa_prompts.toml
-dfa_qa_prompt_path: /root/FlashRAG/exps/dfa_qa_prompts_json.toml
+dfa_vqa_prompt_path: /root/FlashRAG/exps/prompts/dfa_vqa_prompts.toml
+dfa_qa_prompt_path: /root/FlashRAG/exps/prompts/dfa_qa_prompts_json.toml
+omni_qa_prompt_path: /root/FlashRAG/exps/prompts/omni_qa_prompt.toml
 dataset_path: data/datasets/hotpotqa
 image_path: data/datasets/okvqa/images/val2014
 gpu_num: 1

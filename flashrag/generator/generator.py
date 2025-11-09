@@ -411,8 +411,16 @@ class HFCausalLMGenerator(BaseGenerator):
             with torch.inference_mode():
                 torch.cuda.empty_cache()
                 batched_prompts = input_list[idx : idx + batch_size]
+                formatted_prompts = []
+                for conversation in batched_prompts:
+                    formatted_string = self.tokenizer.apply_chat_template(
+                        conversation, 
+                        tokenize=False, # Important: We want a string back, not token IDs yet.
+                        add_generation_prompt=True 
+                    )
+                    formatted_prompts.append(formatted_string)
                 inputs = self.tokenizer(
-                    batched_prompts,
+                    formatted_prompts,
                     return_tensors="pt",
                     padding=True,
                     truncation=True,

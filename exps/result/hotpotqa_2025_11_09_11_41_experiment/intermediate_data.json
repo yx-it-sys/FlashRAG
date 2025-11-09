@@ -1,0 +1,1502 @@
+[
+    {
+        "id": "dev_4264",
+        "question": "What nationality was Oliver Reed's character in the film Royal Flash?",
+        "golden_answers": [
+            "Prussian"
+        ],
+        "output": {
+            "pred": "British",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_3227",
+        "question": "Pacific Mozart Ensemble performed which German composer's Der Lindberghflug in 2002?",
+        "golden_answers": [
+            "Kurt Julian Weill"
+        ],
+        "output": {
+            "pred": "Kurt Weill",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.8,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_6067",
+        "question": "Who released the song \"With or Without You\" first, Jai McDowall or U2?",
+        "golden_answers": [
+            "U2"
+        ],
+        "output": {
+            "pred": "U2",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_317",
+        "question": "What Kentucky county has a population of 60,316 and features the Lake Louisvilla neighborhood?",
+        "golden_answers": [
+            "Oldham County"
+        ],
+        "output": {
+            "pred": "Jefferson County",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_1699",
+        "question": "Para Hills West, South Australia lies within a city with what estimated population?",
+        "golden_answers": [
+            "138,535"
+        ],
+        "output": {
+            "pred": "150,000",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_4114",
+        "question": "In what year was the narrator of \"Blackadder's Christmas Carol\" born?",
+        "golden_answers": [
+            "1959"
+        ],
+        "output": {
+            "pred": "1941",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_3626",
+        "question": "Thomas Fitch defended John Henry Holliday when he was accused of killing men during the gunfight at the o.k. corral, when was that?",
+        "golden_answers": [
+            "October 25, 1881"
+        ],
+        "output": {
+            "pred": "1881",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_2091",
+        "question": "The actor that played Gutthi on Comedy nights with Kapil Show also starred in what 2016 Punjabi film directed by Smeep Kang?",
+        "golden_answers": [
+            "Vaisakhi List"
+        ],
+        "output": {
+            "pred": "Premartham",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_930",
+        "question": "Victor Varnada directed Twisted Fortune, which starred which brother of Eddie Murphy?",
+        "golden_answers": [
+            "Charlie Murphy"
+        ],
+        "output": {
+            "pred": "Jamie Foxx",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_3300",
+        "question": "After his curacy at the village that is a suburb of Scunthorpe, who was Industrial Chaplain to the Bishop of Lincoln?",
+        "golden_answers": [
+            "Dudman"
+        ],
+        "output": {
+            "pred": "<Thought>\nThe retrieved document does not contain any relevant information about the village near Scunthorpe or the clergy member in question. I need to search again for the correct village near Scunthorpe.\n\n<Search>\nText Retrieval: Village near Scunthorpe.\n\n<Thought>\nOnce I have the correct village, I can proceed to find the clergy member who served as a curate there and later became the Industrial Chaplain to the Bishop of Lincoln.\n\n<Sub-Question>\nWhich village is a suburb of Scunthorpe?\n\n<Search>\nText Retrieval: Village near Scunthorpe.\n\n<Thought>\nAfter identifying the correct village, I will look for the clergy member who served as a curate there and later became the Industrial Chaplain to the Bishop of Lincoln.\n\n<Sub-Question>\nWho was the curate at the identified village and later became the Industrial Chaplain to the Bishop of Lincoln?\n\n<Search>\nNo Retrieval\n\n<",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_1963",
+        "question": "What is the first two words of the fifth studio album of Joseph Edgar Foreman?",
+        "golden_answers": [
+            "The Hungry"
+        ],
+        "output": {
+            "pred": "<Thought>\nThe provided text does not contain information about Joseph Edgar Foreman's studio albums. I need to search for his discography to find the title of his fifth studio album.\n<Sub-Question>\nWhat is the title of Joseph Edgar Foreman's fifth studio album?\n<Search>\nText Retrieval: Joseph Edgar Foreman discography.\n\n<Thought>\nAfter retrieving the discography, I should be able to identify his fifth studio album and then find the first two words of its title.\n<Sub-Question>\nWhat is the title of Joseph Edgar Foreman's fifth studio album?\n<Search>\nText Retrieval: Joseph Edgar Foreman discography.\n\n<Thought>\nI have found the title of his fifth studio album. Now I need to extract the first two words from it.\n<Sub-Question>\nWhat are the first two words of the album titled \"The Head\" by Joseph Edgar Foreman?\n<Search>\nNo Retrieval\n\n<Thought>\nThe first two words of Joseph",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_5762",
+        "question": "The Twelfth United States Army Group commander was the first chairman of what?",
+        "golden_answers": [
+            "Joint Chiefs of Staff"
+        ],
+        "output": {
+            "pred": "NATO Supreme Allied Commander Europe",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_2938",
+        "question": "Politician Lyman Sherwood was born in what New York county?",
+        "golden_answers": [
+            "Rensselaer County"
+        ],
+        "output": {
+            "pred": "Rensselaer County",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_4619",
+        "question": "Robert Earl Holding owned an oil company that was originally founded by who?",
+        "golden_answers": [
+            "Harry F. Sinclair"
+        ],
+        "output": {
+            "pred": "Search Oil magnate Robert Earl Holding and his oil company",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_6376",
+        "question": "The chorus of \"On the Radio\" contains references to the song \"November Rain\" whose band's lead singer is?",
+        "golden_answers": [
+            "Axl Rose"
+        ],
+        "output": {
+            "pred": "No reference",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_2834",
+        "question": "If the Charhki  Dadri crash was less dangerous than the Tenerife airport disaster, which occured firat? ",
+        "golden_answers": [
+            "On March 27, 1977, two Boeing 747 passenger jets, KLM Flight 4805 and Pan Am Flight 1736, collided on the runway at Los Rodeos Airport (now Tenerife North Airport)"
+        ],
+        "output": {
+            "pred": "Charhki Dadri crash",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_2105",
+        "question": "Were the films Crazy Love and Welcome to Nollywood both released in 2008?",
+        "golden_answers": [
+            "no"
+        ],
+        "output": {
+            "pred": "2008",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_4779",
+        "question": "In what county was Duffy Jackson born?",
+        "golden_answers": [
+            "Nassau County"
+        ],
+        "output": {
+            "pred": "San Francisco County",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_1695",
+        "question": "When was the defending titlist of 2009–10 Biathlon World Cup – Pursuit Men born? ",
+        "golden_answers": [
+            "27 January 1974"
+        ],
+        "output": {
+            "pred": "1976",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_7028",
+        "question": "Which mountain is taller, Gasherbrum II or Langtang Ri?",
+        "golden_answers": [
+            "Gasherbrum II"
+        ],
+        "output": {
+            "pred": "Gasherbrum II",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_2149",
+        "question": "Which Dutch media tycoon transferred all of its media activities to Talpa Holding?",
+        "golden_answers": [
+            "John de Mol Jr."
+        ],
+        "output": {
+            "pred": "John de Mol Jr.",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_4682",
+        "question": "When did the car depicted on the cover of Pentastar: In the Style of Demons cease production?",
+        "golden_answers": [
+            "1974"
+        ],
+        "output": {
+            "pred": "",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_7073",
+        "question": "What commentator and author questioned the validity of CORE's non-profit status?",
+        "golden_answers": [
+            "Rachel Anne Maddow"
+        ],
+        "output": {
+            "pred": "<Search>\nNo Retrieval\n\nThe retrieved text does not seem to be relevant to our query. We need to continue searching for historical records or news articles that discuss controversies around CORE's operations or funding.\n\n<Sub-Question>\nAre there any historical records or news articles specifically mentioning controversies or questions about CORE's non-profit status?\n<Search>\nText Retrieval: \"historical records or news articles specifically mentioning controversies or questions about CORE's non-profit status\"\n\nPlease provide the result from the text retrieval.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_2956",
+        "question": "did Robert Wise have more award nominations than Zoltan Korda?",
+        "golden_answers": [
+            "yes"
+        ],
+        "output": {
+            "pred": "15",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_6691",
+        "question": "My Neighbor Totoro was produced by a Japanese animation film studio founded in what year?",
+        "golden_answers": [
+            "1985"
+        ],
+        "output": {
+            "pred": "1985",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_146",
+        "question": "When did the English local newspaper, featuring the sculpture and war memorial in the Forbury gardens, change names?",
+        "golden_answers": [
+            "2009"
+        ],
+        "output": {
+            "pred": "The local newspaper changed its name in 1985.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_3155",
+        "question": "What years did Jose Gonzalo Rodriguez Gacha and other leaders of fthe Medallin Cartel operate in Boliva, Colombia, Central America, Peru, the United States, Canada, and Europe?",
+        "golden_answers": [
+            "1970s and 1980s"
+        ],
+        "output": {
+            "pred": "1978-1993",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_5951",
+        "question": "Which writer died later, Agatha Christie or Clement Greenberg?",
+        "golden_answers": [
+            "Clement Greenberg"
+        ],
+        "output": {
+            "pred": "Clement Greenberg",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_3373",
+        "question": "Arthur Noss was a gunner for the commader during which two European theatre battles in WWII?",
+        "golden_answers": [
+            "Battle of Britain and the Battle of Malta"
+        ],
+        "output": {
+            "pred": "Normandy and Eastern Front",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.18181818181818182,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_6129",
+        "question": "Between Pinanga and Alopecurus which genus is more common in temperate regions?",
+        "golden_answers": [
+            "Alopecurus"
+        ],
+        "output": {
+            "pred": "<Search>\nText Retrieval: Distribution of Alopecurus in temperate regions.\n\nPlease provide the result from the text retrieval.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.125,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_7147",
+        "question": "What is the name of shipping magnate Mærsk Mc-Kinney Møller' father?",
+        "golden_answers": [
+            "A.P. Møller"
+        ],
+        "output": {
+            "pred": "Arnold Peter Møller",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_5718",
+        "question": "Who brewed the first espresso coffee in space, Patrick Baudry or Samantha Cristoforetti?",
+        "golden_answers": [
+            "Samantha Cristoforetti"
+        ],
+        "output": {
+            "pred": "Samantha Cristoforetti",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_6263",
+        "question": "Who starred alongside South Korean actor and singer Kim Ki-bum in the 2012 romantic comedy series I Love Lee Tae-ri?",
+        "golden_answers": [
+            "Park Ye-jin"
+        ],
+        "output": {
+            "pred": "Lee Tae-ri",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_5129",
+        "question": "Which port city lies approximately 25 km north of the Lingnan Fine Arts Museum?",
+        "golden_answers": [
+            "Keelung"
+        ],
+        "output": {
+            "pred": "<Search>\nText Retrieval: Port cities near Guangzhou, 25 km north.\n\n<Thought>\nBased on the text, there is no direct mention of a port city that is approximately 25 km north of Guangzhou. However, the text mentions that the distance between Shenzhen and Guangzhou is about 111.12 km, which is much farther than 25 km. Therefore, I need to look for a port city that is closer to Guangzhou and approximately 25 km north.\n\n<Sub-Question>\nIs there any port city that is closer to Guangzhou and approximately 25 km north?\n\n<Search>\nText Retrieval: Port cities near Guangzhou, 25 km north.\n\n<Thought>\nAfter reviewing the text again, it seems that there might be an error in the initial assumption. The text does not provide a direct answer to the question. However, based on the geographical context, the closest major port city to Guangzhou",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_436",
+        "question": "Where is the school that Tyler Kalinoski went to located?",
+        "golden_answers": [
+            "located in Olathe, Kansas"
+        ],
+        "output": {
+            "pred": "California",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_56",
+        "question": "D1NZ is a series based on what oversteering technique?",
+        "golden_answers": [
+            "Drifting"
+        ],
+        "output": {
+            "pred": "<Search>\nNo Retrieval\n\n<Thought>\nThe search did not provide specific information on drifting techniques. However, we know that drifting involves oversteering, and there are several techniques such as handbrake drift, launch control drift, and more. Given the context of D1NZ being a drifting series, it is likely that the series focuses on a specific oversteering technique.\n\n<Sub-Question>\nWhat is the most common or well-known oversteering technique in drifting?\n\n<Search>\nText Retrieval: Most common oversteering technique in drifting.\nWaiting for the result...",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.026666666666666665,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_3607",
+        "question": "The most famous song of the last monarch of Hawaii was what?",
+        "golden_answers": [
+            "Aloha ʻOe"
+        ],
+        "output": {
+            "pred": "Aloha Oe",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_2594",
+        "question": "The NG postcode area is situated approximately how many miles from Gamston, Rushcliffe?",
+        "golden_answers": [
+            "approximately 3 mi"
+        ],
+        "output": {
+            "pred": "5 miles",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_4635",
+        "question": "Along side Thomas Alan, which singer's first three albums were recorded at The Boarding House?",
+        "golden_answers": [
+            "Steve Martin"
+        ],
+        "output": {
+            "pred": "Susan Thomases",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_3365",
+        "question": "The Curaçao Centre for Correction and Detention changed its name to Sentro di Detenshon i Korekshon Kòrsou at this event which saw the dissolution of a Caribbean country on what date?",
+        "golden_answers": [
+            "10 October 2010"
+        ],
+        "output": {
+            "pred": "10 October 2010",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_2978",
+        "question": "What conference champions were putted against each other in the first NBA Finals in which the Orlando Magic's played?",
+        "golden_answers": [
+            "Eastern Conference champion Orlando Magic against the Western Conference champion Houston Rockets."
+        ],
+        "output": {
+            "pred": "Los Angeles Lakers",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_633",
+        "question": "What Australian beer is a British style pale ale whose label features a character conceived in 1926? ",
+        "golden_answers": [
+            "Ballarat Bitter is a 4.9% (abv) Australian beer"
+        ],
+        "output": {
+            "pred": "Ballarat Bitter",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4444444444444445,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_6235",
+        "question": "Who was born first, Chester Bennington or Mikael Stanne?",
+        "golden_answers": [
+            "Bengt Mikael Stanne"
+        ],
+        "output": {
+            "pred": "Chester Bennington",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_4509",
+        "question": "What country of origin does Robert brothers and Jacques Charles have in common?",
+        "golden_answers": [
+            "French"
+        ],
+        "output": {
+            "pred": "France",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_5390",
+        "question": "What character did Selina Giles play in the 2005 dystopian political thriller named \"V for Vendetta\"?",
+        "golden_answers": [
+            "Evey's mother"
+        ],
+        "output": {
+            "pred": "Evey Hammond",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_4956",
+        "question": "Dionne Bunsha worked most recently for the magazine published by what company?",
+        "golden_answers": [
+            "The Hindu Group"
+        ],
+        "output": {
+            "pred": "Condé Nast",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_6254",
+        "question": "The Atik Valide Mosque and Valens Aqueduct are found in what country?",
+        "golden_answers": [
+            "Turkey"
+        ],
+        "output": {
+            "pred": "Turkey",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_1548",
+        "question": "Are both Helen Dunmore and M. P. Shiel of West Indian descent?",
+        "golden_answers": [
+            "no"
+        ],
+        "output": {
+            "pred": "<Thought>\nTo answer this question, we need to know the ethnic backgrounds of Helen Dunmore and M. P. Shiel.\n<Sub-Question>\nWhat is the ethnic background of Helen Dunmore?\n<Search>\nNo Retrieval\n\n<Sub-Question>\nWhat is the ethnic background of M. P. Shiel?\n<Search>\nNo Retrieval",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_2539",
+        "question": "What band wrote the song \"Blue Letter\" and was inducted into the Rock and Roll Hall of Fame in 1998?",
+        "golden_answers": [
+            "Fleetwood Mac"
+        ],
+        "output": {
+            "pred": "Sublime",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_6194",
+        "question": "the municipality of Mirditë is in a country that had how many inhabitants in 2016 ?",
+        "golden_answers": [
+            "almost 3 million"
+        ],
+        "output": {
+            "pred": "2,831,741",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_130",
+        "question": "Which film was Oscar nominated, LaLee's Kin: The Legacy of Cotton or Gimme Shelter, the 1970 Rolling Stones documentary?",
+        "golden_answers": [
+            "LaLee's Kin: The Legacy of Cotton"
+        ],
+        "output": {
+            "pred": "Gimme Shelter",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_147",
+        "question": "What is the name of the Isles who were led by Aonghus Mór and covered a total land area of over 8300 km2?",
+        "golden_answers": [
+            "Kingdom of the Isles"
+        ],
+        "output": {
+            "pred": "<Search>\nImage Retrieval with Text Query: Isles led by Aonghus Mór and their land area.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.1111111111111111,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_3653",
+        "question": "Which part of Handel's Messiah covers the birth of a child who, according to the gospels of Luke and Matthew, was born in Bethlehem?",
+        "golden_answers": [
+            "Part I"
+        ],
+        "output": {
+            "pred": "Part I",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_2996",
+        "question": "What Danish drama thriller which takes place in both Denmark and Africa was produced by Sisse Graum Jørgensen?",
+        "golden_answers": [
+            "In a Better World"
+        ],
+        "output": {
+            "pred": "Jagten",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_3993",
+        "question": "Katie sagona is known as what kind of actor because she was a child acting on stage or in motion pictures or television?",
+        "golden_answers": [
+            "child actor"
+        ],
+        "output": {
+            "pred": "on stage",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_6995",
+        "question": "What was the name of the commander who captured all of the French ships that varied in size?",
+        "golden_answers": [
+            "Joshua Rowley"
+        ],
+        "output": {
+            "pred": "Bonhomme Richard",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_39",
+        "question": "Ralph Hefferline was a psychology professor at a university that is located in what city?",
+        "golden_answers": [
+            "New York City"
+        ],
+        "output": {
+            "pred": "Los Angeles",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_4744",
+        "question": "Both Bo Diddley and The Yardbirds played which common genre of music during their careers?",
+        "golden_answers": [
+            "rock and roll"
+        ],
+        "output": {
+            "pred": "<Thought>\nThe provided text does not directly mention the genres of music played by Bo Diddley and The Yardbirds. I need to search for their genres separately.\n<Sub-Question>\nWhat was the primary genre of music played by Bo Diddley?\n<Search>\nText Retrieval: What was Bo Diddley's musical genre?\n\n<Thought>\nAfter finding Bo Diddley's genre, I will search for The Yardbirds' genre.\n<Sub-Question>\nWhat was the primary genre of music played by The Yardbirds?\n<Search>\nText Retrieval: What was The Yardbirds' musical genre?\n\n<Thought>\nNow that I have the genres for both artists, I can compare them to find the common genre.\n<Sub-Question>\nWhat is the common genre between Bo Diddley and The Yardbirds based on the retrieved information?\n<Search>\nNo Retrieval\n\n<Thought>\nBased on the information retrieved, I can now determine the common genre between Bo D",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.016,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_3628",
+        "question": "WHere are both Sanming and Jiutai District located?",
+        "golden_answers": [
+            "China"
+        ],
+        "output": {
+            "pred": "<Thought>\nTo answer this question, I need to find out which province both Sanming and Jiutai District are located in.\n<Sub-Question>\nWhich province does Sanming belong to?\n<Search>\nNo Retrieval\n\n<Thought>\nNow I need to find out which province Jiutai District belongs to.\n<Sub-Question>\nWhich province does Jiutai District belong to?\n<Search>\nNo Retrieval\n\n<Thought>\nBoth Sanming and Jiutai District must belong to the same province if they are both mentioned together in the question. I need to check if they are indeed in the same province.\n<Sub-Question>\nAre Sanming and Jiutai District in the same province?\n<Search>\nNo Retrieval\n\n<Thought>\nSince I couldn't find the specific provinces through retrieval, I will infer based on common knowledge that Sanming is in Fujian Province and Jiutai District is in Guangdong Province. However, I should verify this.\n<",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_1282",
+        "question": "What production company was founded by George Balanchine to create a live stage version of the 1942 film Casablanca?",
+        "golden_answers": [
+            "The Los Angeles Dance Theater"
+        ],
+        "output": {
+            "pred": "No relevant information found in the provided text regarding the production company founded by George Balanchine for a live stage version of Casablanca. Let's try another search.\n<Search>\nText Retrieval: Production company founded by George Balanchine for live stage adaptation of Casablanca.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_143",
+        "question": "Josey Scott and Ian Watkins were both promising musicians. Which of these talented men was incarcerated, impacting his career with a rock band?",
+        "golden_answers": [
+            "Lostprophets disbanded in 2013 after Watkins was charged with sexual offences in late 2012."
+        ],
+        "output": {
+            "pred": "Ian Watkins",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.125,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_1401",
+        "question": "who was the anthropologist who thought that the plaster casts that were discovered by Paul Freeman were a critical piece of evidence?",
+        "golden_answers": [
+            "Don Jeffrey \"Jeff\" Meldrum (born May 24, 1958) is a Professor of Anatomy and Anthropology"
+        ],
+        "output": {
+            "pred": "Jeff Meldrum",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.25,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_2017",
+        "question": "What are the names of the co-directors of the psychological horror film starring Emily Browning and Elizabeth Banks?",
+        "golden_answers": [
+            "Charles and Thomas Guard"
+        ],
+        "output": {
+            "pred": "Search for the film title that matches the description provided.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_3004",
+        "question": "Where is the first major improved highway located?",
+        "golden_answers": [
+            "Wheeling, West Virginia"
+        ],
+        "output": {
+            "pred": "Turnpike",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_2296",
+        "question": "Which store in Gurney Paragon was founded in Belgium in 1926?",
+        "golden_answers": [
+            "Godiva"
+        ],
+        "output": {
+            "pred": "Maggi",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_1464",
+        "question": "Which Star of British-Canadian-American satirical comedy, co starting with Ricky Gervais, began his career in sketch comedy series\"Full Frontal\" ?",
+        "golden_answers": [
+            "Eric Banadinović"
+        ],
+        "output": {
+            "pred": "Martin Freeman",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_4611",
+        "question": "Löwenbräu and Bürgerbräukeller are both located where?",
+        "golden_answers": [
+            "Germany"
+        ],
+        "output": {
+            "pred": "Munich, Germany",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666666,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_6383",
+        "question": "Progress MS-09 was used to resupply the satellite that first launched into orbit in what year?",
+        "golden_answers": [
+            "1998"
+        ],
+        "output": {
+            "pred": "1998",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_3930",
+        "question": "H-63 is a highway that runs near the county seat of what Michigan county?",
+        "golden_answers": [
+            "Chippewa County"
+        ],
+        "output": {
+            "pred": "Berrien County",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_2713",
+        "question": "Who used a Barrack buster to shoot down a British Army Lynx helicopter",
+        "golden_answers": [
+            "IRA"
+        ],
+        "output": {
+            "pred": "Operation Ellamy",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_4130",
+        "question": "What liberal arts college has their athletic teams named the Lincoln Memorial Railsplitters?",
+        "golden_answers": [
+            "Lincoln Memorial University"
+        ],
+        "output": {
+            "pred": "It appears that the exact phrase \"Lincoln Memorial Railsplitters\" is not being found in the documents. Given the persistence of not finding the correct information, let's try a more direct approach by searching for the college name associated with this team name.\n\n<Search>\nText Retrieval: college associated with Lincoln Memorial Railsplitters.\n\nPlease provide the result from the text retrieval.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.07407407407407407,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_4652",
+        "question": "The Lucy Maud Montgomery novel about the character Anne Shirley was first translated into Japanese by what woman?",
+        "golden_answers": [
+            "Hanako Muraoka"
+        ],
+        "output": {
+            "pred": "Takeko Yagi",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_5727",
+        "question": "Did Yasuzo Masumura and Pitof hail from the same country and professional career?",
+        "golden_answers": [
+            "no"
+        ],
+        "output": {
+            "pred": "Japan and France",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_5355",
+        "question": "What did Eric Radomski produce that premiered on Disney XD on May 26, 2013?",
+        "golden_answers": [
+            "Avengers Assemble"
+        ],
+        "output": {
+            "pred": "There",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_3151",
+        "question": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+        "golden_answers": [
+            "Pieter van Musschenbroek"
+        ],
+        "output": {
+            "pred": "<Search>\nText Retrieval: Who invented the Tribometer?\n\nPlease provide the result after you perform the search.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_960",
+        "question": "What type of auto racing, performed on clay or dirt surfaced oval tracks, is run for the Australian Street Stock Championship? ",
+        "golden_answers": [
+            "Dirt track racing"
+        ],
+        "output": {
+            "pred": "<Thought>\nThe question asks about a specific type of auto racing that is part of the Australian Street Stock Championship. We need to identify the type of racing that uses clay or dirt surfaces on oval tracks.\n<Sub-Question>\nWhat type of auto racing is conducted on clay or dirt surfaced oval tracks?\n<Search>\nNo Retrieval\n\n<Thought>\nSince there was no retrieval needed, we should consider the types of auto racing typically held on clay or dirt oval tracks. Dirt track racing is a common form of auto racing on such surfaces.\n<Sub-Question>\nIs dirt track racing the type of auto racing conducted on clay or dirt surfaced oval tracks?\n<Search>\nNo Retrieval\n\n<Thought>\nBased on the information available, it seems likely that the racing described is indeed dirt track racing. Let's confirm this by checking if the Australian Street Stock Championship involves this type of racing.\n<Sub-Question>\nDoes the Australian Street Stock Championship involve dirt track racing?\n<Search>\nText Retrie",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.03947368421052631,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_1414",
+        "question": "Forest Hill, Texas is a suburb of which fifth-largest city in the state?",
+        "golden_answers": [
+            "Fort Worth"
+        ],
+        "output": {
+            "pred": "Houston",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_5417",
+        "question": "What was the slogan  that came about from the idea of Lebensraum which had its most extreme form supported by the Nazi Party until the end of World War II?",
+        "golden_answers": [
+            "Blood and soil"
+        ],
+        "output": {
+            "pred": "<Thought>\nThe document provides the original title of the book \"Finnlands Lebensraum\" as \"Das geographische und geschichtliche Finnland\" (\"The Geographic and Historic Finland\"). However, it does not explicitly state the slogan or message that was used to promote Lebensraum. We need to infer the message based on the context.\n\n<Sub-Question>\nWhat was the message or slogan in the book \"Finnlands Lebensraum\" that promoted the concept of Lebensraum as supported by the Nazi Party?\n\n<Search>\nText Retrieval: Message or slogan in the book \"Finnlands Lebensraum\" promoting Lebensraum.\nNo Retrieval\n\n<Thought>\nSince the exact slogan is not provided in the text, we can infer that the message in the book likely emphasized the need for Finland to expand its territory to secure its \"living space\" (Lebensraum), aligning with Nazi ideology.\n\n<Sub-Question>\nWhat was the inferred message",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.01680672268907563,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_7045",
+        "question": "Which Bob Stoops coached team beat the 2016 Auburn Tigers football team?",
+        "golden_answers": [
+            "2016 Oklahoma Sooners football team"
+        ],
+        "output": {
+            "pred": "the Oklahoma team",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5714285714285715,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_4426",
+        "question": "According to the 2010 census, what was the population of the city after which the vice president, in April 1813, was named?",
+        "golden_answers": [
+            "5,922"
+        ],
+        "output": {
+            "pred": "<Thought>\nThe question involves identifying a vice president from April 1813, finding the city named after this person, and then determining its population according to the 2010 census. We need to break down the question into smaller parts to find the required information.\n\n<Sub-Question>\nWho was the Vice President in April 1813?\n\n<Search>\nNo Retrieval\n\n<Thought>\nSince no retrieval is needed, we will try to recall or search online for the Vice President in April 1813.\n\n<Sub-Question>\nWhat city was named after the Vice President in April 1813?\n\n<Search>\nNo Retrieval\n\n<Thought>\nAfter identifying the Vice President, we need to find out if there's a city named after him.\n\n<Sub-Question>\nWhat was the population of the city named after the Vice President in April 1813 according to the 2010 census?\n\n<Search>\nText",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_4771",
+        "question": "Which was published first, Take It Easy or Personal Preference?",
+        "golden_answers": [
+            "Take It Easy"
+        ],
+        "output": {
+            "pred": "Take It Easy",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_7372",
+        "question": "Wapping has the oldest riverside tavern, dating back from when?",
+        "golden_answers": [
+            "from around 1520"
+        ],
+        "output": {
+            "pred": "1701",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_5141",
+        "question": "Who was a higher ranked tennis player: Paola Suárez or Michael Venus?",
+        "golden_answers": [
+            "Paola Suárez"
+        ],
+        "output": {
+            "pred": "Paola Suárez",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_6240",
+        "question": "Are Joe Orton and Bernard-Marie Koltès both playwrights ?",
+        "golden_answers": [
+            "yes"
+        ],
+        "output": {
+            "pred": "<Thought>\nTo answer this question, I need to check if both Joe Orton and Bernard-Marie Koltès are known as playwrights.\n<Sub-Question>\nIs Joe Orton a playwright?\n<Search>\nNo Retrieval\n\n<Sub-Question>\nIs Bernard-Marie Koltès a playwright?\n<Search>\nNo Retrieval",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_6369",
+        "question": "What American bluegrass singer performed the song Restless with The New Nashville Cats?",
+        "golden_answers": [
+            "Mark O'Connor"
+        ],
+        "output": {
+            "pred": "<Search>\nImage Retrieval with Text Query: Chris Jones with The New Nashville Cats performing Restless\n\nPlease provide the image title if available.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_3745",
+        "question": "Who lived longer- Bernard-Marie Koltès or Philip José Farmer?",
+        "golden_answers": [
+            "Philip José Farmer"
+        ],
+        "output": {
+            "pred": "Bernard-Marie Koltès",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_1183",
+        "question": "Paul DeBoy is known for an appearance in the Western action-adventure game developed by which company?",
+        "golden_answers": [
+            "Rockstar San Diego"
+        ],
+        "output": {
+            "pred": "Rockstar Games",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_3270",
+        "question": "Are either The Pogues or Pillar an electronic dance music group?",
+        "golden_answers": [
+            "no"
+        ],
+        "output": {
+            "pred": "no",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_4906",
+        "question": "What university did Bill Daly graduate that Gary Bettman also graduated from?",
+        "golden_answers": [
+            "New York University School of Law"
+        ],
+        "output": {
+            "pred": "Michigan State University",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2222222222222222,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_7395",
+        "question": "Who was born first, Bruce Conner or Nils Gaup?",
+        "golden_answers": [
+            "Bruce Conner"
+        ],
+        "output": {
+            "pred": "Bruce Conner",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_2890",
+        "question": "What is one of the most successful retro-clones that is no longer supported by Wizards of the Coast?",
+        "golden_answers": [
+            "Old School Reference and Index Compilation"
+        ],
+        "output": {
+            "pred": "Labyrinth Lord",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_3639",
+        "question": "Name one of the Judges of Spring Baking Championship television series who was born on December 17, 1974 ?",
+        "golden_answers": [
+            "Jeffrey Adam \"Duff\" Goldman"
+        ],
+        "output": {
+            "pred": "Christina Tosi",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_7288",
+        "question": "What was the breakthrough role of the actor starring in Good Boy! and was a native of Atlanta?",
+        "golden_answers": [
+            "Tai Frasier in \"Clueless\""
+        ],
+        "output": {
+            "pred": "\"The Good Life\"",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_3679",
+        "question": "College Humor is a 1933 American pre-Code musical comedy film that starred what American singer and actor who has a trademark warm bass-baritone voice?",
+        "golden_answers": [
+            "Harry Lillis \"Bing\" Crosby Jr."
+        ],
+        "output": {
+            "pred": "Bing Crosby",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5714285714285715,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_2253",
+        "question": "Between Greyia and Calibanus, which genus contains more species?",
+        "golden_answers": [
+            "Greyia"
+        ],
+        "output": {
+            "pred": "Calibanus",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_4221",
+        "question": "What company has a headquarters in Whitley, Convernty, United Kingdom?",
+        "golden_answers": [
+            "Jaguar Land Rover"
+        ],
+        "output": {
+            "pred": "<Thought>\nThe text about the Whitley Fund for Nature still does not provide any information about its headquarters location. I need to look for more specific information about the organization's headquarters.\n<Sub-Question>\nCan you find the headquarters location of the Whitley Fund for Nature?\n<Search>\nText Retrieval: Whitley Fund for Nature headquarters location.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_4096",
+        "question": "Who starred as an American attorney in Grey Gardens?",
+        "golden_answers": [
+            "Ken Howard"
+        ],
+        "output": {
+            "pred": "<Search>\nText Retrieval: Grey Gardens cast list.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_6913",
+        "question": "Was Princess Charlotte of Cambridge born before or after the repealing of the Royal Marriages Act 1772?",
+        "golden_answers": [
+            "after"
+        ],
+        "output": {
+            "pred": "after",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "dev_2880",
+        "question": "Hermann Wilhelm Göring was a veteran fighter pilot in a war that ended in what year?",
+        "golden_answers": [
+            "1918"
+        ],
+        "output": {
+            "pred": "1945",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dev_5309",
+        "question": "Ethel Winter worked with which avant-garde theater director?",
+        "golden_answers": [
+            "Jean Erdman"
+        ],
+        "output": {
+            "pred": "Edward Gordon Craig",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    }
+]

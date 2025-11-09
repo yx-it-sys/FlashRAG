@@ -42,15 +42,9 @@ def main(args):
     )
     
 
-    prediction_list = []
-    with open("result/mnt/data/okvqa_dummy_entropy_plain_run/output.jsonl", 'r', encoding='utf-8') as f:
-        for line in f:
-            data = json.loads(line)
-            prediction_list.append(data.get("prediction"))
-
-    pipeline = OmniSearchQAPipeline(config, prompt_template=qa_prompt_template)
+    pipeline = OmniSearchQAPipeline(config)
     # output_dataset = pipeline.naive_run(test_data, do_eval=False, generated_answers_list=prediction_list)
-    output_dataset = pipeline.run(test_data, do_eval=True, prompt_answer_path="result/hotpotqa_omni_run/output.jsonl")
+    output_dataset = pipeline.run(test_data, do_eval=True)
 
     # uncertainty = DisturbImage(config, prompt_templete, method="cluster", threshold=0.7)
     # chunk_size = 10

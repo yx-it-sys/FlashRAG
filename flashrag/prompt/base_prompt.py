@@ -237,7 +237,12 @@ class PromptTemplate:
         
         messages.append({'role': 'user', 'content': content})
         return messages
-    
+
+    def get_string_for_omni(self, item, prompt):
+        messages = []
+        messages.append({'role': 'system', 'content': prompt["system_prompt"]['multimodal_qa'].format(input_question=item.question)})
+        return messages
+
     def get_string_with_varying_examplars(
         self,
         question,
