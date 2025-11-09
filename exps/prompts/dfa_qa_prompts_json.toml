@@ -66,30 +66,34 @@ The keys of JSON can only be the above three, and no others can be generated.
 """
 
 assess = """
-# GOAL: You are a strict assessor. Your sole task is to determine if the provided 'Document' contains ALL the necessary information to fully and definitely answer the 'Query'.
+# GOAL: You are a meticulous relevance and sufficiency assessor. Your task is to determine if the "Information" definitively answers the "Query".
+
+# INSTRUCTIONS:
+1.  As long as the information contains some content that is helpful for answering the question, it is 'useful'.
+2.  **Think Step-by-Step**
 
 # OUTPUT FORMAT & DEFINITIONS:
-Your output MUST strictly be in one of two formats: "complete: [reason]" or "incomplete: [reason]".
+Your output MUST strictly be in one of two formats: 
+"useful: [reason]" or "useless: [reason]".
 
-- `complete`: Use this **only if ALL parts** of the Query can be answered using *only* the information within the provided Document.
-- `incomplete`: Use this if **ANY part** of the Query cannot be answered by the Document.
+- [reason] is your THINK-STEP-BY-STEP PROCESS.
 
 ---
 # EXAMPLES:
 
-**Example 1: Incomplete Information**
+**Example 1: Useful Information**
 
 **Query:** "What are the capitals of Spain and Japan?"
 **Document:** "Madrid is the vibrant capital of Spain, known for its rich history and art. The city is a major European cultural center."
 **Your Output:**
-incomplete: The document provides the capital of Spain (Madrid), but it contains no information about the capital of Japan.
+useful: The document provides the capital of Spain (Madrid), though it contains no information about the capital of Japan. Therefore, it's useful. 
 
-**Example 2: Complete Information**
+**Example 2: Useless Information**
 
 **Query:** "Who wrote the play Hamlet?"
-**Document:** "Hamlet, one of the most influential tragedies in English literature, was written by William Shakespeare around 1600. It is his longest play."
+**Document:** "Hamlet is a 1996 epic historical drama film. The film is the first unabridged theatrical film version of Hamlet, running more than four hours."
 **Your Output:**
-complete: The document explicitly states that William Shakespeare wrote Hamlet, which fully answers the query.
+useless: The document introduces the movie Hamlet, but it does not specify the creator of Hamlet. Therefore, it's useless.
 
 ---
 # TASK TO COMPLETE:
