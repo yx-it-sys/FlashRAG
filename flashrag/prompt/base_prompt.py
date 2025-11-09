@@ -207,7 +207,7 @@ class PromptTemplate:
                 content = prompt['tasks'][state_type].format(current_query=query, docs='')
         
         elif state_type == "plain":
-            query = run_state['current_query']
+            query = run_state['initial_query']
             content = prompt['tasks'][state_type].format(query=query)
 
         elif state_type == "judge":

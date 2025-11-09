@@ -325,23 +325,21 @@ class DFAQAPipeline(BasicMultiModalPipeline):
         output = response_dict[0]
         response = self._parse_output_json(output)
         
-        if response is None:
-            run_state["record"].append({"state": "plain_generate", "response": output, "result": "Fail to parse llm's output!"})
-            self.dfa_print(run_state["record"])
-            return "S_Fail"
-
         answer = response.get("answer", "")
         
-        if answer == "I can't answer":
-            return "S_Fail"
-        else:
-            run_state['s_generate_reponse'] = answer
-            run_state["record"].append({"state": "plain_generate", "response": answer, "result": {"response": answer}})
-            self.dfa_print(run_state['record'])
+        run_state["final_answer"] = answer
+        result = {'reasoning': run_state.get('reasoning', ''), 'final_answer': run_state.get('final_answer', '')}
+        run_state["record"].append({"state": "plain_generate", "response": output, "result": result})
+        self.dfa_print(run_state["record"])
 
-            run_state['further_analysis'].append({"sub_question": run_state['current_query'], "answer": answer})
-            return "S_Judge"
-        
+        result_data = {
+            "id": run_state['id'],
+            "question": run_state['initial_query'],
+            "prediction": run_state['final_answer'],
+            "record": run_state['record']
+        }
+        return result_data
+                
     def _state_fail(self, run_state: dict):
         if run_state['s_generate_response'] is None:
             prediction = "I can't answer."
@@ -402,7 +400,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             }
 
             current_state = "S_Initial"
-            while current_state != "S_Final" and current_state != "S_Fail":
+            while current_state != "S_Final" and current_state != "S_Fail" and current_state != "S_Plain_Generate":
                 handler = state_handlers[current_state]
                 next_state = handler(run_state)
                 current_state = next_state
@@ -410,6 +408,8 @@ class DFAQAPipeline(BasicMultiModalPipeline):
                 result_data = self._state_final(run_state)
             elif current_state == "S_Fail":
                 result_data = self._state_fail(run_state)
+            elif current_state == "S_Plain_Generate":
+                result_data = self._state_plain_generate(run_state)
             else:
                 print("ERROR! current state is not any of 'S_Fail' or 'S_Final'!")
             
