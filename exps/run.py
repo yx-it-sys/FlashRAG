@@ -4,8 +4,8 @@ import json
 import os
 from flashrag.config import Config
 from flashrag.utils import get_dataset
-from flashrag.pipeline import OmniSearchIGPipeline, OmniSearchPipeline
-from flashrag.prompt import MMPromptTemplate
+from flashrag.pipeline import OmniSearchQAPipeline, OmniSearchPipeline
+from flashrag.prompt import MMPromptTemplate, PromptTemplate
 from flashrag.uncertainty import DisturbImage
 
 def load_prompt(prompt_name: str) -> str:
@@ -15,15 +15,14 @@ def load_prompt(prompt_name: str) -> str:
 
 def main(args):
     config_dict = {
-        "data_dir": "lmms-lab/OK-VQA",
-        # "image_path": "data/",
-        "index_path": "indexes/bm25",
-        "corpus_path": "indexes/bm25/corpus.jsonl",
-        "generator_model": "Qwen2.5-VL-7B-Instruct",
-        # "generator_model_path": "data",
+        "dataset_path": "data/datasets/hotpotqa",
+        "image_path": "data/datasets/okvqa/images/val2014",
+        "index_path": "data/indexes/bm25",
+        "corpus_path": "data/indexes/wiki18_100w.jsonl",
+        "generator_model_path": "data/models/Qwen2.5-7B-Instruct",
         "retrieval_method": "bm25",
         "metrics": ["em", "f1", "acc"],
-        "retrieval_topk": 1,
+        "retrieval_topk": 2,
         "save_intermediate_data": True,
     }
 
@@ -31,13 +30,17 @@ def main(args):
     all_split = get_dataset(config)
     test_data = all_split["dev"]
     data = list(test_data)
-    base_sys_prompt = load_prompt("multimodal_qa")
+    # base_sys_prompt = load_prompt("multimodal_qa")
     
-    prompt_templete = MMPromptTemplate(
-        config=config,
-        system_prompt=base_sys_prompt,
-        user_prompt= "This is the input image. Now, please start following your instructions to answer the original question: {input_question}",
+    # prompt_templete = MMPromptTemplate(
+    #     config=config,
+    #     system_prompt=base_sys_prompt,
+    #     user_prompt= "This is the input image. Now, please start following your instructions to answer the original question: {input_question}",
+    # )
+    qa_prompt_template = PromptTemplate(
+        config=config
     )
+    
 
     prediction_list = []
     with open("result/mnt/data/okvqa_dummy_entropy_plain_run/output.jsonl", 'r', encoding='utf-8') as f:
@@ -45,9 +48,9 @@ def main(args):
             data = json.loads(line)
             prediction_list.append(data.get("prediction"))
 
-    pipeline = OmniSearchPipeline(config, prompt_template=prompt_templete)
+    pipeline = OmniSearchQAPipeline(config, prompt_template=qa_prompt_template)
     # output_dataset = pipeline.naive_run(test_data, do_eval=False, generated_answers_list=prediction_list)
-    output_dataset = pipeline.run(test_data, do_eval=True, prompt_answer_path="result/mnt/data/okvqa_omni_run/output.jsonl")
+    output_dataset = pipeline.run(test_data, do_eval=True, prompt_answer_path="result/hotpotqa_omni_run/output.jsonl")
 
     # uncertainty = DisturbImage(config, prompt_templete, method="cluster", threshold=0.7)
     # chunk_size = 10

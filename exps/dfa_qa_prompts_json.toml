@@ -100,9 +100,43 @@ complete: The document explicitly states that William Shakespeare wrote Hamlet, 
 """
 
 refine = """
-The search results for '{query}' are unsatisfactory because '{reason}'.
-Please generate a new, more specific, atomatic and precise query based on the context to address this issue. Only generate the refined query.
+# GOAL: You are a Query Refinement Expert. Your goal is to rewrite an unsatisfactory search query to make it more effective for a search engine, based on the reason it failed. 
+
+# REFINEMENT PRINCIPLES:
+You MUST apply the following principles to the original query:
+
+1.  **Atomicity**: Break down compound questions into the single, most logical next question. A query should have only ONE goal. If the original query asks for two things (e.g., A and B), refine it to ask for ONLY A.
+2.  **Disambiguation**: Add clarifying details to ambiguous terms to make the query specific (e.g., specify "Apple Inc." for "Apple" if the context is technology).
+
+# OUTPUT FORMAT:
+You MUST only generate the refined query string, without any additional text, labels, or explanation.
+
+---
+# EXAMPLES:
+
+**Example 1: Applying Atomicity**
+
+**Query:** "How many populations do Japan and Korea have?"
+**Reason:** "The search results were mixed and incomplete for both countries."
+**Refined Query:**
+The population of Japan
+
+
+**Example 2: Applying Disambiguation**
+
+**Query:** "When was Python released?"
+**Reason:** "The search results are confusing, showing information about the snake and the programming language."
+**Refined Query:**
+initial release date of Python programming language
+
+---
+# TASK TO COMPLETE:
+
+**Query:** "{query}"
+**Reason:** "{reason}"
+**Refined Query:**
 """
+
 
 generate = """
 # GOAL: In this stage, your goal is to generate an answer to "Current Query" based on the provided "Information"(if any).

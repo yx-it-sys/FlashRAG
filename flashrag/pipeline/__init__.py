@@ -1,4 +1,5 @@
 from flashrag.pipeline.mm_pipeline import *
+from flashrag.pipeline.omni_pipeline import *
 from flashrag.pipeline.dfa_pipeline import *
 from flashrag.pipeline.pipeline import *
 from flashrag.pipeline.branching_pipeline import REPLUGPipeline, SuRePipeline
