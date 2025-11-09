@@ -199,7 +199,6 @@ class DFAQAPipeline(BasicMultiModalPipeline):
     
     def _state_judge(self, run_state: dict) -> str:
         if run_state['generate_plan_loop_counter'] > 5:
-            run_state['generate_plan_loop_counter'] = 0
             return "S_Plain_Generate"
         else:
             run_state['generate_plan_loop_counter'] += 1
@@ -223,7 +222,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
 
     def _state_assess(self, run_state: dict) -> str:
         if run_state['retrieval_assess_refine_loop_counter'] > 5:
-            run_state['retrieval_assess_refine_loop_counter'] = 0
+            # run_state['retrieval_assess_refine_loop_counter'] = 0
             return "S_Plain_Generate"
         else:
             run_state['retrieval_assess_refine_loop_counter'] += 1
