@@ -6,7 +6,7 @@
             "Prussian"
         ],
         "output": {
-            "pred": "British",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -21,10 +21,10 @@
             "Kurt Julian Weill"
         ],
         "output": {
-            "pred": "Kurt Weill",
+            "pred": "Pacific Mozart Ensemble performed Kurt Weill's 'Der Lindberghflug' in 2002.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.8,
+                "f1": 0.15384615384615383,
                 "acc": 0.0
             }
         }
@@ -36,11 +36,11 @@
             "U2"
         ],
         "output": {
-            "pred": "U2",
+            "pred": "I can't answer.",
             "metric_score": {
-                "em": 1.0,
-                "f1": 1.0,
-                "acc": 1.0
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -51,10 +51,10 @@
             "Oldham County"
         ],
         "output": {
-            "pred": "Jefferson County",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.5,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -66,7 +66,7 @@
             "138,535"
         ],
         "output": {
-            "pred": "150,000",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -81,7 +81,7 @@
             "1959"
         ],
         "output": {
-            "pred": "1941",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -111,10 +111,10 @@
             "Vaisakhi List"
         ],
         "output": {
-            "pred": "Premartham",
+            "pred": "Vaishaki List",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
+                "f1": 0.5,
                 "acc": 0.0
             }
         }
@@ -126,7 +126,7 @@
             "Charlie Murphy"
         ],
         "output": {
-            "pred": "Jamie Foxx",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -141,7 +141,7 @@
             "Dudman"
         ],
         "output": {
-            "pred": "<Thought>\nThe retrieved document does not contain any relevant information about the village near Scunthorpe or the clergy member in question. I need to search again for the correct village near Scunthorpe.\n\n<Search>\nText Retrieval: Village near Scunthorpe.\n\n<Thought>\nOnce I have the correct village, I can proceed to find the clergy member who served as a curate there and later became the Industrial Chaplain to the Bishop of Lincoln.\n\n<Sub-Question>\nWhich village is a suburb of Scunthorpe?\n\n<Search>\nText Retrieval: Village near Scunthorpe.\n\n<Thought>\nAfter identifying the correct village, I will look for the clergy member who served as a curate there and later became the Industrial Chaplain to the Bishop of Lincoln.\n\n<Sub-Question>\nWho was the curate at the identified village and later became the Industrial Chaplain to the Bishop of Lincoln?\n\n<Search>\nNo Retrieval\n\n<",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -156,7 +156,7 @@
             "The Hungry"
         ],
         "output": {
-            "pred": "<Thought>\nThe provided text does not contain information about Joseph Edgar Foreman's studio albums. I need to search for his discography to find the title of his fifth studio album.\n<Sub-Question>\nWhat is the title of Joseph Edgar Foreman's fifth studio album?\n<Search>\nText Retrieval: Joseph Edgar Foreman discography.\n\n<Thought>\nAfter retrieving the discography, I should be able to identify his fifth studio album and then find the first two words of its title.\n<Sub-Question>\nWhat is the title of Joseph Edgar Foreman's fifth studio album?\n<Search>\nText Retrieval: Joseph Edgar Foreman discography.\n\n<Thought>\nI have found the title of his fifth studio album. Now I need to extract the first two words from it.\n<Sub-Question>\nWhat are the first two words of the album titled \"The Head\" by Joseph Edgar Foreman?\n<Search>\nNo Retrieval\n\n<Thought>\nThe first two words of Joseph",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -171,7 +171,7 @@
             "Joint Chiefs of Staff"
         ],
         "output": {
-            "pred": "NATO Supreme Allied Commander Europe",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -201,7 +201,7 @@
             "Harry F. Sinclair"
         ],
         "output": {
-            "pred": "Search Oil magnate Robert Earl Holding and his oil company",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -216,7 +216,7 @@
             "Axl Rose"
         ],
         "output": {
-            "pred": "No reference",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -231,7 +231,7 @@
             "On March 27, 1977, two Boeing 747 passenger jets, KLM Flight 4805 and Pan Am Flight 1736, collided on the runway at Los Rodeos Airport (now Tenerife North Airport)"
         ],
         "output": {
-            "pred": "Charhki Dadri crash",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -246,7 +246,7 @@
             "no"
         ],
         "output": {
-            "pred": "2008",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -261,10 +261,10 @@
             "Nassau County"
         ],
         "output": {
-            "pred": "San Francisco County",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.4,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -276,11 +276,11 @@
             "27 January 1974"
         ],
         "output": {
-            "pred": "1976",
+            "pred": "27 January 1974",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
             }
         }
     },
@@ -291,11 +291,11 @@
             "Gasherbrum II"
         ],
         "output": {
-            "pred": "Gasherbrum II",
+            "pred": "I can't answer.",
             "metric_score": {
-                "em": 1.0,
-                "f1": 1.0,
-                "acc": 1.0
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -306,11 +306,11 @@
             "John de Mol Jr."
         ],
         "output": {
-            "pred": "John de Mol Jr.",
+            "pred": "John de Mol",
             "metric_score": {
-                "em": 1.0,
-                "f1": 1.0,
-                "acc": 1.0
+                "em": 0.0,
+                "f1": 0.8571428571428571,
+                "acc": 0.0
             }
         }
     },
@@ -321,11 +321,11 @@
             "1974"
         ],
         "output": {
-            "pred": "",
+            "pred": "The Sassy Green Plymouth Barracuda depicted on the cover of 'Pentastar: In the Style of Demons' ceased production after 1974 due to the 1973 energy crisis.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "f1": 0.08695652173913045,
+                "acc": 1.0
             }
         }
     },
@@ -336,7 +336,7 @@
             "Rachel Anne Maddow"
         ],
         "output": {
-            "pred": "<Search>\nNo Retrieval\n\nThe retrieved text does not seem to be relevant to our query. We need to continue searching for historical records or news articles that discuss controversies around CORE's operations or funding.\n\n<Sub-Question>\nAre there any historical records or news articles specifically mentioning controversies or questions about CORE's non-profit status?\n<Search>\nText Retrieval: \"historical records or news articles specifically mentioning controversies or questions about CORE's non-profit status\"\n\nPlease provide the result from the text retrieval.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -351,7 +351,7 @@
             "yes"
         ],
         "output": {
-            "pred": "15",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -381,7 +381,7 @@
             "2009"
         ],
         "output": {
-            "pred": "The local newspaper changed its name in 1985.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -396,7 +396,7 @@
             "1970s and 1980s"
         ],
         "output": {
-            "pred": "1978-1993",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -411,11 +411,11 @@
             "Clement Greenberg"
         ],
         "output": {
-            "pred": "Clement Greenberg",
+            "pred": "I can't answer.",
             "metric_score": {
-                "em": 1.0,
-                "f1": 1.0,
-                "acc": 1.0
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -426,10 +426,10 @@
             "Battle of Britain and the Battle of Malta"
         ],
         "output": {
-            "pred": "Normandy and Eastern Front",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.18181818181818182,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -441,11 +441,11 @@
             "Alopecurus"
         ],
         "output": {
-            "pred": "<Search>\nText Retrieval: Distribution of Alopecurus in temperate regions.\n\nPlease provide the result from the text retrieval.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.125,
-                "acc": 1.0
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -486,10 +486,10 @@
             "Park Ye-jin"
         ],
         "output": {
-            "pred": "Lee Tae-ri",
+            "pred": "Park Yerin",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
+                "f1": 0.5,
                 "acc": 0.0
             }
         }
@@ -501,7 +501,7 @@
             "Keelung"
         ],
         "output": {
-            "pred": "<Search>\nText Retrieval: Port cities near Guangzhou, 25 km north.\n\n<Thought>\nBased on the text, there is no direct mention of a port city that is approximately 25 km north of Guangzhou. However, the text mentions that the distance between Shenzhen and Guangzhou is about 111.12 km, which is much farther than 25 km. Therefore, I need to look for a port city that is closer to Guangzhou and approximately 25 km north.\n\n<Sub-Question>\nIs there any port city that is closer to Guangzhou and approximately 25 km north?\n\n<Search>\nText Retrieval: Port cities near Guangzhou, 25 km north.\n\n<Thought>\nAfter reviewing the text again, it seems that there might be an error in the initial assumption. The text does not provide a direct answer to the question. However, based on the geographical context, the closest major port city to Guangzhou",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -516,7 +516,7 @@
             "located in Olathe, Kansas"
         ],
         "output": {
-            "pred": "California",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -531,11 +531,11 @@
             "Drifting"
         ],
         "output": {
-            "pred": "<Search>\nNo Retrieval\n\n<Thought>\nThe search did not provide specific information on drifting techniques. However, we know that drifting involves oversteering, and there are several techniques such as handbrake drift, launch control drift, and more. Given the context of D1NZ being a drifting series, it is likely that the series focuses on a specific oversteering technique.\n\n<Sub-Question>\nWhat is the most common or well-known oversteering technique in drifting?\n\n<Search>\nText Retrieval: Most common oversteering technique in drifting.\nWaiting for the result...",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.026666666666666665,
-                "acc": 1.0
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -546,10 +546,10 @@
             "Aloha ʻOe"
         ],
         "output": {
-            "pred": "Aloha Oe",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.5,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -561,7 +561,7 @@
             "approximately 3 mi"
         ],
         "output": {
-            "pred": "5 miles",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -576,7 +576,7 @@
             "Steve Martin"
         ],
         "output": {
-            "pred": "Susan Thomases",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -591,11 +591,11 @@
             "10 October 2010"
         ],
         "output": {
-            "pred": "10 October 2010",
+            "pred": "I can't answer.",
             "metric_score": {
-                "em": 1.0,
-                "f1": 1.0,
-                "acc": 1.0
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -606,7 +606,7 @@
             "Eastern Conference champion Orlando Magic against the Western Conference champion Houston Rockets."
         ],
         "output": {
-            "pred": "Los Angeles Lakers",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -621,10 +621,10 @@
             "Ballarat Bitter is a 4.9% (abv) Australian beer"
         ],
         "output": {
-            "pred": "Ballarat Bitter",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.4444444444444445,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -636,7 +636,7 @@
             "Bengt Mikael Stanne"
         ],
         "output": {
-            "pred": "Chester Bennington",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -651,7 +651,7 @@
             "French"
         ],
         "output": {
-            "pred": "France",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -666,7 +666,7 @@
             "Evey's mother"
         ],
         "output": {
-            "pred": "Evey Hammond",
+            "pred": "Valérie Stowe",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -681,7 +681,7 @@
             "The Hindu Group"
         ],
         "output": {
-            "pred": "Condé Nast",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -696,11 +696,11 @@
             "Turkey"
         ],
         "output": {
-            "pred": "Turkey",
+            "pred": "I can't answer.",
             "metric_score": {
-                "em": 1.0,
-                "f1": 1.0,
-                "acc": 1.0
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -711,11 +711,11 @@
             "no"
         ],
         "output": {
-            "pred": "<Thought>\nTo answer this question, we need to know the ethnic backgrounds of Helen Dunmore and M. P. Shiel.\n<Sub-Question>\nWhat is the ethnic background of Helen Dunmore?\n<Search>\nNo Retrieval\n\n<Sub-Question>\nWhat is the ethnic background of M. P. Shiel?\n<Search>\nNo Retrieval",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
-                "acc": 1.0
+                "acc": 0.0
             }
         }
     },
@@ -726,7 +726,7 @@
             "Fleetwood Mac"
         ],
         "output": {
-            "pred": "Sublime",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -741,7 +741,7 @@
             "almost 3 million"
         ],
         "output": {
-            "pred": "2,831,741",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -756,7 +756,7 @@
             "LaLee's Kin: The Legacy of Cotton"
         ],
         "output": {
-            "pred": "Gimme Shelter",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -771,10 +771,10 @@
             "Kingdom of the Isles"
         ],
         "output": {
-            "pred": "<Search>\nImage Retrieval with Text Query: Isles led by Aonghus Mór and their land area.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.1111111111111111,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -786,10 +786,10 @@
             "Part I"
         ],
         "output": {
-            "pred": "Part I",
+            "pred": "Part I, section with Isaiah’s prophecies",
             "metric_score": {
-                "em": 1.0,
-                "f1": 1.0,
+                "em": 0.0,
+                "f1": 0.5,
                 "acc": 1.0
             }
         }
@@ -801,7 +801,7 @@
             "In a Better World"
         ],
         "output": {
-            "pred": "Jagten",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -816,7 +816,7 @@
             "child actor"
         ],
         "output": {
-            "pred": "on stage",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -831,7 +831,7 @@
             "Joshua Rowley"
         ],
         "output": {
-            "pred": "Bonhomme Richard",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -846,7 +846,7 @@
             "New York City"
         ],
         "output": {
-            "pred": "Los Angeles",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -861,10 +861,10 @@
             "rock and roll"
         ],
         "output": {
-            "pred": "<Thought>\nThe provided text does not directly mention the genres of music played by Bo Diddley and The Yardbirds. I need to search for their genres separately.\n<Sub-Question>\nWhat was the primary genre of music played by Bo Diddley?\n<Search>\nText Retrieval: What was Bo Diddley's musical genre?\n\n<Thought>\nAfter finding Bo Diddley's genre, I will search for The Yardbirds' genre.\n<Sub-Question>\nWhat was the primary genre of music played by The Yardbirds?\n<Search>\nText Retrieval: What was The Yardbirds' musical genre?\n\n<Thought>\nNow that I have the genres for both artists, I can compare them to find the common genre.\n<Sub-Question>\nWhat is the common genre between Bo Diddley and The Yardbirds based on the retrieved information?\n<Search>\nNo Retrieval\n\n<Thought>\nBased on the information retrieved, I can now determine the common genre between Bo D",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.016,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -876,7 +876,7 @@
             "China"
         ],
         "output": {
-            "pred": "<Thought>\nTo answer this question, I need to find out which province both Sanming and Jiutai District are located in.\n<Sub-Question>\nWhich province does Sanming belong to?\n<Search>\nNo Retrieval\n\n<Thought>\nNow I need to find out which province Jiutai District belongs to.\n<Sub-Question>\nWhich province does Jiutai District belong to?\n<Search>\nNo Retrieval\n\n<Thought>\nBoth Sanming and Jiutai District must belong to the same province if they are both mentioned together in the question. I need to check if they are indeed in the same province.\n<Sub-Question>\nAre Sanming and Jiutai District in the same province?\n<Search>\nNo Retrieval\n\n<Thought>\nSince I couldn't find the specific provinces through retrieval, I will infer based on common knowledge that Sanming is in Fujian Province and Jiutai District is in Guangdong Province. However, I should verify this.\n<",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -891,7 +891,7 @@
             "The Los Angeles Dance Theater"
         ],
         "output": {
-            "pred": "No relevant information found in the provided text regarding the production company founded by George Balanchine for a live stage version of Casablanca. Let's try another search.\n<Search>\nText Retrieval: Production company founded by George Balanchine for live stage adaptation of Casablanca.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -906,10 +906,10 @@
             "Lostprophets disbanded in 2013 after Watkins was charged with sexual offences in late 2012."
         ],
         "output": {
-            "pred": "Ian Watkins",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.125,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -921,10 +921,10 @@
             "Don Jeffrey \"Jeff\" Meldrum (born May 24, 1958) is a Professor of Anatomy and Anthropology"
         ],
         "output": {
-            "pred": "Jeff Meldrum",
+            "pred": "Jeff Meldrum of Idaho State University",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.25,
+                "f1": 0.3,
                 "acc": 0.0
             }
         }
@@ -936,7 +936,7 @@
             "Charles and Thomas Guard"
         ],
         "output": {
-            "pred": "Search for the film title that matches the description provided.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -951,7 +951,7 @@
             "Wheeling, West Virginia"
         ],
         "output": {
-            "pred": "Turnpike",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -966,7 +966,7 @@
             "Godiva"
         ],
         "output": {
-            "pred": "Maggi",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -981,7 +981,7 @@
             "Eric Banadinović"
         ],
         "output": {
-            "pred": "Martin Freeman",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -996,11 +996,11 @@
             "Germany"
         ],
         "output": {
-            "pred": "Munich, Germany",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.6666666666666666,
-                "acc": 1.0
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -1026,10 +1026,10 @@
             "Chippewa County"
         ],
         "output": {
-            "pred": "Berrien County",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.5,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -1041,11 +1041,11 @@
             "IRA"
         ],
         "output": {
-            "pred": "Operation Ellamy",
+            "pred": "The Provisional IRA South Armagh Brigade",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "f1": 0.33333333333333337,
+                "acc": 1.0
             }
         }
     },
@@ -1056,10 +1056,10 @@
             "Lincoln Memorial University"
         ],
         "output": {
-            "pred": "It appears that the exact phrase \"Lincoln Memorial Railsplitters\" is not being found in the documents. Given the persistence of not finding the correct information, let's try a more direct approach by searching for the college name associated with this team name.\n\n<Search>\nText Retrieval: college associated with Lincoln Memorial Railsplitters.\n\nPlease provide the result from the text retrieval.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.07407407407407407,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -1071,7 +1071,7 @@
             "Hanako Muraoka"
         ],
         "output": {
-            "pred": "Takeko Yagi",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1086,7 +1086,7 @@
             "no"
         ],
         "output": {
-            "pred": "Japan and France",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1101,11 +1101,11 @@
             "Avengers Assemble"
         ],
         "output": {
-            "pred": "There",
+            "pred": "Avengers Assemble",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
             }
         }
     },
@@ -1116,7 +1116,7 @@
             "Pieter van Musschenbroek"
         ],
         "output": {
-            "pred": "<Search>\nText Retrieval: Who invented the Tribometer?\n\nPlease provide the result after you perform the search.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1131,10 +1131,10 @@
             "Dirt track racing"
         ],
         "output": {
-            "pred": "<Thought>\nThe question asks about a specific type of auto racing that is part of the Australian Street Stock Championship. We need to identify the type of racing that uses clay or dirt surfaces on oval tracks.\n<Sub-Question>\nWhat type of auto racing is conducted on clay or dirt surfaced oval tracks?\n<Search>\nNo Retrieval\n\n<Thought>\nSince there was no retrieval needed, we should consider the types of auto racing typically held on clay or dirt oval tracks. Dirt track racing is a common form of auto racing on such surfaces.\n<Sub-Question>\nIs dirt track racing the type of auto racing conducted on clay or dirt surfaced oval tracks?\n<Search>\nNo Retrieval\n\n<Thought>\nBased on the information available, it seems likely that the racing described is indeed dirt track racing. Let's confirm this by checking if the Australian Street Stock Championship involves this type of racing.\n<Sub-Question>\nDoes the Australian Street Stock Championship involve dirt track racing?\n<Search>\nText Retrie",
+            "pred": "Dirt track racing",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0.03947368421052631,
+                "em": 1.0,
+                "f1": 1.0,
                 "acc": 1.0
             }
         }
@@ -1146,7 +1146,7 @@
             "Fort Worth"
         ],
         "output": {
-            "pred": "Houston",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1161,10 +1161,10 @@
             "Blood and soil"
         ],
         "output": {
-            "pred": "<Thought>\nThe document provides the original title of the book \"Finnlands Lebensraum\" as \"Das geographische und geschichtliche Finnland\" (\"The Geographic and Historic Finland\"). However, it does not explicitly state the slogan or message that was used to promote Lebensraum. We need to infer the message based on the context.\n\n<Sub-Question>\nWhat was the message or slogan in the book \"Finnlands Lebensraum\" that promoted the concept of Lebensraum as supported by the Nazi Party?\n\n<Search>\nText Retrieval: Message or slogan in the book \"Finnlands Lebensraum\" promoting Lebensraum.\nNo Retrieval\n\n<Thought>\nSince the exact slogan is not provided in the text, we can infer that the message in the book likely emphasized the need for Finland to expand its territory to secure its \"living space\" (Lebensraum), aligning with Nazi ideology.\n\n<Sub-Question>\nWhat was the inferred message",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.01680672268907563,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -1176,10 +1176,10 @@
             "2016 Oklahoma Sooners football team"
         ],
         "output": {
-            "pred": "the Oklahoma team",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.5714285714285715,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -1191,7 +1191,7 @@
             "5,922"
         ],
         "output": {
-            "pred": "<Thought>\nThe question involves identifying a vice president from April 1813, finding the city named after this person, and then determining its population according to the 2010 census. We need to break down the question into smaller parts to find the required information.\n\n<Sub-Question>\nWho was the Vice President in April 1813?\n\n<Search>\nNo Retrieval\n\n<Thought>\nSince no retrieval is needed, we will try to recall or search online for the Vice President in April 1813.\n\n<Sub-Question>\nWhat city was named after the Vice President in April 1813?\n\n<Search>\nNo Retrieval\n\n<Thought>\nAfter identifying the Vice President, we need to find out if there's a city named after him.\n\n<Sub-Question>\nWhat was the population of the city named after the Vice President in April 1813 according to the 2010 census?\n\n<Search>\nText",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1206,11 +1206,11 @@
             "Take It Easy"
         ],
         "output": {
-            "pred": "Take It Easy",
+            "pred": "I can't answer.",
             "metric_score": {
-                "em": 1.0,
-                "f1": 1.0,
-                "acc": 1.0
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -1221,7 +1221,7 @@
             "from around 1520"
         ],
         "output": {
-            "pred": "1701",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1236,11 +1236,11 @@
             "Paola Suárez"
         ],
         "output": {
-            "pred": "Paola Suárez",
+            "pred": "I can't answer.",
             "metric_score": {
-                "em": 1.0,
-                "f1": 1.0,
-                "acc": 1.0
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -1251,7 +1251,7 @@
             "yes"
         ],
         "output": {
-            "pred": "<Thought>\nTo answer this question, I need to check if both Joe Orton and Bernard-Marie Koltès are known as playwrights.\n<Sub-Question>\nIs Joe Orton a playwright?\n<Search>\nNo Retrieval\n\n<Sub-Question>\nIs Bernard-Marie Koltès a playwright?\n<Search>\nNo Retrieval",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1266,7 +1266,7 @@
             "Mark O'Connor"
         ],
         "output": {
-            "pred": "<Search>\nImage Retrieval with Text Query: Chris Jones with The New Nashville Cats performing Restless\n\nPlease provide the image title if available.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1281,7 +1281,7 @@
             "Philip José Farmer"
         ],
         "output": {
-            "pred": "Bernard-Marie Koltès",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1296,10 +1296,10 @@
             "Rockstar San Diego"
         ],
         "output": {
-            "pred": "Rockstar Games",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.4,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -1311,11 +1311,11 @@
             "no"
         ],
         "output": {
-            "pred": "no",
+            "pred": "I can't answer.",
             "metric_score": {
-                "em": 1.0,
-                "f1": 1.0,
-                "acc": 1.0
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -1326,10 +1326,10 @@
             "New York University School of Law"
         ],
         "output": {
-            "pred": "Michigan State University",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.2222222222222222,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -1341,11 +1341,11 @@
             "Bruce Conner"
         ],
         "output": {
-            "pred": "Bruce Conner",
+            "pred": "I can't answer.",
             "metric_score": {
-                "em": 1.0,
-                "f1": 1.0,
-                "acc": 1.0
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -1356,7 +1356,7 @@
             "Old School Reference and Index Compilation"
         ],
         "output": {
-            "pred": "Labyrinth Lord",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1371,7 +1371,7 @@
             "Jeffrey Adam \"Duff\" Goldman"
         ],
         "output": {
-            "pred": "Christina Tosi",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1386,7 +1386,7 @@
             "Tai Frasier in \"Clueless\""
         ],
         "output": {
-            "pred": "\"The Good Life\"",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1401,10 +1401,10 @@
             "Harry Lillis \"Bing\" Crosby Jr."
         ],
         "output": {
-            "pred": "Bing Crosby",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.5714285714285715,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -1416,7 +1416,7 @@
             "Greyia"
         ],
         "output": {
-            "pred": "Calibanus",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1431,7 +1431,7 @@
             "Jaguar Land Rover"
         ],
         "output": {
-            "pred": "<Thought>\nThe text about the Whitley Fund for Nature still does not provide any information about its headquarters location. I need to look for more specific information about the organization's headquarters.\n<Sub-Question>\nCan you find the headquarters location of the Whitley Fund for Nature?\n<Search>\nText Retrieval: Whitley Fund for Nature headquarters location.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1446,7 +1446,7 @@
             "Ken Howard"
         ],
         "output": {
-            "pred": "<Search>\nText Retrieval: Grey Gardens cast list.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1461,11 +1461,11 @@
             "after"
         ],
         "output": {
-            "pred": "after",
+            "pred": "I can't answer.",
             "metric_score": {
-                "em": 1.0,
-                "f1": 1.0,
-                "acc": 1.0
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -1476,11 +1476,11 @@
             "1918"
         ],
         "output": {
-            "pred": "1945",
+            "pred": "1918",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
             }
         }
     },
@@ -1491,7 +1491,7 @@
             "Jean Erdman"
         ],
         "output": {
-            "pred": "Edward Gordon Craig",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,

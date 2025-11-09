@@ -176,9 +176,8 @@ class PromptTemplate:
                 further_analysis_text = "## Analysis Record:\n"
                 for i, analysis in enumerate(further_analysis, 1):
                     sub_question = analysis['sub_question']
-                    reasoning = analysis['reasoning']
                     answer = analysis['answer']
-                    record = f"**sub_question:** {sub_question}\n**reasoning:** {reasoning}\n**answer:** {answer}"
+                    record = f"**sub_question:** {sub_question}\n**answer:** {answer}"
                     further_analysis_text += f"Analysis Record {i}:\n{record}\n\n"
                 further_analysis_text = further_analysis_text.strip()
             else:
@@ -207,15 +206,18 @@ class PromptTemplate:
             else:
                 content = prompt['tasks'][state_type].format(current_query=query, docs='')
         
+        elif state_type == "plain":
+            query = run_state['current_query']
+            content = prompt['tasks'][state_type].format(query=query)
+
         elif state_type == "judge":
             initial_query = question
             further_analysis = run_state['further_analysis']
             further_analysis_text = "## Analysis Record:\n"
             for i, analysis in enumerate(further_analysis, 1):
                 sub_question = analysis['sub_question']
-                reasoning = analysis['reasoning']
                 answer = analysis['answer']
-                record = f"**sub_question:** {sub_question}\n**reasoning:** {reasoning}\n**answer:** {answer}"
+                record = f"**sub_question:** {sub_question}\n**answer:** {answer}"
                 further_analysis_text += f"Analysis Record {i}:\n{record}\n\n"
                 further_analysis_text = further_analysis_text.strip()
 
@@ -227,9 +229,8 @@ class PromptTemplate:
             further_analysis_text = "## Analysis Record:\n"
             for i, analysis in enumerate(further_analysis, 1):
                 sub_question = analysis['sub_question']
-                reasoning = analysis['reasoning']
                 answer = analysis['answer']
-                record = f"**sub_question:** {sub_question}\n**reasoning:** {reasoning}\n**answer:** {answer}"
+                record = f"**sub_question:** {sub_question}\n**answer:** {answer}"
                 further_analysis_text += f"Analysis Record {i}:\n{record}\n\n"
                 further_analysis_text = further_analysis_text.strip()
 

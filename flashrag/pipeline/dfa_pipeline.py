@@ -97,6 +97,17 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             return None, None, None
     
     def _parse_assess(self, response: str):
+        if response.startswith("useful:"):
+            return "useful", None
+        elif response.startswith("useless:"):
+            parts = response.split(':', 1)
+            if len(parts) > 1:
+                return parts[0].strip(), parts[1].strip()
+        else:
+            print(f"_parse_assess: 未找到匹配项。{response}")
+            return None, None   
+             
+    def _parse_judge(self, response: str):
         if response.startswith("complete:"):
             return "complete", None
         elif response.startswith("incomplete:"):
@@ -105,8 +116,8 @@ class DFAQAPipeline(BasicMultiModalPipeline):
                 return parts[0].strip(), parts[1].strip()
         else:
             print(f"_parse_assess: 未找到匹配项。{response}")
-            return None, None        
-
+            return None, None 
+        
     def dfa_print(self, record: List[dict]):
         """Pretty print the state transitions and their results."""
         if not record:
@@ -188,13 +199,14 @@ class DFAQAPipeline(BasicMultiModalPipeline):
     
     def _state_judge(self, run_state: dict) -> str:
         if run_state['generate_plan_loop_counter'] > 5:
-            return "S_Fail"
+            run_state['generate_plan_loop_counter'] = 0
+            return "S_Plain_Generate"
         else:
             run_state['generate_plan_loop_counter'] += 1
             input_prompt = self.prompt_template.get_string_for_dfa(config=self.config, prompt=self.prompt, state_type="judge", run_state=run_state)
             response_dict = self.generator.generate_for_dfa_qa([input_prompt])
             output = response_dict[0]
-            judgement, reason = self._parse_assess(output)
+            judgement, reason = self._parse_judge(output)
             
             run_state["record"].append({"state": "judge", "response": output, "further_analysis": run_state['further_analysis'], "result": {"judgement_result": judgement, "reason": reason if reason is not None else ""}})
             self.dfa_print(run_state["record"])
@@ -211,7 +223,8 @@ class DFAQAPipeline(BasicMultiModalPipeline):
 
     def _state_assess(self, run_state: dict) -> str:
         if run_state['retrieval_assess_refine_loop_counter'] > 5:
-            return "S_Fail"
+            run_state['retrieval_assess_refine_loop_counter'] = 0
+            return "S_Plain_Generate"
         else:
             run_state['retrieval_assess_refine_loop_counter'] += 1
             input_prompt = self.prompt_template.get_string_for_dfa(config=self.config, prompt=self.prompt, state_type="assess", run_state=run_state)
@@ -222,7 +235,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             run_state["record"].append({"state": "assess", "response": response, "result": {"assessment_result": assess, "reason": reason if reason is not None else ""}})
             self.dfa_print(run_state["record"])
 
-            if assess == 'complete':
+            if assess == 'useful':
                 run_state['assessment_result'] = assess
                 return "S_Generate"
             else:
@@ -255,7 +268,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             print(f"_parse_generate: 未找到匹配项。{response}")
             return None, response
 
-    def _state_generate(self, run_state: dict) -> str:
+    def _state_generate(self, run_state: dict):
         input_prompt = self.prompt_template.get_string_for_dfa(config=self.config, prompt=self.prompt, state_type="generate", run_state=run_state)
         response_dict = self.generator.generate_for_dfa_qa([input_prompt])
         output = response_dict[0]
@@ -273,15 +286,16 @@ class DFAQAPipeline(BasicMultiModalPipeline):
             self.dfa_print(run_state["record"])
             return "S_Fail"
 
+        run_state['s_generate_response'] = response_content
         run_state["record"].append({"state": "generate", "response": output, "result": {"reasoning": reasoning_content, "response": response_content}})
         self.dfa_print(run_state['record'])
 
-        run_state['further_analysis'].append({"sub_question": run_state['current_query'], "reasoning": reasoning_content, "answer": response_content})
+        run_state['further_analysis'].append({"sub_question": run_state['current_query'], "answer": response_content})
         print(f"further_analysis: {run_state['further_analysis']}")
         
         return "S_Judge"
         
-    def _state_final(self, run_state: dict) -> str:
+    def _state_final(self, run_state: dict):
         input_prompt = self.prompt_template.get_string_for_dfa(config=self.config, prompt=self.prompt, state_type="final_answer", run_state=run_state)
         response_dict = self.generator.generate_for_dfa_qa([input_prompt])
         output = response_dict[0]
@@ -306,7 +320,30 @@ class DFAQAPipeline(BasicMultiModalPipeline):
         }
         return result_data
     
-    def _state_fail(self, run_state: dict) -> str:
+    def _state_plain_generate(self, run_state: dict):
+        input_prompt = self.prompt_template.get_string_for_dfa(config=self.config, prompt=self.prompt, state_type="plain", run_state=run_state)
+        response_dict = self.generator.generate_for_dfa_qa([input_prompt])
+        output = response_dict[0]
+        response = self._parse_output_json(output)
+        
+        if response is None:
+            run_state["record"].append({"state": "plain_generate", "response": output, "result": "Fail to parse llm's output!"})
+            self.dfa_print(run_state["record"])
+            return "S_Fail"
+
+        answer = response.get("answer", "")
+        
+        if answer == "I can't answer":
+            return "S_Fail"
+        else:
+            run_state['s_generate_reponse'] = answer
+            run_state["record"].append({"state": "plain_generate", "response": answer, "result": {"response": answer}})
+            self.dfa_print(run_state['record'])
+
+            run_state['further_analysis'].append({"sub_question": run_state['current_query'], "answer": answer})
+            return "S_Judge"
+        
+    def _state_fail(self, run_state: dict):
         if run_state['s_generate_response'] is None:
             prediction = "I can't answer."
         else:
@@ -359,6 +396,7 @@ class DFAQAPipeline(BasicMultiModalPipeline):
                 "S_Assess": self._state_assess,
                 "S_Refine": self._state_refine,
                 "S_Generate": self._state_generate,
+                "S_Plain_Generate": self._state_plain_generate,
                 "S_Fail": self._state_fail,
                 "S_Judge": self._state_judge,
                 "S_Final": self._state_final,

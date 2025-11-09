@@ -257,3 +257,25 @@ You must generate a SINGLE, valid JSON object as your output. MUST conform to th
 **Analysis Records:** "{further_analysis}"
 **Your Output:**
 """
+
+plain = """
+# GOAL:
+In this stage, you must make the most of your INTERNAL knowledge to answer the "Current Query". 
+# INSTRUCTIONS:
+1. Think step by Step
+2. If you still can not answer even trying your best, JUST output "I can't answer."
+
+# OUTPUT FORMAT:
+You must generate a SINGLE, valid JSON object as your output. MUST conform to the following structure:
+{{
+  "reasoning": "Your think-step-by-step reasoning process for generating the answer.",
+  "answer": "Your generated answer." or "I can't answer"
+}}
+**NOTE**: The keys of JSON can only be the above two, and no others can be generated.
+
+---
+# TASK TO COMPLETE:
+**Current Query:** "{query}"
+**Your Output:**
+"""
+
