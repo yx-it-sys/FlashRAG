@@ -35,25 +35,25 @@ class DFAExecutor():
 
     def _format_sub_question(self, node_id: str, prev_answers: dict) -> str:
         sub_question_template = self.graph[node_id].get("sub_question", "") # 带有[answer_for_xx]的sub_question
-        
         def replace_func(match):
             dep_id = match.group(1)
             return str(prev_answers.get(dep_id, match.group(0)))
-        
-        return re.sub(r"\[answer_from_(.*?)\]", replace_func, sub_question_template)
+        formatted_question = re.sub(r"\[answer_from_(.*?)\]", replace_func, sub_question_template)
+        return formatted_question
     
     def _execute_node(self, node_id: str, dependency_results: dict):
         prev_answers = {dep_id: result[0] for dep_id, result in dependency_results.items()}
+        print(f"prev_answers: {prev_answers}")
         prev_contexts = [result[1] for dep_i, result in dependency_results.items()]
-
+        print(f"prev_contexts: {prev_contexts}")    
         formatted_question = self._format_sub_question(node_id, prev_answers)
-        
+        print(f"formatted question: {formatted_question}")
         if not formatted_question:
-            final_aggregated_answer =  f"Final aggregation of results: {list(dependency_results.values())}", 
+            final_aggregated_answer =  f"Final aggregation of results: {list(dependency_results.values())}"
             return final_aggregated_answer, prev_contexts
         
-        answer, new_context = self.pipeline.run_with_quastion_only(sub_question=formatted_question)
-        
+        answer, new_context = self.pipeline.run_with_question_only(question=formatted_question)
+        print(f"Omni Answer: {answer}")
         all_contexts = prev_contexts + [new_context]
 
         return answer, all_contexts
@@ -75,7 +75,6 @@ class DFAExecutor():
     def execute(self, item):
         question = item.question
         automaton = self.meta_dfa.generate_dfa(question)
-        print(f"Automaton: {automaton}")
         self._parse_graph(automaton)
         self.futures = {}
         with ThreadPoolExecutor() as executor:
@@ -86,7 +85,7 @@ class DFAExecutor():
                     node for node in nodes_to_run
                     if all(dep in self.futures for dep in self.dependencies[node])
                 }
-
+                print(f"Ready Nodes: {ready_nodes}")
                 if not ready_nodes:
                     if nodes_to_run:
                       raise ValueError(f"图执行错误：可能存在循环依赖。剩余节点: {nodes_to_run}")

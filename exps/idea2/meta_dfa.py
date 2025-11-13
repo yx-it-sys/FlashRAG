@@ -5,12 +5,12 @@ from json_repair import repair_json
 from flashrag.config import Config
 from flashrag.utils import get_dataset
 from flashrag.utils import get_generator
-import time
+import re
 class MetaDFA():
     def __init__(self, prompts_path, generator):
         self.generator = generator
-        self.classify_prompt = self._load_classify_prompts(prompts_path['classify'])
-        self.dfa_prompt = self._load_dfa_prompts(prompts_path['dfa'])
+        self.classify_prompt = self._load_classify_prompts(prompts_path)
+        self.dfa_prompt = self._load_dfa_prompts(prompts_path)
     
     def _load_classify_prompts(self, prompts_path):
         with open(prompts_path, "rb") as f:
@@ -53,40 +53,29 @@ class MetaDFA():
         return graph_data
     
     def check_json(self, response: str) -> dict | None:
-        marker = "JSON:"
-        try:
-            index = response.find(marker)
-            
-            if index == -1:
-                print("Error: Marker 'JSON:' not found in the response.")
-                return None
-            payload_part = response[index + len(marker):]
-        
-            first_brace_index = payload_part.find('{')
-            last_brace_index = payload_part.rfind('}')
-            
-            if first_brace_index == -1 or last_brace_index == -1 or last_brace_index < first_brace_index:
-                print("Error: Could not find a valid JSON object starting with '{' and ending with '}'.")
-                return None
-                
-            json_string = payload_part[first_brace_index : last_brace_index + 1]
-            
-            parsed_json = json.loads(json_string)
-            automaton = self.validate_and_fix_graph(parsed_json)
-            return automaton
+        pattern = r"(?:Thought:|JSON:)\s*(?:```json\s*)?(\{[\s\S]+\})\s*(?:```)?"
+        match = re.search(pattern, response)
+        if match:
+            json_string = match.group(1)
+            print(f"check_json: {json_string}")
 
-        except json.JSONDecodeError as e:
-            print("⚠️ LLM output is not valid JSON. Attempting to repair...")
-            print(json_string)        
-            try:
-                repaired_json_string = repair_json(response)
-                parsed_json = json.loads(repaired_json_string)
-                # 寻找state最后一个状态是否为q_final，如果不是，就加一个
+            try:           
+                parsed_json = json.loads(json_string)
                 automaton = self.validate_and_fix_graph(parsed_json)
                 return automaton
-            except (json.JSONDecodeError, ValueError) as e:
-                print(f"❌ Failed to parse JSON even after repair. Error: {e}")
-                return None
+
+            except json.JSONDecodeError as e:
+                print("⚠️ LLM output is not valid JSON. Attempting to repair...")
+                print(json_string)        
+                try:
+                    repaired_json_string = repair_json(json_string)
+                    parsed_json = json.loads(repaired_json_string)
+                    # 寻找state最后一个状态是否为q_final，如果不是，就加一个
+                    automaton = self.validate_and_fix_graph(parsed_json)
+                    return automaton
+                except (json.JSONDecodeError, ValueError) as e:
+                    print(f"❌ Failed to parse JSON even after repair. Error: {e}")
+                    return None
             
     def generate_dfa(self, question: str) -> List:
         current_dfa_prompt = [p.copy() for p in self.dfa_prompt]
@@ -111,10 +100,7 @@ def main():
         "save_intermediate_data": True,
     }
     config = Config("my_config.yaml", config_dict=config_dict)
-    prompts_path = {
-        "classify": "prompts/question_classify.toml",
-        "dfa": "prompts/meta_plan.toml"
-    }
+    prompts_path = "prompts/meta_plan.toml"
     
     all_split = get_dataset(config)
     test_data = all_split["dev"]
