@@ -113,6 +113,6 @@ metric_setting:
 save_metric_score: True #　whether to save the metric score into txt file
 
 # DFA Config
-dfa_vqa_prompt_path: "/root/FlashRAG/exps/prompts/dfa_vqa_prompts.toml"
-dfa_qa_prompt_path: "/root/FlashRAG/exps/prompts/dfa_qa_prompts_json.toml"
-omni_qa_prompt_path: "/root/FlashRAG/exps/prompts/omni_qa_prompt.toml"
+dfa_vqa_prompt_path: "/root/FlashRAG/exps/idea2/prompts/dfa_vqa_prompts.toml"
+dfa_qa_prompt_path: "/root/FlashRAG/exps/idea2/prompts/dfa_qa_prompts_json.toml"
+omni_qa_prompt_path: "/root/FlashRAG/exps/idea2/prompts/omni_qa_prompt.toml"

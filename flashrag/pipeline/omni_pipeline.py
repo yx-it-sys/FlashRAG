@@ -287,7 +287,15 @@ class OmniSearchQAPipeline(BasicMultiModalPipeline):
         dataset.update_output("pred", pred_answer_list)
         dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=None)                 
         return dataset
-        
+
+    def run_with_question_only(self, question: str):
+        data_items = {
+            "question": question,
+            "input_prompt": self.prompt_template.get_string_for_omni_question_only(question, self.prompt)
+            }
+        answer, response_dict, context = self.iterative_infer(data_items)
+        return answer, context
+
 class OmniSearchIGPipeline(BasicMultiModalPipeline):
     def __init__(self, config, prompt_template=None):
         super().__init__(config, prompt_template)

@@ -13,7 +13,7 @@ def load_prompt(prompt_name: str) -> str:
         prompts_data = tomllib.load(f)
     return prompts_data["system_prompts"][prompt_name]
 
-def main(args):
+def main():
     config_dict = {
         "dataset_path": "data/datasets/hotpotqa",
         "image_path": "data/datasets/okvqa/images/val2014",

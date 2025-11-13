@@ -1,0 +1,17 @@
+[
+    {
+        "id": "dev_8344",
+        "question": "Do both films Just Getting Started (Film) and The Dove'S Lost Necklace have the directors that share the same nationality?",
+        "golden_answers": [
+            "no"
+        ],
+        "output": {
+            "pred": "I can't answer.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    }
+]
