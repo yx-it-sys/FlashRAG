@@ -2,12 +2,16 @@ import tomllib
 from typing import List
 import json
 from json_repair import repair_json
+from flashrag.config import Config
+from flashrag.utils import get_dataset
+from flashrag.utils import get_generator
 
 class MetaDFA():
     def __init__(self, prompts_path, generator):
         self.generator = generator
         self.classify_prompt = self._load_classify_prompts(prompts_path['classify'])
         self.dfa_prompt = self._load_dfa_prompts(prompts_path['dfa'])
+    
     def _load_classify_prompts(self, prompts_path):
         with open(prompts_path, "rb") as f:
             data = tomllib.load(f)
@@ -24,7 +28,8 @@ class MetaDFA():
             data = tomllib.load(f)
             system_content = data['system_prompt']['sys']
             messages = [
-                {"role": "system", "content": system_content}
+                {"role": "system", "content": system_content},
+                {"role": "user", "content": "Here is the user's query, start working:\n{initial_query}\n\nYour Response:"}
             ]
         return messages
     
@@ -62,31 +67,48 @@ class MetaDFA():
                 return None
             
     def generate_dfa(self, question: str) -> List:
-        current_classify_prompt = [p.copy() for p in self.classify_prompt]
         current_dfa_prompt = [p.copy() for p in self.dfa_prompt]
-        current_prompt[1]["content"] = current_prompt[1]["content"].format(initial_query=question)
-        
-        response_dict = self.generator.generate([current_prompt])
+        current_dfa_prompt[1]["content"] = current_dfa_prompt[1]["content"].format(initial_query=question)
+        response_dict = self.generator.generate([current_dfa_prompt])
         response = response_dict[0]
-        # text = self.tokenizer.apply_chat_template(
-        #     current_prompt,
-        #     tokenize=False,
-        #     add_generation_prompt=True
-        # )
-
-        # inputs = self.tokenizer(
-        #     [text],
-        #     return_tensors="pt",
-        # ).to(self.model.device)
-
-        # generated_ids = self.model.generate(
-        #     **inputs,
-        #     max_new_tokens=1024
-        # )
-        # generated_ids = [
-        #     output_ids[len(input_ids):] for input_ids, output_ids in zip(inputs.input_ids, generated_ids)
-        # ]
-
-        # response = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
         parsed_json = self.extract_json(response)
         return parsed_json
+
+
+def main():
+    config_dict = {
+        "dataset_path": "data/datasets/hotpotqa",
+        "image_path": "data/datasets/okvqa/images/val2014",
+        "index_path": "data/indexes/bm25",
+        "corpus_path": "data/indexes/wiki18_100w.jsonl",
+        "generator_model_path": "data/models/Qwen2.5-7B-Instruct",
+        "retrieval_method": "bm25",
+        "metrics": ["em", "f1", "acc"],
+        "retrieval_topk": 2,
+        "save_intermediate_data": True,
+    }
+    config = Config("my_config.yaml", config_dict=config_dict)
+    prompts_path = {
+        "classify": "prompts/question_classify.toml",
+        "dfa": "prompts/meta_dfa.toml"
+    }
+    
+    all_split = get_dataset(config)
+    test_data = all_split["dev"]
+    
+    generator = get_generator(config)
+    meta_dfa = MetaDFA(prompts_path, generator)
+
+    for item in test_data:
+        question = item.question
+        automaton = meta_dfa.generate_dfa(question)
+        print(f"Question: {question}")
+        print(f"DFA: {automaton}")
+    
+
+
+
+    
+if __name__ == "__main__":    
+    main()
+
