@@ -6,9 +6,9 @@ from json_repair import repair_json
 class MetaDFA():
     def __init__(self, prompts_path, generator):
         self.generator = generator
-        self.prompt = self._load_prompts_from_toml(prompts_path)
-
-    def _load_prompts_from_toml(self, prompts_path):
+        self.classify_prompt = self._load_classify_prompts(prompts_path['classify'])
+        self.dfa_prompt = self._load_dfa_prompts(prompts_path['dfa'])
+    def _load_classify_prompts(self, prompts_path):
         with open(prompts_path, "rb") as f:
             data = tomllib.load(f)
             system_content = data['system_prompt']['sys']
@@ -18,7 +18,16 @@ class MetaDFA():
                 {"role": "user", "content": user_content}
             ]
         return messages
-
+    
+    def _load_dfa_prompts(self, prompts_path):
+        with open(prompts_path, "rb") as f:
+            data = tomllib.load(f)
+            system_content = data['system_prompt']['sys']
+            messages = [
+                {"role": "system", "content": system_content}
+            ]
+        return messages
+    
     def extract_json(self, response: str) -> dict | None:
         marker = "**json:**"
         try:
@@ -53,7 +62,8 @@ class MetaDFA():
                 return None
             
     def generate_dfa(self, question: str) -> List:
-        current_prompt = [p.copy() for p in self.prompt]
+        current_classify_prompt = [p.copy() for p in self.classify_prompt]
+        current_dfa_prompt = [p.copy() for p in self.dfa_prompt]
         current_prompt[1]["content"] = current_prompt[1]["content"].format(initial_query=question)
         
         response_dict = self.generator.generate([current_prompt])
