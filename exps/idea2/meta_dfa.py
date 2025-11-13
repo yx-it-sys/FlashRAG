@@ -5,7 +5,7 @@ from json_repair import repair_json
 from flashrag.config import Config
 from flashrag.utils import get_dataset
 from flashrag.utils import get_generator
-
+import time
 class MetaDFA():
     def __init__(self, prompts_path, generator):
         self.generator = generator
@@ -29,7 +29,7 @@ class MetaDFA():
             system_content = data['system_prompt']['sys']
             messages = [
                 {"role": "system", "content": system_content},
-                {"role": "user", "content": "Here is the user's query, start working:\n{initial_query}\n\nYour Response:"}
+                {"role": "user", "content": "Now it's your turn.\nUser Query: {query}\nYour Response:"}
             ]
         return messages
     
@@ -68,11 +68,13 @@ class MetaDFA():
             
     def generate_dfa(self, question: str) -> List:
         current_dfa_prompt = [p.copy() for p in self.dfa_prompt]
-        current_dfa_prompt[1]["content"] = current_dfa_prompt[1]["content"].format(initial_query=question)
+        current_dfa_prompt[1]["content"] = current_dfa_prompt[1]["content"].format(query=question)
         response_dict = self.generator.generate([current_dfa_prompt])
         response = response_dict[0]
-        parsed_json = self.extract_json(response)
-        return parsed_json
+        print(f"Response:{response}")
+        time.sleep(1)
+        # parsed_json = self.extract_json(response)
+        return response
 
 
 def main():
@@ -101,9 +103,9 @@ def main():
 
     for item in test_data:
         question = item.question
-        automaton = meta_dfa.generate_dfa(question)
         print(f"Question: {question}")
-        print(f"DFA: {automaton}")
+        automaton = meta_dfa.generate_dfa(question)
+        
     
 
 

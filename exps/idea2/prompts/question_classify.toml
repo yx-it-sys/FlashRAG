@@ -25,7 +25,7 @@ Your Response: fork-join
 """
 
 [user_prompt]
-user:"""
+user = """
 User Query: {initial_query}
 Your Response:
 """
