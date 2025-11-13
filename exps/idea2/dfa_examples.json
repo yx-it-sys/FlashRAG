@@ -1,0 +1,78 @@
+Question: Which writer died later, Agatha Christie or Clement Greenberg?
+{
+  "graph_type": "fork-join",
+  "start_state": "q0",
+  "states": {
+    "q0": {
+      "sub_question": "When did Agatha Christie die?",
+      "transitions": {
+        "*": "q2"
+      }
+    },
+    "q1": {
+      "sub_question": "When did Clement Greenberg die?",
+      "transitions": {
+        "*": "q2"
+      }
+    },
+    "q2": {
+      "sub_question": "Compare the death date of Agatha Christie ([answer_from_q0]) with the death date of Clement Greenberg ([answer_from_q1]) and determine which writer died later.",
+      "transitions": {
+        "*": "q_final"
+      }
+    },
+    "q_final": {}
+  }
+}
+Question: Arthur Noss was a gunner for the commader during which two European theatre battles in WWII?
+{
+  "graph_type": "multi-hop",
+  "start_state": "q0",
+  "states": {
+    "q0": {
+      "sub_question": "Who was Arthur Noss and what was his role in WWII?",
+      "transitions": {
+        "*": "q1"
+      }
+    },
+    "q1": {
+      "sub_question": "For which commander did Arthur Noss serve as a gunner?",
+      "transitions": {
+        "*": "q2"
+      }
+    },
+    "q2": {
+      "sub_question": "During which two European theatre battles did [answer_from_q1] participate?",
+      "transitions": {
+        "*": "q_final"
+      }
+    },
+    "q_final": {}
+  }
+}
+Question: Between Pinanga and Alopecurus which genus is more common in temperate regions?
+{
+  "graph_type": "fork-join",
+  "start_state": "q0",
+  "states": {
+    "q0": {
+      "sub_question": "Where is the genus Pinanga commonly found?",
+      "transitions": {
+        "*": "q2"
+      }
+    },
+    "q1": {
+      "sub_question": "Where is the genus Alopecurus commonly found?",
+      "transitions": {
+        "*": "q2"
+      }
+    },
+    "q2": {
+      "sub_question": "Compare the distribution of the genus Pinanga ([answer_from_q0]) with the distribution of the genus Alopecurus ([answer_from_q1]) and determine which is more common in temperate regions.",
+      "transitions": {
+        "*": "q_final"
+      }
+    },
+    "q_final": {}
+  }
+}

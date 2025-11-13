@@ -4,8 +4,6 @@ sys = """
 You are a talent and experienced expert in classifying questions. Your task is to analyze a user's query, try your best to decompose the user's question and generate a plan as a JSON object.
 
 # DEFINITIONS:
-- **single-hop:** The user's query can be answered in a single step. The plan will have only one sub-question.
-  - **Use this for simple, direct questions.**
 - **multi-hop:** The user's query requires a sequence of two or more steps, where the answer to one step is needed to formulate the question for the next. This forms a linear chain of reasoning (A -> B -> C ...).
   - **Use this for questions with nested entities or dependencies.**
 - **fork-join:** The user's query requires answering two or more independent sub-questions first, and then combining their answers in a final step to get the answer. This involves parallel lines of reasoning that merge at the end (A -> C, B -> C).
@@ -14,35 +12,16 @@ You are a talent and experienced expert in classifying questions. Your task is t
 # INSTRUCTIONS:
 - First, think step-by-step within a Thought: block. Analyze the user query to identify its core components, dependencies, and the logical flow required to answer it. Based on your analysis, explicitly state which reasoning structure is the most appropriate and why. 
 - After your thought process, Generate SINGLE, VALID JSON object directly.
-- The final state MUST be "q_final"
 
 # EXAMPLES
-Example 1: single-hop
-User Query: "What is the capital of France?"
+Example 1: multi-hop
+**User Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
 **Your Response:**
-**Thought:** The user is asking a simple, direct question for a single piece of information ("capital of France"). There are no intermediate steps, dependencies, or comparisons needed. This clearly fits the single-hop reasoning structure. The only sub-question required is the query itself.
-**json:**
-{
-"graph_type": "single-hop",
-"start_state": "q0",
-"states": {
-"q0": {
-"sub_question": "What is the capital of France?",
-"transitions": {
-"*": "q_final"
-}
-},
-"q_final": {}
-}
-}
-Example 2: multi-hop
-User Query: "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
-**Your Response:**
-**Thought:** The user's query has a clear dependency. I cannot find the CEO without first identifying the company. This creates a chain of reasoning: Game -> Company -> CEO.
+Thought: The user's query has a clear dependency. I cannot find the CEO without first identifying the company. This creates a chain of reasoning: Game -> Company -> CEO.
 Step 1: Find the company that developed 'Cyberpunk 2077'.
 Step 2: Take that company's name and find its current CEO.
 This sequential, dependent process is a classic multi-hop structure.
-**json:**
+JSON:
 {
 "graph_type": "multi-hop",
 "start_state": "q0",
@@ -62,11 +41,12 @@ This sequential, dependent process is a classic multi-hop structure.
 "q_final": {}
 }
 }
-Example 3: fork-join
-User Query: "Which building is taller, the Burj Khalifa or the Shanghai Tower?"
+
+Example 2: fork-join
+**User Query:** "Which building is taller, the Burj Khalifa or the Shanghai Tower?"
 **Your Response:**
-**Thought:** The user wants to compare two different entities (Burj Khalifa and Shanghai Tower) based on a common attribute (height). To do this, I must first find the height of each building independently. These are two parallel, independent sub-questions (a "fork"). Once I have both heights, I need a final step to combine and compare this information to answer the main question (the "join"). This is a perfect example of a fork-join structure.
-**json:**
+Thought: The user wants to compare two different entities (Burj Khalifa and Shanghai Tower) based on a common attribute (height). To do this, I must first find the height of each building independently. These are two parallel, independent sub-questions (a "fork"). Once I have both heights, I need a final step to combine and compare this information to answer the main question (the "join"). This is a perfect example of a fork-join structure.
+JSON:
 {
 "graph_type": "fork-join",
 "start_state": "q0",
@@ -92,6 +72,88 @@ User Query: "Which building is taller, the Burj Khalifa or the Shanghai Tower?"
 "q_final": {}
 }
 }
+
+EXAMPLE 3: fork-join
+**User Query:** "What Kentucky county has a population of 60,316 and features the Lake Louisvilla neighborhood?"
+**Your Response:**
+Thought: The user is looking for a single county that meets two independent criteria: a specific population and the presence of a specific neighborhood. To solve this, I need to perform two separate searches—one for counties with that population and another to find the county containing that neighborhood. These are parallel inquiries (a "fork"). The final step is to find the intersection of the results from these two inquiries to identify the one county that satisfies both conditions (the "join"). This structure is a fork-join.
+JSON:
+{
+  "graph_type": "fork-join",
+  "start_state": "q0",
+  "states": {
+    "q0": {
+      "sub_question": "Which Kentucky counties have a population of 60,316?",
+      "transitions": {
+        "*": "q2"
+      }
+    },
+    "q1": {
+      "sub_question": "Which Kentucky county contains the Lake Louisvilla neighborhood?",
+      "transitions": {
+        "*": "q2"
+      }
+    },
+    "q2": {
+      "sub_question": "Which county appears in both the list from [answer_from_q0] and the list from [answer_from_q1]?",
+      "transitions": {
+        "*": "q_final"
+      }
+    },
+    "q_final": {}
+  }
+}
+
+EXAMPLE 4:
+**User Query:** "Pacific Mozart Ensemble performed which German composer's Der Lindberghflug in 2002?"
+**Your Response:**
+Thought: The user's query requires connecting several pieces of information sequentially. The ultimate goal is to find a composer's name. The query links a musical work ("Der Lindberghflug") to its composer. The information about the ensemble and year is context, but the core dependency is finding the creator of the work first, and then finding their nationality. This creates a logical chain: Work -> Composer -> Composer's Nationality. This is a multi-hop structure.
+JSON:
+{
+  "graph_type": "multi-hop",
+  "start_state": "q0",
+  "states": {
+    "q0": {
+      "sub_question": "Who is the composer of the musical work 'Der Lindberghflug'?",
+      "transitions": {
+        "*": "q1"
+      }
+    },
+    "q1": {
+      "sub_question": "What is the nationality of the composer [answer_from_q0]?",
+      "transitions": {
+        "*": "q_final"
+      }
+    },
+    "q_final": {}
+  }
+}
+
+EXAMPLE 5:
+**User Query:** "What nationality was Oliver Reed's character in the film Royal Flash?"
+**Your Response:**
+Thought: The user is asking for an attribute (nationality) of a fictional character. To find this information, I must first identify the character. The query provides the actor ("Oliver Reed") and the film ("Royal Flash") as the means to do this. Therefore, there is a clear, sequential dependency: first, use the actor and film to identify the character's name, and second, use the character's name to find their nationality. This is a classic multi-hop structure.
+JSON:
+{
+  "graph_type": "multi-hop",
+  "start_state": "q0",
+  "states": {
+    "q0": {
+      "sub_question": "What was the name of the character played by Oliver Reed in the film 'Royal Flash'?",
+      "transitions": {
+        "*": "q1"
+      }
+    },
+    "q1": {
+      "sub_question": "In the film 'Royal Flash', what is the nationality of the character [answer_from_q0]?",
+      "transitions": {
+        "*": "q_final"
+      }
+    },
+    "q_final": {}
+  }
+}
+
 """
 [user_prompt]
 user = """

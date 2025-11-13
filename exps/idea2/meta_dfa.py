@@ -27,9 +27,10 @@ class MetaDFA():
         with open(prompts_path, "rb") as f:
             data = tomllib.load(f)
             system_content = data['system_prompt']['sys']
+            user_content = data['user_prompt']['user']
             messages = [
                 {"role": "system", "content": system_content},
-                {"role": "user", "content": "Now it's your turn.\nUser Query: {query}\nYour Response:"}
+                {"role": "user", "content": user_content}
             ]
         return messages
     
@@ -68,11 +69,10 @@ class MetaDFA():
             
     def generate_dfa(self, question: str) -> List:
         current_dfa_prompt = [p.copy() for p in self.dfa_prompt]
-        current_dfa_prompt[1]["content"] = current_dfa_prompt[1]["content"].format(query=question)
+        current_dfa_prompt[1]["content"] = current_dfa_prompt[1]["content"].format(initial_query=question)
         response_dict = self.generator.generate([current_dfa_prompt])
         response = response_dict[0]
         print(f"Response:{response}")
-        time.sleep(1)
         # parsed_json = self.extract_json(response)
         return response
 
@@ -92,7 +92,7 @@ def main():
     config = Config("my_config.yaml", config_dict=config_dict)
     prompts_path = {
         "classify": "prompts/question_classify.toml",
-        "dfa": "prompts/meta_dfa.toml"
+        "dfa": "prompts/meta_plan.toml"
     }
     
     all_split = get_dataset(config)

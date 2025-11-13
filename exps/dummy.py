@@ -3,11 +3,11 @@ from datasets import load_dataset
 import os
 from tqdm import tqdm
 
-# num_samples = 1000
+num_samples = 100
 seed = 42
-full_dataset = load_dataset("RUC-NLPIR/FlashRAG_datasets", "hotpotqa", split='dev')
+full_dataset = load_dataset("RUC-NLPIR/FlashRAG_datasets", "hotpotqa", split='train')
 full_dataset = full_dataset.shuffle(seed=seed)
-# dummy_subset = full_dataset.select(range(num_samples))
+dummy_subset = full_dataset.select(range(num_samples))
 annotations_dir = os.path.dirname("data/datasets/hotpotqa")
 
 os.makedirs(annotations_dir, exist_ok=True)
@@ -21,7 +21,7 @@ for item in full_dataset:
     }
     processed_data.append(clean_item)
 
-output_filename = "dev.jsonl"
+output_filename = "train.jsonl"
 output_path = os.path.join(annotations_dir, output_filename)
 
 with open(output_path, 'w', encoding='utf-8') as f:

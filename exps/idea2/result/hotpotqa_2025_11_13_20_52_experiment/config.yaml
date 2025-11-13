@@ -50,14 +50,15 @@ method2index:
     bge: null
     bge-m3: null
 data_dir: data/datasets/
-save_dir: result/hotpotqa_2025_11_13_16_17_experiment
+save_dir: result/hotpotqa_2025_11_13_20_52_experiment
 gpu_id: '0'
 dataset_name: hotpotqa
 split:
+- train
 - validation
 - test
 - dev
-test_sample_num: 100
+test_sample_num: 30
 random_sample: false
 seed: 2024
 save_intermediate_data: true
@@ -144,10 +145,10 @@ generator_model_path: data/models/Qwen2.5-7B-Instruct
 generator_max_input_len: 32768
 generator_batch_size: 4
 generation_params:
-    max_tokens: 200
+    max_tokens: 4096
     do_sample: false
-    temperature: 0.1
-    top_p: 1.0
+    temperature: 0.0
+    top_p: 0.0
 use_fid: false
 gpu_memory_utilization: 0.85
 metrics:

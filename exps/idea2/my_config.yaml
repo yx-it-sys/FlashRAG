@@ -54,10 +54,10 @@ method2index:
 # ----Environment Settings----
 gpu_id: "0"
 dataset_name: "hotpotqa"
-split: ['validation','test','dev']
+split: ['train', 'validation','test','dev']
 
 # Sampling configurations for testing
-test_sample_num: 100
+test_sample_num: 30
 random_sample: False
 save_intermediate_data: True
 # Seed for reproducibility
@@ -98,9 +98,9 @@ generator_max_input_len: 32768
 generator_batch_size: 4
 generation_params:
   do_sample: False
-  max_tokens: 200
-  temperature: 0.1
-  top_p: 1.0
+  max_tokens: 4096
+  temperature: 0.0
+  top_p: 0.0
 vllm_gpu_memory_utilization: 0.95
 
 # ----Evaluation Settings----

@@ -9,16 +9,41 @@ sys = """
         - sub_question (string): The specific sub-problem that needs to be solved in the current step.
         - expected_answer (string): explaining what kind of information is expected to be obtained.
         - is_final_step (string): It is 'true' if solving this sub-problem is equivalent to answering the user's original question; otherwise, it is 'false'.
-4. Your generated sub-question must be a SINGLE and ATOMIC question.
+4. Your generated sub-question must be a SINGLE and ATOMIC question. 
+5. Do NOT repeat the user's query.
 EXAMPLE 1:
-User Query: "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
-Your Response:
+User Query: "Which airport is located in Maine, Sacramento International Airport or Knox County Regional Airport?"
+CORRECT Response:
 {
-  "sub_question": "Which company developed the game 'Cyberpunk 2077'?",
-  "expected_answer": "The name of the video game development studio responsible for creating 'Cyberpunk 2077'.",
+  "sub_question": "Where is Sacramento International Airport located?",
+  "expected_answer": "Location of Sacramento International Airport.",
   "is_final_step": "false"
 }
 
+WRONG Response:
+{
+  "sub_question": Where are Sacramento International Airport and Knox County Regional Airport located?
+  "expected_answer": "Location of Sacramento International Airport and Knox County Regional Airport.",
+  "is_final_step": "false"
+}
+Reason for the error: The question is not a single, indivisible one; it is necessary to ask about the locations of the two airports separately.
+
+EXAMPLE 2:
+User Query: Peter Hobbs founded the company that is based in what town in Manchester?
+CORRECT Response:
+{
+  "sub_question": "Where is Sacramento International Airport located?",
+  "expected_answer": "Location of Sacramento International Airport.",
+  "is_final_step": "false"
+}
+
+WRONG Response:
+{
+  "sub_question": Where are Sacramento International Airport and Knox County Regional Airport located?
+  "expected_answer": "Location of Sacramento International Airport and Knox County Regional Airport.",
+  "is_final_step": "false"
+}
+Reason for the error:
 EXAMPLE 2:
 User Query: "Which building is taller, the Burj Khalifa or the Shanghai Tower?"
 Your Response:
