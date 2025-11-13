@@ -34,13 +34,31 @@ class MetaDFA():
             ]
         return messages
     
-    def extract_json(self, response: str) -> dict | None:
-        marker = "**json:**"
+    def validate_and_fix_graph(self, graph_data: dict) -> dict:
+        states = graph_data['states']
+        if 'q_final' in states and list(states.keys())[-1] != 'q_final':
+            del states['q_final']
+        if not states or list(states.keys())[-1] != 'q_final':
+            states['q_final'] = {}
+        
+        state_keys = list(states.keys())
+        if len(state_keys) < 2:
+            return graph_data
+        second_last_key = state_keys[-2]
+        second_last_state = states[second_last_key]
+
+        if second_last_state.get('transitions', {}).get('*') != 'q_final':
+            second_last_state.setdefault('transitions', {})['*'] = 'q_final'
+
+        return graph_data
+    
+    def check_json(self, response: str) -> dict | None:
+        marker = "JSON:"
         try:
             index = response.find(marker)
             
             if index == -1:
-                print("Error: Marker '**json**' not found in the response.")
+                print("Error: Marker 'JSON:' not found in the response.")
                 return None
             payload_part = response[index + len(marker):]
         
@@ -54,7 +72,8 @@ class MetaDFA():
             json_string = payload_part[first_brace_index : last_brace_index + 1]
             
             parsed_json = json.loads(json_string)
-            return parsed_json
+            automaton = self.validate_and_fix_graph(parsed_json)
+            return automaton
 
         except json.JSONDecodeError as e:
             print("⚠️ LLM output is not valid JSON. Attempting to repair...")
@@ -62,7 +81,9 @@ class MetaDFA():
             try:
                 repaired_json_string = repair_json(response)
                 parsed_json = json.loads(repaired_json_string)
-                return parsed_json
+                # 寻找state最后一个状态是否为q_final，如果不是，就加一个
+                automaton = self.validate_and_fix_graph(parsed_json)
+                return automaton
             except (json.JSONDecodeError, ValueError) as e:
                 print(f"❌ Failed to parse JSON even after repair. Error: {e}")
                 return None
@@ -73,8 +94,8 @@ class MetaDFA():
         response_dict = self.generator.generate([current_dfa_prompt])
         response = response_dict[0]
         print(f"Response:{response}")
-        # parsed_json = self.extract_json(response)
-        return response
+        parsed_json = self.check_json(response)
+        return parsed_json
 
 
 def main():
