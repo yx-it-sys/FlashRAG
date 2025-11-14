@@ -32,6 +32,8 @@ def main():
     
 
     pipeline = IterativePipeline(config)
+    # pipeline = SelfRAGPipeline(config)
+    # pipeline = SelfAskPipeline(config)
     output_dataset = pipeline.run(test_data, do_eval=True, pred_process_fun=None)
 
     # uncertainty = DisturbImage(config, prompt_templete, method="cluster", threshold=0.7)
