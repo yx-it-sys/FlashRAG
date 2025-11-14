@@ -4,7 +4,7 @@ import json
 import os
 from flashrag.config import Config
 from flashrag.utils import get_dataset
-from flashrag.pipeline import OmniSearchQAPipeline, OmniSearchPipeline
+from flashrag.pipeline import OmniSearchQAPipeline, IterativePipeline, SelfAskPipeline, SelfRAGPipeline, FLAREPipeline
 from flashrag.prompt import MMPromptTemplate, PromptTemplate
 from flashrag.uncertainty import DisturbImage
 
@@ -29,22 +29,10 @@ def main():
     config = Config("my_config.yaml", config_dict=config_dict)
     all_split = get_dataset(config)
     test_data = all_split["dev"]
-    data = list(test_data)
-    # base_sys_prompt = load_prompt("multimodal_qa")
-    
-    # prompt_templete = MMPromptTemplate(
-    #     config=config,
-    #     system_prompt=base_sys_prompt,
-    #     user_prompt= "This is the input image. Now, please start following your instructions to answer the original question: {input_question}",
-    # )
-    qa_prompt_template = PromptTemplate(
-        config=config
-    )
     
 
-    pipeline = OmniSearchQAPipeline(config)
-    # output_dataset = pipeline.naive_run(test_data, do_eval=False, generated_answers_list=prediction_list)
-    output_dataset = pipeline.run(test_data, do_eval=True)
+    pipeline = IterativePipeline(config)
+    output_dataset = pipeline.run(test_data, do_eval=True, pred_process_fun=None)
 
     # uncertainty = DisturbImage(config, prompt_templete, method="cluster", threshold=0.7)
     # chunk_size = 10
