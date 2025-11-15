@@ -50,7 +50,7 @@ method2index:
     bge: null
     bge-m3: null
 data_dir: data/datasets/
-save_dir: result/hotpotqa_2025_11_15_18_21_experiment
+save_dir: result/hotpotqa_2025_11_15_19_06_experiment
 gpu_id: '0'
 dataset_name: hotpotqa
 split:
@@ -64,7 +64,7 @@ save_intermediate_data: true
 save_note: experiment
 retrieval_method: e5
 retrieval_model_path: intfloat/e5-base-v2
-index_path: data/indexes/e5/
+index_path: data/indexes/e5/e5_flat_inner.index
 multimodal_index_path_dict: null
 faiss_gpu: false
 corpus_path: data/indexes/wiki18_100w.jsonl
