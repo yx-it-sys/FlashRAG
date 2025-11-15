@@ -1,6 +1,6 @@
 import tomllib
 from typing import List
-import json
+from utils import extract_json
 from json_repair import repair_json
 
 class MetaDFA():
@@ -29,40 +29,7 @@ class MetaDFA():
                 {"role": "user", "content": "Here is the user's question, now start your work:\n{initial_query}"}
             ]
         return messages
-    
-    def extract_json(self, response: str) -> dict | None:
-        marker = "**json:**"
-        try:
-            index = response.find(marker)
-            
-            if index == -1:
-                print("Error: Marker '**json**' not found in the response.")
-                return None
-            payload_part = response[index + len(marker):]
-        
-            first_brace_index = payload_part.find('{')
-            last_brace_index = payload_part.rfind('}')
-            
-            if first_brace_index == -1 or last_brace_index == -1 or last_brace_index < first_brace_index:
-                print("Error: Could not find a valid JSON object starting with '{' and ending with '}'.")
-                return None
                 
-            json_string = payload_part[first_brace_index : last_brace_index + 1]
-            
-            parsed_json = json.loads(json_string)
-            return parsed_json
-
-        except json.JSONDecodeError as e:
-            print("⚠️ LLM output is not valid JSON. Attempting to repair...")
-            print(json_string)        
-            try:
-                repaired_json_string = repair_json(response)
-                parsed_json = json.loads(repaired_json_string)
-                return parsed_json
-            except (json.JSONDecodeError, ValueError) as e:
-                print(f"❌ Failed to parse JSON even after repair. Error: {e}")
-                return None
-            
     def generate_dfa(self, question: str) -> List:
         current_dfa_prompt = [p.copy() for p in self.dfa_prompt]
         # fill in the user's question into the dfa prompt
@@ -89,5 +56,5 @@ class MetaDFA():
         # ]
 
         # response = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
-        parsed_json = self.extract_json(response)
+        parsed_json = extract_json(response)
         return parsed_json

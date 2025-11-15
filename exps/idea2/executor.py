@@ -71,6 +71,11 @@ class DFAExecutor():
 
         with open(file_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(result_data, ensure_ascii=False) + "\n")
+    
+    def run(self, dataset, do_eval=True, pred_process_fun=None):
+        for data in dataset:
+            self.execute(data)
+        ### Continue coding...
 
     def execute(self, item):
         question = item.question
