@@ -43,7 +43,7 @@ class IterativePipeline(BasicPipeline):
                 self.prompt_template.get_string(question=q, retrieval_result=r)
                 for q, r in zip(questions, retrieval_results)
             ]
-
+            print(f"Input Prompts: {input_prompts}")
             dataset.update_output(f"prompt_iter_{iter_idx}", input_prompts)
             past_generation_result = self.generator.generate(input_prompts)
             dataset.update_output(f"pred_iter_{iter_idx}", past_generation_result)
