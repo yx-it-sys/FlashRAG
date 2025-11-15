@@ -11,7 +11,7 @@ import json
 import tomllib
 import torch
 from PIL import Image
-
+from transformers import AutoTokenizer
 class OmniSearchPipeline(BasicMultiModalPipeline):
     def __init__(self, config, prompt_template=None, retriever=None, generator=None):
         super().__init__(config, prompt_template)
@@ -186,6 +186,8 @@ class OmniSearchQAPipeline(BasicMultiModalPipeline):
         super().__init__(config, prompt_template)
         self.config = config
         prompt_path = self.config['omni_qa_prompt_path']
+        self.model_path = self.config['generator_model_path']
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
         with open(prompt_path, "rb") as f:
             self.prompt = tomllib.load(f)
 
@@ -198,7 +200,12 @@ class OmniSearchQAPipeline(BasicMultiModalPipeline):
     
     def iterative_infer(self, input_prompt):
         prompt = input_prompt["input_prompt"]
-        response_dict = self.generator.generate([prompt])
+        inputs = self.tokenizer.apply_chat_template(
+                prompt, 
+                tokenize=False, # Important: We want a string back, not token IDs yet.
+                add_generation_prompt=True 
+            )
+        response_dict = self.generator.generate(inputs)
         response = response_dict[0]
         print(f"First Response: {response}")
         input_prompt["input_prompt"].append({'role': 'assistant', 'content': response})
@@ -236,7 +243,12 @@ class OmniSearchQAPipeline(BasicMultiModalPipeline):
                 input_prompt["input_prompt"].append({'role': 'user', 'content': contents})
 
                 try:
-                    response_dict = self.generator.generate([input_prompt['input_prompt']])
+                    inputs = self.tokenizer.apply_chat_template(
+                        input_prompt['input_prompt'], 
+                        tokenize=False, # Important: We want a string back, not token IDs yet.
+                        add_generation_prompt=True 
+                    )
+                    response_dict = self.generator.generate(inputs)
                     response = response_dict[0]
                     print(f"response: {response}")
                     input_prompt["input_prompt"].append({"role":"assistant", "content": response})

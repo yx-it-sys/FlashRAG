@@ -1,4 +1,3 @@
-import argparse
 import tomllib
 import json
 import os
@@ -17,10 +16,10 @@ def main():
     config_dict = {
         "dataset_path": "data/datasets/hotpotqa",
         "image_path": "data/datasets/okvqa/images/val2014",
-        "index_path": "data/indexes/bm25",
+        "index_path": "data/indexes/e5/e5_flat_inner.index",
         "corpus_path": "data/indexes/wiki18_100w.jsonl",
         "generator_model_path": "data/models/Qwen2.5-7B-Instruct",
-        "retrieval_method": "bm25",
+        "retrieval_method": "e5",
         "metrics": ["em", "f1", "acc"],
         "retrieval_topk": 2,
         "save_intermediate_data": True,
@@ -31,10 +30,11 @@ def main():
     test_data = all_split["dev"]
     
 
-    pipeline = IterativePipeline(config)
+    # pipeline = IterativePipeline(config)
+    pipeline = OmniSearchQAPipeline(config=config)
     # pipeline = SelfRAGPipeline(config)
     # pipeline = SelfAskPipeline(config)
-    output_dataset = pipeline.run(test_data, do_eval=True, pred_process_fun=None)
+    output_dataset = pipeline.run(test_data, do_eval=True)
 
     # uncertainty = DisturbImage(config, prompt_templete, method="cluster", threshold=0.7)
     # chunk_size = 10
@@ -52,10 +52,6 @@ def main():
     #     uncertainty.generate_answers(chunk, step=5)
 
     
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run the OmniSearch pipeline.")
-    parser.add_argument("--model_path", type=str, help="Path to config file")
-    args = parser.parse_args()
-    
-    main(args)
+if __name__ == "__main__":    
+    main()
 
