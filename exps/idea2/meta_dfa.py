@@ -1,7 +1,6 @@
 import tomllib
 from typing import List
 from utils import extract_json
-from json_repair import repair_json
 
 class MetaDFA():
     def __init__(self, prompts_path, generator):

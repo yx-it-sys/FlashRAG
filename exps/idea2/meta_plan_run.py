@@ -40,7 +40,7 @@ def main():
     for item in test_data:
         print(f"Question:{item.question}")
         print(f"Golden Answer: {item.golden_answers}")
-        pred = executor.execute(item)
+        pred = executor.serial_execute(item)
         print(f"prediction:{pred}")
         prediction_list.append(pred)
     

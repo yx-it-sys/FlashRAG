@@ -1,0 +1,14 @@
+system_prompt = """
+# ROLE:
+You are an intelligent knowledge question and answer assistant
+# TASK:
+Answer the question based on the given documents. Only give me the answer and do not output any other words.
+"""
+
+user_prompt = """
+# Given documents:
+{reference}
+# Question: 
+{question}
+# Your Response:
+"""

@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 import re
-from collections import defaultdict
+from collections import defaultdict, deque
 import os
 import json
 from flashrag.pipeline import OmniSearchQAPipeline
@@ -53,7 +53,7 @@ class DFAExecutor():
             return final_aggregated_answer, prev_contexts
         
         answer, new_context = self.pipeline.run_with_question_only(question=formatted_question)
-        print(f"Omni Answer: {answer}")
+        print(f"Answer: {answer}")
         all_contexts = prev_contexts + [new_context]
 
         return answer, all_contexts
@@ -77,7 +77,7 @@ class DFAExecutor():
             self.execute(data)
         ### Continue coding...
 
-    def execute(self, item):
+    def parallel_execute(self, item):
         question = item.question
         automaton = self.meta_dfa.generate_dfa(question)
         self._parse_graph(automaton)
@@ -114,3 +114,46 @@ class DFAExecutor():
             else:
                 print("警告：图中未找到 'q_final' 节点。")
                 return None
+            
+    def serial_execute(self, item):
+        question = item.question
+        automaton = self.meta_dfa.generate_dfa(question)
+        self._parse_graph(automaton)
+
+        in_degree = {node_id: len(deps) for node_id, deps in self.dependencies.items()}
+        
+        queue = deque([node_id for node_id, degree in in_degree.items() if degree == 0])
+
+        execution_order = []
+
+        while queue:
+            node_id = queue.popleft()
+            execution_order.append(node_id)
+
+            successors = self.dependencies.get(node_id, [])
+            for successor_id in successors:
+                in_degree[successor_id] -= 1
+                if in_degree[successor_id] == 0:
+                    queue.append(successor_id)
+
+        if len(execution_order) != len(self.graph):
+            raise ValueError(f"图执行错误：检测到循环依赖。执行顺序: {execution_order}, 所有节点: {list(self.graph.keys())}")
+        
+        self.results = {}
+        all_contexts_collected = []
+
+        for node_id in execution_order:
+            if node_id == "q_final":
+                continue
+
+            dep_results = {
+                dep_id: self.results[dep_id][0]
+                for dep_id in self.dependencies[node_id]
+            }
+
+            answer, context = self._execute_node(node_id, dep_results)
+
+            self.results[node_id] = (answer, context)
+            all_contexts_collected.append(context)
+
+            return self.results
