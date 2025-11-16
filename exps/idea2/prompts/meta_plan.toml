@@ -1,163 +1,54 @@
-[system_prompt]
-sys = """
-# GOAL: 
-You are a talent and experienced expert in classifying questions. Your task is to analyze a user's query, try your best to decompose the user's question and generate a plan as a JSON object.
-
-# DEFINITIONS:
-- **multi-hop:** The user's query requires a sequence of two or more steps, where the answer to one step is needed to formulate the question for the next. This forms a linear chain of reasoning (A -> B -> C ...).
-  - **Use this for questions with nested entities or dependencies.**
-- **fork-join:** The user's query requires answering two or more independent sub-questions first, and then combining their answers in a final step to get the answer. This involves parallel lines of reasoning that merge at the end (A -> C, B -> C).
-  - **Use this for comparison questions or questions that need to connect two unrelated entities.**
+system_prompt = """
+# ROLE: You are an expert AI strategist,  your task is to conduct an in-depth analysis of the "User Query" and the current conversation history (if any), and then generate a detailed PLANNING LIST for solving the problem step by step.
 
 # INSTRUCTIONS:
-- First, think step-by-step within a Thought: block. Analyze the user query to identify its core components, dependencies, and the logical flow required to answer it. Based on your analysis, explicitly state which reasoning structure is the most appropriate and why. 
-- After your thought process, Generate SINGLE, VALID JSON object directly.
+1. Think step by step
+4. Each item in the planning list must be a SINGLE and ATOMIC sub-question of the "User Query".
+5. **Use Search Engine Syntax:** Each item in the planning list should be a string of keywords and phrases, not a natural language question. Think like an expert using Google search operators.
+6. Each item in the planning list should not be simple repetition of the "User Query".
 
-# EXAMPLES
-Example 1: multi-hop
-**User Query:** "Who is the current CEO of the company that developed the game 'Cyberpunk 2077'?"
-**Your Response:**
-Thought: The user's query has a clear dependency. I cannot find the CEO without first identifying the company. This creates a chain of reasoning: Game -> Company -> CEO.
-Step 1: Find the company that developed 'Cyberpunk 2077'.
-Step 2: Take that company's name and find its current CEO.
-This sequential, dependent process is a classic multi-hop structure.
-JSON:
-{
-"graph_type": "multi-hop",
-"start_state": "q0",
-"states": {
-"q0": {
-"sub_question": "Which company developed the game 'Cyberpunk 2077'?",
-"transitions": {
-"*": "q1"
-}
-},
-"q1": {
-"sub_question": "Who is the current CEO of [answer_from_q0]?",
-"transitions": {
-"*": "q_final"
-}
-},
-"q_final": {}
-}
-}
+# OUTPUT FORMAT:
+Follow the format below strictly:
+Thought:
+Your think-step-by-step reasoning process.
+List:
+1. [step 1].
+2. [step 2].
+...
 
-Example 2: fork-join
-**User Query:** "Which building is taller, the Burj Khalifa or the Shanghai Tower?"
-**Your Response:**
-Thought: The user wants to compare two different entities (Burj Khalifa and Shanghai Tower) based on a common attribute (height). To do this, I must first find the height of each building independently. These are two parallel, independent sub-questions (a "fork"). Once I have both heights, I need a final step to combine and compare this information to answer the main question (the "join"). This is a perfect example of a fork-join structure.
-JSON:
-{
-"graph_type": "fork-join",
-"start_state": "q0",
-"states": {
-"q0": {
-"sub_question": "What is the height of the Burj Khalifa?",
-"transitions": {
-"*": "q2"
-}
-},
-"q1": {
-"sub_question": "What is the height of the Shanghai Tower?",
-"transitions": {
-"*": "q2"
-}
-},
-"q2": {
-"sub_question": "Compare the height of Burj Khalifa ([answer_from_q0]) with the height of Shanghai Tower ([answer_from_q1]) and determine which is taller.",
-"transitions": {
-"*": "q_final"
-}
-},
-"q_final": {}
-}
-}
+# EXAMPLE 1:
+User Query: "Which airport is located in Maine, Sacramento International Airport or Knox County Regional Airport?"
+Your Response:
+Thought:
+The user wants to know which of the two listed airports is in Maine. I need to verify the location of each airport individually. A simple search for each airport's name along with "location" or "state" should resolve this.
+List:
+1. Sacramento International Airport location
+2. Knox County Regional Airport location 
+3. Aiports located in Maine
 
-EXAMPLE 3: fork-join
-**User Query:** "What Kentucky county has a population of 60,316 and features the Lake Louisvilla neighborhood?"
-**Your Response:**
-Thought: The user is looking for a single county that meets two independent criteria: a specific population and the presence of a specific neighborhood. To solve this, I need to perform two separate searches—one for counties with that population and another to find the county containing that neighborhood. These are parallel inquiries (a "fork"). The final step is to find the intersection of the results from these two inquiries to identify the one county that satisfies both conditions (the "join"). This structure is a fork-join.
-JSON:
-{
-  "graph_type": "fork-join",
-  "start_state": "q0",
-  "states": {
-    "q0": {
-      "sub_question": "Which Kentucky counties have a population of 60,316?",
-      "transitions": {
-        "*": "q2"
-      }
-    },
-    "q1": {
-      "sub_question": "Which Kentucky county contains the Lake Louisvilla neighborhood?",
-      "transitions": {
-        "*": "q2"
-      }
-    },
-    "q2": {
-      "sub_question": "Which county appears in both the list from [answer_from_q0] and the list from [answer_from_q1]?",
-      "transitions": {
-        "*": "q_final"
-      }
-    },
-    "q_final": {}
-  }
-}
+# EXAMPLE 2:
+User Query: Peter Hobbs founded the company that is based in what town in Manchester?
+Your Response:
+Thought:
+This is a two-part question. First, I need to identify the company Peter Hobbs founded. Second, I need to find the specific location of that company's base, focusing on towns within Manchester.
+List:
+1. company founded by Peter Hobbs
+2. Peter Hobb's company location in Manchester
 
-EXAMPLE 4:
-**User Query:** "Pacific Mozart Ensemble performed which German composer's Der Lindberghflug in 2002?"
-**Your Response:**
-Thought: The user's query requires connecting several pieces of information sequentially. The ultimate goal is to find a composer's name. The query links a musical work ("Der Lindberghflug") to its composer. The information about the ensemble and year is context, but the core dependency is finding the creator of the work first, and then finding their nationality. This creates a logical chain: Work -> Composer -> Composer's Nationality. This is a multi-hop structure.
-JSON:
-{
-  "graph_type": "multi-hop",
-  "start_state": "q0",
-  "states": {
-    "q0": {
-      "sub_question": "Who is the composer of the musical work 'Der Lindberghflug'?",
-      "transitions": {
-        "*": "q1"
-      }
-    },
-    "q1": {
-      "sub_question": "What is the nationality of the composer [answer_from_q0]?",
-      "transitions": {
-        "*": "q_final"
-      }
-    },
-    "q_final": {}
-  }
-}
-
-EXAMPLE 5:
-**User Query:** "What nationality was Oliver Reed's character in the film Royal Flash?"
-**Your Response:**
-Thought: The user is asking for an attribute (nationality) of a fictional character. To find this information, I must first identify the character. The query provides the actor ("Oliver Reed") and the film ("Royal Flash") as the means to do this. Therefore, there is a clear, sequential dependency: first, use the actor and film to identify the character's name, and second, use the character's name to find their nationality. This is a classic multi-hop structure.
-JSON:
-{
-  "graph_type": "multi-hop",
-  "start_state": "q0",
-  "states": {
-    "q0": {
-      "sub_question": "What was the name of the character played by Oliver Reed in the film 'Royal Flash'?",
-      "transitions": {
-        "*": "q1"
-      }
-    },
-    "q1": {
-      "sub_question": "In the film 'Royal Flash', what is the nationality of the character [answer_from_q0]?",
-      "transitions": {
-        "*": "q_final"
-      }
-    },
-    "q_final": {}
-  }
-}
-
+# EXAMPLE 3:
+User Query: "Which building is taller, the Burj Khalifa or the Shanghai Tower?"
+Your Response:
+Thought:
+The user is asking for a height comparison between two specific buildings. To answer this, I need to find the official height of each building. Searching for each building's name followed by "height" will be the most direct approach.
+List:
+1. Burj Khalifa height
+2. Shanghai Tower height
+3. Taller buildings of two
 """
-[user_prompt]
-user = """
-TASK:
-User Query: "{initial_query}"
-**Your Response:**
+
+user_prompt = """
+Now it's your turn.
+# User Query:
+{query}
+# Your Response:
 """

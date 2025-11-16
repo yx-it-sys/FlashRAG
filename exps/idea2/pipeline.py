@@ -81,7 +81,7 @@ class Pipeline():
             ).to(self.model.device)
 
             outputs = self.model.generate(**inputs, max_new_tokens=2048)
-            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:])
+            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
             print(f"Assess response: {response}")
             assessment_result = extract_json_for_assessment(response)
             return assessment_result
@@ -99,8 +99,8 @@ class Pipeline():
                 return_tensors="pt",
             ).to(self.model.device)
 
-            outputs = self.model.generate(**inputs, max_new_tokens=40)
-            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:])
+            outputs = self.model.generate(**inputs, max_new_tokens=2048)
+            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
             return response
 
     def rag_generate(self, question: str, supporting_docs: List[str]):
@@ -116,8 +116,8 @@ class Pipeline():
                 return_tensors="pt",
             ).to(self.model.device)
 
-            outputs = self.model.generate(**inputs, max_new_tokens=40)
-            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:])
+            outputs = self.model.generate(**inputs, max_new_tokens=2048)
+            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
             return response
     
     def internal_debate_generate(self, question: str, supporting_docs: List[str]):

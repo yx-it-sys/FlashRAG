@@ -9,7 +9,7 @@ Your task is to assess whether the provided [Retrieved Documents] contain suffic
    - If the documents only provide partial clues, related topics, or vague statements, mark as "insufficient".
    - If you have to guess or infer heavily, mark as "insufficient".
 3. **Evidence Extraction**:
-   - Extract exact sentences or phrases from the documents that support your judgment.
+   - Extract exact sentences or phrases from the documents that support the [User Query].
    - Even if the judgment is "insufficient", extract any *partially relevant* information that might be useful context.
 
 ### OUTPUT FORMAT:
