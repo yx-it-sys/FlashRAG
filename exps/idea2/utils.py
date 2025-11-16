@@ -20,7 +20,7 @@ def extract_json(response: str) -> dict | None:
                 return None
         return parsed_json
     else:
-        print(f"❌ Failed to parse JSON even after repair. Error: {e}")
+        print(f"❌ Failed to parse JSON: {response}")
         return None
                     
 def extract_json_for_assessment(llm_output: str):
@@ -50,3 +50,13 @@ def extract_json_for_assessment(llm_output: str):
         except Exception as e:
             print(f"Error: JSON repair also failed. The string might be too malformed. Details: {e}")
             return None
+
+def parse_response(response: str):
+    if "JSON:" not in response:
+        return []
+    list_part = response.split("JSON:")[1].strip()
+    lines = list_part.splitlines()
+    parsed_items = [re.sub(r"^\d+\.\s*", "", line).strip() for line in lines if line.strip()]
+
+    return parsed_items
+

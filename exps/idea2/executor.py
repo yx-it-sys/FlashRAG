@@ -52,7 +52,7 @@ class DFAExecutor():
             
     def serial_execute(self, item):
         question = item.question
-        planning_list = self.plan_generator.generate_plan(question)
+        planning = self.plan_generator.generate_plan(question)
         stepwise_answer = []
         contexts = []
         for plan, context in zip(planning_list, contexts):

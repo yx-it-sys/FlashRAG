@@ -1,6 +1,6 @@
 import tomllib
 from typing import List
-import re
+from utils import extract_json
 
 class MetaPlan():
     def __init__(self, prompts_path, generator):
@@ -25,16 +25,7 @@ class MetaPlan():
         
         response = self.generator.generate([current_plan_prompt])[0]
         print(f"response: {response}")
-        planning_list = self.parse_response(response)
-        print(f"Planning List: {planning_list}")
-        return planning_list
+        planning = extract_json(response)
+        print(f"Planning: {planning}")
+        return planning
     
-    def parse_response(self, response: str):
-        if "List:" not in response:
-            return []
-        list_part = response.split("List:")[1].strip()
-        lines = list_part.splitlines()
-        parsed_items = [re.sub(r"^\d+\.\s*", "", line).strip() for line in lines if line.strip()]
-
-        return parsed_items
-
