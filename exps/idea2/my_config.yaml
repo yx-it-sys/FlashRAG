@@ -69,7 +69,7 @@ data_dir: "data/datasets/"
 save_dir: "result/"
 
 # ----Retrieval Settings----
-retrieval_method: "bm25" # name or path of the retrieval model
+retrieval_method: "e5" # name or path of the retrieval model
 index_path: ~ # Set automatically if not provided
 corpus_path: ~
 retrieval_pooling_method: ~

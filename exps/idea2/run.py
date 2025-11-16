@@ -18,12 +18,12 @@ def main():
     config_dict = {
         "dataset_path": "data/datasets/hotpotqa",
         "image_path": "data/datasets/okvqa/images/val2014",
-        "index_path": "data/indexes/bm25",
+        "index_path": "data/indexes/e5/e5_flat_inner.index",
         "corpus_path": "data/indexes/wiki18_100w.jsonl",
         "generator_model_path": "data/models/Qwen2.5-7B-Instruct",
-        "retrieval_method": "bm25",
+        "retrieval_method": "e5",
         "metrics": ["em", "f1", "acc"],
-        "retrieval_topk": 2,
+        "retrieval_topk": 5,
         "save_intermediate_data": True,
     }
     config = Config("my_config.yaml", config_dict=config_dict)

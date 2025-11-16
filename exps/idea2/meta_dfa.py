@@ -5,20 +5,8 @@ from utils import extract_json
 class MetaDFA():
     def __init__(self, prompts_path, generator):
         self.generator = generator
-        self.classify_prompt = self._load_classify_prompts(prompts_path['classify'])
-        self.dfa_prompt = self._load_dfa_prompts(prompts_path['dfa'])
-    
-    def _load_classify_prompts(self, prompts_path):
-        with open(prompts_path, "rb") as f:
-            data = tomllib.load(f)
-            system_content = data['system_prompt']['sys']
-            user_content = data['user_prompt']['user']
-            messages = [
-                {"role": "system", "content": system_content},
-                {"role": "user", "content": user_content}
-            ]
-        return messages
-    
+        self.dfa_prompt = self._load_dfa_prompts(prompts_path)
+        
     def _load_dfa_prompts(self, prompts_path):
         with open(prompts_path, "rb") as f:
             data = tomllib.load(f)
@@ -55,5 +43,6 @@ class MetaDFA():
         # ]
 
         # response = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+        print(f"response: {response}")
         parsed_json = extract_json(response)
         return parsed_json

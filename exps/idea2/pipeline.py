@@ -5,7 +5,7 @@ from typing import List
 from utils import extract_json_for_assessment
 
 class Pipeline():
-    def __init__(self, config, model_name, max_loops, ret_thresh):
+    def __init__(self, config, model_name, max_loops, ret_thresh, retriever=None):
         self.model_name = model_name
         self.config = config
         self.max_loops = max_loops
@@ -49,21 +49,23 @@ class Pipeline():
             missing_information = assessment_result.get('missing_information', '')
 
             collected_useful_fragments.extend(useful_fragments)
-
+            print(f"collected_useful_fragments: {collected_useful_fragments}")
             if assessment == "sufficient":
-                final_answer = self.rag_generate(question, list({v['id']: v for v in collected_useful_fragments}.values()))
+                final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
                 print(f"Sufficient case, RAG anser: {final_answer}")
                 return final_answer
 
             elif assessment == "insufficient":
+                if loop_count > self.max_loops:
+                    break
+                loop_count += 1
                 current_query = self.refine(question, current_query, collected_useful_fragments, missing_information)
                 print(f"refined Query: {current_query}")
-                loop_count += 1
         
         # supervised_answer = self.internal_debate_generate(question, list({v['id']: v for v in collected_useful_fragments}.values()))
-        final_answer = self.rag_generate(question, list({v['id']: v for v in collected_useful_fragments}.values()))
+        final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
         print(f"Mocked Debate Answer: {final_answer}")
-        return final_answer
+        return final_answer, None
     
     def assess(self, query: str, docs: List[str]):
             messages = [                
@@ -78,8 +80,9 @@ class Pipeline():
                 return_tensors="pt",
             ).to(self.model.device)
 
-            outputs = self.model.generate(**inputs, max_new_tokens=40)
+            outputs = self.model.generate(**inputs, max_new_tokens=2048)
             response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:])
+            print(f"Assess response: {response}")
             assessment_result = extract_json_for_assessment(response)
             return assessment_result
 
@@ -102,8 +105,8 @@ class Pipeline():
 
     def rag_generate(self, question: str, supporting_docs: List[str]):
             messages = [                
-                {"role": "system", "content": self.refine_prompt['system_prompt']},
-                {"role": "user", "content": self.refine_prompt['user_prompt'].format(reference=supporting_docs, question=question)}
+                {"role": "system", "content": self.rag_prompt['system_prompt']},
+                {"role": "user", "content": self.rag_prompt['user_prompt'].format(reference=supporting_docs, question=question)}
             ]
             inputs = self.tokenizer.apply_chat_template(
                 messages,

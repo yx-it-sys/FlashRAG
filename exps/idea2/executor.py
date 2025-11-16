@@ -3,7 +3,7 @@ import re
 from collections import defaultdict, deque
 import os
 import json
-from flashrag.pipeline import OmniSearchQAPipeline
+from pipeline import Pipeline
 from meta_dfa import MetaDFA
 from flashrag.utils import get_generator
 
@@ -11,7 +11,7 @@ class DFAExecutor():
     def __init__(self, prompt_path, config):
         self.config = config
         self.generator = get_generator(config)
-        self.pipeline = OmniSearchQAPipeline(config, generator=self.generator)
+        self.pipeline = Pipeline(config, model_name="Qwen/Qwen2.5-7B-Instruct", max_loops=3, ret_thresh=0.7)
         self.meta_dfa = MetaDFA(prompt_path, generator=self.generator)
         self.graph = None   # 将会在_parse_graph()方法中修改
         self.dependencies = None    # 将会在_parse_graph()方法中修改
@@ -118,6 +118,7 @@ class DFAExecutor():
     def serial_execute(self, item):
         question = item.question
         automaton = self.meta_dfa.generate_dfa(question)
+        print(f"automaton: {automaton}")
         self._parse_graph(automaton)
 
         in_degree = {node_id: len(deps) for node_id, deps in self.dependencies.items()}

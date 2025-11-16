@@ -1,39 +1,28 @@
 import json
-import repair_json
+import re
+from json_repair import repair_json
 
 def extract_json(response: str) -> dict | None:
-    marker = "**json:**"
-    try:
-        index = response.find(marker)
-        
-        if index == -1:
-            print("Error: Marker '**json**' not found in the response.")
-            return None
-        payload_part = response[index + len(marker):]
-    
-        first_brace_index = payload_part.find('{')
-        last_brace_index = payload_part.rfind('}')
-        
-        if first_brace_index == -1 or last_brace_index == -1 or last_brace_index < first_brace_index:
-            print("Error: Could not find a valid JSON object starting with '{' and ending with '}'.")
-            return None
-            
-        json_string = payload_part[first_brace_index : last_brace_index + 1]
-        
-        parsed_json = json.loads(json_string)
-        return parsed_json
-
-    except json.JSONDecodeError as e:
-        print("⚠️ LLM output is not valid JSON. Attempting to repair...")
-        print(json_string)        
+    pattern = r"JSON:\s*(\{[\s\S]+\})"
+    match = re.search(pattern, response)
+    if match:
+        json_string = match.group(1)
         try:
-            repaired_json_string = repair_json(response)
-            parsed_json = json.loads(repaired_json_string)
-            return parsed_json
-        except (json.JSONDecodeError, ValueError) as e:
-            print(f"❌ Failed to parse JSON even after repair. Error: {e}")
-            return None
-        
+            parsed_json = json.loads(json_string)
+        except json.JSONDecodeError as e:
+            print("⚠️ LLM output is not valid JSON. Attempting to repair...")
+            print(json_string)        
+            try:
+                repaired_json_string = repair_json(response)
+                parsed_json = json.loads(repaired_json_string)
+            except (json.JSONDecodeError, ValueError) as e:
+                print(f"❌ Failed to parse JSON even after repair. Error: {e}")
+                return None
+        return parsed_json
+    else:
+        print(f"❌ Failed to parse JSON even after repair. Error: {e}")
+        return None
+                    
 def extract_json_for_assessment(llm_output: str):
     start_index = llm_output.find('{')
     end_index = llm_output.rfind('}')
