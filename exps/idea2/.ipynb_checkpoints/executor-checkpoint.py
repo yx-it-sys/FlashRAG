@@ -6,14 +6,11 @@ from meta_plan import MetaPlan
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from utils import parse_action
 import torch
-import tomllib
 
 class DFAExecutor():
     def __init__(self, config, prompts_path, model_name="Qwen/Qwen2.5-7B-Instruct"):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        with open("prompts/final_answer.toml", "rb") as f:
-            self.final_answer_prompt = tomllib.load(f)
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
             device_map="auto",
@@ -51,60 +48,37 @@ class DFAExecutor():
 
         with open(file_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(result_data, ensure_ascii=False) + "\n")
-                
+    
+    def run(self, dataset, do_eval=True, pred_process_fun=None):
+        for data in dataset:
+            self.execute(data)
+        ### Continue coding...
+            
     def serial_execute(self, item):
         question = item.question
-        max_loop = 5
+        max_loop = 3
         loop = 0
         context = []
-        final_answer = "I can't answer."
-        logs = []
+        final_action = "I can't answer."
         while loop < max_loop:
             print(f"Loop {loop}:")
             planning = self.plan_generator.generate(question, context)
-            logs.append({"meta_plan": planning})
             action_type, current_action = parse_action(planning)
-            if action_type is None:
-                action_type = "reason"
             # print(f"Action Type: {action_type}")
             # print(f"Current Action: {current_action}")    
             if action_type.lower() == "search":
                 loop += 1
-                answer, log = self.pipeline.run_with_question_only(current_action)
-                logs.append({"meta_state": "search", "logs": log})
-                
+                answer = self.pipeline.run_with_question_only(current_action, context)
                 if answer is None:
                     return final_answer, context
-
-                context.append(answer)
+                context.append(self.pipeline.run_with_question_only(current_action, context))
             elif action_type.lower() == "reason":
                 loop += 1
                 context.append(current_action)
-                logs.append({"meta_state": "reason", "logs": current_action})
             elif action_type.lower() == "conclude":
-                conclusion = current_action
-                final_answer = self.generate_final_answer(initial_question=question, conclusion=conclusion)
-                print(f"final_answer: {final_answer}")
-                logs.append({"meta_state": "conclude", "logs": conclusion})
+                final_action = current_action
                 break
-        return final_answer, logs
-
-    
-    def generate_final_answer(self, initial_question: str, conclusion: str) -> str:
-            messages = [                
-                {"role": "system", "content": self.final_answer_prompt['system_prompt']},
-                {"role": "user", "content": self.final_answer_prompt['user_prompt'].format(initial_question=initial_question, conclusion=conclusion)}
-            ]
-            inputs = self.tokenizer.apply_chat_template(
-                messages,
-                add_generation_prompt=True,
-                tokenize=True,
-                return_dict=True,
-                return_tensors="pt",
-            ).to(self.model.device)
-            outputs = self.model.generate(**inputs, max_new_tokens=2048)
-            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
-
-            return response
+        return final_action, context
+        
         
             

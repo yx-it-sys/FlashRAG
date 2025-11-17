@@ -50,7 +50,7 @@ method2index:
     bge: null
     bge-m3: null
 data_dir: data/datasets/
-save_dir: result/hotpotqa_2025_11_16_12_33_experiment
+save_dir: result/hotpotqa_2025_11_17_20_07_experiment
 gpu_id: '0'
 dataset_name: hotpotqa
 split:
@@ -58,7 +58,7 @@ split:
 - validation
 - test
 - dev
-test_sample_num: 1
+test_sample_num: 100
 random_sample: false
 seed: 2024
 save_intermediate_data: true

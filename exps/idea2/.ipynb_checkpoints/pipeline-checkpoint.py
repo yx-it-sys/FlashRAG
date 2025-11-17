@@ -27,32 +27,30 @@ class Pipeline():
             retriever = get_retriever(config)
         self.retriever = retriever
 
-    def run_with_question_only(self, question: str):
+    def run_with_question_only(self, question: str, context: List[str]):
         # current_query = self.rectify(question, context)
         current_query = question
         loop_count = 0
         collected_useful_fragments = []
-        records = []
+
         while loop_count < self.max_loops:
             retrieved_docs, scores = self.retriever.search(query=current_query, num=self.top_k, return_score=True)
             retrieved_results = []
 
             for doc, score in zip(retrieved_docs, scores):
                 if score >= self.ret_thresh:
-                    retrieved_results.append({'doc': doc['contents'], 'score': score})
+                    retrieved_results.append({'doc': doc, 'score': score})
             
-            # print(f"Retrieved Results: {retrieved_results}")
+            print(f"Retrieved Results: {retrieved_results}")
             
             assessment_result = self.assess(current_query, [doc['doc'] for doc in retrieved_results])
             
             print(f"Assessment Result: {assessment_result}")
-            # 保存assessment result
-            records.append({"state": "assess", "result": assessment_result})
+
             # 当LLM生成失败，则跳过assess的步骤，直接return，转到下一个数据点
             if assessment_result is None:
                 print("Error in LLM Generating, skipping to the next question")
-                records.append({"state": "assess", "result": "Error in LLM Generating, skipping to the next question"})
-                return None, assessment_result
+                return None
             
             assessment = assessment_result.get('judgment', '')
             useful_fragments = assessment_result.get('useful_fragments', '')
@@ -63,9 +61,7 @@ class Pipeline():
             if assessment == "sufficient":
                 final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
                 print(f"Sufficient case, RAG answer: {final_answer}")
-                records.append({"state": "rag_generate", "result": final_answer})
-                log = {'sub_question': question, "records": records}
-                return final_answer, log
+                return final_answer
 
             elif assessment == "insufficient":
                 if loop_count > self.max_loops:
@@ -73,14 +69,11 @@ class Pipeline():
                 loop_count += 1
                 current_query = self.refine(question, current_query, collected_useful_fragments, missing_information)
                 print(f"refined Query: {current_query}")
-                records.append({"state": "refine", "result": current_query})
         
         # supervised_answer = self.internal_debate_generate(question, list({v['id']: v for v in collected_useful_fragments}.values()))
         final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
         print(f"Mocked Debate Answer: {final_answer}")
-        records.append({"state": "internal_generate", "result": final_answer})
-        log = {'sub_question': question, "records": records}
-        return final_answer, log
+        return final_answer
     
     def rectify(self, question: str, context: List[str]):
         messages = [                

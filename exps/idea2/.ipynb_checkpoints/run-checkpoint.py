@@ -2,7 +2,6 @@ from flashrag.evaluator import Evaluator
 from flashrag.config import Config
 from flashrag.utils import get_dataset
 from executor import DFAExecutor
-import json
 
 def evaluate(evaluator, dataset, do_eval=True, pred_process_func=None):
     """The evaluation process after finishing overall generation"""
@@ -19,10 +18,10 @@ def main():
     config_dict = {
         "dataset_path": "data/datasets/hotpotqa",
         "image_path": "data/datasets/okvqa/images/val2014",
-        "index_path": "data/indexes/e5/e5_flat_inner.index",
+        "index_path": "data/indexes/bm25",
         "corpus_path": "data/indexes/wiki18_100w.jsonl",
         "generator_model_path": "data/models/Qwen2.5-7B-Instruct",
-        "retrieval_method": "e5",
+        "retrieval_method": "bm25",
         "metrics": ["em", "f1", "acc"],
         "retrieval_topk": 5,
         "save_intermediate_data": True,
@@ -37,35 +36,14 @@ def main():
     evaluator = Evaluator(config)
     executor = DFAExecutor(config=config, prompts_path=prompt_path, model_name=model_name)
     
-    output_file_path = "output.jsonl"
-
     prediction_list = []
-
-    existing_keys = set()
-    with open(output_file_path, "r", encoding='utf-8') as f:
-        for line in f:
-            data = json.loads(line.strip())
-            if "question" in data:
-                existing_keys.add(data["question"])
-
-    with open(output_file_path, "a", encoding='utf-8') as f:
-        for item in test_data:
-            if item.question in existing_keys:
-                continue
-            pred, logs = executor.serial_execute(item)
-            # prediction_list.append(pred)
-            data = {'question': item.question, 'golden_answer': item.golden_answers, 'prediction': pred, 'logs': logs}
-            f.write(json.dumps(data, ensure_ascii=False)+'\n')
+    for item in test_data:
+        print(f"Question:{item.question}")
+        print(f"Golden Answer: {item.golden_answers}")
+        pred = executor.serial_execute(item)
+        print(f"prediction:{pred}")
+        prediction_list.append(pred)
     
-    all_prediction_map = {}
-    with open(output_file_path, "r", encoding="utf-8") as f:
-        for line in f:
-            data = json.loads(line)
-            all_prediction_map[data['question']] = data['prediction']
-    
-    prediction_list = [all_prediction_map.get(item.question) for item in test_data]
-    if None in prediction_list:
-        print("警告：部分测试数据在输出文件中未找到对应的预测结果。")
     test_data.update_output("pred", prediction_list)
     test_data = evaluate(evaluator, test_data, do_eval=True, pred_process_func=None)                 
 

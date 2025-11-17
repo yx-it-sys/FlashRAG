@@ -57,7 +57,7 @@ dataset_name: "hotpotqa"
 split: ['train', 'validation','test','dev']
 
 # Sampling configurations for testing
-test_sample_num: 100
+test_sample_num: 1
 random_sample: False
 save_intermediate_data: True
 # Seed for reproducibility
