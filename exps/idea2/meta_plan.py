@@ -18,14 +18,14 @@ class MetaPlan():
             ]
         return messages
                 
-    def generate_plan(self, question: str) -> List:
+    def generate(self, question: str, context) -> List:
         current_plan_prompt = [p.copy() for p in self.plan_prompt]
         # fill in the user's question into the plan prompt
         current_plan_prompt[1]["content"] = current_plan_prompt[1]["content"].format(query=question)
-        
+        if context is not None:
+            context_str = "\n".join(context)
+            current_plan_prompt.append({"role": "user", "content": context_str})
         response = self.generator.generate([current_plan_prompt])[0]
         print(f"response: {response}")
-        planning = extract_json(response)
-        print(f"Planning: {planning}")
-        return planning
+        return response
     

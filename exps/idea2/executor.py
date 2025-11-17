@@ -1,12 +1,9 @@
-from concurrent.futures import ThreadPoolExecutor
-import re
-from collections import defaultdict, deque
+from collections import deque
 import os
 import json
 from pipeline import Pipeline
-from meta_plan import MetaPlan
-from flashrag.utils import get_generator
 from transformers import AutoTokenizer, AutoModelForCausalLM
+from utils import parse_action
 
 class DFAExecutor():
     def __init__(self, config, model_name="Qwen/Qwen2.5-7B-Instruct"):
@@ -52,46 +49,17 @@ class DFAExecutor():
             
     def serial_execute(self, item):
         question = item.question
-        planning = self.plan_generator.generate_plan(question)
-        stepwise_answer = []
-        contexts = []
-        for plan, context in zip(planning_list, contexts):
+        max_loop = 5
+        loop = 0
+        context = []
+        while loop < max_loop:
+            planning = self.plan_generator.generate(question, context)
+            action_type, current_action = parse_action(planning)    
+            if action_type.lower() == "compare":
+                return current_action
+            elif action_type.lower() == "choose":
+                return current_action
+            else:
+                context.append(self.pipeline(current_action, context))
+        return "I can't answer."
             
-
-        in_degree = {node_id: len(deps) for node_id, deps in self.dependencies.items()}
-        
-        queue = deque([node_id for node_id, degree in in_degree.items() if degree == 0])
-
-        execution_order = []
-
-        while queue:
-            node_id = queue.popleft()
-            execution_order.append(node_id)
-
-            successors = self.dependencies.get(node_id, [])
-            for successor_id in successors:
-                in_degree[successor_id] -= 1
-                if in_degree[successor_id] == 0:
-                    queue.append(successor_id)
-
-        if len(execution_order) != len(self.graph):
-            raise ValueError(f"图执行错误：检测到循环依赖。执行顺序: {execution_order}, 所有节点: {list(self.graph.keys())}")
-        
-        self.results = {}
-        all_contexts_collected = []
-
-        for node_id in execution_order:
-            if node_id == "q_final":
-                continue
-
-            dep_results = {
-                dep_id: self.results[dep_id][0]
-                for dep_id in self.dependencies[node_id]
-            }
-
-            answer, context = self._execute_node(node_id, dep_results)
-
-            self.results[node_id] = (answer, context)
-            all_contexts_collected.append(context)
-
-            return self.results

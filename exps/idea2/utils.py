@@ -60,3 +60,10 @@ def parse_response(response: str):
 
     return parsed_items
 
+
+def parse_action(response: str):
+    match = re.search(r"(?P<before>\w+):\s*(?P<after>.*)$", response)
+    action_type = match.group('before')
+    current_action = match.group('after')
+
+    return action_type, current_action

@@ -13,6 +13,8 @@ class Pipeline():
         self.ret_thresh = ret_thresh
         self.tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-7B-Instruct")
         self.model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-7B-Instruct")
+        with open('prompts/rectify.toml', "rb") as f:
+             self.rectify_prompt = tomllib.load(f)
         with open('prompts/assess.toml', "rb") as f:
             self.assessment_prompt = tomllib.load(f)
         with open('prompts/refine.toml', 'rb') as f:
@@ -25,8 +27,8 @@ class Pipeline():
             retriever = get_retriever(config)
         self.retriever = retriever
 
-    def run_with_question_only(self, question):
-        current_query = question
+    def run_with_question_only(self, question: str, context: List[str]):
+        current_query = self.rectify(question, context)
         loop_count = 0
         collected_useful_fragments = []
 
@@ -67,6 +69,25 @@ class Pipeline():
         print(f"Mocked Debate Answer: {final_answer}")
         return final_answer, None
     
+    def rectify(self, question: str, context: List[str]):
+        messages = [                
+            {"role": "system", "content": self.rectify_prompt['system_prompt']},
+            {"role": "user", "content": self.rectify_prompt['user_prompt'].format(user_query=question, context=context)}
+        ]
+
+        inputs = self.tokenizer.apply_chat_template(
+            messages,
+            add_generation_prompt=True,
+            tokenize=True,
+            return_dict=True,
+            return_tensors="pt",
+        ).to(self.model.device)
+
+        outputs = self.model.generate(**inputs, max_new_tokens=2048)
+        response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+        print(f"Rectify response: {response}")
+        return response
+
     def assess(self, query: str, docs: List[str]):
             messages = [                
                 {"role": "system", "content": self.assessment_prompt['system_prompt']},
