@@ -74,9 +74,9 @@ class DFAExecutor():
                 logs.append({"meta_state": "search", "logs": log})
                 
                 if answer is None:
-                    return final_answer, context
+                    return final_answer, logs
 
-                context.append(answer)
+                context.append(f"{current_action}: {answer}")
             elif action_type.lower() == "reason":
                 loop += 1
                 context.append(current_action)

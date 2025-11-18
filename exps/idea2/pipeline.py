@@ -17,7 +17,7 @@ class Pipeline():
              self.rectify_prompt = tomllib.load(f)
         with open('prompts/assess.toml', "rb") as f:
             self.assessment_prompt = tomllib.load(f)
-        with open('prompts/refine.toml', 'rb') as f:
+        with open('prompts/refine_misinformation.toml', 'rb') as f:
             self.refine_prompt = tomllib.load(f)
         with open('prompts/rag_generate.toml', 'rb') as f:
              self.rag_prompt = tomllib.load(f)
@@ -42,9 +42,10 @@ class Pipeline():
                     retrieved_results.append({'doc': doc['contents'], 'score': score})
             
             # print(f"Retrieved Results: {retrieved_results}")
-            
-            assessment_result = self.assess(current_query, [doc['doc'] for doc in retrieved_results])
-            
+            if len(collected_useful_fragments) == 0:
+                assessment_result = self.assess(question, [doc['doc'] for doc in retrieved_results])
+            else:
+                assessment_result = self.assess(question, collected_useful_fragments)
             print(f"Assessment Result: {assessment_result}")
             # 保存assessment result
             records.append({"state": "assess", "result": assessment_result})
@@ -59,7 +60,7 @@ class Pipeline():
             missing_information = assessment_result.get('missing_information', '')
 
             collected_useful_fragments.extend(useful_fragments)
-            print(f"collected_useful_fragments: {collected_useful_fragments}")
+            # print(f"collected_useful_fragments: {collected_useful_fragments}")
             if assessment == "sufficient":
                 final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
                 print(f"Sufficient case, RAG answer: {final_answer}")
@@ -71,7 +72,7 @@ class Pipeline():
                 if loop_count > self.max_loops:
                     break
                 loop_count += 1
-                current_query = self.refine(question, current_query, collected_useful_fragments, missing_information)
+                current_query = self.refine(current_query, missing_information)
                 print(f"refined Query: {current_query}")
                 records.append({"state": "refine", "result": current_query})
         
@@ -115,14 +116,14 @@ class Pipeline():
             ).to(self.model.device)
             outputs = self.model.generate(**inputs, max_new_tokens=2048)
             response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
-            print(f"Assess response: {response}")
+            # print(f"Assess response: {response}")
             assessment_result = extract_json_for_assessment(response)
             return assessment_result
 
-    def refine(self, initial_query: str, current_query: str, collected_useful_fragments: List[str], missing_information: str):
+    def refine(self, current_query: str,  missing_information: str):
             messages = [                
                 {"role": "system", "content": self.refine_prompt['system_prompt']},
-                {"role": "user", "content": self.refine_prompt['user_prompt'].format(original_user_query=initial_query, last_attempted_query=current_query, collected_useful_fragments=collected_useful_fragments, missing_info_from_assess =missing_information)}
+                {"role": "user", "content": self.refine_prompt['user_prompt'].format(current_query=current_query, missing_info_from_assess=missing_information)}
             ]
             inputs = self.tokenizer.apply_chat_template(
                 messages,

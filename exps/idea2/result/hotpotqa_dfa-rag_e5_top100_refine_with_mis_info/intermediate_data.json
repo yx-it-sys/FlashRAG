@@ -6,7 +6,7 @@
             "Prussian"
         ],
         "output": {
-            "pred": "Oliver Reed's character in the film \"Royal Flash\" was German.",
+            "pred": "German",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -21,10 +21,10 @@
             "Kurt Julian Weill"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Kurt Weill.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
+                "f1": 0.8,
                 "acc": 0.0
             }
         }
@@ -36,10 +36,10 @@
             "U2"
         ],
         "output": {
-            "pred": "U2 released \"With or Without You\" first.",
+            "pred": "U2",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0.25,
+                "em": 1.0,
+                "f1": 1.0,
                 "acc": 1.0
             }
         }
@@ -66,7 +66,7 @@
             "138,535"
         ],
         "output": {
-            "pred": "The estimated population of the city containing Para Hills West, South Australia is 137,979.",
+            "pred": "1,333,927",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -81,11 +81,11 @@
             "1959"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "1959",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
             }
         }
     },
@@ -96,10 +96,10 @@
             "October 25, 1881"
         ],
         "output": {
-            "pred": "The defense of John Henry Holliday by Thomas Fitch occurred on October 26, 1881.",
+            "pred": "November 1881",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.25,
+                "f1": 0.4,
                 "acc": 0.0
             }
         }
@@ -126,11 +126,11 @@
             "Charlie Murphy"
         ],
         "output": {
-            "pred": "Among the given names, Charles Edward Murphy and Charlie Murphy are likely the brothers of Eddie Murphy. We need to confirm if either of them starred in \"Twisted Fortune.\" Given the context, it is more probable that Charlie Murphy, as he shares the first name with Eddie Murphy, is the correct answer. Let's verify this.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.07692307692307693,
-                "acc": 1.0
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -156,7 +156,7 @@
             "The Hungry"
         ],
         "output": {
-            "pred": "Fiction Family",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -171,10 +171,10 @@
             "Joint Chiefs of Staff"
         ],
         "output": {
-            "pred": "General Omar Bradley became the first Chairman of the Joint Chiefs of Staff eight days after the Normandy landings.",
+            "pred": "The Joint Chiefs of Staff",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0.4,
+                "em": 1.0,
+                "f1": 1.0,
                 "acc": 1.0
             }
         }
@@ -186,11 +186,11 @@
             "Rensselaer County"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Rensselaer County",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
             }
         }
     },
@@ -201,7 +201,7 @@
             "Harry F. Sinclair"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Henry Flagler.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -216,11 +216,11 @@
             "Axl Rose"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Axl Rose.",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
             }
         }
     },
@@ -231,7 +231,7 @@
             "On March 27, 1977, two Boeing 747 passenger jets, KLM Flight 4805 and Pan Am Flight 1736, collided on the runway at Los Rodeos Airport (now Tenerife North Airport)"
         ],
         "output": {
-            "pred": "The Tenerife airport disaster occurred first.",
+            "pred": "Tenerife airport disaster occurred first.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0.12121212121212122,
@@ -246,11 +246,11 @@
             "no"
         ],
         "output": {
-            "pred": "Both Crazy Love and Welcome to Nollywood were not released in 2008, but rather in 2001.",
+            "pred": " Neither film was released in 2008.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
-                "acc": 1.0
+                "acc": 0.0
             }
         }
     },
@@ -261,10 +261,10 @@
             "Nassau County"
         ],
         "output": {
-            "pred": "Duffy Jackson was born in Nassau County.",
+            "pred": "Nassau County",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0.4444444444444445,
+                "em": 1.0,
+                "f1": 1.0,
                 "acc": 1.0
             }
         }
@@ -276,10 +276,10 @@
             "27 January 1974"
         ],
         "output": {
-            "pred": "Ole Einar Bjørndalen was born in 1974.",
+            "pred": "1974",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.2,
+                "f1": 0.5,
                 "acc": 0.0
             }
         }
@@ -291,10 +291,10 @@
             "Gasherbrum II"
         ],
         "output": {
-            "pred": "Gasherbrum II is taller than Langtang Ri.",
+            "pred": "Gasherbrum II is taller.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.4444444444444445,
+                "f1": 0.6666666666666666,
                 "acc": 1.0
             }
         }
@@ -321,11 +321,11 @@
             "1974"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "1974",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
             }
         }
     },
@@ -336,7 +336,7 @@
             "Rachel Anne Maddow"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Michael Pollan",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -366,11 +366,11 @@
             "1985"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "1985",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
             }
         }
     },
@@ -411,10 +411,10 @@
             "Clement Greenberg"
         ],
         "output": {
-            "pred": "Clement Greenberg died later than Agatha Christie.",
+            "pred": "Clement Greenberg died later.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.4444444444444445,
+                "f1": 0.6666666666666666,
                 "acc": 1.0
             }
         }
@@ -426,10 +426,10 @@
             "Battle of Britain and the Battle of Malta"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "No record of participation in European theatre battles during WWII.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
+                "f1": 0.11764705882352941,
                 "acc": 0.0
             }
         }
@@ -441,10 +441,10 @@
             "Alopecurus"
         ],
         "output": {
-            "pred": "Alopecurus is more common in temperate regions.",
+            "pred": "Alopecurus",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0.25,
+                "em": 1.0,
+                "f1": 1.0,
                 "acc": 1.0
             }
         }
@@ -456,10 +456,10 @@
             "A.P. Møller"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Arnold Peter Møller.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
+                "f1": 0.4,
                 "acc": 0.0
             }
         }
@@ -471,11 +471,11 @@
             "Samantha Cristoforetti"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Samantha Cristoforetti",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
             }
         }
     },
@@ -486,7 +486,7 @@
             "Park Ye-jin"
         ],
         "output": {
-            "pred": "Park Ye-jin.",
+            "pred": "Park Ye-jin",
             "metric_score": {
                 "em": 1.0,
                 "f1": 1.0,
@@ -516,10 +516,10 @@
             "located in Olathe, Kansas"
         ],
         "output": {
-            "pred": "Tyler Kalinoski went to Olathe East High School in Olathe, Kansas, United States.",
+            "pred": "Olathe, Kansas, United States",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.3529411764705882,
+                "f1": 0.5,
                 "acc": 0.0
             }
         }
@@ -531,7 +531,7 @@
             "Drifting"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "lift-off oversteer",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -546,10 +546,10 @@
             "Aloha ʻOe"
         ],
         "output": {
-            "pred": "The most famous song of the last monarch of Hawaii, Liliuokalani, was \"Aloha ʻOe.\"",
+            "pred": "Aloha ʻOe",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0.2857142857142857,
+                "em": 1.0,
+                "f1": 1.0,
                 "acc": 1.0
             }
         }
@@ -561,10 +561,10 @@
             "approximately 3 mi"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Approximately 6 miles",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
+                "f1": 0.3333333333333333,
                 "acc": 0.0
             }
         }
@@ -591,10 +591,10 @@
             "10 October 2010"
         ],
         "output": {
-            "pred": "The date of the dissolution of the Caribbean country is October 10, 2010.",
+            "pred": "October 10, 2010",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.4615384615384615,
+                "f1": 1.0,
                 "acc": 0.0
             }
         }
@@ -606,10 +606,10 @@
             "Eastern Conference champion Orlando Magic against the Western Conference champion Houston Rockets."
         ],
         "output": {
-            "pred": "In the first NBA Finals where the Orlando Magic participated (1995), they were put against the Houston Rockets.",
+            "pred": "Eastern Conference champion Orlando Magic and the Western Conference champion Houston Rockets",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.3846153846153846,
+                "f1": 0.9090909090909091,
                 "acc": 0.0
             }
         }
@@ -621,10 +621,10 @@
             "Ballarat Bitter is a 4.9% (abv) Australian beer"
         ],
         "output": {
-            "pred": "Ballarat Bertie.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.22222222222222224,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -636,7 +636,7 @@
             "Bengt Mikael Stanne"
         ],
         "output": {
-            "pred": "Mikael Stanne.",
+            "pred": "Mikael Stanne",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0.8,
@@ -666,7 +666,7 @@
             "Evey's mother"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Valerie Page",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -681,11 +681,11 @@
             "The Hindu Group"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "The Hindu Group",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
             }
         }
     },
@@ -696,10 +696,10 @@
             "Turkey"
         ],
         "output": {
-            "pred": "The Atik Valide Mosque and Valens Aqueduct are found in Turkey.",
+            "pred": "Turkey",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0.18181818181818182,
+                "em": 1.0,
+                "f1": 1.0,
                 "acc": 1.0
             }
         }
@@ -711,11 +711,11 @@
             "no"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "No, they are not both of West Indian descent.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
-                "acc": 0.0
+                "acc": 1.0
             }
         }
     },
@@ -726,11 +726,11 @@
             "Fleetwood Mac"
         ],
         "output": {
-            "pred": "Fleetwood Mac wrote the song \"Blue Letter\" and was inducted into the Rock and Roll Hall of Fame in 1998.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.19999999999999998,
-                "acc": 1.0
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -741,7 +741,7 @@
             "almost 3 million"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "2,886,026",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -756,7 +756,7 @@
             "LaLee's Kin: The Legacy of Cotton"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Gimme Shelter",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -771,10 +771,10 @@
             "Kingdom of the Isles"
         ],
         "output": {
-            "pred": "The Isles led by Aonghus Mór with a total land area of over 8300 km² are the Aran Islands, specifically Inis Mór.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.18181818181818182,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -786,10 +786,10 @@
             "Part I"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "The annunciation to the shepherds section.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.4,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -816,11 +816,11 @@
             "child actor"
         ],
         "output": {
-            "pred": "Katie Sagona is known as a child actor.",
+            "pred": "Child actress",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.4444444444444445,
-                "acc": 1.0
+                "f1": 0.5,
+                "acc": 0.0
             }
         }
     },
@@ -831,7 +831,7 @@
             "Joshua Rowley"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Rosily",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -861,11 +861,11 @@
             "rock and roll"
         ],
         "output": {
-            "pred": "The common genre of music that both Bo Diddley and The Yardbirds played during their careers is rock and roll.",
+            "pred": "Rock",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.2857142857142857,
-                "acc": 1.0
+                "f1": 0.5,
+                "acc": 0.0
             }
         }
     },
@@ -876,10 +876,10 @@
             "China"
         ],
         "output": {
-            "pred": "Sanming is located in Fujian province, and Jiutai District is located in Liaoning province, China.",
+            "pred": "Both Sanming and Jiutai District are located in China.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.125,
+                "f1": 0.19999999999999998,
                 "acc": 1.0
             }
         }
@@ -891,11 +891,11 @@
             "The Los Angeles Dance Theater"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Los Angeles Dance Theater",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
             }
         }
     },
@@ -906,10 +906,10 @@
             "Lostprophets disbanded in 2013 after Watkins was charged with sexual offences in late 2012."
         ],
         "output": {
-            "pred": "Josey Scott was the musician who was incarcerated, impacting his career with a rock band.",
+            "pred": "Ian Watkins.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.14814814814814817,
+                "f1": 0.125,
                 "acc": 0.0
             }
         }
@@ -921,7 +921,7 @@
             "Don Jeffrey \"Jeff\" Meldrum (born May 24, 1958) is a Professor of Anatomy and Anthropology"
         ],
         "output": {
-            "pred": "Jeff Meldrum.",
+            "pred": "Jeff Meldrum",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0.25,
@@ -936,10 +936,10 @@
             "Charles and Thomas Guard"
         ],
         "output": {
-            "pred": "The co-directors of the psychological horror film starring Emily Browning and Elizabeth Banks are the members of the Guard Brothers.",
+            "pred": "The Guard Brothers",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.2,
+                "f1": 0.3333333333333333,
                 "acc": 0.0
             }
         }
@@ -951,7 +951,7 @@
             "Wheeling, West Virginia"
         ],
         "output": {
-            "pred": "The first major improved highway in the United States, the National Road, started in Cumberland, Maryland, on the Potomac River and extended westward towards the Ohio River.",
+            "pred": "Cumberland, Maryland",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -966,7 +966,7 @@
             "Godiva"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "No such store exists.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -981,7 +981,7 @@
             "Eric Banadinović"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Mae Martin",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -996,11 +996,11 @@
             "Germany"
         ],
         "output": {
-            "pred": "Both Löwenbräu and Bürgerbräukeller are located in Munich.",
+            "pred": "Munich, Germany",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "f1": 0.6666666666666666,
+                "acc": 1.0
             }
         }
     },
@@ -1011,10 +1011,10 @@
             "1998"
         ],
         "output": {
-            "pred": "The satellite that first launched into orbit and was resupplied by Progress MS-09 was the first module of the International Space Station, which launched in 1998.",
+            "pred": "1998",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0.08333333333333333,
+                "em": 1.0,
+                "f1": 1.0,
                 "acc": 1.0
             }
         }
@@ -1041,10 +1041,10 @@
             "IRA"
         ],
         "output": {
-            "pred": "The Provisional Irish Republican Army (IRA) used an improvised mortar, which can be considered a Barrage (Barrack) buster, to shoot down a British Army Lynx helicopter on 20 March 1994.",
+            "pred": "The Irish Republican Army (IRA)",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.07407407407407407,
+                "f1": 0.4,
                 "acc": 1.0
             }
         }
@@ -1056,7 +1056,7 @@
             "Lincoln Memorial University"
         ],
         "output": {
-            "pred": "Lincoln Memorial University.",
+            "pred": "Lincoln Memorial University",
             "metric_score": {
                 "em": 1.0,
                 "f1": 1.0,
@@ -1071,7 +1071,7 @@
             "Hanako Muraoka"
         ],
         "output": {
-            "pred": "The Lucy Maud Montgomery novel about the character Anne Shirley was first translated into Japanese by Katayama Hiroko.",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1086,10 +1086,10 @@
             "no"
         ],
         "output": {
-            "pred": "No, Yasuzo Masumura and Pitof did not hail from the same country and did not have similar professional careers.",
+            "pred": "No",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
+                "em": 1.0,
+                "f1": 1.0,
                 "acc": 1.0
             }
         }
@@ -1116,11 +1116,11 @@
             "Pieter van Musschenbroek"
         ],
         "output": {
-            "pred": "Based on the available information, there is no single man credited with inventing both the Leyden jar and the tribometer. Pieter van Musschenbroek is known for the Leyden jar, and Ewald Georg von Kleist is also associated with its discovery. There is no clear historical figure credited with both inventions.",
+            "pred": "No man is credited with inventing both the Leyden jar and the Tribometer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.12244897959183672,
-                "acc": 1.0
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -1131,7 +1131,7 @@
             "Dirt track racing"
         ],
         "output": {
-            "pred": "Dirt track racing.",
+            "pred": "Dirt track racing",
             "metric_score": {
                 "em": 1.0,
                 "f1": 1.0,
@@ -1146,7 +1146,7 @@
             "Fort Worth"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Houston",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1161,7 +1161,7 @@
             "Blood and soil"
         ],
         "output": {
-            "pred": "The slogan that came about from the idea of Lebensraum supported by the Nazi Party until the end of World War II was \"Volk ohne Raum.\"",
+            "pred": "Volk ohne Raum",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1176,11 +1176,11 @@
             "2016 Oklahoma Sooners football team"
         ],
         "output": {
-            "pred": "The 2016 Oklahoma Sooners football team.",
+            "pred": "I can't answer.",
             "metric_score": {
-                "em": 1.0,
-                "f1": 1.0,
-                "acc": 1.0
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -1191,7 +1191,7 @@
             "5,922"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "1,905",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1206,11 +1206,11 @@
             "Take It Easy"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Take It Easy was published first.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "f1": 0.6666666666666666,
+                "acc": 1.0
             }
         }
     },
@@ -1221,10 +1221,10 @@
             "from around 1520"
         ],
         "output": {
-            "pred": "The oldest riverside tavern in Wapping, the Prospect of Whitby, dates back to 1520.",
+            "pred": "around 1520",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.13333333333333333,
+                "f1": 0.8,
                 "acc": 0.0
             }
         }
@@ -1236,11 +1236,11 @@
             "Paola Suárez"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Paola Suárez was a higher ranked tennis player.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "f1": 0.4444444444444445,
+                "acc": 1.0
             }
         }
     },
@@ -1251,7 +1251,7 @@
             "yes"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "No, they are not both playwrights.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1266,11 +1266,11 @@
             "Mark O'Connor"
         ],
         "output": {
-            "pred": "Among Vince Gill, Ricky Skaggs, Steve Wariner, and Mark O'Connor, determine who has performed \"Restless\" with The New Nashville Cats.",
+            "pred": "Vince Gill",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.1904761904761905,
-                "acc": 1.0
+                "f1": 0,
+                "acc": 0.0
             }
         }
     },
@@ -1281,11 +1281,11 @@
             "Philip José Farmer"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Philip José Farmer",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
             }
         }
     },
@@ -1296,10 +1296,10 @@
             "Rockstar San Diego"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Rockstar Studios",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
+                "f1": 0.4,
                 "acc": 0.0
             }
         }
@@ -1311,7 +1311,7 @@
             "no"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Neither is an EDM group.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1371,10 +1371,10 @@
             "Jeffrey Adam \"Duff\" Goldman"
         ],
         "output": {
-            "pred": "No judge of the Spring Baking Championship was born on December 17, 1974.",
+            "pred": "Duff Goldman",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
+                "f1": 0.6666666666666666,
                 "acc": 0.0
             }
         }
@@ -1386,10 +1386,10 @@
             "Tai Frasier in \"Clueless\""
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Rashad's breakthrough role was in \"Good Boy!\" as the main character.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
+                "f1": 0.14285714285714288,
                 "acc": 0.0
             }
         }
@@ -1401,10 +1401,10 @@
             "Harry Lillis \"Bing\" Crosby Jr."
         ],
         "output": {
-            "pred": "Bing Crosby",
+            "pred": "I can't answer.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0.5714285714285715,
+                "f1": 0,
                 "acc": 0.0
             }
         }
@@ -1416,11 +1416,11 @@
             "Greyia"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "Greyia contains more species than Calibanus.",
             "metric_score": {
                 "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "f1": 0.2857142857142857,
+                "acc": 1.0
             }
         }
     },
@@ -1431,10 +1431,10 @@
             "Jaguar Land Rover"
         ],
         "output": {
-            "pred": "Jaguar Land Rover Limited and Jaguar Land Rover Automotive PLC",
+            "pred": "Jaguar Land Rover.",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0.4615384615384615,
+                "em": 1.0,
+                "f1": 1.0,
                 "acc": 1.0
             }
         }
@@ -1446,7 +1446,7 @@
             "Ken Howard"
         ],
         "output": {
-            "pred": "Drew Barrymore and Jessica Lange",
+            "pred": "No American attorney starred in Grey Gardens.",
             "metric_score": {
                 "em": 0.0,
                 "f1": 0,
@@ -1461,11 +1461,11 @@
             "after"
         ],
         "output": {
-            "pred": "I can't answer.",
+            "pred": "after",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
             }
         }
     },
@@ -1476,11 +1476,11 @@
             "1918"
         ],
         "output": {
-            "pred": "Not applicable",
+            "pred": "1918",
             "metric_score": {
-                "em": 0.0,
-                "f1": 0,
-                "acc": 0.0
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
             }
         }
     },
