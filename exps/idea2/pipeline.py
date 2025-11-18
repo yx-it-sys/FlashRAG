@@ -46,7 +46,7 @@ class Pipeline():
                 assessment_result = self.assess(question, [doc['doc'] for doc in retrieved_results])
             else:
                 assessment_result = self.assess(question, collected_useful_fragments)
-            print(f"Assessment Result: {assessment_result}")
+            # print(f"Assessment Result: {assessment_result}")
             # 保存assessment result
             records.append({"state": "assess", "result": assessment_result})
             # 当LLM生成失败，则跳过assess的步骤，直接return，转到下一个数据点
@@ -60,6 +60,7 @@ class Pipeline():
             missing_information = assessment_result.get('missing_information', '')
 
             collected_useful_fragments.extend(useful_fragments)
+            loop_count += 1
             # print(f"collected_useful_fragments: {collected_useful_fragments}")
             # if assessment == "sufficient":
             #     final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
