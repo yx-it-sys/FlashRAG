@@ -33,7 +33,7 @@ class Pipeline():
         loop_count = 0
         collected_useful_fragments = []
         records = []
-        while loop_count < self.max_loops:
+        while loop_count < 1:
             retrieved_docs, scores = self.retriever.search(query=current_query, num=self.top_k, return_score=True)
             retrieved_results = []
 
@@ -61,20 +61,20 @@ class Pipeline():
 
             collected_useful_fragments.extend(useful_fragments)
             # print(f"collected_useful_fragments: {collected_useful_fragments}")
-            if assessment == "sufficient":
-                final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
-                print(f"Sufficient case, RAG answer: {final_answer}")
-                records.append({"state": "rag_generate", "result": final_answer})
-                log = {'sub_question': question, "records": records}
-                return final_answer, log
+            # if assessment == "sufficient":
+            #     final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
+            #     print(f"Sufficient case, RAG answer: {final_answer}")
+            #     records.append({"state": "rag_generate", "result": final_answer})
+            #     log = {'sub_question': question, "records": records}
+            #     return final_answer, log
 
-            elif assessment == "insufficient":
-                if loop_count > self.max_loops:
-                    break
-                loop_count += 1
-                current_query = self.refine(current_query, missing_information)
-                print(f"refined Query: {current_query}")
-                records.append({"state": "refine", "result": current_query})
+            # elif assessment == "insufficient":
+            #     if loop_count > self.max_loops:
+            #         break
+            #     loop_count += 1
+            #     current_query = self.refine(current_query, missing_information)
+            #     print(f"refined Query: {current_query}")
+            #     records.append({"state": "refine", "result": current_query})
         
         # supervised_answer = self.internal_debate_generate(question, list({v['id']: v for v in collected_useful_fragments}.values()))
         final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
