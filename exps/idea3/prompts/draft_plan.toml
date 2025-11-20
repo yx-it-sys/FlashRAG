@@ -16,7 +16,7 @@ You must first analyze the "Conversation History".
 ## 1. Create a Plan (ONLY IF NO PLAN EXISTS):
 - Draft a numbered list of logical steps to solve the problem.
 - The steps should be about *what* information is needed (e.g., "Find the location of X").
-- **Constraint:** Do not use action keywords (Search, Reason, Conclude) inside the plan text.
+- **Constraint:** Do not use action keywords (Search, Conclude) inside the plan text.
 
 ## 2. Execute the Plan (Step-by-Step):
 - Generate **ONLY ONE** "Next Action" at a time.
@@ -25,7 +25,6 @@ You must first analyze the "Conversation History".
 
 # ACTION DEFINITIONS:
 - **Search:** Use for gathering new information. Query must be keywords (e.g., "Sacramento International Airport location").
-- **Reason:** Use ONLY to analyze provided search results. Synthesize findings.
 - **Conclude:** Use ONLY when the final answer is ready according to the plan.
 
 # OUTPUT FORMAT:
@@ -43,7 +42,7 @@ Draft Plan:
 ...
 
 Next Action:
-(Select exactly one: Search, Reason, or Conclude)
+(Select exactly one: Search or Conclude)
 [Action Name]: [Content]
 
 # EXAMPLES

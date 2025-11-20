@@ -66,12 +66,12 @@ class DFAExecutor():
             parsed_result = parse_action(planning)
             
             draft_plan = parsed_result["plan"]
-            context.append(f"Plan:" {draft_plan})
+            context.append(f"Plan: {draft_plan}")
             action_type = parsed_result["action_type"]
             current_action = parsed_result["action_content"]
 
             if action_type is None:
-                action_type = "reason"
+               return "I can't answer"
             # print(f"Action Type: {action_type}")
             # print(f"Current Action: {current_action}")    
             if action_type.lower() == "search":
@@ -83,10 +83,6 @@ class DFAExecutor():
                     return final_answer, logs
 
                 context.append(f"{current_action}: {answer}")
-            elif action_type.lower() == "reason":
-                loop += 1
-                context.append(current_action)
-                logs.append({"meta_state": "reason", "logs": current_action})
             elif action_type.lower() == "conclude":
                 conclusion = current_action
                 final_answer = self.generate_final_answer(initial_question=question, conclusion=conclusion)

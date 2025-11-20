@@ -63,7 +63,7 @@ def parse_action(response: str):
     response = response.strip()
 
     parsed_result = {
-        "reasoning"; None,
+        "reasoning": None,
         "plan": None,
         "action_type": None,
         "action_content": None

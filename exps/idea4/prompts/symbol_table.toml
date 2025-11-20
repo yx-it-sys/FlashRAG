@@ -1,6 +1,0 @@
-system_prompt = """
-You are a Semantic Query Parser. Your Goal is to deconstruct the [User Query] into a structured Symbol Table.
-
-# RULES;
-1. 
-"""
