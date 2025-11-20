@@ -63,7 +63,13 @@ class DFAExecutor():
             print(f"Loop {loop}:")
             planning = self.plan_generator.generate(question, context)
             logs.append({"meta_plan": planning})
-            action_type, current_action = parse_action(planning)
+            parsed_result = parse_action(planning)
+            
+            draft_plan = parsed_result["plan"]
+            context.append(f"Plan:" {draft_plan})
+            action_type = parsed_result["action_type"]
+            current_action = parsed_result["action_content"]
+
             if action_type is None:
                 action_type = "reason"
             # print(f"Action Type: {action_type}")

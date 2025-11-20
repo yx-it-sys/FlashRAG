@@ -60,14 +60,42 @@ def parse_response(response: str):
 
 
 def parse_action(response: str):
-    pattern = r"^\s*Next Action:\s*(\w+):\s*(.*)$"
-    match = re.search(pattern, response, re.MULTILINE | re.IGNORECASE)
+    response = response.strip()
 
-    if match:
-        action_type = match.group(1)
-        action_value = match.group(2)
+    parsed_result = {
+        "reasoning"; None,
+        "plan": None,
+        "action_type": None,
+        "action_content": None
+    }
 
-        return action_type, action_value
+    reasoning_match = re.search(
+        r"Reasoning:\s*(.*?)(?=\n\s*(?:Draft Plan|next Action)|$)",
+        response,
+        re.DOTALL | re.IGNORECASE
+    )
+
+    if reasoning_match:
+        parsed_result["reasoning"] = reasoning_match.group(1).strip()
+
+    plan_match = re.search(
+        r"Draft Plan:\s*(.*?)(?=\n\s*Next Action)",
+        response,
+        re.DOTALL | re.IGNORECASE
+    )
+    if plan_match:
+        parsed_result["plan"] = plan_match.group(1).strip()
+
+    action_match = re.search(
+        r"Next Action:\s*\n?\s*(Search|Reason|conclude)\s*:\s*(.*)",
+        response,
+        re.DOTALL | re.IGNORECASE
+    )
+
+    if action_match:
+        parsed_result["action_type"] = action_match.group(1).strip()
+        parsed_result["action_content"] = action_match.group(2).strip()
+
     else:
-        print(f"Fail to parse planning! Return None.")
-        return None, None
+        print(f"Fail to parse Next Action! Raw response fragment: {response[-100:]}")
+    return parsed_result 

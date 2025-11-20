@@ -53,7 +53,6 @@ class DFAExecutor():
             f.write(json.dumps(result_data, ensure_ascii=False) + "\n")
                 
     def serial_execute(self, item):
-        self.plan_generator.plan_prompt = self.plan_generator.plan_prompt[:2]
         question = item.question
         max_loop = 5
         loop = 0
@@ -62,7 +61,7 @@ class DFAExecutor():
         logs = []
         while loop < max_loop:
             print(f"Loop {loop}:")
-            planning = self.plan_generator.generate(question, context, loop)
+            planning = self.plan_generator.generate(question, context)
             logs.append({"meta_plan": planning})
             action_type, current_action = parse_action(planning)
             if action_type is None:
@@ -88,7 +87,7 @@ class DFAExecutor():
                 print(f"final_answer: {final_answer}")
                 logs.append({"meta_state": "conclude", "logs": conclusion})
                 break
-            
+        self.plan_generator.reset_prompt()  
         return final_answer, logs
 
     

@@ -70,18 +70,9 @@ Next Action:
 Conclude: X is located in Y.
 """
 
-user_prompt_1 = """
+user_prompt = """
 Now it's your turn.
 # User Query:
 {query}
-# Your Response:
-"""
-
-user_prompt_2 = """
-Now it's your turn.
-# User Query:
-{query}
-# Conversation History
-{conversation_history}
 # Your Response:
 """

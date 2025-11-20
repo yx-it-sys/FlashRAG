@@ -27,7 +27,9 @@ class MetaPlan():
         current_plan_prompt[1]["content"] = current_plan_prompt[1]["content"].format(query=question)
         print(f"Context: {context}")
         if context is not None:
-            context_str = "\n".join([item for item in context if item is not None])
+            plan = context[0]
+            context_str = "\n".join([item for item in context[1:] if item is not None])
+            current_plan_prompt.append({"role": "assistant", "content": plan})
             current_plan_prompt.append({"role": "user", "content": context_str})
         
         inputs = self.tokenizer.apply_chat_template(

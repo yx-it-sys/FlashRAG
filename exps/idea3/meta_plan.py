@@ -8,7 +8,8 @@ class MetaPlan():
         self.tokenizer = tokenizer
         self.model = model
         self.device = device
-        self.template_messages = self._load_plan_prompts(prompts_path)
+        self.prompts_path = prompts_path
+        self.plan_prompt = self._load_plan_prompts(self.prompts_path)
         self.history = []
         
     def _load_plan_prompts(self, prompts_path):
@@ -22,15 +23,14 @@ class MetaPlan():
             ]
         return messages
 
-    def reset(self, question: str):
-        self.history = [msg.copy() for msg in self.template_messages]
-        self.history[1]["content"] = self.history[1]["content"].format(query=question)
+    def reset_prompt(self):
+        self.plan_prompt = self._load_plan_prompts(self.prompts_path)
         
-    def generate(self, question: str, context, loop) -> List:
+    def generate(self, question: str, context) -> List:
         current_plan_prompt = [p.copy() for p in self.plan_prompt]
         # fill in the user's question into the plan prompt
         current_plan_prompt[1]["content"] = current_plan_prompt[1]["content"].format(query=question)
-        print(f"Current Plan Prompt: {current_plan_prompt}")
+        # print(f"Current Plan Prompt: {current_plan_prompt}")
         if context is not None:
             context_str = "\n".join([item for item in context if item is not None])
             current_plan_prompt.append({"role": "user", "content": context_str})
