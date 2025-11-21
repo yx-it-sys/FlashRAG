@@ -1,6 +1,6 @@
 import tomllib
 from typing import List
-from utils import extract_json
+from utils import extract_json, chat_with_qwen
 import torch
 
 class MetaPlan():
@@ -35,16 +35,7 @@ class MetaPlan():
             context_str = "\n".join([item for item in context if item is not None])
             current_plan_prompt.append({"role": "user", "content": context_str})
         
-        inputs = self.tokenizer.apply_chat_template(
-            current_plan_prompt,
-            add_generation_prompt=True,
-            tokenize=True,
-            return_dict=True,
-            return_tensors="pt",
-        ).to(self.model.device)
-    
-        outputs = self.model.generate(**inputs, max_new_tokens=2048)
-        response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+        response = chat_with_qwen(model=self.model, tokenizer=self.tokenizer, messages=current_plan_prompt, type="qwen3", mode="thinking")
         self.plan_prompt.append({"role": "assistant", "content": response})
         print(f"response: {response}")
         return response
