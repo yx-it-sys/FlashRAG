@@ -104,7 +104,7 @@ class DFAExecutor():
                 return_tensors="pt",
             ).to(self.model.device)
             outputs = self.model.generate(**inputs, max_new_tokens=2048)
-            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)['content']
 
             return response
         

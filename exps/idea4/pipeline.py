@@ -89,7 +89,7 @@ class Pipeline():
             {"role": "user", "content": self.rectify_prompt['user_prompt'].format(user_query=question, context=context)}
         ]
 
-        response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")
+        response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")['content']
         print(f"Rectify response: {response}")
         return response
 
@@ -98,7 +98,7 @@ class Pipeline():
                 {"role": "system", "content": self.assessment_prompt['system_prompt']},
                 {"role": "user", "content": self.assessment_prompt['user_prompt'].format(user_query=query, documents_list=docs)}
             ]
-            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")
+            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")['content']
             # print(f"Assess response: {response}")
             assessment_result = extract_json_for_assessment(response)
             return assessment_result
@@ -108,7 +108,7 @@ class Pipeline():
                 {"role": "system", "content": self.refine_prompt['system_prompt']},
                 {"role": "user", "content": self.refine_prompt['user_prompt'].format(current_query=current_query, missing_info_from_assess=missing_information)}
             ]
-            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")
+            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")['content']
             return response
 
     def rag_generate(self, question: str, supporting_docs: List[str]):
@@ -116,7 +116,7 @@ class Pipeline():
                 {"role": "system", "content": self.rag_prompt['system_prompt']},
                 {"role": "user", "content": self.rag_prompt['user_prompt'].format(reference=supporting_docs, question=question)}
             ]
-            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")
+            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")['content']
             return response
     
     def internal_debate_generate(self, question: str, supporting_docs: List[str]):
