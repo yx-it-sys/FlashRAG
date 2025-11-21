@@ -4,7 +4,7 @@ import json
 from pipeline import Pipeline
 from meta_plan import MetaPlan
 from transformers import AutoTokenizer, AutoModelForCausalLM
-from utils import parse_action
+from utils import parse_action, chat_with_qwen
 import torch
 import tomllib
 
@@ -98,16 +98,7 @@ class DFAExecutor():
                 {"role": "system", "content": self.final_answer_prompt['system_prompt']},
                 {"role": "user", "content": self.final_answer_prompt['user_prompt'].format(initial_question=initial_question, conclusion=conclusion)}
             ]
-            inputs = self.tokenizer.apply_chat_template(
-                messages,
-                add_generation_prompt=True,
-                tokenize=True,
-                return_dict=True,
-                return_tensors="pt",
-            ).to(self.model.device)
-            outputs = self.model.generate(**inputs, max_new_tokens=2048)
-            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
-
+            response = chat_with_qwen(self.model, self.tokenizer, messages, type="qwen3", mode="thinking")
             return response
         
             

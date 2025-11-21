@@ -1,6 +1,7 @@
 import json
 import re
 from json_repair import repair_json
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 def extract_json(response: str) -> dict | None:
     pattern = r"JSON:\s*(\{[\s\S]+\})"
@@ -71,3 +72,39 @@ def parse_action(response: str):
     else:
         print(f"Fail to parse planning! Return None.")
         return None, None
+    
+def chat_with_qwen(model, tokenizer, messages, type, mode):
+        if type == "qwen2":
+            inputs = tokenizer.apply_chat_template(
+                messages,
+                add_generation_prompt=True,
+                tokenize=True,
+                return_dict=True,
+                return_tensors="pt",
+            ).to(model.device)
+            outputs = model.generate(**inputs, max_new_tokens=32768)
+            response = tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+            return response
+        elif type == "qwen3":
+            enable_thinking = True if mode == "thinking" else False
+            inputs = tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True,
+                enable_thinking=enable_thinking
+            )
+            model_inputs = tokenizer([inputs], return_tensors="pt").to(model.device)
+            generated_ids = model.generate(
+                **model_inputs,
+                max_new_tokens=32768
+            )
+            output_ids = generated_ids[0][len(model_inputs.input_ids[0]):].tolist()
+
+            try:
+                index = len(output_ids) - output_ids[::-1].index(151668)
+            except ValueError:
+                index = 0
+
+            thinking_content = tokenizer.decode(output_ids[:index], skip_special_tokens=True).strip("\n")
+            content = tokenizer.decode(output_ids[index:], skip_special_tokens=True).strip("\n")
+            return {"thinking_content": thinking_content, "content": content}

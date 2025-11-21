@@ -28,7 +28,7 @@ def main():
         "save_intermediate_data": True,
     }
     config = Config("my_config.yaml", config_dict=config_dict)
-    model_name = "Qwen/Qwen2.5-7B-Instruct"
+    model_name = "Qwen/Qwen3-8B"
     prompt_path = "prompts/draft_plan.toml"
     
     all_split = get_dataset(config)
