@@ -42,6 +42,7 @@ class Pipeline():
                     retrieved_results.append({'doc': doc['contents'], 'score': score})
             
             # print(f"Retrieved Results: {retrieved_results}")
+            records.append({"state": "retrieve", "result": [doc['doc'] for doc in retrieved_results]})
             if len(collected_useful_fragments) == 0:
                 assessment_result = self.assess(question, [doc['doc'] for doc in retrieved_results])
             else:

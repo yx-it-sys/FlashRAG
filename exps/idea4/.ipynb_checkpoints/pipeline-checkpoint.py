@@ -2,7 +2,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import tomllib
 from flashrag.utils import get_retriever
 from typing import List
-from utils import extract_json_for_assessment
+from utils import extract_json_for_assessment, chat_with_qwen
 
 class Pipeline():
     def __init__(self, config, model, tokenizer, device, max_loops, ret_thresh, retriever=None):
@@ -42,6 +42,7 @@ class Pipeline():
                     retrieved_results.append({'doc': doc['contents'], 'score': score})
             
             # print(f"Retrieved Results: {retrieved_results}")
+            records.append({"state": "retrieve", "result": [doc['doc'] for doc in retrieved_results]})
             if len(collected_useful_fragments) == 0:
                 assessment_result = self.assess(question, [doc['doc'] for doc in retrieved_results])
             else:
@@ -89,16 +90,7 @@ class Pipeline():
             {"role": "user", "content": self.rectify_prompt['user_prompt'].format(user_query=question, context=context)}
         ]
 
-        inputs = self.tokenizer.apply_chat_template(
-            messages,
-            add_generation_prompt=True,
-            tokenize=True,
-            return_dict=True,
-            return_tensors="pt",
-        ).to(self.model.device)
-
-        outputs = self.model.generate(**inputs, max_new_tokens=2048)
-        response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+        response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")['content']
         print(f"Rectify response: {response}")
         return response
 
@@ -107,15 +99,7 @@ class Pipeline():
                 {"role": "system", "content": self.assessment_prompt['system_prompt']},
                 {"role": "user", "content": self.assessment_prompt['user_prompt'].format(user_query=query, documents_list=docs)}
             ]
-            inputs = self.tokenizer.apply_chat_template(
-                messages,
-                add_generation_prompt=True,
-                tokenize=True,
-                return_dict=True,
-                return_tensors="pt",
-            ).to(self.model.device)
-            outputs = self.model.generate(**inputs, max_new_tokens=2048)
-            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")['content']
             # print(f"Assess response: {response}")
             assessment_result = extract_json_for_assessment(response)
             return assessment_result
@@ -125,16 +109,7 @@ class Pipeline():
                 {"role": "system", "content": self.refine_prompt['system_prompt']},
                 {"role": "user", "content": self.refine_prompt['user_prompt'].format(current_query=current_query, missing_info_from_assess=missing_information)}
             ]
-            inputs = self.tokenizer.apply_chat_template(
-                messages,
-                add_generation_prompt=True,
-                tokenize=True,
-                return_dict=True,
-                return_tensors="pt",
-            ).to(self.model.device)
-
-            outputs = self.model.generate(**inputs, max_new_tokens=2048)
-            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")['content']
             return response
 
     def rag_generate(self, question: str, supporting_docs: List[str]):
@@ -142,16 +117,7 @@ class Pipeline():
                 {"role": "system", "content": self.rag_prompt['system_prompt']},
                 {"role": "user", "content": self.rag_prompt['user_prompt'].format(reference=supporting_docs, question=question)}
             ]
-            inputs = self.tokenizer.apply_chat_template(
-                messages,
-                add_generation_prompt=True,
-                tokenize=True,
-                return_dict=True,
-                return_tensors="pt",
-            ).to(self.model.device)
-
-            outputs = self.model.generate(**inputs, max_new_tokens=2048)
-            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")['content']
             return response
     
     def internal_debate_generate(self, question: str, supporting_docs: List[str]):
