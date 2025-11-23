@@ -1,0 +1,3 @@
+system_prompt = """
+You are an expert Agentic RAG Planner. Your task is to 检查当前的Draft Plan，结合历史上下文
+"""
