@@ -65,4 +65,8 @@ def agentic_search(intent: str, entity: List[str], constraints: List[str], retri
     background_knowledge = "\n".join(sections)
 
     final_context = f"=== Intent Related Information ===\n{intent_docs}\n\n{background_knowledge}"
-    return final_context
+
+    # LLM 登场
+    # 首先根据constraints对final_context进行过滤和调整
+    # 最终生成当前Plan的结果
+    # 内部抛出异常时，外部捕获
