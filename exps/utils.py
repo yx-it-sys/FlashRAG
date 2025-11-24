@@ -1,6 +1,8 @@
-import nltk
 from typing import List
 from transformers import pipeline
+import re
+import json
+import json_repair
 
 def general_generate(messages, model, tokenizer):
 
@@ -22,51 +24,19 @@ def general_generate(messages, model, tokenizer):
 
     return response
 
-def agentic_search(intent: str, entity: List[str], constraints: List[str], retriever, extractor, ret_thresh, top_k: int = 5) -> str:
-    retrieved_intent_content, intent_content_scores = retriever.search(query=intent, num=top_k, return_score=True)
-    intent_docs = []
-
-    for doc, score in zip(retrieved_intent_content, intent_content_scores):
-        if score >= ret_thresh:
-            intent_docs.append(doc['contents'])
-    
-    background_knowledge = []
-    for entity in entity:
-        retrieved_docs = []
-        retrieved_entity_content, entiity_content_scores = retriever.search(query=entity, num=top_k, return_score=True)
-        for doc, score in zip(retrieved_entity_content, entiity_content_scores):
-            if score >= ret_thresh:
-                retrieved_docs.append(doc['contents'])
-        background_knowledge.append({entity: retrieved_docs})
-    
-    # # Rescaling
-    # # Trim intent_docs
-    # sentences = nltk.sent_tokenize("\n".join(intent_docs))
-    # relevant_sentences = []
-    # for sent in sentences:
-    #     result = extractor(question=intent, context=sent)
-    #     if result['score'] > 0.5:
-    #         relevant_sentences.append(sent)
-    # intent_docs = relevant_sentences    
-    # # Remove duplicates from background_knowledge and trim each entity's docs
-    intent_docs = "\n".join(intent_docs)
-    sections = ["=== Background Knowledge for Entities ==="]
-        
-    for item in background_knowledge:
-        for entity, docs in item.items():
-            if not docs:
-                continue
-            sections.append(f"\n## Introduction to: {entity}")
-            
-            for i, doc in enumerate(docs, 1):
-                clean_doc = doc.strip().replace('\n', ' ')
-                sections.append(f"{i}. {clean_doc}")
-        
-    background_knowledge = "\n".join(sections)
-
-    final_context = f"=== Intent Related Information ===\n{intent_docs}\n\n{background_knowledge}"
-
-    # LLM 登场
-    # 首先根据constraints对final_context进行过滤和调整
-    # 最终生成当前Plan的结果
-    # 内部抛出异常时，外部捕获
+def parse_json(text: str):
+    pattern = r"\{[\s\S]*\}"
+    match = re.search(pattern, text)
+    if not match:
+        print("❌ 未找到任何大括号 {} 包裹的内容")
+        return None
+    json_str = match.group(0)
+    try:
+        return json.loads(json_str)
+    except json.JSONDecodeError:
+        print(f"⚠️ 标准 JSON 解析失败，正在调用 json_repair 尝试修复...\n{json_str}")
+        try:
+            return json_repair.loads(json_str)
+        except Exception as e:
+            print(f"❌ json_repair 解析失败: {e}")
+            return None
