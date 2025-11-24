@@ -1,7 +1,7 @@
 import tomllib
-from utils import general_generate
+from utils import general_generate, search, compare, conclude
 import re
-
+from typing import List
 class Planner():
     def __init__(self, model, tokenizer):
         self.model = model
@@ -20,15 +20,25 @@ class Planner():
         draft_plan = self.extract(result)
         return draft_plan
     
-    def extract(self, result: str):
-        clean_text = re.sub(r'<think>.*?</think>', '', result, flags=re.DOTALL).strip()
-        step_pattern = re.compile(r'^\s*(\s+)\.\s*(.*?)(?=^\s*\d+\.|\Z)', re.DOTALL|re.MULTILINE)
-        matches = step_pattern.findall(clean_text)
-        parsed_plan = []
-        for step_num, step_content in matches:
-            parsed_plan.append({
-                "step": int(step_num),
-                "content": step_content.strip()
-            })
+    def extract(self, result: str) -> List[str]:
+        pattern = r"```(?:python|Python)?\s*(.*?)```"
+        match = re.search(pattern, result, re.DOTALL)
 
-        return parsed_plan
+        if not match:
+            raw_text = re.sub(r'<think>.*?</think>', '', result, flags=re.DOTALL).strip()
+        else:
+            raw_text = match.group(1)
+        
+        lines = raw_text.split('\n')
+
+        executable_lines = []
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            if line.startswith('#'):
+                continue
+            executable_lines.append(line)
+
+        return executable_lines
+    

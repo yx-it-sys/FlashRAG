@@ -40,6 +40,7 @@ Describe the immediate next sub-task in natural language.
 
 user_prompt = """
 User Query: {user_query}
-Useful Information: {usefual_information}
+Draft Plan: {draft_plan}
+Context: {context}
 Your Response:
 """
