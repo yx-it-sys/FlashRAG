@@ -87,6 +87,7 @@ class DFAExecutor():
                 print(f"final_answer: {final_answer}")
                 logs.append({"meta_state": "conclude", "logs": conclusion})
                 break
+        # 计划过于长，仍未得出结论，进入Replan
         self.plan_generator.reset_prompt()  
         return final_answer, logs
 

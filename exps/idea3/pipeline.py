@@ -5,8 +5,9 @@ from typing import List
 from utils import extract_json_for_assessment, chat_with_qwen
 
 class Pipeline():
-    def __init__(self, config, model, tokenizer, device, max_loops, ret_thresh, retriever=None):
+    def __init__(self, config, model, tokenizer, entity_extractor, device, max_loops, ret_thresh, retriever=None):
         self.device = device
+        self.entity_extractor = entity_extractor
         self.model = model
         self.tokenizer = tokenizer
         self.config = config
@@ -28,13 +29,14 @@ class Pipeline():
         self.retriever = retriever
 
     def run_with_question_only(self, question: str):
-        # current_query = self.rectify(question, context)
-        current_query = question
+        current_query = [question]
         loop_count = 0
         collected_useful_fragments = []
         records = []
         while loop_count < self.max_loops:
-            retrieved_docs, scores = self.retriever.search(query=current_query, num=self.top_k, return_score=True)
+            retrieved_docs, scores = self.retriever.batch_search(query=current_query, num=self.top_k, return_score=True)
+            print(f"retrieved_docs: {retrieved_docs}")
+            print(f"scores: {scores}")
             retrieved_results = []
 
             for doc, score in zip(retrieved_docs, scores):
@@ -76,6 +78,8 @@ class Pipeline():
                 print(f"refined Query: {current_query}")
                 records.append({"state": "refine", "result": current_query})
         
+        # 循环次数太多，考虑Replan
+        
         # supervised_answer = self.internal_debate_generate(question, collected_useful_fragments)
         final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
         print(f"Mocked Debate Answer: {final_answer}")
@@ -83,16 +87,6 @@ class Pipeline():
         log = {'sub_question': question, "records": records}
         return final_answer, log
     
-    def rectify(self, question: str, context: List[str]):
-        messages = [                
-            {"role": "system", "content": self.rectify_prompt['system_prompt']},
-            {"role": "user", "content": self.rectify_prompt['user_prompt'].format(user_query=question, context=context)}
-        ]
-
-        response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")
-        print(f"Rectify response: {response}")
-        return response
-
     def assess(self, query: str, docs: List[str]):
             messages = [                
                 {"role": "system", "content": self.assessment_prompt['system_prompt']},
@@ -103,13 +97,14 @@ class Pipeline():
             assessment_result = extract_json_for_assessment(response)
             return assessment_result
 
-    def refine(self, current_query: str,  missing_information: str):
-            messages = [                
-                {"role": "system", "content": self.refine_prompt['system_prompt']},
-                {"role": "user", "content": self.refine_prompt['user_prompt'].format(current_query=current_query, missing_info_from_assess=missing_information)}
-            ]
-            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")
-            return response
+    def refine(self, missing_information: str):
+            # GLiNER提取missing_information的实体，得到实体列表
+            labels = ["person", "award", "date", "competitions", "teams"]
+            entity_list = self.entity_extractor.predict_entities(missing_information, labels)
+            # 将current_query与实体列表中的元素一一配对，新的查询列表
+            query_list = [f"Find '{missing_information}' related to {entity}" for entity in entity_list]
+            # 返回新的查询列表
+            return query_list
 
     def rag_generate(self, question: str, supporting_docs: List[str]):
             messages = [                
