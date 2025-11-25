@@ -7,28 +7,41 @@ from transformers import pipeline
 import nltk
 import re
 
+class DataStarvationError(Exception):
+    def __init__(self, relevant_details, missing_info, step_id):
+        self.relevant_details = relevant_details
+        self.missing_info = missing_info
+        self.step_id = step_id
+        super().__init__(f"Data starvation at step {step_id}: missing {missing_info}")
+
 class RAGPipeline():
     def __init__(self, config, model, tokenizer, ret_thresh, extractor=None, retriever=None):
-        self.model = model
-        self.tokenizer = tokenizer
-        self.config = config
         if extractor is None:
-            extractor = pipeline("question-answering", model="ddeepset/deberta-v3-base-squad2")
+            extractor = pipeline("question-answering", model="deepset/deberta-v3-base-squad2")
         self.extractor = extractor
         if retriever is None:
             retriever = get_retriever(self.config)
-
         self.retriever = retriever
         self.top_k = 5
         self.ret_thresh = ret_thresh
-
-        search_func = partial(self.agentic_search, self.retriever, self.extractor, self.top_k, self.ret_thresh)
         self.context_vars = {
-            "search": search_func,
+            "search": self._search_wrapper,
+            "compare": self._compare_wrapper,
+            "conclude": self._conclude_wrapper,
         }
+        self.execution_log = []
+        self.model = model
+        self.tokenizer = tokenizer
+        self.config = config
+
         with open('prompts/reasoning.toml', 'rb') as f:
             self.prompt = tomllib.load(f)
-    
+        self.loop = 0
+
+    def _search_wrapper(self, intent, entity, constraints):
+        self.execution_log.append({"tool": 'search', 'params': {"intent": intent, "entity": entity, "contraints": constraints}})
+        return self.agentic_search(intent, entity, constraints)
+
     def agentic_search(self, intent: str, entity: List[str], constraints: List[str]) -> str:
         retrieved_intent_content, intent_content_scores = self.retriever.search(query=intent, num=self.top_k, return_score=True)
         intent_docs = []
@@ -83,18 +96,37 @@ class RAGPipeline():
         json_dict = parse_json(json_text)
         if json_dict is None:
             print("I can't answer! json_dict is None.")
-        return json_dict.get('final_answer', '')
+        final_answer =  json_dict.get('final_answer', '')
         # 最终生成当前Plan的结果
-        # 内部抛出异常时，外部捕获
-
+        if final_answer.lower() == "insufficient information":
+            raise DataStarvationError(relevant_details=json_dict.get('relevant_details', ''), missing_info=json_dict.get('missing_entity', 'unspecified'), step_id="search")
+        return final_answer
+    
     def run(self, draft_plan: List[str], user_query: str, context: str):
         for plan in draft_plan:
             try:
                 exec(plan, {}, self.context_vars)
-            except Exception as e:
-                print(f"Error executing plan line: {plan}\nError: {e}")
-                break
-            
+            except DataStarvationError as e:
+                print(f"Catched an insfficient retrieval exception: {e}")
+                self.loop += 1
+                if self.loop >= 3:
+                    print("Reached maximum retry attempts. Aborting.")
+                    return "I can't answer."
+                missing_entity = e.missing_info
+                # 根据缺失的信息，进行补充检索
+                retrieved_docs = []
+                retrieved_docs.append(e.relevant_details)
+                for entity in missing_entity:
+                    retrieved_entity_content, entiity_content_scores = self.retriever.search(query=entity, num=self.top_k, return_score=True)
+                    for doc, score in zip(retrieved_entity_content, entiity_content_scores):
+                        if score >= self.ret_thresh:
+                            retrieved_docs.append(doc['contents'])
+                messages = [
+                    {"role": "system", "content": "You are an helpful assistant that helps users to complete the task based on provided context."},
+                    {"role": "user", "content": f"Task:{self.execution_log[-1]['params']['intent']}\nContext:{retrieved_docs}\nYour Response:\n"}
+                ]
+                response = general_generate(messages, self.model, self.tokenizer)
+                return response
         # messages = [
         #     {"role": "system", "content": self.prompt['system_prompt']},
         #     {"role": "user", "content": self.prompt['user_prompt'].format(user_query=user_query, draft_plan=draft_plan, context=context)}

@@ -5,6 +5,7 @@ You are an expert assistant specialized information processing and queastion ans
 1. carefully read the "Intention" and "Constarints" from user input.
 2. Analyze the provided "Context" to identify relevant information that aligns with the "Intention" while adhering to the "Constraints".
 3. Formulate a clear and concise response that directly addresses the "Intention" using only the relevant information extracted from the "Context".
+**NOTE**: If the "Context" does not contain sufficient information to fulfill the "Intention" under the given "Constraints", respond with "Insufficient information" and missing entity.
 
 # Format
 <think>
@@ -13,7 +14,8 @@ Your step by step reasoning here
 <answer>
 {
     "relevant_details": "Your extracted key details here",
-    "final_answer": "Your concise answer here"
+    "final_answer": "Your concise answer here" or "Insufficient information",
+    "missing_entity": ["List of Missing entities"] (list of entities, only if final_answer is "Insufficient information")
 }
 """
 
