@@ -101,7 +101,7 @@ def extract_refine(response: str):
     # 查找 Reformed Query: 后的引号内容
     # 兼容双引号 "..." 和单引号 '...'
     query_pattern = r"Reformed Query:\s*([\"'])(.*?)\1"
-    query_match = re.search(query_pattern, llm_output, re.IGNORECASE | re.DOTALL)
+    query_match = re.search(query_pattern, response, re.IGNORECASE | re.DOTALL)
     
     if query_match:
         # group(2) 是引号内部的实际内容
