@@ -35,8 +35,6 @@ class Pipeline():
         records = []
         while loop_count < self.max_loops:
             retrieved_docs, scores = self.retriever.batch_search(query=current_query, num=self.top_k, return_score=True)
-            print(f"retrieved_docs: {retrieved_docs}")
-            print(f"scores: {scores}")
             retrieved_results = []
 
             for docs, scores in zip(retrieved_docs, scores):
@@ -96,6 +94,7 @@ class Pipeline():
                 {"role": "user", "content": self.assessment_prompt['user_prompt'].format(user_query=query, documents_list=docs)}
             ]
             response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)
+            llm_output = response['content']
             # print(f"Assess response: {response}")
             assessment_result = extract_json_for_assessment(response)
             return assessment_result
