@@ -29,18 +29,21 @@ class Pipeline():
         self.retriever = retriever
 
     def run_with_question_only(self, question: str):
-        current_query = [question]
+        query_list = [question]
         loop_count = 0
         collected_useful_fragments = []
         records = []
         while loop_count < self.max_loops:
-            print(f"Current Query: {current_query}")
-            retrieved_docs, scores = self.retriever.batch_search(query=current_query, num=self.top_k, return_score=True)
+            print(f"Current Query: {query_list}")
+            if query_list is None or len(query_list) == 0:
+                print("No more queries to process. Exiting loop.")
+                break
+            retrieved_docs, scores = self.retriever.batch_search(query=query_list, num=self.top_k, return_score=True)
             retrieved_results = []
 
             for docs, scores in zip(retrieved_docs, scores):
                 for doc, score in zip(docs, scores):
-                     if score >= self.ret_thresh:
+                    if score >= self.ret_thresh:
                         retrieved_results.append({'doc': doc['contents'], 'score': score})
             # print(f"Retrieved Results: {retrieved_results}")
             if len(collected_useful_fragments) == 0:
@@ -73,9 +76,9 @@ class Pipeline():
                 if loop_count > self.max_loops:
                     break
                 loop_count += 1
-                current_query = self.refine(missing_information)
-                print(f"refined Query: {current_query}")
-                records.append({"state": "refine", "result": current_query})
+                query_list = self.refine(missing_information)
+                print(f"refined Query: {query_list}")
+                records.append({"state": "refine", "result": query_list})
         
         # 循环次数太多，考虑Replan
         if loop_count >= self.max_loops:
