@@ -1,4 +1,3 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
 import tomllib
 from flashrag.utils import get_retriever
 from typing import List
