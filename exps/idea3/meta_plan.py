@@ -35,8 +35,7 @@ class MetaPlan():
             context_str = "\n".join([item for item in context if item is not None])
             current_plan_prompt.append({"role": "user", "content": context_str})
         
-        response = chat_with_qwen(model=self.model, tokenizer=self.tokenizer, messages=current_plan_prompt, type="qwen3", mode="thinking")
-        thinking_content = response['thinking_content']
+        response = chat_with_qwen(model=self.model, tokenizer=self.tokenizer, messages=current_plan_prompt, type="qwen2", enable_thinking=False)
         content = response['content']
         self.plan_prompt.append({"role": "assistant", "content": content})
         print(f"response: {response}")

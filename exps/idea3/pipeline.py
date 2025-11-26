@@ -95,7 +95,7 @@ class Pipeline():
                 {"role": "system", "content": self.assessment_prompt['system_prompt']},
                 {"role": "user", "content": self.assessment_prompt['user_prompt'].format(user_query=query, documents_list=docs)}
             ]
-            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")
+            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)
             # print(f"Assess response: {response}")
             assessment_result = extract_json_for_assessment(response)
             return assessment_result
@@ -114,7 +114,7 @@ class Pipeline():
                 {"role": "system", "content": self.rag_prompt['system_prompt']},
                 {"role": "user", "content": self.rag_prompt['user_prompt'].format(reference=supporting_docs, question=question)}
             ]
-            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen3", "thinking")
+            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)
             return response
     
     def internal_debate_generate(self, question: str, supporting_docs: List[str]):

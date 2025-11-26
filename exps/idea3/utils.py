@@ -73,7 +73,7 @@ def parse_action(response: str):
         print(f"Fail to parse planning! Return None.")
         return None, None
     
-def chat_with_qwen(model, tokenizer, messages, type, mode):
+def chat_with_qwen(model, tokenizer, messages, type, enable_thinking=True):
         if type == "qwen2":
             inputs = tokenizer.apply_chat_template(
                 messages,
@@ -84,9 +84,10 @@ def chat_with_qwen(model, tokenizer, messages, type, mode):
             ).to(model.device)
             outputs = model.generate(**inputs, max_new_tokens=32768)
             response = tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
-            return response
+            return {"thinking_content": None, "content": response}
+        
         elif type == "qwen3":
-            enable_thinking = True if mode == "thinking" else False
+            enable_thinking = True if enable_thinking else False
             inputs = tokenizer.apply_chat_template(
                 messages,
                 tokenize=False,
