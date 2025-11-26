@@ -84,7 +84,7 @@ def extract_refine(response: str):
     # 使用正则查找 Entities: 后的 [...] 部分
     # re.DOTALL 允许 . 匹配换行符，防止列表跨行时匹配失败
     entities_pattern = r"Entities:\s*(\[.*?\])"
-    entities_match = re.search(entities_pattern, llm_output, re.IGNORECASE | re.DOTALL)
+    entities_match = re.search(entities_pattern, response, re.IGNORECASE | re.DOTALL)
     
     if entities_match:
         raw_list_str = entities_match.group(1)
