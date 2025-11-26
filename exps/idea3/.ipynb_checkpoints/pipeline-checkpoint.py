@@ -2,11 +2,12 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import tomllib
 from flashrag.utils import get_retriever
 from typing import List
-from utils import extract_json_for_assessment
+from utils import extract_json_for_assessment, extract_refine, chat_with_qwen
 
 class Pipeline():
-    def __init__(self, config, model, tokenizer, device, max_loops, ret_thresh, retriever=None):
+    def __init__(self, config, model, tokenizer, entity_extractor, device, max_loops, ret_thresh, retriever=None):
         self.device = device
+        self.entity_extractor = entity_extractor
         self.model = model
         self.tokenizer = tokenizer
         self.config = config
@@ -17,7 +18,7 @@ class Pipeline():
              self.rectify_prompt = tomllib.load(f)
         with open('prompts/assess.toml', "rb") as f:
             self.assessment_prompt = tomllib.load(f)
-        with open('prompts/refine_misinformation.toml', 'rb') as f:
+        with open('prompts/refine.toml', 'rb') as f:
             self.refine_prompt = tomllib.load(f)
         with open('prompts/rag_generate.toml', 'rb') as f:
              self.rag_prompt = tomllib.load(f)
@@ -28,19 +29,19 @@ class Pipeline():
         self.retriever = retriever
 
     def run_with_question_only(self, question: str):
-        # current_query = self.rectify(question, context)
-        current_query = question
+        current_query = [question]
         loop_count = 0
         collected_useful_fragments = []
         records = []
         while loop_count < self.max_loops:
-            retrieved_docs, scores = self.retriever.search(query=current_query, num=self.top_k, return_score=True)
+            print(f"Current Query: {current_query}")
+            retrieved_docs, scores = self.retriever.batch_search(query=current_query, num=self.top_k, return_score=True)
             retrieved_results = []
 
-            for doc, score in zip(retrieved_docs, scores):
-                if score >= self.ret_thresh:
-                    retrieved_results.append({'doc': doc['contents'], 'score': score})
-            
+            for docs, scores in zip(retrieved_docs, scores):
+                for doc, score in zip(docs, scores):
+                     if score >= self.ret_thresh:
+                        retrieved_results.append({'doc': doc['contents'], 'score': score})
             # print(f"Retrieved Results: {retrieved_results}")
             if len(collected_useful_fragments) == 0:
                 assessment_result = self.assess(question, [doc['doc'] for doc in retrieved_results])
@@ -72,10 +73,16 @@ class Pipeline():
                 if loop_count > self.max_loops:
                     break
                 loop_count += 1
-                current_query = self.refine(current_query, missing_information)
+                current_query = self.refine(missing_information)
                 print(f"refined Query: {current_query}")
                 records.append({"state": "refine", "result": current_query})
         
+        # 循环次数太多，考虑Replan
+        if loop_count >= self.max_loops:
+            print("Loop in Retrieval-Assess-Refine.")
+            for record in records:
+                print(f"state: {record['state']}")
+                print(f"result: {record['result']}")
         # supervised_answer = self.internal_debate_generate(question, collected_useful_fragments)
         final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
         print(f"Mocked Debate Answer: {final_answer}")
@@ -83,75 +90,34 @@ class Pipeline():
         log = {'sub_question': question, "records": records}
         return final_answer, log
     
-    def rectify(self, question: str, context: List[str]):
-        messages = [                
-            {"role": "system", "content": self.rectify_prompt['system_prompt']},
-            {"role": "user", "content": self.rectify_prompt['user_prompt'].format(user_query=question, context=context)}
-        ]
-
-        inputs = self.tokenizer.apply_chat_template(
-            messages,
-            add_generation_prompt=True,
-            tokenize=True,
-            return_dict=True,
-            return_tensors="pt",
-        ).to(self.model.device)
-
-        outputs = self.model.generate(**inputs, max_new_tokens=2048)
-        response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
-        print(f"Rectify response: {response}")
-        return response
-
     def assess(self, query: str, docs: List[str]):
             messages = [                
                 {"role": "system", "content": self.assessment_prompt['system_prompt']},
                 {"role": "user", "content": self.assessment_prompt['user_prompt'].format(user_query=query, documents_list=docs)}
             ]
-            inputs = self.tokenizer.apply_chat_template(
-                messages,
-                add_generation_prompt=True,
-                tokenize=True,
-                return_dict=True,
-                return_tensors="pt",
-            ).to(self.model.device)
-            outputs = self.model.generate(**inputs, max_new_tokens=2048)
-            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)
+            llm_output = response['content']
             # print(f"Assess response: {response}")
-            assessment_result = extract_json_for_assessment(response)
+            assessment_result = extract_json_for_assessment(llm_output)
             return assessment_result
 
-    def refine(self, current_query: str,  missing_information: str):
-            messages = [                
+    def refine(self, missing_information: str):
+        messages = [
                 {"role": "system", "content": self.refine_prompt['system_prompt']},
-                {"role": "user", "content": self.refine_prompt['user_prompt'].format(current_query=current_query, missing_info_from_assess=missing_information)}
+                {"role": "user", "content": self.refine_prompt['user_prompt'].format(last_attempted_query=query, missing_info_from_assess=missing_information)}
             ]
-            inputs = self.tokenizer.apply_chat_template(
-                messages,
-                add_generation_prompt=True,
-                tokenize=True,
-                return_dict=True,
-                return_tensors="pt",
-            ).to(self.model.device)
-
-            outputs = self.model.generate(**inputs, max_new_tokens=2048)
-            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
-            return response
+        response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)
+        entities, refined_query = extract_refine(response)
+        entities.append(refined_query)
+        return entities
+        
 
     def rag_generate(self, question: str, supporting_docs: List[str]):
             messages = [                
                 {"role": "system", "content": self.rag_prompt['system_prompt']},
                 {"role": "user", "content": self.rag_prompt['user_prompt'].format(reference=supporting_docs, question=question)}
             ]
-            inputs = self.tokenizer.apply_chat_template(
-                messages,
-                add_generation_prompt=True,
-                tokenize=True,
-                return_dict=True,
-                return_tensors="pt",
-            ).to(self.model.device)
-
-            outputs = self.model.generate(**inputs, max_new_tokens=2048)
-            response = self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+            response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)
             return response
     
     def internal_debate_generate(self, question: str, supporting_docs: List[str]):

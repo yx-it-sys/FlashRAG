@@ -2,7 +2,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import tomllib
 from flashrag.utils import get_retriever
 from typing import List
-from utils import extract_json_for_assessment, chat_with_qwen
+from utils import extract_json_for_assessment, extract_refine, chat_with_qwen
 
 class Pipeline():
     def __init__(self, config, model, tokenizer, entity_extractor, device, max_loops, ret_thresh, retriever=None):
@@ -18,7 +18,7 @@ class Pipeline():
              self.rectify_prompt = tomllib.load(f)
         with open('prompts/assess.toml', "rb") as f:
             self.assessment_prompt = tomllib.load(f)
-        with open('prompts/refine_misinformation.toml', 'rb') as f:
+        with open('prompts/refine.toml', 'rb') as f:
             self.refine_prompt = tomllib.load(f)
         with open('prompts/rag_generate.toml', 'rb') as f:
              self.rag_prompt = tomllib.load(f)
@@ -34,6 +34,7 @@ class Pipeline():
         collected_useful_fragments = []
         records = []
         while loop_count < self.max_loops:
+            print(f"Current Query: {current_query}")
             retrieved_docs, scores = self.retriever.batch_search(query=current_query, num=self.top_k, return_score=True)
             retrieved_results = []
 
@@ -72,15 +73,16 @@ class Pipeline():
                 if loop_count > self.max_loops:
                     break
                 loop_count += 1
-                current_query = self.refine(current_query, missing_information)
+                current_query = self.refine(missing_information)
                 print(f"refined Query: {current_query}")
                 records.append({"state": "refine", "result": current_query})
         
         # 循环次数太多，考虑Replan
-        print("Loop in Retrieval-Assess-Refine.")
-        for record in records:
-            print(f"state: {record['state']}")
-            print(f"result: {record['result']}")
+        if loop_count >= self.max_loops:
+            print("Loop in Retrieval-Assess-Refine.")
+            for record in records:
+                print(f"state: {record['state']}")
+                print(f"result: {record['result']}")
         # supervised_answer = self.internal_debate_generate(question, collected_useful_fragments)
         final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
         print(f"Mocked Debate Answer: {final_answer}")
@@ -96,17 +98,19 @@ class Pipeline():
             response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)
             llm_output = response['content']
             # print(f"Assess response: {response}")
-            assessment_result = extract_json_for_assessment(response)
+            assessment_result = extract_json_for_assessment(llm_output)
             return assessment_result
 
-    def refine(self, missing_information: str):
-            # GLiNER提取missing_information的实体，得到实体列表
-            labels = ["person", "award", "date", "competitions", "teams"]
-            entity_list = self.entity_extractor.predict_entities(missing_information, labels)
-            # 将current_query与实体列表中的元素一一配对，新的查询列表
-            query_list = [f"Find '{missing_information}' related to {entity}" for entity in entity_list]
-            # 返回新的查询列表
-            return query_list
+    def refine(self, current_query, missing_information: str):
+        messages = [
+                {"role": "system", "content": self.refine_prompt['system_prompt']},
+                {"role": "user", "content": self.refine_prompt['user_prompt'].format(last_attempted_query=current_query, missing_info_from_assess=missing_information)}
+            ]
+        response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)
+        entities, refined_query = extract_refine(response)
+        entities.append(refined_query)
+        return entities
+        
 
     def rag_generate(self, question: str, supporting_docs: List[str]):
             messages = [                

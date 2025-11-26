@@ -1,5 +1,6 @@
 import json
 import re
+import ast
 from json_repair import repair_json
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
@@ -72,6 +73,41 @@ def parse_action(response: str):
     else:
         print(f"Fail to parse planning! Return None.")
         return None, None
+
+def extract_refine(response: str):
+    result = {
+        "entities": [],
+        "reformed_query": ""
+    }
+
+    # 1. 提取 Entities
+    # 使用正则查找 Entities: 后的 [...] 部分
+    # re.DOTALL 允许 . 匹配换行符，防止列表跨行时匹配失败
+    entities_pattern = r"Entities:\s*(\[.*?\])"
+    entities_match = re.search(entities_pattern, llm_output, re.IGNORECASE | re.DOTALL)
+    
+    if entities_match:
+        raw_list_str = entities_match.group(1)
+        try:
+            # ast.literal_eval 可以安全地将字符串形式的 Python 列表转换为实际列表
+            # 它比 json.loads 更宽容，支持单引号和双引号
+            result["entities"] = ast.literal_eval(raw_list_str)
+        except (ValueError, SyntaxError):
+            print("Warning: Failed to parse entities list syntax.")
+            result["entities"] = []
+            # 如果解析失败，可以在这里通过正则硬提取作为备选方案
+
+    # 2. 提取 Reformed Query
+    # 查找 Reformed Query: 后的引号内容
+    # 兼容双引号 "..." 和单引号 '...'
+    query_pattern = r"Reformed Query:\s*([\"'])(.*?)\1"
+    query_match = re.search(query_pattern, llm_output, re.IGNORECASE | re.DOTALL)
+    
+    if query_match:
+        # group(2) 是引号内部的实际内容
+        result["reformed_query"] = query_match.group(2)
+
+    return result["entities"], result["reformed_query"]
     
 def chat_with_qwen(model, tokenizer, messages, type, enable_thinking=True):
         if type == "qwen2":

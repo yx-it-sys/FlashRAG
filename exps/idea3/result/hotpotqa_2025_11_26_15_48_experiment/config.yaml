@@ -50,7 +50,7 @@ method2index:
     bge: null
     bge-m3: null
 data_dir: data/datasets/
-save_dir: result/hotpotqa_2025_11_21_14_17_experiment
+save_dir: result/hotpotqa_2025_11_26_15_48_experiment
 gpu_id: '0'
 dataset_name: hotpotqa
 split:

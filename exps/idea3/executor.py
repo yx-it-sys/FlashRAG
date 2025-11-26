@@ -90,10 +90,14 @@ class DFAExecutor():
                 break
         # 计划过于长，仍未得出结论，进入Replan
         # 先展示出Trajectory，便于后续制定Replan策略
-        print(f"Meta Plan: {logs[0]['meta_plan']}")
-        for log in logs[1:]:
-            print(f"Meta State: {log['meta_state']}")
-            print(f"Logs: {log['logs']}")
+        if loop >= max_loop:
+            print("Replan of Plan")
+            print(f"Meta Plan: {logs[0]['meta_plan']}")
+            for log in logs[1:]:
+                first_key = next(iter(log))
+                print(f"log: {log}")
+                print(f"Meta State: {log[first_key]}")
+                print(f"Logs: {log['logs']}")
 
         self.plan_generator.reset_prompt()  
         return final_answer, logs
