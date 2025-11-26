@@ -79,7 +79,10 @@ class Pipeline():
                 records.append({"state": "refine", "result": current_query})
         
         # 循环次数太多，考虑Replan
-        
+        print("Loop in Retrieval-Assess-Refine.")
+        for record in records:
+            print(f"state: {record['state']}")
+            print(f"result: {record['result']}")
         # supervised_answer = self.internal_debate_generate(question, collected_useful_fragments)
         final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
         print(f"Mocked Debate Answer: {final_answer}")

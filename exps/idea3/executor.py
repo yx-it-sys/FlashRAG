@@ -1,4 +1,3 @@
-from collections import deque
 import os
 import json
 from pipeline import Pipeline
@@ -7,6 +6,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from utils import parse_action
 import torch
 import tomllib
+from gliner import GLiNER
 
 class DFAExecutor():
     def __init__(self, config, prompts_path, model_name="Qwen/Qwen2.5-7B-Instruct"):
@@ -18,7 +18,8 @@ class DFAExecutor():
             model_name,
             device_map="auto",
             torch_dtype=torch.float16).to(self.device)
-        self.pipeline = Pipeline(config, self.model, self.tokenizer, self.device, max_loops=2, ret_thresh=0.7)
+        self.entity_extractor = GLiNER.from_pretrained("urchade/gliner_medium-v2.1")
+        self.pipeline = Pipeline(config, self.model, self.tokenizer, self.entity_extractor, self.device, max_loops=2, ret_thresh=0.7)
         self.plan_generator = MetaPlan(self.model, self.tokenizer, self.device, prompts_path)
 
     def _execute_node(self, node_id: str, dependency_results: dict):
@@ -88,6 +89,12 @@ class DFAExecutor():
                 logs.append({"meta_state": "conclude", "logs": conclusion})
                 break
         # 计划过于长，仍未得出结论，进入Replan
+        # 先展示出Trajectory，便于后续制定Replan策略
+        print(f"Meta Plan: {logs[0]['meta_plan']}")
+        for log in logs[1:]:
+            print(f"Meta State: {log['meta_state']}")
+            print(f"Logs: {log['logs']}")
+
         self.plan_generator.reset_prompt()  
         return final_answer, logs
 
