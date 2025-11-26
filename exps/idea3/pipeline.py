@@ -39,10 +39,10 @@ class Pipeline():
             print(f"scores: {scores}")
             retrieved_results = []
 
-            for doc, score in zip(retrieved_docs, scores):
-                if score >= self.ret_thresh:
-                    retrieved_results.append({'doc': doc['contents'], 'score': score})
-            
+            for docs, scores in zip(retrieved_docs, scores):
+                for doc, score in zip(docs, scores):
+                     if score >= self.ret_thresh:
+                        retrieved_results.append({'doc': doc['contents'], 'score': score})
             # print(f"Retrieved Results: {retrieved_results}")
             if len(collected_useful_fragments) == 0:
                 assessment_result = self.assess(question, [doc['doc'] for doc in retrieved_results])
