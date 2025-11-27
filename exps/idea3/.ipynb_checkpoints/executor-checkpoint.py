@@ -6,7 +6,6 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from utils import parse_action
 import torch
 import tomllib
-from gliner import GLiNER
 
 class DFAExecutor():
     def __init__(self, config, prompts_path, model_name="Qwen/Qwen2.5-7B-Instruct"):
@@ -18,8 +17,7 @@ class DFAExecutor():
             model_name,
             device_map="auto",
             torch_dtype=torch.float16).to(self.device)
-        self.entity_extractor = GLiNER.from_pretrained("urchade/gliner_medium-v2.1")
-        self.pipeline = Pipeline(config, self.model, self.tokenizer, self.entity_extractor, self.device, max_loops=2, ret_thresh=0.7)
+        self.pipeline = Pipeline(config, self.model, self.tokenizer, self.device, max_loops=2, ret_thresh=0.7)
         self.plan_generator = MetaPlan(self.model, self.tokenizer, self.device, prompts_path)
 
     def _execute_node(self, node_id: str, dependency_results: dict):
@@ -91,13 +89,18 @@ class DFAExecutor():
         # 计划过于长，仍未得出结论，进入Replan
         # 先展示出Trajectory，便于后续制定Replan策略
         if loop >= max_loop:
+            print("=="*30)
             print("Replan of Plan")
-            print(f"Meta Plan: {logs[0]['meta_plan']}")
+            print('--'*30)
+            print(f"Meta Plan: {logs[0].get('meta_plan', None)}")
             for log in logs[1:]:
                 first_key = next(iter(log))
                 print(f"log: {log}")
+                print('--'*30)
                 print(f"Meta State: {log[first_key]}")
-                print(f"Logs: {log['logs']}")
+                print('--'*30)
+                print(f"Logs: {log.get('logs', None)}")
+                print('=='*30)
 
         self.plan_generator.reset_prompt()  
         return final_answer, logs

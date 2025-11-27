@@ -1,13 +1,11 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
 import tomllib
 from flashrag.utils import get_retriever
 from typing import List
 from utils import extract_json_for_assessment, extract_refine, chat_with_qwen
 
 class Pipeline():
-    def __init__(self, config, model, tokenizer, entity_extractor, device, max_loops, ret_thresh, retriever=None):
+    def __init__(self, config, model, tokenizer, device, max_loops, ret_thresh, retriever=None):
         self.device = device
-        self.entity_extractor = entity_extractor
         self.model = model
         self.tokenizer = tokenizer
         self.config = config
@@ -29,18 +27,21 @@ class Pipeline():
         self.retriever = retriever
 
     def run_with_question_only(self, question: str):
-        current_query = [question]
+        query_list = [question]
         loop_count = 0
         collected_useful_fragments = []
         records = []
         while loop_count < self.max_loops:
-            print(f"Current Query: {current_query}")
-            retrieved_docs, scores = self.retriever.batch_search(query=current_query, num=self.top_k, return_score=True)
+            #print(f"Current Query: {query_list}")
+            if query_list is None or len(query_list) == 0:
+                print("No more queries to process. Exiting loop.")
+                break
+            retrieved_docs, scores = self.retriever.batch_search(query=query_list, num=self.top_k, return_score=True)
             retrieved_results = []
 
             for docs, scores in zip(retrieved_docs, scores):
                 for doc, score in zip(docs, scores):
-                     if score >= self.ret_thresh:
+                    if score >= self.ret_thresh:
                         retrieved_results.append({'doc': doc['contents'], 'score': score})
             # print(f"Retrieved Results: {retrieved_results}")
             if len(collected_useful_fragments) == 0:
@@ -61,10 +62,10 @@ class Pipeline():
             missing_information = assessment_result.get('missing_information', '')
 
             collected_useful_fragments.extend(useful_fragments)
-            print(f"collected_useful_fragments: {collected_useful_fragments}")
+            #print(f"collected_useful_fragments: {collected_useful_fragments}")
             if assessment == "sufficient":
                 final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
-                print(f"Sufficient case, RAG answer: {final_answer}")
+                #print(f"Sufficient case, RAG answer: {final_answer}")
                 records.append({"state": "rag_generate", "result": final_answer})
                 log = {'sub_question': question, "records": records}
                 return final_answer, log
@@ -73,9 +74,9 @@ class Pipeline():
                 if loop_count > self.max_loops:
                     break
                 loop_count += 1
-                current_query = self.refine(missing_information)
-                print(f"refined Query: {current_query}")
-                records.append({"state": "refine", "result": current_query})
+                query_list = self.refine(query_list[-1], missing_information)
+                #print(f"refined Query: {query_list}")
+                records.append({"state": "refine", "result": query_list})
         
         # 循环次数太多，考虑Replan
         if loop_count >= self.max_loops:
@@ -101,12 +102,12 @@ class Pipeline():
             assessment_result = extract_json_for_assessment(llm_output)
             return assessment_result
 
-    def refine(self, missing_information: str):
+    def refine(self, current_query, missing_information: str):
         messages = [
                 {"role": "system", "content": self.refine_prompt['system_prompt']},
-                {"role": "user", "content": self.refine_prompt['user_prompt'].format(last_attempted_query=query, missing_info_from_assess=missing_information)}
+                {"role": "user", "content": self.refine_prompt['user_prompt'].format(last_attempted_query=current_query, missing_info_from_assess=missing_information)}
             ]
-        response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)
+        response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)['content']
         entities, refined_query = extract_refine(response)
         entities.append(refined_query)
         return entities

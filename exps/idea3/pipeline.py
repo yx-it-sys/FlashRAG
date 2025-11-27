@@ -4,9 +4,8 @@ from typing import List
 from utils import extract_json_for_assessment, extract_refine, chat_with_qwen
 
 class Pipeline():
-    def __init__(self, config, model, tokenizer, entity_extractor, device, max_loops, ret_thresh, retriever=None):
+    def __init__(self, config, model, tokenizer, device, max_loops, ret_thresh, retriever=None):
         self.device = device
-        self.entity_extractor = entity_extractor
         self.model = model
         self.tokenizer = tokenizer
         self.config = config
@@ -33,7 +32,7 @@ class Pipeline():
         collected_useful_fragments = []
         records = []
         while loop_count < self.max_loops:
-            print(f"Current Query: {query_list}")
+            #print(f"Current Query: {query_list}")
             if query_list is None or len(query_list) == 0:
                 print("No more queries to process. Exiting loop.")
                 break
@@ -63,10 +62,10 @@ class Pipeline():
             missing_information = assessment_result.get('missing_information', '')
 
             collected_useful_fragments.extend(useful_fragments)
-            print(f"collected_useful_fragments: {collected_useful_fragments}")
+            #print(f"collected_useful_fragments: {collected_useful_fragments}")
             if assessment == "sufficient":
                 final_answer = self.rag_generate(question, list(dict.fromkeys(collected_useful_fragments)))
-                print(f"Sufficient case, RAG answer: {final_answer}")
+                #print(f"Sufficient case, RAG answer: {final_answer}")
                 records.append({"state": "rag_generate", "result": final_answer})
                 log = {'sub_question': question, "records": records}
                 return final_answer, log
@@ -75,8 +74,8 @@ class Pipeline():
                 if loop_count > self.max_loops:
                     break
                 loop_count += 1
-                query_list = self.refine(missing_information)
-                print(f"refined Query: {query_list}")
+                query_list = self.refine(query_list[-1], missing_information)
+                #print(f"refined Query: {query_list}")
                 records.append({"state": "refine", "result": query_list})
         
         # 循环次数太多，考虑Replan
@@ -108,7 +107,7 @@ class Pipeline():
                 {"role": "system", "content": self.refine_prompt['system_prompt']},
                 {"role": "user", "content": self.refine_prompt['user_prompt'].format(last_attempted_query=current_query, missing_info_from_assess=missing_information)}
             ]
-        response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)
+        response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)['content']
         entities, refined_query = extract_refine(response)
         entities.append(refined_query)
         return entities
