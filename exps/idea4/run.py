@@ -29,7 +29,7 @@ def main():
     }
     config = Config("my_config.yaml", config_dict=config_dict)
     model_name = "Qwen/Qwen2.5-7B-Instruct"
-    prompt_path = "prompts/meta_draft_plan.toml"
+    prompt_path = "prompts/draft_plan.toml"
     
     all_split = get_dataset(config)
     test_data = all_split["dev"]

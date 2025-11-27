@@ -54,7 +54,7 @@ method2index:
 # ----Environment Settings----
 gpu_id: "0"
 dataset_name: "hotpotqa"
-split: ['train', 'validation','test','dev']
+split: ['validation','test','dev']
 
 # Sampling configurations for testing
 test_sample_num: 100
@@ -69,7 +69,7 @@ data_dir: "data/datasets/"
 save_dir: "result/"
 
 # ----Retrieval Settings----
-retrieval_method: "bm25" # name or path of the retrieval model
+retrieval_method: "e5" # name or path of the retrieval model
 index_path: ~ # Set automatically if not provided
 corpus_path: ~
 retrieval_pooling_method: ~
@@ -98,7 +98,7 @@ generator_max_input_len: 32768
 generator_batch_size: 4
 generation_params:
   do_sample: False
-  max_tokens: 4096
+  max_tokens: 200
   temperature: 0.0
   top_p: 0.0
 vllm_gpu_memory_utilization: 0.95
@@ -113,6 +113,5 @@ metric_setting:
 save_metric_score: True #　whether to save the metric score into txt file
 
 # DFA Config
-dfa_vqa_prompt_path: "/root/FlashRAG/exps/idea2/prompts/dfa_vqa_prompts.toml"
-dfa_qa_prompt_path: "/root/FlashRAG/exps/idea2/prompts/dfa_qa_prompts_json.toml"
-omni_qa_prompt_path: "/root/FlashRAG/exps/idea2/prompts/omni_qa_prompt.toml"
+omni_vqa_prompt_path: "/root/FlashRAG/exps/idea1/prompts/dfa_vqa_prompts.toml"
+omni_qa_prompt_path: "/root/FlashRAG/exps/idea3/prompts/omni_with_plan.toml"
