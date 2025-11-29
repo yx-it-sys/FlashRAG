@@ -3,7 +3,7 @@ import json
 import os
 from flashrag.config import Config
 from flashrag.utils import get_dataset
-from flashrag.pipeline import OmniSearchQAPipeline, IterativePipeline, SelfAskPipeline, SelfRAGPipeline, FLAREPipeline
+from flashrag.pipeline import MMSequentialPipeline, OmniSearchPipeline
 from flashrag.prompt import MMPromptTemplate, PromptTemplate
 from flashrag.uncertainty import DisturbImage
 
@@ -14,14 +14,14 @@ def load_prompt(prompt_name: str) -> str:
 
 def main():
     config_dict = {
-        "dataset_path": "data/datasets/hotpotqa",
+        "dataset_path": "data/datasets/okvqa",
         "image_path": "data/datasets/okvqa/images/val2014",
         "index_path": "data/indexes/e5/e5_flat_inner.index",
         "corpus_path": "data/indexes/wiki18_100w.jsonl",
-        "generator_model_path": "data/models/Qwen2.5-7B-Instruct",
+        "generator_model_path": "data/models/Qwen2.5-VL-7B-Instruct",
         "retrieval_method": "e5",
         "metrics": ["em", "f1", "acc"],
-        "retrieval_topk": 2,
+        "retrieval_topk": 5,
         "save_intermediate_data": True,
     }
 
@@ -30,10 +30,7 @@ def main():
     test_data = all_split["dev"]
     
 
-    pipeline = IterativePipeline(config)
-    # pipeline = OmniSearchQAPipeline(config=config)
-    # pipeline = SelfRAGPipeline(config)
-    # pipeline = SelfAskPipeline(config)
+    pipeline = MMSequentialPipeline(config)
     output_dataset = pipeline.run(test_data, do_eval=True)
 
     # uncertainty = DisturbImage(config, prompt_templete, method="cluster", threshold=0.7)
