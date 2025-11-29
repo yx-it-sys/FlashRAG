@@ -12,8 +12,6 @@ class Pipeline():
         self.max_loops = max_loops
         self.top_k = self.config['retrieval_topk']
         self.ret_thresh = ret_thresh
-        with open('prompts/assess.toml', "rb") as f:
-            self.assessment_prompt = tomllib.load(f)
         with open('prompts/refine.toml', 'rb') as f:
             self.refine_prompt = tomllib.load(f)
         with open('prompts/rag_generate.toml', 'rb') as f:
@@ -87,10 +85,10 @@ class Pipeline():
         log = {'sub_question': question, "records": records}
         return final_answer, log
     
-    def assess(self, query: str, docs: List[str]):
+    def assess_generate(self, query: str, docs: List[str]):
             messages = [                
-                {"role": "system", "content": self.assessment_prompt['system_prompt']},
-                {"role": "user", "content": self.assessment_prompt['user_prompt'].format(user_query=query, documents_list=docs)}
+                {"role": "system", "content": self.rag_prompt['system_prompt']},
+                {"role": "user", "content": self.rag_prompt['user_prompt'].format(question=query, reference=docs)}
             ]
             response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)
             llm_output = response['content']
