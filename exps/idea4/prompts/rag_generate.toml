@@ -16,7 +16,7 @@ Answer the question based on the "Retrieved Contents". Only give me the answer a
 Your step-by-step thinking process.
 </think>
 <missing>
-The missing information required to answer the question. If not needed, only generate this tag.
+The missing information required to answer the question. If not needed, only generate the tags.
 </missing>
 <answer>
 Your answer based on the "Retrieved Contents".
