@@ -1,7 +1,8 @@
 import tomllib
 from flashrag.utils import get_retriever
 from typing import List
-from utils import extract_json_for_assessment, extract_refine, chat_with_qwen
+import re
+from utils import extract_refine, chat_with_qwen
 
 class Pipeline():
     def __init__(self, config, model, tokenizer, device, max_loops, ret_thresh, retriever=None):
@@ -19,7 +20,44 @@ class Pipeline():
         if retriever is None:
             retriever = get_retriever(config)
         self.retriever = retriever
+    def run_rag(self, question: str):
+        query_list = [question]
+        retrieved_docs, scores = self.retriever.batch_search(query=query_list, num=self.top_k, return_score=True)
+        retrieved_results = []
+        for docs, scores in zip(retrieved_docs, scores):
+            for doc, score in zip(docs, scores):
+                if score >= self.ret_thresh:
+                    retrieved_results.append(doc['contents'])
+        references = "\n".join(retrieved_results)
+        messages = [                
+            {"role": "system", "content": self.rag_prompt['system_prompt']},
+            {"role": "user", "content": self.rag_prompt['user_prompt'].format(question=question, reference=references)}
+        ]
+        response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)
+        llm_output = response['content']
+        # print(f"Assess response: {response}")
+        # parse outputs in xml format
+        patterns = {
+            "think": r"<think>(.*?)</think>",
+            "missing": r"<missing>(.*?)</missing>",
+            "answer": r"<answer>(.*?)</answer>"
+        }
 
+        parts = {}
+        for key, pattern in patterns.items():
+            match = re.search(pattern, llm_output, re.DOTALL)
+            if match:
+                content = match.group(1).strip()
+                parts[key] = content if content else None
+            else:
+                print(f"ERROR! fail to parse assess&generate.")
+                parts[key] = None
+        is_sufficient = True if parts["missing"] is None else False
+        if not is_sufficient:
+            # Retriever Pro
+            
+    
+    
     def run_with_question_only(self, question: str):
         query_list = [question]
         loop_count = 0
@@ -93,7 +131,26 @@ class Pipeline():
             response = chat_with_qwen(self.model, self.tokenizer, messages, "qwen2", enable_thinking=False)
             llm_output = response['content']
             # print(f"Assess response: {response}")
-            assessment_result = extract_json_for_assessment(llm_output)
+            # parse outputs in xml format
+            patterns = {
+                "think": r"<think>(.*?)</think>",
+                "missing": r"<missing>(.*?)</missing>",
+                "answer": r"<answer>(.*?)</answer>"
+            }
+
+            parts = {}
+            for key, pattern in patterns.items():
+                match = re.search(pattern, llm_output, re.DOTALL)
+                if match:
+                    content = match.group(1).strip()
+                    parts[key] = content if content else None
+                else:
+                    print(f"ERROR! fail to parse assess&generate.")
+                    parts[key] = None
+            is_sufficient = True if parts["missing"] is None else False
+            if not is_sufficient:
+                # Retriever Pro
+
             return assessment_result
 
     def refine(self, current_query, missing_information: str):
