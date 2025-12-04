@@ -28,7 +28,7 @@ def main():
 
     config = Config("my_config.yaml", config_dict=config_dict)
     all_split = get_dataset(config)
-    test_data = all_split["dev"]
+    test_data = all_split["test"]
     
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         "Qwen/Qwen2.5-VL-7B-Instruct", torch_dtype="auto", device_map="auto"
