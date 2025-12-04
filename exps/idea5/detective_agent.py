@@ -76,7 +76,7 @@ class Detective:
             response = self.generate(messages)
             messages.append({"role": "assistant", "content": response})
             print(f"Loop {loop} response:\n {response}")
-            log["raw_response"]: response
+            log["raw_response"] = response
             if "Final Answer" in response:
                 final_answer = response.split("Final Answer:")[-1].strip()
                 log["final_answer"] = final_answer
@@ -87,14 +87,16 @@ class Detective:
             need_txt_ret = "Text Retrieval" in response
             need_evidence_info = "Evidence Retrieval" in response
 
-            contents = []
+            contents = None
             search_text = None
             if need_txt_ret or need_evidence_info:
                 if need_txt_ret:
                     pattern = r"<search>(.*?)</search>"
                     matches = re.findall(pattern, response, re.DOTALL)[0]    
                     query_text = matches.split("Text Retrieval:")[-1].strip()
-                    search_text = [text['contents'] for text in self.retriever.search(query_text)]
+                    search_result = self.retriever.search(query_text)
+                    print(f"search_result:{search_result}")
+                    search_text = [text['contents'] for text in search_result]
                     search_text = "\n".join(search_text)
                     print(f"Contents of retrieved documents:\n{search_text}")
                     log["need_txt_ret"] = search_text
@@ -118,13 +120,19 @@ class Detective:
                     log["need_evidence_ret"] = evidence
 
                 if search_text:
+                    contents = []
                     contents.append("Contents of retrieved documents:")
                     contents.extend(search_text)
+                    contents = "\n".join(contents)
                 elif search_evidence_list:
+                    contents = []
                     contents.append("Contents of evidence from image:")
                     contents.extend(search_evidence_list)
+                    contents = "\n".join(contents)
                 else:
+                    contents = []
                     contents.append("No relevant information found.")
+                    contents = "\n".join(contents)
             print(f"Contents:{contents}")
             messages.append(
                 {
