@@ -1,19 +1,18 @@
 import tomllib
-from retriever import retrieve
 
 class ObjectProcessor:
-    def __init__(self, model, processor):
+    def __init__(self, model, processor, retriever):
         self.model = model
         self.processor = processor
         with open('prompts/object_process.toml', 'rb') as f:
             self.prompt = tomllib.load(f)
-        
+        self.retriever = retriever
 
     def object_expansion(self, objects):
         object_retrieval_expansion = {}
         object_feature_expansion = {}
         for object in objects:
-            retrieved_content = retrieve(object['object'], top_k=3)
+            retrieved_content = self.retriever.search(object['object'], top_k=3)
             object_retrieval_expansion[object['object']] = retrieved_content
             object_feature_expansion[object['object']] = object['features']
 
