@@ -1,6 +1,7 @@
 from object_detector import ObjectDetector
 import tomllib
 from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
+from flashrag.evaluator import Evaluator
 from qwen_vl_utils import process_vision_info
 from object_processor import ObjectProcessor
 import os
@@ -19,7 +20,20 @@ class Detective:
         self.retriever = retriever
         self.object_detector = ObjectDetector(self.model, self.processor)
         self.object_processor = ObjectProcessor(self.model, self.processor, self.retriever)
-
+        self.evaluator = Evaluator(config)
+        
+    def evaluate(self, dataset, do_eval=True, pred_process_func=None):
+            """The evaluation process after finishing overall generation"""
+    
+            if pred_process_func is not None:
+                dataset = pred_process_func(dataset)
+    
+            if do_eval:
+                # evaluate & save result
+                eval_result = self.evaluator.evaluate(dataset)
+                print(eval_result)
+            return
+        
     def generate(self, messages):
         text = self.processor.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True
@@ -74,11 +88,14 @@ class Detective:
         while loop <= self.max_loop:
             log = {}
             response = self.generate(messages)
+            print(f"Response: {response}")
             messages.append({"role": "assistant", "content": response})
-            print(f"Loop {loop} response:\n {response}")
+            print(f"Loop {loop}")
+            print(f"Question: {question}")
             log["raw_response"] = response
             if "Final Answer" in response:
                 final_answer = response.split("Final Answer:")[-1].strip()
+                print(f"Final Answer: {final_answer}")
                 log["final_answer"] = final_answer
                 logs.append(log)
                 all_logs['logs'] = logs
@@ -120,25 +137,21 @@ class Detective:
                     log["need_evidence_ret"] = evidence
 
                 if search_text:
-                    contents = []
-                    contents.append("Contents of retrieved documents:")
-                    contents.extend(search_text)
-                    contents = "\n".join(contents)
+                    contents = f"Contents of retrieved documents:\n{search_text}"
+                    print(f"contents: {contents}")
                 elif search_evidence_list:
                     contents = []
                     contents.append("Contents of evidence from image:")
                     contents.extend(search_evidence_list)
                     contents = "\n".join(contents)
                 else:
-                    contents = []
-                    contents.append("No relevant information found.")
-                    contents = "\n".join(contents)
+                    contents = "No relevant information found."
             print(f"Contents:{contents}")
             messages.append(
                 {
-                    "role": "assistant",
+                    "role": "user",
                     "content": [
-                        {"type": "text", "text": "\n".join(contents)}
+                        {"type": "text", "text": contents}
                     ]
                 }
             )

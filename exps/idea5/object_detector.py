@@ -53,7 +53,6 @@ class ObjectDetector:
             generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
         )
         response = output_text[0]
-        print(f"response:{response}")
         final_list = []
         try:
             pattern = r'```(?:json)?\s*([\s\S]*?)\s*```'

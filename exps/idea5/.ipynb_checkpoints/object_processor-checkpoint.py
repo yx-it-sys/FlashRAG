@@ -14,11 +14,13 @@ class ObjectProcessor:
         query_list = []
         for object in objects:
             query_list.append(object['object'])
-        retrieved_contents = [text['contents'] for text in self.retriever.batch_search(query_list)]
+        print(f"Query List: {query_list}")
+        results = self.retriever.batch_search(query_list)[0]
+        retrieved_contents = [text['contents'] for text in results]
         retrieved_contents = "\n".join(retrieved_contents)
         
-        for object, retrieved_content in zip(objects, retrieved_contents):
-            object_retrieval_expansion[object['object']] = retrieved_content
+        for object in objects:
+            object_retrieval_expansion[object['object']] = retrieved_contents
             object_feature_expansion[object['object']] = object['features']
 
         return object_feature_expansion, object_retrieval_expansion
