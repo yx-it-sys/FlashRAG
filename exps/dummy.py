@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 num_samples = 100
 seed = 42
-full_dataset = load_dataset("lmms-lab/OK-VQA", split='val2024')
+full_dataset = load_dataset("lmms-lab/OK-VQA", split='val2014')
 full_dataset = full_dataset.shuffle(seed=seed)
 
 dummy_subset = full_dataset.select(range(num_samples))
@@ -28,9 +28,9 @@ for item in full_dataset:
     image.save(img_filepath, 'JPEG')
 
     clean_item = {
-        "id": item["id"],
+        "id": item["question_id"],
         "question": item["question"],
-        "golden_answers": item["golden_answers"]
+        "golden_answers": item["answers"]
     }
     processed_data.append(clean_item)
 

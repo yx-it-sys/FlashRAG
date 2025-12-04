@@ -1,0 +1,47 @@
+[objects]
+user_prompt = """
+Find all the objects in the picture and describe their key features.
+"""
+
+user_prompt1 = """
+Given the image and the question, please highlight ambiguities or visual elements that hinder your ability to provide an accurate answer most.
+
+# INSTRUCTIONS
+1. Based on the user's question, locate the key objects in the picture.
+2. Think about how to make full use of every detail in the picture to answer the user's questions.
+3. During the thinking process, what information in the picture caused confusion for you in answering the question? Generate your confusion.
+4. Assign a confusion score for each confusion point (an integer ranging from 1 to 10, where 1-3 means not very confused, 4-6 means confused, and 7-10 means very confused), and sort them in descending order.
+4. Your confusion should be related to the user's question.
+5. Each confusion item in the list must start with "I'm confused that":
+
+# FORMAT
+Your response must be in a JSON List format as follows:
+[
+    {{
+        "confusion": "I'm confused that...",
+        "confusion_score": Your assigned confusion score.
+    }},
+]
+
+The User Question: {question}
+
+Your Response:
+"""
+
+[plan]
+user_prompt = """
+Please formulate a PLAN to answer the user's question based on the detailed information about the objects provided, making full use of the object information as much as possible.
+
+# INSTRUCTIONS
+1. If the question is complicated, decompose it into atomic sub-questions.
+2. Every step in the plan must be a operation like search, reasoning, and conclude.
+3. Find background information in detailed information about the objects provided and conduct reasoning based on it.
+
+the user's question:
+{question}
+
+detailed information about the objects provided:
+{objects}
+
+Your Plan:
+"""

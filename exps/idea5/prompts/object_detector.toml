@@ -1,0 +1,12 @@
+user_prompt = """
+Find ALL the objects in the picture and describe their features in detail.
+
+You must response in a JSON list format like below:
+[
+    {{
+        "object": "name of object",
+        "features": "their features in detail"
+    }}
+]
+"""
+
