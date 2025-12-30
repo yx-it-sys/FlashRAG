@@ -1,0 +1,11 @@
+python -m flashrag.retriever.index_builder \
+  --retrieval_method clip \
+  --model_path /root/FlashRAG/exps/idea6/data/models/clip-vit-base-patch32 \
+  --corpus_path data/datasets/evqa/corpus/corpus.jsonl \
+  --save_dir data/datasets/evqa/corpus/indexes/ \
+  --use_fp16 \
+  --max_length 512 \
+  --batch_size 256 \
+  --pooling_method mean \
+  --faiss_type Flat \
+  --index_modal image

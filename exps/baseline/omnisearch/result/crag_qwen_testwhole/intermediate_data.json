@@ -1,0 +1,3002 @@
+[
+    {
+        "id": "687cecd1-d839-4eb1-bf38-638cf5daa579",
+        "question": "what material is this sculpture made from?",
+        "golden_answers": [
+            "this version of auguste rodin's eve sculpture is cast in bronze and made in 1883."
+        ],
+        "output": {
+            "pred": "The sculpture is made of bronze.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "8309a492-853c-4873-ae71-08c778825e11",
+        "question": "do electrons weigh more than protons?",
+        "golden_answers": [
+            "no, electrons are 1,836 times lighter than protons."
+        ],
+        "output": {
+            "pred": "No, electrons do not weigh more than protons; in fact, electrons have much less mass than protons.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.31999999999999995,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "3c0bacd2-cb3a-40d2-8504-76480582e2bd",
+        "question": "What is the maximum height of this orchid species?",
+        "golden_answers": [
+            "Corybas cheesemanii reaches a mature height of up to 9 inches when fruiting, but 0.4 to 0.6 inches when flowering."
+        ],
+        "output": {
+            "pred": "Thought: The retrieved documents do not provide specific information about the maximum height of the orchid species shown in the image. The closest match seems to be the Dendrobium species, but there is no mention of the maximum height of this particular species. Therefore, we need to search for more specific information about the Dendrobium species shown in the image.\n\n<Search>\nText Retrieval: \"maximum height of the orchid species shown in the image\"\n<End>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.12195121951219512,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "7759e81e-db7a-4774-8040-1150a9475786",
+        "question": "how many veggie slicers come with this single serve appliance?",
+        "golden_answers": [
+            "none, nutribullet blender is used to mix and crush vegetables into a smooth and uniform paste like texture. they are not for slicing vegetables."
+        ],
+        "output": {
+            "pred": "Thought: The retrieved documents consistently mention that the Veggie Bullet is a 3-in-1 spiralizer, shredder, and slicer. However, the exact number of veggie slicers included is not specified. We need to look for more detailed specifications or user reviews to determine the exact number of veggie slicers.\n<Search>\nText Retrieval: \"Veggie Bullet number of veggie slicers\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.13333333333333333,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "03292bfb-c8b7-46c0-9e32-8dadf12a5509",
+        "question": "how many grams of sugar are in a serving of this?",
+        "golden_answers": [
+            "there are two grams of sugar in a serving of fresh gourmet honey roasted walnut pieces."
+        ],
+        "output": {
+            "pred": "The exact sugar content per serving of Fresh Gourmet Honey Roasted Walnut Pieces cannot be determined from the image alone. You would need to refer to the nutrition facts panel on the packaging for this information.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3829787234042553,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "a6d2363d-c098-4b35-8a23-4c15c3bba8c0",
+        "question": "is there any dangers in maintaining these?",
+        "golden_answers": [
+            "yes, distribution transformers have electricity running through them which can be dangerous when not handled with care."
+        ],
+        "output": {
+            "pred": "Maintaining sidewalks and concrete surfaces during winter involves potential dangers such as chemical damage to concrete, harm to pets, and environmental impact. Using safer alternatives like urea-based products and pre-treating surfaces can help mitigate these risks.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.03773584905660377,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "0f546023-6988-4737-8fa5-8519e92969af",
+        "question": "which state is it located in?",
+        "golden_answers": [
+            "the great ocean road is located in the state of victoria, abbreviated as vic."
+        ],
+        "output": {
+            "pred": "The state it is located in is Victoria, Australia.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "fee9400b-708f-454d-a6ab-f311d40824da",
+        "question": "how large is the estate's grounds?",
+        "golden_answers": [
+            "adlington hall's grounds cover an area of 160 acres."
+        ],
+        "output": {
+            "pred": "The Biltmore Estate, located in North Carolina, USA, includes a mansion and extensive grounds covering approximately 178,926 square feet of floor space and 135,280 square feet of living area. The estate also features a variety of buildings, stunning walled gardens, and a range of listed pavilions, a hotel and public house, a village store, and hosts a wide range of commercial and community events.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.09375,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "25923538-8c50-4af4-a28f-3f0a76c8ae9d",
+        "question": "what is the former name of the manufacturer of this car?",
+        "golden_answers": [
+            "the former name of bmw, who manufactures the mini clubman, is rapp motorenwerke."
+        ],
+        "output": {
+            "pred": "The former name of the manufacturer of the Mini Cooper was the British Motor Corporation (BMC).",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.34782608695652173,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "804ff703-e647-4c50-93ed-14de080fabc8",
+        "question": "What type of soil does this plant typically thrive in?",
+        "golden_answers": [
+            "Juniperus deppeana growns best in sandy, well drained soil."
+        ],
+        "output": {
+            "pred": "<Thought>\nBased on the retrieved documents, coniferous plants such as Picea glauca (White spruce), Abies concolor (California white fir), Pinus strobus (Eastern white pine), Pinus sylvestris (Scotch pine), and Pinus virginiana (Virginia pine) thrive in well-drained soils. These plants are adapted to a wide range of edaphic and climatic conditions, and they require well-drained soils to avoid root rot and other soilborne diseases. Therefore, the plant in the image, which has needle-like leaves, likely thrives in well-drained soil.\n</Thought>\n<Sub-Question>\nWhat type of soil does a coniferous plant typically thrive in?\n</Sub-Question>\n<Search>\nText Retrieval: \"soil type for coniferous plants\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.03809523809523809,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "71810499-303f-4399-a5a2-dda0ddeee927",
+        "question": "how many elevators does it have?",
+        "golden_answers": [
+            "the jeddah tower has 59 elevators, consisting of 55 single deck and 4 double deck, made by kone."
+        ],
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents provide information on the number of elevators in buildings, but none of them specifically mention the number of elevators in the building shown in the image. The Burj Khalifa is mentioned, but it is not the same building in the image. Therefore, we cannot determine the exact number of elevators in the building from the given information.\n</Thought>\n<Sub-Question>\nWhat is the number of elevators in the building shown in the image?\n</Sub-Question>\n<Search>\nNo Retrieval.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.047619047619047616,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "ca515dd6-ae98-4268-9db7-0f7d1bf6622f",
+        "question": "In 2011, what did the New York Times describe this pastry as?",
+        "golden_answers": [
+            "In 2011, the New York Times described kouign-amann as the fattiest pastry in all of Europe."
+        ],
+        "output": {
+            "pred": "In 2011, the New York Times described the kouign-amann as having a \"moment among foodies.\"",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6153846153846153,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "3820bcbd-033e-4545-a8ea-a08842d4792c",
+        "question": "which notes above the root may be altered in a ninth chord?",
+        "golden_answers": [
+            "within a ninth chord, the 3rd, 5th, 7th, and 9th notes may be altered above the root."
+        ],
+        "output": {
+            "pred": "The notes above the root in a ninth chord that may be altered are the 3rd, 5th, 7th, and 9th.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.8666666666666666,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "253dc956-dbe7-43d6-ae3f-85f29a299d68",
+        "question": "how much sodium does this have compared to classico?",
+        "golden_answers": [
+            "ragu has 460 mg of sodium per 1/2 cup while classico has 420 mg of sodium per 1/2 cup."
+        ],
+        "output": {
+            "pred": "Ragu Hidden Heroes has 100 mg less sodium than Classico, and Ragu Simply Traditional Sauce has 200 mg less sodium than Classico.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3902439024390244,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "28a92dda-cf36-47ad-8a51-bf4028b8e8cf",
+        "question": "how many official languages ​​does the country this comes from have?",
+        "golden_answers": [
+            "switzerland, where swatch is from, has four official languages: german, french, italian, and romansh."
+        ],
+        "output": {
+            "pred": "The country this comes from has 4 official languages.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.36363636363636365,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "061f5358-6de5-44d0-846e-b54385a1391e",
+        "question": "what names have been used to refer to this region in ancient times?",
+        "golden_answers": [
+            "in ancient times, thrace was referred to as aria and perki, later as thrake by ancient greeks, and rumeli in turkish tradition."
+        ],
+        "output": {
+            "pred": "The names used to refer to this region in ancient times include Thrace.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.29411764705882354,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "892aed51-6407-44ca-91d5-9446d1e90005",
+        "question": "How to differentiate a Mangoose from this animal?",
+        "golden_answers": [
+            "The mongoose has a bushier tail than the meerkat and a broader face. They occur in a range of colours, while meerkats are always fawn with lighter silver or grey highlights."
+        ],
+        "output": {
+            "pred": "Based on the retrieved documents, here are the key physical characteristics of a meerkat:\n\n- **Size**: Meerkats are generally smaller, measuring around 25-35 cm in length, excluding the tail, which is around 10 inches long.\n- **Physical Appearance**: They have a slender, elongated body with a light gray to brown coat. Their face tapers to a point at the nose, which is brown. Their snouts are long, measuring 5-8 centimeters, and are whiskered.\n- **Tail**: The meerkat's tail is long, thin, and tapers to a black-tipped color.\n- **Behavior**: Meerkats are known for their upright posture and social behavior. They use their tails for balance when standing upright and have a unique system of rotating tasks within their group, with some serving as lookouts for predators while others forage for food.\n\nNow, let's compare these characteristics with those of a mongoose.\n\n<Thought>\nThe meerkat and mongoose share some similarities in terms of being small mammals and having slender bodies, but there are distinct differences in their physical appearances and behaviors. The meerkat has a longer, thinner tail that tapers to a black tip, while the mongoose has a bushier tail. The meerkat's face tapers to a point at the nose, which is brown, while the mongoose has a pointed face and a bushy tail. Additionally, the meerkat is known for its upright posture and social behavior, while the mongoose is known for its agility, speed, and ability to stand their ground and fight when necessary.\n</Thought>\n<Sub-Question>\nHow do the meerkat and mongoose differ in their physical appearances and behaviors?\n</Sub-Question>\n<Search>\nNo Retrieval\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.1076923076923077,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "7bbf802b-6372-4bac-88d0-96be804a4ccb",
+        "question": "which country claims this hearty soup as its own?",
+        "golden_answers": [
+            "goulash is the national dish of hungary"
+        ],
+        "output": {
+            "pred": "Hungary.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2857142857142857,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "c94f7820-e54f-4ccd-a357-362138553ec2",
+        "question": "how big is the home town of this store?",
+        "golden_answers": [
+            "oklahoma city, the home town of hobby lobby, has a population of 681,054."
+        ],
+        "output": {
+            "pred": "The population of Oklahoma City is approximately 650,000 inhabitants. Therefore, the hometown of the Hobby Lobby store in the image is Oklahoma City, which has a population of about 650,000.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4444444444444444,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "2c612718-fbb6-47da-86e7-29599ca46e5d",
+        "question": "what are the extrasegmental mechanisms this uses?",
+        "golden_answers": [
+            "the extrasegmental mechanisms used in a tens unit are activation of the midbrain periaqueductal grey and rostral ventromedial medulla and inhibition of descending pain facilitatory pathways."
+        ],
+        "output": {
+            "pred": "The extrasegmental mechanisms of an anesthesia machine typically include:\n\n1. Ventilation control: Managing the patient's breathing by controlling the rate, depth, and composition of the inhaled gases.\n2. Oxygen concentration adjustment: Regulating the percentage of oxygen in the inhaled gas mixture to ensure adequate oxygenation of the blood.\n3. Monitoring systems: Continuous monitoring of vital signs such as heart rate, blood pressure, and respiratory rate to ensure patient safety.\n4. Anesthesia delivery: Delivering the appropriate amount of anesthetic agent to achieve the desired level of anesthesia.\n5. Circuit management: Ensuring the integrity of the breathing circuit to prevent leaks and maintain optimal gas exchange.\n\nThese mechanisms are designed to support the patient's physiological functions during surgery and ensure a safe and controlled environment.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.12121212121212123,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "2f4a5a7b-fe89-4784-824a-813753be3677",
+        "question": "what collection is this a part of?",
+        "golden_answers": [
+            "horse and groom is part of the collection a selection of chinese ceramics from the adele and stanley herzman collection, displayed at the new york metropolitan museum of art."
+        ],
+        "output": {
+            "pred": "The image appears to be part of the Tang Dynasty Art Collection at a museum.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.32432432432432434,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "d92b99d8-59e2-485d-bb51-802aaf805bf3",
+        "question": "which is older, this mosque or the islamic cultural center of new york?",
+        "golden_answers": [
+            "this mosque is older."
+        ],
+        "output": {
+            "pred": "The Islamic Cultural Center of New York is older than Masjid Manhattan.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.26666666666666666,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "0f9e3c3d-6603-4e2c-a3bc-3679615a53a4",
+        "question": "What is the typical duration to complete this type of pilgrimage on foot?",
+        "golden_answers": [
+            "The Shikoku Pilgrimage, traditionally completed on foot, typically takes around 45 days or six weeks to complete the 750-mile route encompassing 88 temples."
+        ],
+        "output": {
+            "pred": "The typical duration to complete the Shikoku Pilgrimage on foot is approximately 45 days, but it can vary from as little as 5 weeks to as long as several months depending on individual pace and rest days.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3214285714285714,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "0ddfd0a7-cc3f-4dbe-8d91-1c99a9cea762",
+        "question": "when was the organization that makes rules about these founded?",
+        "golden_answers": [
+            "the federal highway administration was founded on april 1, 1967."
+        ],
+        "output": {
+            "pred": "The organization that makes rules about hospitals, the Food and Drug Administration (FDA), was founded in 1906 with the passage of the Federal Food and Drug Act.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.25,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "bf93a424-7ba8-4a99-839c-02d03533067c",
+        "question": "what ph soil should this plant be kept in?",
+        "golden_answers": [
+            "calathea lancifolia should be kept in soil with a ph between 6.1 and 7.3."
+        ],
+        "output": {
+            "pred": "Please provide the type of plant shown in the image so that I can determine the ideal soil pH range for it.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.18749999999999997,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "c712732d-16e2-4f39-8a68-5cc82671ba6c",
+        "question": "how does this organ digest food?",
+        "golden_answers": [
+            "the stomach digests food by producing enzymes and acids that break down food."
+        ],
+        "output": {
+            "pred": "The stomach is a muscular sac that temporarily stores food and breaks it down into a consistency that is easier to digest for the rest of the intestines. It produces gastric juices containing hydrochloric acid and enzymes such as pepsin to break down proteins. The stomach also secretes mucus to protect the gastric lining from damage by acid and intrinsic factor necessary for vitamin B12 absorption. The stomach's muscular walls contract and relax during peristalsis, which physically breaks down food and propels it into the small intestine. The stomach also regulates the passage of partially digested food (chyme) into the duodenum, the first part of the small intestine, where further digestion continues.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.16363636363636366,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "ee08abe3-08f4-44f0-957a-58827e92f9ed",
+        "question": "how are these different from heat diffusers?",
+        "golden_answers": [
+            "heat diffusers use small candles under a bowl to vaporize a mixture of water and oil, while reed diffusers use long sticks, or reeds, to diffuse essential oils."
+        ],
+        "output": {
+            "pred": "Based on the retrieved documents, heat diffusers are typically devices that use heat to disperse essential oils into the environment. They work by placing a heat source under a heat-proof container filled with essential oils and carrier oil, which accelerates the evaporation process and releases the resulting aroma into the surrounding environment. Reed diffusers, on the other hand, use a wick system to disperse essential oils into the air. The reeds in a reed diffuser absorb the essential oils and release them into the air over time, providing a steady stream of aroma. \n\nIn summary, heat diffusers use heat to vaporize essential oils, while reed diffusers use a wick system to disperse the oils into the air. The primary difference lies in the mechanism of how the essential oils are dispersed into the environment.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.24637681159420288,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "a1558b7f-af22-457c-bb2a-263c4f798740",
+        "question": "Between this plant and the common sunflower, which one grows taller?",
+        "golden_answers": [
+            "Podocarpus macrophyllus grows taller than the common sunflower, up to about 20 meters compared with about 3."
+        ],
+        "output": {
+            "pred": "The common sunflower grows taller than the yew shown in the image.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.39999999999999997,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "5ec406c4-fe58-4a21-b7d6-cbb972ce19fc",
+        "question": "has this brand been around longer than kirkland signature?",
+        "golden_answers": [
+            "kirkland signature, launched in 1995, is 17 years older than simple truth, launched in 2012."
+        ],
+        "output": {
+            "pred": "No, the Simple Truth brand has not been around longer than Kirkland Signature. Kirkland Signature was launched in 1995, while Simple Truth was introduced in 2012.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "3251db13-4943-4412-bb9f-abbc40e682c6",
+        "question": "what phylum does this animal's most common prey belong to?",
+        "golden_answers": [
+            "sponges, which are the primary prey of cowries, belong to the phylum porifera."
+        ],
+        "output": {
+            "pred": "The phylum of the animal's most common prey is Mollusca.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3157894736842105,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "56677e8f-e296-4f74-9474-082fd6d60a9f",
+        "question": "where is this plant native to?",
+        "golden_answers": [
+            "ravenea rivularis is native to madagascar."
+        ],
+        "output": {
+            "pred": "The plants in the image appear to be various types of palm trees. Palm trees are native to tropical and subtropical regions around the world, including parts of Africa, Asia, the Americas, and Australia.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.1111111111111111,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dd471ef1-3597-4b6e-b626-2c572e3bd191",
+        "question": "is this dish usually served hot or cold?",
+        "golden_answers": [
+            "this dish is usually served hot."
+        ],
+        "output": {
+            "pred": "The dish, lasagna, is usually served hot.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.8333333333333334,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "036b536f-5655-40ad-ba22-2036eb5dc5fe",
+        "question": "Was this an affordable car if it was purchased new in 2019?",
+        "golden_answers": [
+            "No, with an MSRP of $241,825 in 2019, the Aston Martin Rapide was a luxury vehicle with a high price."
+        ],
+        "output": {
+            "pred": "No, the Aston Martin Rapide S was not an affordable car if it was purchased new in 2019.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4375,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "6b7303e3-88e4-4583-8590-dc0c822b75e6",
+        "question": "when was this species first described?",
+        "golden_answers": [
+            "parsonsia alboflavescens was first described in 1818."
+        ],
+        "output": {
+            "pred": "The botanical illustration in the image appears to depict a plant that matches the style and detail of historical botanical illustrations from the 16th century. Given the historical context and the style of the illustration, it is plausible that the species depicted was first described around the time of Pier Andrea Mattioli, who was active in the 16th century.\n\nHowever, without a clear identification of the species, it is not possible to provide a definitive answer regarding the exact date of its first description. To obtain a precise answer, we would need to identify the specific plant species depicted in the illustration.\n\n<Search>\nText Retrieval: \"identification of the plant species in the image\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.07920792079207921,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "7f8d4b54-58cc-4775-95a3-6b4888f09e09",
+        "question": "where is this car model's parent company from?",
+        "golden_answers": [
+            "hyundai, which makes the hyundai sonata, is from south korea."
+        ],
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents consistently mention that Hyundai Motor Company is owned by the Hyundai Motor Group, a South Korean multinational conglomerate. The Hyundai Motor Group is headquartered in Seoul, South Korea, and is one of the world's largest automotive manufacturers. The Hyundai Motor Group owns other brands such as Genesis and Ioniq, and has a significant stake in Kia. Therefore, the parent company of Hyundai is the Hyundai Motor Group.\n</Thought>\n<Sub-Question>\nWhat is the parent company of Hyundai?\n</Sub-Question>\n<Search>\nNo Retrieval\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.11904761904761904,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "f5225a9f-0531-4c61-8140-fb9ee22931e1",
+        "question": "What's the name of the botanist that described this rare species endemic to small area in New South Wales, Australia?",
+        "golden_answers": [
+            "Norman Byrnes, an Australian botanist, specializing in taxonomy first described the Melaleuca tortifolia in 1984. The species is endemic to New South Wales, Australia, and belongs to the Myrtle or Myrtaceae family."
+        ],
+        "output": {
+            "pred": "The botanist who described the rare species endemic to New South Wales, Australia, is Gustav Heynhold.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4761904761904762,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "cbdb1f26-4e40-4519-b116-3d50620e5f7f",
+        "question": "In which locations is this plant typically found?",
+        "golden_answers": [
+            "The Babiana sambucina is found over a wide range, extending from the Cold Bokkeveld Mountains in the Western Cape to Port Elizabeth in the Eastern Cape, including the Karoo. It grows on rocky slopes and flats, in dry fynbos and renosterveld, most often on sandstone slopes, in soils which are nutrient-poor, at altitudes of 650–1 150 m."
+        ],
+        "output": {
+            "pred": "The plant in the image is likely a conifer, such as a pine tree, spruce, or fir, which are typically found in arid and northern regions. These plants are adapted to withstand harsh conditions and are often found in mountainous areas, forests, and regions with cold winters. Their long, thin leaves help them minimize overheating and drying.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.23076923076923075,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "93c0a32c-3d72-4d3c-b9b0-70b229052479",
+        "question": "how was this tree traditionally used by indigenous tribes?",
+        "golden_answers": [
+            "western redcedar trees were traditionally used by indigenous tribes to make a wide variety of everyday things such as canoes, housing, tools, and totem poles."
+        ],
+        "output": {
+            "pred": "The western red cedar (Thuja plicata) was traditionally used by indigenous tribes for medicinal purposes, material crafting, and cultural and ritual activities.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3111111111111111,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "03c390e5-0b03-410f-8f74-c334360856b5",
+        "question": "What is the primary source of food for the largest carnivorous marsupial in Australia?",
+        "golden_answers": [
+            "The primary source of food for the Sarcophilus harrisii is carrion."
+        ],
+        "output": {
+            "pred": "The primary source of food for the largest carnivorous marsupial in Australia, the Tasmanian devil, is scavenged meat, particularly from large mammals and opportunistically from vertebrates.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.37500000000000006,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "38de57ea-75ae-4cb5-b6da-d32ae4f98bce",
+        "question": "Which car has more engine power, the Volkswagen Golf or this one?",
+        "golden_answers": [
+            "The Volkswagen Golf has more engine power than the Opel Astra."
+        ],
+        "output": {
+            "pred": "The Volkswagen Golf has more engine power than the Opel Astra.",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "5bf11a8e-a839-4ec0-a840-146f8e664f82",
+        "question": "What is the typical lifespan of this eucalyptus tree compared to the platypus type?",
+        "golden_answers": [
+            "Both types of eucalyptus can live hundreds of years. Eucalyptus lifespans vary based on environmental conditions."
+        ],
+        "output": {
+            "pred": "Based on the retrieved documents, the typical lifespan of eucalyptus trees varies. Some sources suggest that eucalyptus trees can live for up to 200 years or more in their native habitats, while others indicate that they typically live for 20-30 years in optimal conditions. The lifespan can also be influenced by factors such as care, environmental conditions, and the specific species of eucalyptus tree.\n\nFor comparison, the typical lifespan of a platypus is around 10-14 years in the wild. Therefore, the eucalyptus tree has a significantly longer lifespan compared to the platypus.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.22448979591836735,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "37221baa-3693-4dbb-9acb-1afc2df54153",
+        "question": "The engineer who developed this car also developed what famous car?",
+        "golden_answers": [
+            "Ferdinand Porsche is also known for engineering the first gasoline-electric hybrid car, auto union racing cars, and the Mercedes-Benz SS/SSK."
+        ],
+        "output": {
+            "pred": "The famous car developed by the same engineer is the Volkswagen Beetle.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.14814814814814814,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "5b52fb31-fb9c-4b71-8706-bbb2c44fef9a",
+        "question": "Does this type of bread have more sodium compared to white toast?",
+        "golden_answers": [
+            "One plain bagel has 443mg of sodium while one plain white toast has 145mg of sodium."
+        ],
+        "output": {
+            "pred": "Based on the retrieved information, bagels generally contain more sodium compared to white toast. A typical bagel can have about 400 to 500 milligrams of sodium, which is close to 17-22% of the recommended daily sodium intake of 2,300 milligrams per day. White toast, on the other hand, usually has a lower sodium content. Therefore, the bagel shown in the image likely has more sodium than a slice of white toast.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.22784810126582278,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "e63cdfe6-a526-4c06-9015-7d2d90b1fad7",
+        "question": "are these spicy?",
+        "golden_answers": [
+            "no, bell peppers are not considered spicy, and rank at the lowest level on the scoville heat scale."
+        ],
+        "output": {
+            "pred": "No, these bell peppers are not spicy. They belong to the same botanical family as spicy peppers but have a recessive gene that prevents the production of capsaicin, the compound responsible for the heat in peppers.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2978723404255319,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dca0da03-4bb0-4cb7-a32e-6322a8608f6f",
+        "question": "what chinese dynasty used these as money?",
+        "golden_answers": [
+            "cowrie shells were used as currency in china as early as the shang dynasty."
+        ],
+        "output": {
+            "pred": "The Shang Dynasty used cowrie shells as money.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "99de1d84-58ad-412f-bbd9-eb83591bccb3",
+        "question": "what kind of meat is in this?",
+        "golden_answers": [
+            "albacore, also known as longfin tuna, is a species of tuna."
+        ],
+        "output": {
+            "pred": "The meat in the container is albacore tuna.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.37499999999999994,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "e32e089f-5ad1-4494-bb65-b0fa5c26d6b9",
+        "question": "what did this place open?",
+        "golden_answers": [
+            "hoover dam opened in 1936."
+        ],
+        "output": {
+            "pred": "The Hoover Dam was completed on March 1, 1936.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4615384615384615,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "c9d602e7-490b-4a51-8fd7-8ecec449cbb0",
+        "question": "what is this used for in sewing?",
+        "golden_answers": [
+            "bobbins hold the thread in an orderly manner which is necessary to feed into a sewing machine without it tangling."
+        ],
+        "output": {
+            "pred": "The image shows various sewing tools and materials. To determine the purpose of an item in sewing, we need to identify it first. Please describe the object in question so I can assist you better.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.16666666666666666,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "37ba73af-9530-41b9-b9f8-5a06919176be",
+        "question": "how long does it take the closest car to go from 0 to 60?",
+        "golden_answers": [
+            "it take 7.3 seconds."
+        ],
+        "output": {
+            "pred": "The closest car in the image, which appears to be a Honda Accord, can accelerate from 0 to 60 mph in approximately 7.3 seconds.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.16,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "28d07394-74c1-4bb4-ae4f-2bf719950766",
+        "question": "How many centuries after the start of this structure’s construction was the Great Pyramid of Giza built?",
+        "golden_answers": [
+            "The Stonehenge were built in multiple phases in 3100 BC and the Great Pyramid of Giza was built in 2600 BC, five centuries after the Stonehenge."
+        ],
+        "output": {
+            "pred": "Based on the information provided, the Great Pyramid of Giza was built around 2580 BCE. The construction of the Great Pyramid of Giza took place over a twenty-year period during the reign of King Khufu (Cheops) of the 4th Dynasty, which lasted from approximately 2589 to 2566 BCE. Therefore, the construction of the Great Pyramid of Giza took place around 2580 BCE.\n\n<Thought>\nThe Great Pyramid of Giza was built around 2580 BCE. To determine how many centuries after the start of its construction it was built, we need to calculate the time difference between 2580 BCE and the start of the 4th Dynasty.\n</Thought>\n<Sub-Question>\nWhat is the approximate start year of the 4th Dynasty?\n</Sub-Question>\n<Search>\nText Retrieval: \"start year of the 4th Dynasty\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.15037593984962408,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "534cf768-a506-4c8f-808e-f7fd042ee9fe",
+        "question": "is this a protestant or catholic denomination?",
+        "golden_answers": [
+            "presbyterian is a protestant denomination."
+        ],
+        "output": {
+            "pred": "The church shown in the image is a Presbyterian church, which is a Protestant denomination.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5333333333333333,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "8b9f95f3-9071-43c9-97d7-02cfd904611d",
+        "question": "where did the founders of the brand that produces this product make their first sale?",
+        "golden_answers": [
+            "allison and drew cesati, the founders of yeehaw pickle company, sold their first jar of hot damn dills at a local farmer's market in park city, utah."
+        ],
+        "output": {
+            "pred": "The brand \"Yee Haw Pickle Co.\" was founded in [insert location here].",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.1111111111111111,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "3cade8fd-5f67-48e9-bf4b-671d3783584a",
+        "question": "who filed the first patent for this?",
+        "golden_answers": [
+            "the first patent for a torque wrench was filed by john h. sharp of chicago in 1931."
+        ],
+        "output": {
+            "pred": "J.J. Richardson filed the first patent for a ratchet wrench in 1863.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.48,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "cd0ea90e-4f9e-4560-8236-bd71c010bdb0",
+        "question": "on average, how many calories does one of these have?",
+        "golden_answers": [
+            "on average, 1 medium size doughnut provides between 190 to 300 calories, although this will vary in calories depending on the size and ingredients used."
+        ],
+        "output": {
+            "pred": "The average calorie count of a donut is approximately 150 calories.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.12121212121212122,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "769cb26c-e971-4376-914f-ac717f4e2ca4",
+        "question": "why was this plant once considered poisonous?",
+        "golden_answers": [
+            "poinsettias are often mistakenly believed to be toxic. this myth originated from a 1919 urban legend about a child's death after eating a poinsettia leaf."
+        ],
+        "output": {
+            "pred": "The plant was once considered poisonous due to a historical misunderstanding and the spread of misinformation, which led to the belief that the plant's sap could cause severe harm when ingested. However, subsequent studies have shown that poinsettias are not poisonous and are safe for pets and children when handled properly.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.08823529411764705,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "6d4ea0b5-3989-48d8-b016-9605f729ad25",
+        "question": "Does this food costs more than sandwich in McDonald?",
+        "golden_answers": [
+            "No, Filet-O-Fish sandwich costs more than basic McDonald's hamburger. The price of Filet-O-Fish is $4.59 while of hamburger, it's $2.19."
+        ],
+        "output": {
+            "pred": "<Thought>\nBased on the retrieved documents, the price of a cheeseburger at McDonald's in the United States can vary by location. In California, a cheeseburger costs $3.49, while in Peoria, Illinois, it costs about $2.50. The price of a Big Mac at McDonald's in the United States ranges from $5.29 to $7.89. The food shown in the image appears to be a burger and onion rings, which are not typical McDonald's menu items. Without knowing the specific prices of these items at McDonald's, it is not possible to directly compare the cost of this food to a sandwich at McDonald's.\n</Thought>\n<Sub-Question>\nWhat is the price of a Big Mac at McDonald's in the United States?\n</Sub-Question>\n<Search>\nText Retrieval: \"price of Big Mac at McDonald's in the United States\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.1212121212121212,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "46a94765-4d21-4107-9dd6-17a4b4daf166",
+        "question": "Can this car be eco-friendly?",
+        "golden_answers": [
+            "Yes, you can choose a hybrid Lexus LC 500 which is considered more eco-friendly since it uses less fossil gasoline."
+        ],
+        "output": {
+            "pred": "Yes, the Lexus LC 500h is eco-friendly due to its hybrid powertrain, offering better fuel efficiency and lower emissions compared to the V8 model.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2926829268292683,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "227612db-4f27-4ccf-b30c-46b05a517ca3",
+        "question": "what is the red object at the top of this?",
+        "golden_answers": [
+            "the red object at the top of this holiday wreath is a red bow."
+        ],
+        "output": {
+            "pred": "The red object at the top of the image is a decorative bow, which is part of a wreath.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.64,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "49121bf6-60e2-4784-b909-f5545a009ecc",
+        "question": "Is this temple located in a country that uses the Euro as its official currency?",
+        "golden_answers": [
+            "No, Angkor Wat is located in Cambodia, which uses the riel and the US dollar as its official currency."
+        ],
+        "output": {
+            "pred": "No, the temple is not located in a country that uses the Euro as its official currency.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5806451612903226,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "b152ea27-5234-4bda-a1c6-d248d148bb75",
+        "question": "when was this brand founded?",
+        "golden_answers": [
+            "hugo boss was founded in 1924."
+        ],
+        "output": {
+            "pred": "The brand Hugo Boss was founded in 1924.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.923076923076923,
+                "acc": 1.0
+            }
+        }
+    },
+    {
+        "id": "2f29d234-b40f-4b64-a4b2-02231aab888c",
+        "question": "can i drive the white car if i don't know how to drive with a stick shift?",
+        "golden_answers": [
+            "the current generation hyundai elantra is available with an automatic transmission, meaning you do not need to know how to drive with a stick shift in order to drive it."
+        ],
+        "output": {
+            "pred": "Yes, you can drive the white car if you don't know how to drive with a stick shift, assuming the car has an automatic transmission.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4583333333333333,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "dd2d7414-24a1-4acb-a9bd-c78ba79e4b23",
+        "question": "what's this for?",
+        "golden_answers": [
+            "etch a sketch is a mechanical drawing toy that lets users to create images by turning two knobs to control a stylus inside a screen filled with aluminium powder. it's great for creativity, entertainment, and improving motor fine motor skills."
+        ],
+        "output": {
+            "pred": "The Magic Sketch board is designed for children to create and erase drawings, making it an educational and fun tool for artistic expression.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2105263157894737,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "f9d03f1a-06b6-4648-bef8-676c44d1804d",
+        "question": "how many steps are there to this diagram?",
+        "golden_answers": [
+            "there are 6 total steps to this stratigic planning cycle."
+        ],
+        "output": {
+            "pred": "There are six steps in the Strategic Planning Cycle diagram.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5263157894736842,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "e7ad1649-b235-4d6c-b860-ff6d70a55294",
+        "question": "How much taller is Merderka 118 than this tower?",
+        "golden_answers": [
+            "Kuala Lumpur tower is 421 meters tall and Merderka 118 is a 678.9-meter-tall tower, making it 257.9 meters taller than Kuala Lumpur Tower."
+        ],
+        "output": {
+            "pred": "Thought: The retrieved documents do not contain any information about the height of Merderka 118 or the tower in the image. I need to find the height of Merderka 118 to proceed with the comparison.\n\n<Search>\nText Retrieval: \"Merderka 118 height\"\n<End>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.10344827586206896,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "6e228fd0-fe73-4fa4-9162-9e9b79b60324",
+        "question": "is this vegan?",
+        "golden_answers": [
+            "the sandwich options with focaccia all contain meat at this restaurant."
+        ],
+        "output": {
+            "pred": "Based on the menu items shown, none of the listed items appear to be vegan as they contain meat and other animal products.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.12903225806451613,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "828ba075-761d-4da8-8b24-7def86d639f2",
+        "question": "what exhibition did the designer of this statue visited in 1893?",
+        "golden_answers": [
+            "in 1893, bartholdi and his wife visited the 1893 world's columbian exposition in chicago."
+        ],
+        "output": {
+            "pred": "The designer of the Statue of Liberty, Frédéric Auguste Bartholdi, visited the 1893 Columbian Exposition in Chicago.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5185185185185186,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "ffd9fd39-d2ad-44bf-b35a-bed17c4b7b23",
+        "question": "when was this school established?",
+        "golden_answers": [
+            "nasarawa state university was established in 2001."
+        ],
+        "output": {
+            "pred": "Nasarawa State University, Keffi was established in 2001.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.9333333333333333,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "594c0bd7-b7fb-4a20-9c6f-694515804766",
+        "question": "does this plant like sun or shade?",
+        "golden_answers": [
+            "skimmia japonica plant grows best in part shade or full shade. it does not grow well in locations with prolonged afternoon sun exposure."
+        ],
+        "output": {
+            "pred": "The plant in the image seems to prefer shade.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "1db6b6f7-1ada-4a31-8504-fb68ac8f2be8",
+        "question": "what type of dog is this item designed as?",
+        "golden_answers": [
+            "the rowing blazers x target dog decorative bookend is designed as a bulldog."
+        ],
+        "output": {
+            "pred": "<Thought>\nThe image shows a ceramic figurine of a dog. To determine the type of dog it is designed as, I need to analyze its features such as the shape of the head, ears, body structure, and tail.\n<Sub-Question>\nWhat breed of dog does this figurine resemble?\n<Search>\nNo Retrieval.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.14545454545454545,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "aeef4d4a-3b49-4b26-93f7-93adcc0a3cbe",
+        "question": "where was the botanist who first formally described the plant on the coffee table from?",
+        "golden_answers": [
+            "the botanist olof swartz, who first formally described the dendrobium, was from sweden."
+        ],
+        "output": {
+            "pred": "The botanist who first formally described the plant on the coffee table is Carl Linnaeus, and he is from Sweden.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "7f69ebf1-c54e-4712-b154-4976ab57a43d",
+        "question": "what are the benefits for these supplements?",
+        "golden_answers": [
+            "greenies supplements provide dental health benefits, including reducing tartar and plaque, freshening breath, and promoting healthy gums and teeth."
+        ],
+        "output": {
+            "pred": "Greenies Supplements offer several benefits for dogs, including digestive health, skin and coat health, immune health, and joint health. These supplements are formulated with natural ingredients and are designed to be tasty treats that dogs enjoy, making it easier to incorporate them into their daily routine.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.24615384615384617,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "06cfc075-eb5c-4557-8785-b2b60d23875a",
+        "question": "what is the drivetrain layout of this car?",
+        "golden_answers": [
+            "the drivetrain layout of the kia cadenza is front-engine, front-wheel-drive."
+        ],
+        "output": {
+            "pred": "The drivetrain layout of the car in the image is all-wheel drive (AWD).",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4444444444444445,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "c19a9767-7d2a-4bd2-bede-f47780ed2d07",
+        "question": "Does this pastry have a longer shelf life than a Croissant?",
+        "golden_answers": [
+            "Baked empanadas have a shelf life of 7 days while croissants have a shelf life of 3 days"
+        ],
+        "output": {
+            "pred": "Yes, the samosa in the image likely has a longer shelf life than a croissant.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.14814814814814814,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "76cfd29d-ae80-4894-85a0-0e555532b938",
+        "question": "what was the first year of the 4th generation of this suv?",
+        "golden_answers": [
+            "2020 was the first year of the 4th generation of toyota highlander."
+        ],
+        "output": {
+            "pred": "The first year of the 4th generation of the Toyota Highlander is 2013.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.8000000000000002,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "92a215f8-8836-4ccc-a140-fe044b560bce",
+        "question": "what was the population in 2022 of the city where the inventor of this was born?",
+        "golden_answers": [
+            "in 2022, 60,491 people lived in vineland, new jersey, where john landis mason, inventor of mason jar, was born."
+        ],
+        "output": {
+            "pred": "The population of Trenton, New Jersey, in 2022, is approximately 9.5 million.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3333333333333333,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "404bd214-4628-46ff-834d-0b0747523c4c",
+        "question": "who is the main character in this musical?",
+        "golden_answers": [
+            "juliet capulet is the main character in the musical & juliet."
+        ],
+        "output": {
+            "pred": "The main character in the musical \"Juliet\" is Romeo.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.7999999999999999,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "9ebf6ecb-e10b-4c66-8a08-11e60b0fd34f",
+        "question": "what is the use of this?",
+        "golden_answers": [
+            "a fire hydrant is a connection point for firefighters to access a water supply for fighting fires."
+        ],
+        "output": {
+            "pred": "The image shows a fire hydrant and some pipes. To determine the use of these objects, let's break down the question into sub-questions:\n\n<Sub-Question>\nWhat is the purpose of a fire hydrant?\n</Sub-Question>\n\n<Sub-Question>\nWhat is the purpose of the pipes in the image?\n</Sub-Question>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.16,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "bd9322fa-954f-4a18-a491-70282a150ab3",
+        "question": "What factors contributed to the historical significance of this recipe?",
+        "golden_answers": [
+            "The historical significance of the Bottarga recipe lies in its ancient origins, preservation techniques, and cultural impact. Bottarga, a salted and dried fish roe, has a history spanning centuries, with origins possibly dating back to the Phoenicians who first salted and dried grey mullet roe. Its preservation method, which involved salting, pressing, and drying, allowed for food storage and transportation. The unique flavor and nutritional value of bottarga, along with its use in various cuisines such as the Sardinian Fregula Pasta, contributed to its cultural significance in Mediterranean regions, particularly Sardinia. "
+        ],
+        "output": {
+            "pred": "The historical significance of the candy cane is multifaceted, encompassing religious symbolism, cultural traditions, and technological advancements in production. Its association with Christmas and its role in holiday celebrations have solidified its place as a beloved holiday treat.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.21848739495798322,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "4a279ec6-6e29-4652-b7e0-cad950def016",
+        "question": "what language is this?",
+        "golden_answers": [
+            "the word is from the portuguese language and means \"index\"."
+        ],
+        "output": {
+            "pred": "The language is Spanish.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.36363636363636365,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "a76b5be1-0e05-4d30-9e85-038876accffc",
+        "question": "Is this park bigger in area than central park?",
+        "golden_answers": [
+            "No, Fort Washington Park covers an area of 341 acres while as central park covers over 843 acres."
+        ],
+        "output": {
+            "pred": "The park shown in the image is significantly smaller in area than Central Park.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.27586206896551724,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "717f2afe-5de8-4515-8cc8-53fc2ce7e84a",
+        "question": "when were these introduced to australia?",
+        "golden_answers": [
+            "red foxes were introduced to australia in the 1830s."
+        ],
+        "output": {
+            "pred": "The red fox was introduced to Australia in the 1830s, specifically by settlers for recreational hunting purposes.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5217391304347827,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "8c0ee009-a820-48e2-b9ba-4266d32b121b",
+        "question": "What's the conservation status of this plant?",
+        "golden_answers": [
+            "Syzygium puberulum, commonly known as white satinash, has a conservation status of Least Concern in its native home of Oceania."
+        ],
+        "output": {
+            "pred": "The conservation status of the plant in the image is Critically Endangered (CR C2a(i,ii); D) due to its extremely low population size and restricted habitat.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.24390243902439024,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "900c3a21-a7b3-4d6b-b7d2-4b621f234327",
+        "question": "can i bring this product in my carry-on on an international flight?",
+        "golden_answers": [
+            "no, this 16 fluid ounce bottle is too large for carry-on."
+        ],
+        "output": {
+            "pred": "Yes, you can bring the Hibiclens antiseptic skin cleanser in your carry-on on an international flight as long as it is in a container no larger than 3.4 ounces (100 milliliters) and fits in a quart-sized bag.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.13636363636363635,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "3e1f3e11-f5e4-4624-bf1c-c5ac3d8675fa",
+        "question": "What is the difference between this dish and nachos?",
+        "golden_answers": [
+            "While both chilaquiles and nachos use tortilla chips and cheese, chilaquiles are characterized by tortilla chips simmered in salsa, often green or red, while nachos are typically topped with various ingredients like cheese, beans and meat, and are not typically simmered."
+        ],
+        "output": {
+            "pred": "The dish in the image appears to be a variation of nachos, featuring tortilla chips topped with melted cheese, beans, and rice. It shares similarities with traditional nachos but may have additional toppings that could be indicative of a specific regional or personal twist on the dish.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.26506024096385544,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "0fa415ec-ba73-4ae5-95d7-58c0400b3bb2",
+        "question": "does this have less salt than smithfield original beef jerky?",
+        "golden_answers": [
+            "no, jack link's teriyaki beef jerky has 550 mg of sodium per 28 g of jerky, whereas smithfield original beef jerky has 310 mg of sodium per 28 g of jerky."
+        ],
+        "output": {
+            "pred": "Based on the retrieved information, Smithfield Original Beef Jerky typically contains 400mg of sodium per serving, while Jack Link's Teriyaki Beef Jerky contains 280mg of sodium per serving. Therefore, Jack Link's Teriyaki Beef Jerky has less salt than Smithfield Original Beef Jerky.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "132f522d-5cac-4c39-813c-70d2b6ffa6ee",
+        "question": "is this open on saturdays?",
+        "golden_answers": [
+            "yes, fountain house gallery is open from 1 to 7 pm on saturdays."
+        ],
+        "output": {
+            "pred": "Based on the information provided, it is not possible to determine if the JNTA store is open on Saturdays. Additional research or direct contact with the store would be necessary to confirm its opening hours.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.22222222222222224,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "4f8d84df-0b2c-4e4d-9a02-2977671cf3b8",
+        "question": "What British comedy film from 1975 featured this castle using a different name?",
+        "golden_answers": [
+            "The British comedy film, Monty Python and the Holy Grail, featured Castle Stalker which was used as the Castle of Aaargh. "
+        ],
+        "output": {
+            "pred": "The British comedy film from 1975 that featured Castle Stalker under a different name is \"Monty Python and the Holy Grail.\"",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6111111111111112,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "3d5d2258-b46a-432e-9ff5-485bf513babb",
+        "question": "which grows to a larger height, this type of dog or an english bulldog?",
+        "golden_answers": [
+            "the black labrador retriever grows to a size between 21.5 to 24.5 inches tall, which is taller than the english bulldog, which grows to a size between 14 and 16 inches tall."
+        ],
+        "output": {
+            "pred": "The German Shepherd grows to a larger height compared to the English Bulldog.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2631578947368421,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "22119a2a-2f45-45f8-9bdd-053d5eb41978",
+        "question": "How do flowers from this plant species differ from aloe vera?",
+        "golden_answers": [
+            "Aloe vossii produces red and orange flowers, while Aloe vera typically has yellow tubular flowers. "
+        ],
+        "output": {
+            "pred": "The flowers of the plant in the image differ from Aloe vera in several ways. While Aloe vera has tubular flowers that are yellow, orange, pink, or red, and are borne densely clustered and pendant at the apex of simple or branched, leafless stems, the flowers of the plant in the image are ventricose (with a little belly) and secund (oriented in one direction on the flower stalk, up), topped with colorful exserted stamens (purple filaments and orange anthers) when they open.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2727272727272727,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "8a3e6df6-0d5d-4e7f-a361-6b4feaa06495",
+        "question": "What is the total land area of the region in India where this dish originates?",
+        "golden_answers": [
+            "Idil is popular in Southern India, which has a total land area of 635,780 square kilometers or 245,480 square miles."
+        ],
+        "output": {
+            "pred": "The total land area of the region in India where this dish originates is approximately 342,239 square kilometers.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5142857142857142,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "1c613a06-f45a-426b-871b-480b8c4f4aea",
+        "question": "translate this",
+        "golden_answers": [
+            "the sentence translates to \"log in below to access your recent orders.\""
+        ],
+        "output": {
+            "pred": "The translation of \"Inicia sesión abajo para acceder a tus órdenes recientes\" is \"Log in below to access your recent orders.\"",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5333333333333333,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "7e7f2cc9-e127-469f-91bc-87f828b87dc1",
+        "question": "how often should these kinds of plants be watered compared to succulents?",
+        "golden_answers": [
+            "the dracaena tricolor is typically watered once a week, while succulents are watered every other week during warmer months and once a month during colder months."
+        ],
+        "output": {
+            "pred": "Thought: The retrieved documents provide detailed descriptions of various plant species, but they do not specifically address the watering frequency of the plants shown in the image. Therefore, we need to focus on the image itself to identify the types of plants and their watering needs.\n\n<Sub-Question>\nWhat types of plants are shown in the image?\n<Search>\nRetrieval with Input Image",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.051948051948051945,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "a3fe0e8a-ebf5-451b-bff7-c2d179177850",
+        "question": "in what year did production for this first start?",
+        "golden_answers": [
+            "tiburon first began production in late 1996."
+        ],
+        "output": {
+            "pred": "The production for Hyundai's first car started in 1968.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.39999999999999997,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "a84cb109-38a7-4383-8032-911a115f26e9",
+        "question": "what does that phrase mean?",
+        "golden_answers": [
+            "the latin inscription translates to \"blessed are they who walk in the law of the lord\"."
+        ],
+        "output": {
+            "pred": "The phrase \"BEATI QVI AMBVLANT IN LEGE DOMINI\" means \"Blessed are those who walk in the law of the Lord,\" which is a reference to a verse from the Bible, specifically from the Book of Deuteronomy 8:16. It is a religious statement that emphasizes the importance of living according to the teachings of God.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3157894736842105,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "f4e47a91-23f3-470e-9923-2c31e1d0e8a8",
+        "question": "who described this species?",
+        "golden_answers": [
+            "the magnolia zenii was described by wan-chun cheng."
+        ],
+        "output": {
+            "pred": "The species was described by Pierre Magnol.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4615384615384615,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "56150c54-1a54-49f9-9da4-d9b6d698c785",
+        "question": "when was the person who invented these born?",
+        "golden_answers": [
+            "percy spencer was born on july 19th, 1894."
+        ],
+        "output": {
+            "pred": "Percy Spencer, the inventor of the microwave, was born in 1894.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5882352941176471,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "46acaca0-2889-43f9-9fa1-7fc159da6bba",
+        "question": "Where was this car made and what is the engine?",
+        "golden_answers": [
+            "The Lada 110 is a compact car built by the Russians, featuring a 1.6-liter engine producing approximately 90 horsepower."
+        ],
+        "output": {
+            "pred": "The Scion xB was made in Japan, and the engine types for the Scion xB included a 1.5L or 1.8L four-cylinder engine, depending on the model year.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.05405405405405406,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "0d8cf3ea-9206-4f8c-9518-63837389351f",
+        "question": "how old was this artist when he started hosting his own show on nbc?",
+        "golden_answers": [
+            "nat king cole was 37 years old when he started hosting the nat king cole show on nbc."
+        ],
+        "output": {
+            "pred": "Based on the information provided, Nat King Cole was born on March 17, 1919. Since he started hosting his own show on NBC in 1956, we can calculate his age at that time:\n\n1956 - 1919 = 37 years\n\nTherefore, Nat King Cole was 37 years old when he started hosting his own show on NBC.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4857142857142857,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "060d0875-d6d4-4e89-b826-55a2a2269119",
+        "question": "what was this pharmacy called when it first opened?",
+        "golden_answers": [
+            "walgreen's was originally named walgreen drug co. when it opened in 1901."
+        ],
+        "output": {
+            "pred": "The pharmacy was called Walgreens when it first opened.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "70b2ec85-f13c-48a6-a9fa-fbc185e089a8",
+        "question": "why are these fed to chickens?",
+        "golden_answers": [
+            "seashells, particularly oyster shells, are fed to chickens as a primary source of calcium, which is crucial for building strong eggshells."
+        ],
+        "output": {
+            "pred": "The image shows a hand holding a seashell, but there are no chickens visible in the image. It seems like the question might be referring to something else that is not shown in the image. Could you please clarify what you are asking about?",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.13793103448275862,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "32141f91-b4ab-4c77-aac7-84c120c66241",
+        "question": "what country is this from?",
+        "golden_answers": [
+            "the kora originated in kaabu."
+        ],
+        "output": {
+            "pred": "The country this instrument is from is Senegal.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "54fcee57-66ff-4c25-9511-60c3852b816d",
+        "question": "what is the angle of this?",
+        "golden_answers": [
+            "all sides of a square are equal and perpendicular to each other, the angle between any two adjacent lines in a square is always 90 degrees."
+        ],
+        "output": {
+            "pred": "The angle 'x' in the diagram appears to be a right angle, as indicated by the square symbol at the vertex.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.20512820512820512,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "285838d2-5b56-43ee-8436-335048e484db",
+        "question": "translate this to english.",
+        "golden_answers": [
+            "the sentence says, \"what was the date of the boston tea party?\""
+        ],
+        "output": {
+            "pred": "The date of the Boston Tea Party was December 16, 1773.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666666,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "da23efcd-58f1-4af7-acfb-c12852c5d650",
+        "question": "what kind of cuisine does this place have?",
+        "golden_answers": [
+            "the king of falafel & shawarma is a popular new york eatery that specializes in middle eastern street food."
+        ],
+        "output": {
+            "pred": "The restaurant serves Middle Eastern cuisine, specifically falafel and shawarma.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.32,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "4682417c-8fe1-4147-a2aa-993e3a58ec16",
+        "question": "can i plant in this in full-sun area of a yard in florida?",
+        "golden_answers": [
+            "rhododendrons need partial shade and minimal direct sunlight , a fully exposed location in florida would not be a proper growing environment for this plant."
+        ],
+        "output": {
+            "pred": "Yes, you can plant the Rubber Plant (Ficus elastica) in a full-sun area of a yard in Florida.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.16216216216216214,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "9f54a5e4-7712-4f2a-ac7b-298233d673b6",
+        "question": "how many species are there in the same kingdom as these?",
+        "golden_answers": [
+            "there are an estimated 2.2 to 3.8 million species of fungi."
+        ],
+        "output": {
+            "pred": "There are approximately 2.2 million species in the same kingdom as the mushrooms shown in the image.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.41666666666666663,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "ba29a20d-a2a2-4f7f-b8d5-30d7ae6b132f",
+        "question": "What's the ideal temperature for this plant?",
+        "golden_answers": [
+            "The ideal temperature for aloe vera is from 55°F to 80°F (13°C to 27°C)."
+        ],
+        "output": {
+            "pred": "<Thought>\nBased on the retrieved documents, the plant in the image appears to be an Aloe vera, which is a succulent plant. Aloe vera typically thrives in temperatures between 65°F to 80°F (18°C to 27°C). It is important to note that Aloe vera prefers warm temperatures and can tolerate higher temperatures, but it should be protected from extreme heat to prevent sunburn on its leaves.\n<Sub-Question>\nWhat is the ideal temperature range for Aloe vera?\n<Search>\nNo Retrieval.\n<End>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2558139534883721,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "7a7dbf1a-6f52-49e3-8437-829c9064ac83",
+        "question": "what's a good way to deep clean this material by hand?",
+        "golden_answers": [
+            "to deep clean your carpet by hand, vacuum, pre-treat stains and apply a mild detergent solution, scrubbing gently and blotting dry."
+        ],
+        "output": {
+            "pred": "To deep clean this carpet by hand, use a carpet cleaning machine, vacuum the carpet from different directions, and ensure no objects or cords are in the way. Deep clean at least twice a year, or more frequently if you have pets, kids, or a smoking habit.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.25806451612903225,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "e1a9364b-2875-461e-9f1f-5ca8f1716d6a",
+        "question": "can i buy this at king soopers?",
+        "golden_answers": [
+            "yes, king soopers sells kroger worcestershire sauce 15 fl oz."
+        ],
+        "output": {
+            "pred": "Based on the image provided, it appears that Worcestershire sauce is available at King Soopers. However, for a definitive answer, it would be best to check the King Soopers website or store inventory online.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.1951219512195122,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "5c06f025-c67d-418c-8f75-fba27c2d6e0e",
+        "question": "what is the main subject of the museum in rochester ny that hosts competitions for these things every christmas?",
+        "golden_answers": [
+            "the main subject of the george eastman museum where gingerbread house competitions are hosted every christmas, is photography and film."
+        ],
+        "output": {
+            "pred": "The main subject of the museum in Rochester, NY that hosts competitions for gingerbread houses every Christmas is the George Eastman Museum.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5945945945945946,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "6f3176f2-2b74-4133-bffc-bc0f48ad2e08",
+        "question": "who did the costumes for this on broadway?",
+        "golden_answers": [
+            "dede ayite is the costume designer for the broadway musical hell's kitchen."
+        ],
+        "output": {
+            "pred": "The costume designer for the Broadway musical \"Hell's Kitchen\" is Dede Ayite.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 1.0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "0fc196ea-615a-4cde-a55c-dd090f9bf5ae",
+        "question": "what allergens are present in the ingredients of this sauce?",
+        "golden_answers": [
+            "kraft sweet honey contains mustard flour, which can be a potential allergen for some."
+        ],
+        "output": {
+            "pred": "The allergens present in the ingredients of Kraft Sweet Honey Barbecue Sauce may include tomato, apple cider vinegar, mustard, garlic, and paprika.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.24242424242424246,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "1195d0f9-c4ec-4ad3-8204-518ded3f5e87",
+        "question": "what does the light sign in the middle of the picture say in english?",
+        "golden_answers": [
+            "in english, \"e incominciavo a volare\", translates to \"and i started to fly."
+        ],
+        "output": {
+            "pred": "The light sign in the middle of the picture says \"e incominciavo a volare\" in English. This translates to \"and I started to fly\" in English.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.7058823529411764,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "40c54b88-ac6f-463d-a70f-1b88fe859e7b",
+        "question": "what influences the population decline of this animal in front of me?",
+        "golden_answers": [
+            "declining habitat, deforestation, and poaching influences the population decline of the kudu."
+        ],
+        "output": {
+            "pred": "The population decline of Kudus is influenced by habitat loss and fragmentation, poaching, competition with livestock, and inadequate conservation efforts.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.41379310344827586,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "59e665a3-6829-4151-b34a-cd2d1c4a48c0",
+        "question": "Does this Eucalyptus species grow taller than Eucalyptus camaldulensis?",
+        "golden_answers": [
+            "No, Eucalyptus camaldulensis grows much taller up to a height of 25 to 45 meters and Eucalyptus deflexa grows up to a height of 1 to 3 meters. "
+        ],
+        "output": {
+            "pred": "Yes, Eucalyptus robusta is expected to grow taller than Eucalyptus camaldulensis.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.27027027027027023,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "9237dc80-19a7-49cf-b773-95013787ea80",
+        "question": "What is the primary purpose of raising this large mammal?",
+        "golden_answers": [
+            "The primary purpose of raising Bos taurus is for the production of meat, dairy products and leather."
+        ],
+        "output": {
+            "pred": "Based on the retrieved documents, the primary purpose of raising large mammals such as elephants and cows is for various practical reasons:\n\n1. **Elephants**:\n   - **Transportation**: Historically, elephants were used to pull sleds across long distances in Siberia.\n   - **Agriculture**: Elephants are used in agriculture, particularly in Africa, where they help in tasks like plowing fields and transporting heavy loads.\n   - **Tourism**: Elephants are also used in tourism, providing rides and entertainment for tourists.\n\n2. **Cows**:\n   - **Milk Production**: Cows are primarily raised for milk production, which is a significant source of protein and nutrients in human diets.\n   - **Meat Production**: Cows are also raised for meat, contributing to the global food supply.\n   - **Labor**: Historically, cows were used for labor, pulling carts and plowing fields.\n   - **Leather**: Cows provide leather for various products, including clothing and accessories.\n\nIn summary, the primary purposes of raising large mammals like elephants and cows include transportation, agriculture, tourism, and providing food resources such as milk and meat.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.1437125748502994,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "23ed9a41-8a8d-49a3-9f7f-0f2587467a34",
+        "question": "What are the characteristic phenotypic features of this plant?",
+        "golden_answers": [
+            "The characteristic phenotypic features of Cassia leptophylla include an average height of around 20 to 25 feet, ideal bloom time from June to August, and yellow blooms."
+        ],
+        "output": {
+            "pred": "The plant in the image is likely Ilex cornuta (Chinese Holly), characterized by being evergreen, small tree, fragrant flowers, heat tolerant, drought tolerant, white flowers, shrub, honey bees, nectar plant, winter interest, security plant, air pollution tolerant, specialized bees, privacy, deer resistant, spines, foundation planting, red fruits, screening, and pollinator plant.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.02702702702702702,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "ec5fced0-9cb1-4d4e-b0f8-2477471961fe",
+        "question": "what singing voices are associated with this musical annotation?",
+        "golden_answers": [
+            "the treble clef is used for the soprano, mezzo-soprano, alto, contralto and tenor singing voices."
+        ],
+        "output": {
+            "pred": "The singing voices associated with the musical annotation in the image are likely to be soprano, contralto, and tenor, based on the general vocal ranges described in the retrieved documents.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3157894736842105,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "cbb15472-3855-40ad-acf0-81ada35f23be",
+        "question": "what is the name of the person who created this dish?",
+        "golden_answers": [
+            "the creator of this dish is caesar cardini."
+        ],
+        "output": {
+            "pred": "The person who created the Caesar salad is Caesar Cardini.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.39999999999999997,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "b4eb53be-0e1f-4832-a7bc-cdd1f2469499",
+        "question": "how long will these seeds take to bloom?",
+        "golden_answers": [
+            "these zinnia seeds should take 35 days to bloom into flowers."
+        ],
+        "output": {
+            "pred": "The seeds will take 35 days to bloom.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666665,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "5a8bd5d6-d18d-469e-b419-21efb6b687b0",
+        "question": "How do the ingredients of this pastry compare to the donut?",
+        "golden_answers": [
+            "The dough of both pastries is fried using a batter of eggs, milk, flour, and sugar. The Pączki is often filled with traditional fillings like jam and bavarian cream. "
+        ],
+        "output": {
+            "pred": "The ingredients of the pastry differ significantly from those of a donut. The pastry has a chocolate base and a fruit or jam filling, while the donut is typically made with a yeast dough, sugar, milk, vanilla extract, and salt. The glaze of the pastry seems to be chocolate-based, whereas the donut usually has a sugar glaze.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2816901408450704,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "8605ad2b-115a-4a76-84af-2d400f464fdb",
+        "question": "what is the population of this animal in the world?",
+        "golden_answers": [
+            "there are fewer than 1,000 pairs thought to exist in canada."
+        ],
+        "output": {
+            "pred": "Based on the retrieved documents, the Barn Owl (Tyto alba) is the most widely distributed species of owl in the world and one of the most widespread of all species of birds. The average lifespan of the barn owl is about four years, and statistically two-thirds to three-quarters of all adults survive from one year to the next. However, the exact global population of the Barn Owl cannot be precisely determined from the given information alone, as the documents focus on the population within the United States and Canada, and the global population is not explicitly mentioned.\n\nTo get a more accurate estimate of the global population, further research and data collection from various sources would be necessary. The global population of the Barn Owl is likely to be in the millions, but a precise number cannot be provided based on the current information available.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.04477611940298507,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "e4fa2ba7-8c2e-4173-8fbc-6d85fd7bedf7",
+        "question": "How many of this dog's fatal attacks have occurred in the U.K. from 2021-2022?",
+        "golden_answers": [
+            "In 2021, there were two fatal U.K. American Bully attacks, and six in 2022."
+        ],
+        "output": {
+            "pred": "The number of fatal attacks by American Bully XL dogs in the UK from 2021 to 2022 is not explicitly stated, but it is clear that the breed has been involved in a significant number of fatal attacks, with at least 2 out of 4 fatal attacks in 2021 and 6 out of 10 fatal attacks in 2022.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2941176470588235,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "e117d0ac-3b60-4337-85c1-22d6c4ea482a",
+        "question": "what are the benefits of this kind of lamp?",
+        "golden_answers": [
+            "there is no scientific basis regarding the health benefits of himalayan salt lamps."
+        ],
+        "output": {
+            "pred": "Based on the retrieved documents, Himalayan salt lamps are believed to offer several health benefits, including:\n\n1. **Improved Air Quality**: The salt lamps are believed to release negative ions, which can help purify the air by trapping particles such as smoke, pollen, and dust, thereby reducing allergens and improving indoor air quality.\n\n2. **Enhanced Mood**: The warm, pink glow of the lamp is said to create a calming ambiance, which can help reduce stress and anxiety, making it easier to relax and improve overall mood.\n\n3. **Better Sleep**: The soft, warm light emitted by the lamp is believed to be less disruptive to the natural sleep-wake cycle compared to the harsh blue light from screens, helping to promote better sleep.\n\n4. **Allergy Relief**: The negative ions released by the lamp are thought to help alleviate allergy symptoms by neutralizing allergens in the air.\n\n5. **Stress Reduction**: The calming environment created by the lamp can help reduce stress levels, contributing to a more relaxed state.\n\n6. **Energy Balance**: Some users report feeling more energized and balanced after using Himalayan salt lamps, attributing this to the natural ionization process.\n\n7. **Respiratory Health**: The negative ions are believed to help improve respiratory health by clearing the air of pollutants and allergens.\n\n8. **Negative Ion Production**: The lamp is thought to act as a natural ionizer, producing negative ions that can help improve the quality of the air in the room.\n\n9. **Spiritual and Mental Benefits**: Beyond physical health, Himalayan salt lamps are also believed to have spiritual and mental benefits, enhancing the overall well-being of the user.\n\nWhile the scientific evidence for these benefits is still evolving, many users report experiencing positive effects from using Himalayan salt lamps. However, it's important to note that these benefits are not guaranteed, and the effectiveness may vary depending on individual circumstances and the quality of the lamp.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.0546075085324232,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "d0476ba6-0068-4ba4-8a62-1d00812388e1",
+        "question": "which country had the third largest sales of this car in 2022?",
+        "golden_answers": [
+            "japan had the third largest sales of the nissan kicks in 2022 with 18,697 units sold."
+        ],
+        "output": {
+            "pred": "Based on the retrieved documents, the Nissan Kicks had significant sales in 2022. However, the documents do not provide the exact ranking of the third-largest sales country for the Nissan Kicks in 2022. To determine the third-largest sales country, we would need more detailed sales data for the Nissan Kicks across various countries in 2022.\n\nSince the required information is not provided in the retrieved documents, we cannot definitively answer which country had the third largest sales of the Nissan Kicks in 2022. Additional research or access to more comprehensive sales data would be necessary to provide an accurate answer.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.1782178217821782,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "8559a2ca-550f-4967-a823-d179843e1d3c",
+        "question": "is this older than little miss muffet?",
+        "golden_answers": [
+            "yes, little jack horner first appeared in print in 1725, whereas little miss muffett first appeared in print in 1805."
+        ],
+        "output": {
+            "pred": "To determine if \"Little Jack Horner\" is older than \"Little Miss Muffet,\" we need to find out the publication dates of both stories.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.23809523809523808,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "759248a6-9237-4776-b69f-e8b24652489c",
+        "question": "in which year was the author of this book born?",
+        "golden_answers": [
+            "marie susini, the author of un pas d'homme, was born in 1916 on the french island of corsica. most of her written work revolves around her birthplace."
+        ],
+        "output": {
+            "pred": "Based on the retrieved information, there is still no direct mention of the birth year of Marie Susini. It seems that the author of the book \"Un pas d'homme\" is Marie Susini, but the provided documents do not contain the birth year of Marie Susini. We may need to search for more detailed biographical information about Marie Susini to find her birth year.\n\n<Search>\nText Retrieval: \"Marie Susini birth year\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.24444444444444446,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "058cf9b3-0c58-406f-8e34-23c86cd8e73b",
+        "question": "What country is the designer of this car based in?",
+        "golden_answers": [
+            "The Lancia Thema is manufactured by Lancia Automobiles and designed by Pininfarina, based in Cambiano, Italy."
+        ],
+        "output": {
+            "pred": "<Thought>\nBased on the retrieved information, the headquarters of Fiat Group is located in Italy. Therefore, the designer of the Lancia car, who is part of Fiat Group, is also based in Italy.\n</Thought>\n<Sub-Question>\nWhat is the country where Fiat Group is based?\n</Sub-Question>\n<Search>\nText Retrieval: \"Fiat Group headquarters location\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.15873015873015875,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "8d368886-3419-47c5-a3b5-07c1c88f2ac8",
+        "question": "how many generations of this car have been released?",
+        "golden_answers": [
+            "8 total generations of the volkswagon golf gti have been released to date."
+        ],
+        "output": {
+            "pred": "The Volkswagen Beetle has four generations.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.11764705882352941,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "f15910f1-2c1b-45a1-8dd8-0472e04562ee",
+        "question": "who was one of the first to introduce these shoes designs in london?",
+        "golden_answers": [
+            "one of the first loafer designs was introduced in london by wildsmith shoes, called the wildsmith loafer."
+        ],
+        "output": {
+            "pred": "One of the first to introduce these shoe designs in London was Wildsmith, a London-based shoemaker, who created the first modern loafer in 1926 for King George VI.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.45,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "a49c7eb6-0f31-40e3-aad3-4794cc633e2b",
+        "question": "what is the language_of_origin of the mole sauce?",
+        "golden_answers": [
+            "the mole sauce has nahuatl as its language_of_origin."
+        ],
+        "output": {
+            "pred": "The language of origin of the mole sauce is Nahuatl.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.39999999999999997,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "0dd9f53f-d7d9-43c5-847a-fff3f10f176c",
+        "question": "What are the fermentation effects of this bread?",
+        "golden_answers": [
+            "Sourdough fermentation may lower glycemic index, improve mineral absorption by hydrolyzing phytates, reduce wheat sensitivity components, and enhance gluten-free bread quality."
+        ],
+        "output": {
+            "pred": "The bread in the image appears to be sourdough, which undergoes a long fermentation process that contributes to its unique flavor and texture.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.1951219512195122,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "9d51b5a3-6fd0-4f10-9bfe-f8efd1239cf4",
+        "question": "what is this logo wordmark design based on?",
+        "golden_answers": [
+            "the disney wordmark design is based on a stylized autograph of walt disney."
+        ],
+        "output": {
+            "pred": "The Disney logo wordmark design is based on a combination of elements including a cursive font, the image of Cinderella's Castle, and a shooting star, all of which are designed to evoke a sense of wonder and imagination, reflecting Disney's brand identity as a source of magic and enchantment.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2641509433962264,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "9e97f95f-1761-4d48-9ef8-9e64f3b90a25",
+        "question": "would wearing this constantly at a 90 decibels volume damage a person's hearing?",
+        "golden_answers": [
+            "yes, doing so regularly can lead to noise-induced hearing loss over time. a safer volume is under 85 decibels and taking breaks can minimize the risks."
+        ],
+        "output": {
+            "pred": "Wearing AirPods at a 90 decibel volume is not recommended for long periods due to the risk of hearing damage. It is advisable to keep the volume below 85 decibels and to take regular breaks to allow the ears to rest.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.26229508196721313,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "817a57ca-e29a-4d05-a584-107218d23d84",
+        "question": "What subfamiy does this plant and Arethuseae belong to?",
+        "golden_answers": [
+            "Both the Encyclia adenocaula and the Arethuseae species belong to Epidendroideae subfamily."
+        ],
+        "output": {
+            "pred": "The plant in the image belongs to the subfamily Epidendroideae.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3529411764705882,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "f261ed27-297b-4680-af39-28302267c65c",
+        "question": "what brand is this bike?",
+        "golden_answers": [
+            "the 390 duke is a middle-weight motorcycle made by ktm."
+        ],
+        "output": {
+            "pred": "The brand of the motorcycle in the image is KTM.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.39999999999999997,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "2f98c003-af17-4891-aca9-989498977ff9",
+        "question": "how tall is it?",
+        "golden_answers": [
+            "the chief lelooska totem pole is 50 feet tall and 42 inches in diameter."
+        ],
+        "output": {
+            "pred": "The totem pole in the image is approximately 20-30 meters tall.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4545454545454546,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "c43db3c4-83af-4b79-96a9-cdb8901c6b92",
+        "question": "what is the difference between the origin of this food and sushi?",
+        "golden_answers": [
+            "onigiri makes rice portable and easy to eat as well as preserving it, while sushi originated as a way of preserving fish."
+        ],
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents provide information about the California roll, which is a type of sushi that does not use raw fish as its main ingredient. Instead, it features avocado, imitation crab (or real crab), cucumber, and sushi rice, all wrapped in a sheet of nori (seaweed). The Shrimp Tempura Roll, on the other hand, is a type of sushi roll that includes shrimp tempura as a key ingredient, which is a more traditional Japanese preparation method.\n</Thought>\n<Sub-Question>\nWhat is the origin of the Shrimp Tempura Roll?\n</Sub-Question>\n<Search>\nText Retrieval: \"origin of Shrimp Tempura Roll\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.14814814814814814,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "ca103a37-a475-4b56-ac47-ed3f43e0bd33",
+        "question": "what bird is this?",
+        "golden_answers": [
+            "this is a drawing of a hummingbird."
+        ],
+        "output": {
+            "pred": "The bird in the image appears to resemble a heron or a crane, but further information or a clearer image would be needed for a definitive identification.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "e0c7c0b8-b70d-4d58-a98a-ba22d511588f",
+        "question": "what is the difference between this and a articulating boom lift?",
+        "golden_answers": [
+            "for maximum height and reach, the genie telescopic boom lift offer more horizontal outreach. however, if obstacles are present, an articulated boom lift can navigate up and over them with multiple pivot points."
+        ],
+        "output": {
+            "pred": "Based on the retrieved documents, here are the key differences between an articulating boom lift and a telescopic boom lift:\n\n1. **Reach and Positioning**:\n   - **Articulating Boom Lift**: Offers greater versatility to reach up, over, and out to access work areas. It can maneuver through tight spaces and obstacles, making it ideal for environments with limited clearance.\n   - **Telescopic Boom Lift**: Provides greater horizontal outreach, allowing it to reach higher areas, such as skyscrapers. It is designed for maximum vertical reach and is suitable for outdoor construction and industrial applications.\n\n2. **Operational Flexibility**:\n   - **Articulating Boom Lift**: Can be used indoors and outdoors, offering quiet operation with no emissions. It is equipped with multiple pivot points on the boom sections, allowing it to navigate obstacles effectively.\n   - **Telescopic Boom Lift**: Typically used outdoors due to the fumes emitted by diesel engines. It is designed for quick setup and is ideal for outdoor construction and industrial applications.\n\n3. **Power Source**:\n   - **Articulating Boom Lift**: Available in electric and diesel options. Electric lifts are quieter and can be used indoors, while diesel lifts are more powerful and suitable for outdoor use.\n   - **Telescopic Boom Lift**: Usually powered by diesel engines, which are used outdoors due to the fumes they emit. They are designed for maximum vertical reach and can stretch up to 210 feet.\n\nIn summary, the Genie 3-60 XC shown in the image is an articulating boom lift, which provides greater versatility to reach up, over, and out to access work areas, making it ideal for environments with limited clearance. In contrast, a telescopic boom lift would be better suited for reaching higher areas, such as skyscrapers, and is typically used outdoors due to the fumes emitted by diesel engines.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.15894039735099338,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "35a62bc9-8b1c-40e8-8024-c918dda4d869",
+        "question": "do these generally weigh less than a normal hippopotamus?",
+        "golden_answers": [
+            "yes, pygmy hippos are generally 1/4 of the weight of their larger cousins."
+        ],
+        "output": {
+            "pred": "Yes, these hippos generally weigh less than a normal hippopotamus.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.28571428571428575,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "b363e863-453d-4d2a-b6c9-1d93ce584c5f",
+        "question": "when was this bus company invented?",
+        "golden_answers": [
+            "in 1969, the colorado general assembly created the rtd to provide public transportation to five additional counties in the denver metropolitan area."
+        ],
+        "output": {
+            "pred": "The bus company associated with the bus in the image was invented in 1969.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.19999999999999998,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "8e0b79bb-df9f-48c3-b999-e6a9143a2a66",
+        "question": "Can a person who won a lottery jackpot of 60,000 dollars afford to buy this car?",
+        "golden_answers": [
+            "Yes, a person who won a jackpot prize of $60,000 could afford to buy a Tesla Model 3 because its base price is around $44,130. "
+        ],
+        "output": {
+            "pred": "Yes, a person who won a lottery jackpot of 60,000 dollars can afford to buy the Tesla Model Y, given the starting price of the car is between $46,380 and $52,880.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5833333333333334,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "df94d0b6-63a1-45f1-9186-1c0fa5c30a0d",
+        "question": "what company makes the blue bottles on the top shelf?",
+        "golden_answers": [
+            "sc johnson makes windex."
+        ],
+        "output": {
+            "pred": "The company that makes the blue bottles on the top shelf is S.C. Johnson & Son.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.375,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "5e2c92fa-dcf2-4029-8d34-d80c5f9d1800",
+        "question": "which company owns this brand?",
+        "golden_answers": [
+            "chevrolet is an automobile division owned by its manufacturer and parent company general motors."
+        ],
+        "output": {
+            "pred": "The Chevrolet brand is owned by General Motors.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "386c7c5f-ac6b-4c2f-9999-bae76fa541eb",
+        "question": "What is the typical number of seeds per spikelet in this type of grass compared to regular wheat?",
+        "golden_answers": [
+            "A wheat spike consists of many spikelets and a rachis, and each spikelet contains two or more florets. In general, only 1 to 3 florets can become fertile florets and develop into grains. Whereas wheat averages between 2 grains and 2.5 grains per spikelet."
+        ],
+        "output": {
+            "pred": "The typical number of seeds per spikelet in the grass shown in the image is likely to be around 2 to 2.5 seeds per spikelet, which is comparable to the number of seeds per spikelet in regular wheat.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2368421052631579,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "f388c00e-35e6-4af1-b363-37d7dd535724",
+        "question": "which models of this type of device does sony currently manufacture?",
+        "golden_answers": [
+            "sony currently manufactures two dvd player models, the dvp-sr510h and dvp-sr210p."
+        ],
+        "output": {
+            "pred": "Based on the retrieved documents, Sony still manufactures DVD players, but the specific models are not detailed in the provided information. To find out the current models Sony manufactures, we would need to look at Sony's official website or recent press releases.\n\n<Search>\nText Retrieval: \"Sony current DVD players models\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.14035087719298245,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "97f421cb-f2e9-4059-be30-f056153a1a5b",
+        "question": "how tall do the fragrant trees used for these get in the wild?",
+        "golden_answers": [
+            "douglas firs can reach up to 330 feet tall."
+        ],
+        "output": {
+            "pred": "The height of fragrant trees in the wild can vary, with some reaching up to 20 feet (Abies balsamea) and others growing to about 13 feet (Pandanus odorifer).",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2285714285714286,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "9dc8f548-4b92-4b65-92e4-f328baca30bc",
+        "question": "what's this car named after?",
+        "golden_answers": [
+            "the chevy impala was named after the african antelope, which was used as the car's logo."
+        ],
+        "output": {
+            "pred": "The car in the image appears to be a Ford Focus.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "a4b2c9c0-a16a-47ba-96eb-8c218c659178",
+        "question": "what states did the little engine visit in individual books in this series?",
+        "golden_answers": [
+            "watty piper’s the little engine that could series of books is a classic for kids. the little engine visited several states in individual books on its adventures, including pennsylvania, georgia, illinois, florida, texas, colorado, new york, and california."
+        ],
+        "output": {
+            "pred": "The Little Engine That Could visits all fifty states in the United States, including Texas and California, in the \"A Little Engine Road Trip\" series.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4642857142857143,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "aac7872a-fd60-4d3d-a054-cf0e998db0b1",
+        "question": "which egyptian god did this deity resemble due to the distinctive headdress they shared?",
+        "golden_answers": [
+            "isis resembled hathor due to the distinctive throne headdress they shared, although isis' aspect changed throughout the years due to her reinterpretation by the greeks."
+        ],
+        "output": {
+            "pred": "The Egyptian god associated with a falcon headdress is Horus.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.06666666666666667,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "a041db57-f402-488c-880b-fb4d205ee63b",
+        "question": "Who was the Duke of Edinburgh during the year that this species was discovered?",
+        "golden_answers": [
+            "The reef mantra ray's real name is Mobula alfredi, named in 1868 by Australian Museum director Gerard Krefft after Alfred, the Duke of Edinburgh, visited Australia."
+        ],
+        "output": {
+            "pred": "The Duke of Edinburgh during the year the manta ray (Mobula alfredi) was discovered was Prince Alfred, Duke of Edinburgh.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2926829268292683,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "fa3c8d05-d3e0-4f94-8c80-b750fa487995",
+        "question": "how tall is this building compared to the tallest building in the united states?",
+        "golden_answers": [
+            "one kansas city place, at 624 feet tall, is less than half the height of one world trade center in new york, which is 1,776 feet tall."
+        ],
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents consistently mention that One World Trade Center is 1,776 feet (541 meters) tall, including the antenna. The building in the image is shorter than One World Trade Center, which is 1,776 feet (541 meters) tall. Therefore, the building in the image is shorter than One World Trade Center.\n</Thought>\n<Sub-Question>\nWhat is the height of One World Trade Center?\n</Sub-Question>\n<Search>\nText Retrieval: \"height of One World Trade Center\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3655913978494624,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "c3542f6a-e30b-4195-9679-bdf5a8b8d28f",
+        "question": "What is the famous monicker of the state in which this historic prison is located?",
+        "golden_answers": [
+            "Known by its monicker \"The Golden State,\" California is home to San Quentin State Prison which is known for housing some of the most notable killers in history such as Charles Manson."
+        ],
+        "output": {
+            "pred": "The famous moniker of the state in which this historic prison is located is \"The Golden State.\"",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4090909090909091,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "1a3bd7f9-a53b-4711-b2c8-10d0d4adf256",
+        "question": "who is the executive chef of the restaurant in this hotel?",
+        "golden_answers": [
+            "the executive chef at the four seasons hotel new york downtown is maria tampakis."
+        ],
+        "output": {
+            "pred": "The executive chef of the restaurant in the Four Seasons Hotel New York Downtown is Wolfgang Puck.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6923076923076924,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "ac1b79c8-abaf-4b3f-8389-b65b5d9bd6f2",
+        "question": "What are five other species in the same genus as this plant?",
+        "golden_answers": [
+            "Five other species in the same genus as Syzygium myrtifolium include Syzygium amplifolium, Syzygium andamanicum, Syzygium anisatum, Syzygium angophoroides and Syzygium anisosepalum."
+        ],
+        "output": {
+            "pred": "The five other species in the same genus as Excoecaria cochinchinensis are Excoecaria erythroxyli, Excoecaria palmicola, Excoecaria pellita, and Excoecaria viridis.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "f8291531-823e-4598-9609-1b9a92700ca4",
+        "question": "which quarter had the greatest revenue?",
+        "golden_answers": [
+            "the first church received its greatest revenue in the fourth quarter."
+        ],
+        "output": {
+            "pred": "The total revenue for the first quarter is $313,000.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.375,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "569e92eb-a2d6-4b4d-9cfd-959bc73065a9",
+        "question": "what kind of car is in front of me?",
+        "golden_answers": [
+            "the car in front of you is a chevrolet equinox."
+        ],
+        "output": {
+            "pred": "The car in front of you is a black Chevrolet minivan.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.823529411764706,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "f17933a5-2975-4a36-bef8-fe102476953d",
+        "question": "why does this help rabbit teeth?",
+        "golden_answers": [
+            "timothy hay helps grind down the teeth of rabbits, keeping the teeth and jaw in good order."
+        ],
+        "output": {
+            "pred": "Based on the retrieved documents, Western Timothy Hay helps rabbit teeth in several ways:\n\n1. **High Fiber Content**: Timothy Hay is high in fiber, which is essential for a rabbit's health. Rabbits need a lot of fiber to function properly, and Timothy Hay provides this high fiber content. This fiber helps prevent gut problems like gastrointestinal stasis, which can occur if the digestive system becomes clogged.\n\n2. **Natural Wear Down**: The rough strands of Timothy Hay help keep rabbit teeth from growing too long. As rabbits chew on the hay, the action effectively rubs and grinds down the enamel of their teeth, preventing them from growing excessively. This natural wear-down mechanism is crucial for maintaining healthy teeth.\n\n3. **Prevention of Sharp Points**: Eating Timothy Hay can help keep rabbit teeth from developing sharp points, which can be painful. The rough texture of the hay helps maintain the natural shape of the teeth.\n\n4. **Supports Digestive Health**: Timothy Hay is also beneficial for a rabbit's digestive system. It promotes a balanced digestive system, helps prevent obesity, and keeps energy levels steady. This overall health support indirectly contributes to the maintenance of healthy teeth.\n\nIn summary, Western Timothy Hay helps rabbit teeth by providing the necessary fiber for digestion, preventing overgrowth, and supporting overall dental health.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.09389671361502348,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "999f6c1e-ac62-4c81-ba20-ef254913745c",
+        "question": "how much does this white bottle cost at target versus at walmart?",
+        "golden_answers": [
+            "a 20-ounce bottle of cetaphil daily facial cleanser is $13.44 at walmart and $13.49 at target."
+        ],
+        "output": {
+            "pred": "The Cetaphil Daily Facial Cleanser is priced differently at Target and Walmart. At Walmart, a 16 fl oz bottle costs around $75.36 and a 20 fl oz bottle costs around $59.85. At Target, a 16 fl oz bottle is available for around $11.97, and a 20 fl oz bottle is also available for around $11.97.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3384615384615385,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "a9482d12-116d-4f64-a022-6226ee12ea2f",
+        "question": "what other types of the same material as this bottle exist?",
+        "golden_answers": [
+            "the main types of glass are the soda-lime glass, the lead glass, the borosilicate glass, the silicate glass and the aluminosilicate glass."
+        ],
+        "output": {
+            "pred": "The bottle appears to be made of glass.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.17391304347826086,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "72e83488-db61-40f4-887c-13164f65b97a",
+        "question": "Could someone see this plant bloom in the spring?",
+        "golden_answers": [
+            "No, someone most likely wouldn't be able to see Plectranthus madagascariensis bloom in the spring since it typically blooms in autumn."
+        ],
+        "output": {
+            "pred": "<Thought>\nThe plant in the image is a green, fuzzy-leaved plant with purple-red flowers. Based on the descriptions provided, the plant could potentially be identified as \"Phlomoides tuberosa\" or \"Salvia glutinosa\". However, the image resolution and details are not sufficient to definitively identify the plant. For a precise identification, a more detailed description or a higher-resolution image would be necessary.\n</Thought>\n<Sub-Question>\nCould you describe the plant in the image in more detail?\n</Sub-Question>\n<Search>\nText Retrieval: \"description of a green, fuzzy-leaved plant with purple-red flowers\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.0851063829787234,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "b07704be-ffd4-4d62-b144-c0b08f25da13",
+        "question": "who originally designed this sculpture?",
+        "golden_answers": [
+            "john collier was selected to craft the saint michael the archangel ground zero sculpture, which honors police and other first responders who worked or died in 9/11."
+        ],
+        "output": {
+            "pred": "The sculpture in the image is \"The Thinker\" by Auguste Rodin.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.12121212121212122,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "8da28e6d-54a6-4d72-8d39-d0598104daa3",
+        "question": "are these better than plastic pots?",
+        "golden_answers": [
+            "yes, biodegradable pots are better for the environment, promote healthy root growth, and are cost-effective."
+        ],
+        "output": {
+            "pred": "Based on the retrieved documents, biodegradable plant pots made from natural materials like coir, peat moss, or other plant-based materials offer several advantages over traditional plastic pots:\n\n1. **Environmental Benefits**: Biodegradable pots are made from natural materials that break down over time, reducing the accumulation of waste in landfills and oceans. They can be composted along with the plant and soil, eliminating the need for separate disposal.\n\n2. **Plant Health**: These pots provide a healthier environment for plant roots by allowing for better air circulation, which prevents rot and promotes development. Some designs include perforations or porous materials that facilitate air pruning, where the roots are naturally pruned as they reach the edges of the pot.\n\n3. **Cost-Effectiveness**: While initial costs may be higher due to the materials used, biodegradable pots can be more cost-effective in the long run, especially when considering the reduced need for cleaning and reusing pots, and the potential for composting them.\n\n4. **Sustainability**: They align with eco-friendly practices and contribute to reducing the use of plastic waste, which is beneficial for both the environment and personal health.\n\n5. **Durability**: Some biodegradable pots, particularly those made from materials like bamboo or recycled plastic, can last for several years, offering a balance between sustainability and practicality.\n\nIn conclusion, while traditional plastic pots are durable and resilient, biodegradable plant pots offer significant environmental and health benefits, making them a better choice for those concerned about sustainability and plant health. However, the choice ultimately depends on individual needs, budget, and the specific requirements of the plants being grown.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.07086614173228346,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "8e25f157-08d9-4d93-941e-44a136dd36e3",
+        "question": "what drove the creation of this type of washer over a top-loading washer?",
+        "golden_answers": [
+            "the rise of front-loading washing machines was driven by their superior efficiency in water and energy consumption, along with gentler cleaning and fabric care compared to top-loading models."
+        ],
+        "output": {
+            "pred": "Based on the retrieved documents, front-loading washers were created to improve upon the limitations of top-loading washers. Key reasons include:\n\n1. **Efficiency**: Front-loading washers use less water and energy, making them more environmentally friendly and cost-effective.\n2. **Cleaning Effectiveness**: The tumbling motion of front-loading washers is more effective at removing tough stains and dirt, leading to cleaner clothes.\n3. **Space-Saving**: Front-loading washers are more compact and can be placed in smaller spaces, making them ideal for apartments and small homes.\n4. **Reduced Odor Retention**: Front-loading washers are less likely to retain odors due to the way water drains out of the machine, although regular maintenance is necessary to prevent mold and mildew buildup.\n\nThese advancements in design and functionality have made front-loading washers the preferred choice for many households, despite the initial higher cost and potential for odor issues.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.13836477987421383,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "cefd2155-7049-4d83-aafe-78810398947e",
+        "question": "who manufactures this skin care?",
+        "golden_answers": [
+            "aquaphor is manufactured by beiersdorf inc."
+        ],
+        "output": {
+            "pred": "The brand name on the tube of Aquaphor is Johnson & Johnson.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.26666666666666666,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "32cfd324-243e-4fd2-9ffe-fbff09a8371f",
+        "question": "What is the typical leaf arrangement of this plant?",
+        "golden_answers": [
+            "The typical leaf arrangement of Schumannianthus dichotomus is alternating stalked blades like leaves"
+        ],
+        "output": {
+            "pred": "The typical leaf arrangement of the plant shown in the image is likely to be alternate, where the leaves are arranged in a flat plane on either side of the stem.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.32432432432432434,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "3bfc0390-22e1-4af6-9d3f-88ce59dd9821",
+        "question": "In which years were the different generations of this car released?",
+        "golden_answers": [
+            "The four generations of the Hyundai Tucson were released in 2004, 2009, 2015 and 2020."
+        ],
+        "output": {
+            "pred": "The Hyundai Tucson has been released in the following years for different generations: 2004 (first generation), 2010 (second generation), 2016 (third generation), and 2020 (fourth generation).",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.43243243243243246,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "f6ac8624-35d5-4e69-b619-523ae33c7971",
+        "question": "what kind of machine is that?",
+        "golden_answers": [
+            "the cat th560b is a type of telehandler."
+        ],
+        "output": {
+            "pred": "The machine in the picture is a Caterpillar (CAT) TH560B telehandler.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5714285714285715,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "9fdd97c5-0bc3-47ee-a009-a80a92b64574",
+        "question": "is that dish vegan?",
+        "golden_answers": [
+            "the age tofu is not vegan, as it is served with tempura sauce. tempura sauce is not traditionally vegan, as it's made with dashi flakes."
+        ],
+        "output": {
+            "pred": "The image shows a menu with various sushi and sashimi options. To determine if a specific dish is vegan, we need to check the ingredients listed for each item. However, the image does not provide enough detail about a particular dish. Let's assume the question is referring to a typical sushi or sashimi dish.\n\n<Thought>\nThe question asks if a specific dish is vegan, but the image does not provide enough detail about a particular dish. We need to identify a dish and check its ingredients.\n</Thought>\n<Sub-Question>\nWhat is the name of the dish in question?\n</Sub-Question>\n<Search>\nText Retrieval: \"Tempura Cheese Kani\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.17543859649122806,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "6df5e763-d7b1-4cab-94d6-c52e9929c491",
+        "question": "what year was the movie adaptation of this author's first published book released?",
+        "golden_answers": [
+            "chuck palahniuk's first published book was fight club, which came out as a movie in 1999."
+        ],
+        "output": {
+            "pred": "The movie adaptation of Chuck Palahniuk's first published book, \"Choke,\" was released in 2000.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5714285714285715,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "7df79fdf-cfdf-490d-9003-40d1b81700c0",
+        "question": "What are the other brands owned by the manufacturer of this car?",
+        "golden_answers": [
+            "Pontiac Aztek was manufactured and marketed by General Motors which own Chevrolet, Buick, GMC, and Cadillac. "
+        ],
+        "output": {
+            "pred": "The other brands owned by the manufacturer of the car in the image, Toyota, include Lexus, Daihatsu, and Hino. Toyota also has a 20% stake in Subaru.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.10526315789473685,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "d253fc27-09e5-4831-98ac-3bc4c5de5257",
+        "question": "in what year did the president for whom this bridge is named win the battle of trenton?",
+        "golden_answers": [
+            "george washington won the battle of trenton in late 1776."
+        ],
+        "output": {
+            "pred": "The president for whom the bridge is named, George Washington, won the Battle of Trenton in the year 1776.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666667,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "c69129bf-6f03-4490-8794-0df74a692579",
+        "question": "did this book get published before the fall of the ottomans?",
+        "golden_answers": [
+            "no, the damascus events was published after the fall of the ottomans."
+        ],
+        "output": {
+            "pred": "Yes, the book \"The Damascus Events\" by Eugene Rogan was published before the fall of the Ottoman Empire.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5217391304347826,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "afe5977f-01b0-4f5d-acea-842349f3d37b",
+        "question": "solve this problem.",
+        "golden_answers": [
+            "49 times 55 is 2,695."
+        ],
+        "output": {
+            "pred": "The image shows a piece of paper with a mathematical problem written on it: 49 x 55. To solve this problem, we need to perform multiplication.\n\n<Thought>\nThe next step is to calculate the product of 49 and 55.\n</Thought>\n\n<Sub-Question>\nCalculate the product of 49 and 55.\n</Sub-Question>\n\n<Search>\nNo Retrieval.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.11538461538461536,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "cc745bc5-6a89-4e5d-9328-84e1d7b368d7",
+        "question": "Among the family to which this species belongs, which is the largest?",
+        "golden_answers": [
+            "The largest species in the Requiem shark's family is the Bull shark. Bull sharks are large, heavy-bodied sharks that are found in tropical and subtropical waters around the world."
+        ],
+        "output": {
+            "pred": "The family Carcharhinidae, which includes requiem sharks, is the largest among the families mentioned in the documents.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3157894736842105,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "c73c969e-21b7-4394-8ea1-93557d572cf8",
+        "question": "What is the natural habitat of this bear species size compared to the natural habitat of the Himalayan brown bear?",
+        "golden_answers": [
+            "The sun bear lives in low altitudes in the tropical forests of Southeast Asia in deciduous and seasonally evergreen forests and in non-seasonal evergreen forests, Whereas the Himalayan brown bear lives in high altitudes alpine meadows and scrublands. "
+        ],
+        "output": {
+            "pred": "The natural habitat of the sun bear is in the tropical rainforests of Southeast Asia, whereas the Himalayan brown bear lives in high-altitude mountainous regions of the Himalayas.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4482758620689655,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "3a0295ec-cbad-4fda-8c80-9b78f5826b7d",
+        "question": "Where is the organization that originally registered this cat based?",
+        "golden_answers": [
+            "The organization CFA that originally registered the Maine Coon breed based in Alliance, Ohio, U.S."
+        ],
+        "output": {
+            "pred": "The provided documents do not contain any information related to the organization that originally registered the cat or its location. The text seems unrelated to the question about the cat's registration details. \n\n<Search>\nText Retrieval: \"registration number SE*Eyesome's Amity Royal\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.16666666666666666,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "5c6f440f-60a9-461f-930c-faaf57c91a6f",
+        "question": "How does the current base model engine size of this affect fuel economy?",
+        "golden_answers": [
+            "The current base model engine in the Subaru Forester is a 2.5-liter flat-four engine which results in a fuel economy of around 26 mpg city and 33 mpg highway."
+        ],
+        "output": {
+            "pred": "The current base model engine size of the Subaru Forester, a 2.5-liter four-cylinder engine, significantly contributes to its impressive fuel economy of approximately 33 highway miles per gallon and 26 city miles per gallon, as estimated by the EPA.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5333333333333333,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "23c66b74-2ae8-4c00-be08-8146b33d8d85",
+        "question": "what park was this restaurant's first location in?",
+        "golden_answers": [
+            "shake shack's first location was in madison square park."
+        ],
+        "output": {
+            "pred": "The first location of Shake Shack was in Madison Square Park in New York City.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6956521739130435,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "687630d4-9dba-4c42-b519-47c4d1ecb3e2",
+        "question": "what is the difference in construction between this and wirewound resistors?",
+        "golden_answers": [
+            "metal film resistors are constructed by depositing a thin layer of metal onto a ceramic or glass substrate, whereas wirewound resistors are made by wrapping a resistive wire around a ceramic or fiberglass core."
+        ],
+        "output": {
+            "pred": "The primary difference in construction between wirewound resistors and film resistors lies in the method of creating the resistive element. Wirewound resistors wind a thin metal alloy wire around an insulating ceramic former, while film resistors deposit a metal film onto an insulating ceramic rod or substrate. Wirewound resistors are better suited for high-frequency applications due to their lower inductance and capacitance, whereas film resistors offer tighter tolerances and better long-term stability.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.37894736842105264,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "1ae46b87-94c7-4494-b508-40204ee7615d",
+        "question": "How many floors does this place have compared to the Burj Khalifa?",
+        "golden_answers": [
+            "The James J. Hill House is significantly shorter, only having 5 floors, compared to the Burj Khalifa, which has 163 floors."
+        ],
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents indicate that the Burj Khalifa has 163 floors. The building in the image appears to be a multi-story residential building, which is significantly shorter than the Burj Khalifa. Based on visual inspection, the building in the image has approximately 3-5 floors.\n</Thought>\n<Sub-Question>\nHow many floors does the building in the image have?\n</Sub-Question>\n<Search>\nText Retrieval: \"number of floors in the building in the image\".\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2820512820512821,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "f27574d2-2eff-4f2c-8dfb-d76e2672ffb6",
+        "question": "Can this plant bloom the whole year in the Northern Hemisphere?",
+        "golden_answers": [
+            "No, as Euphorbia pulcherrima typically bloom from late November to January in the Northern Hemisphere, triggered by shortening days and long nights."
+        ],
+        "output": {
+            "pred": "Yes, the plant in the image, which appears to be an Amaryllis, can bloom the whole year in the Northern Hemisphere.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.27027027027027023,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "bb5216c0-c1fc-4ba5-80ba-04b563eebb57",
+        "question": "What is the typical cooking style of this traditional dish?",
+        "golden_answers": [
+            "Humita's preparation styles vary based on the nation where they're made. For example, in Argentina, humita is prepared in a pot or corn husks, they are baked or boiled in corn husks in Chile, and steamed in Ecuador."
+        ],
+        "output": {
+            "pred": "The typical cooking style of tamales, as shown in the image, involves boiling. This method is commonly used for preparing tamales, especially when they are wrapped in corn husks and cooked in a pot of boiling water.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.31428571428571433,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "91fbbe50-527c-41fb-ad15-764ded9492e9",
+        "question": "who is the ceo of the parent company of this brand?",
+        "golden_answers": [
+            "lapo civiletti is the ceo of ferrero, nutella's parent company."
+        ],
+        "output": {
+            "pred": "The CEO of the parent company of Nutella is Giovanni Ferrero.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.6666666666666666,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "14972d23-8b98-4427-864b-98a88436f482",
+        "question": "what does this abbreviation stand for?",
+        "golden_answers": [
+            "dkny stands for donna karan new york."
+        ],
+        "output": {
+            "pred": "The abbreviations \"US XL\", \"CA TG\", \"D XL\", \"F XXL\", and \"CH 175/100A\" stand for size standards used in the United States, Canada, Germany, France, and China, respectively.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.060606060606060615,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "a9177a54-deaf-496d-a7d8-8662d5dac3f8",
+        "question": "How are female flowers of this plant compared to male flowers?",
+        "golden_answers": [
+            "In Baccaurea courtallensis, female flowers are larger and have larger tepals than male flowers."
+        ],
+        "output": {
+            "pred": "The image shows a plant with red flowers. Based on the retrieved documents, the plant could be identified as Kalanchoe thyrsiflora, which is a species of flowering plant native to Botswana, Lesotho, South Africa, and Swaziland. However, without uploading the image to a plant identifier app or service like Whatistheplant, PlantNet, or PictureThis, it is not possible to definitively confirm the plant species.\n\n<Search>\nNo Retrieval\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.0547945205479452,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "878088c7-21ea-48db-a9f5-508d36a24fdb",
+        "question": "what's the ideal temperature for this plant?",
+        "golden_answers": [
+            "Ravenea rivularis prefers temperatures between 65 to 85 degrees Fahrenheit."
+        ],
+        "output": {
+            "pred": "The ideal temperature for a Majesty Palm is between 65°F to 85°F (18°C to 29°C).",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.17391304347826086,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "655dc2b2-60c0-4e94-af31-e95256e0d784",
+        "question": "How many times has this stadium changed names?",
+        "golden_answers": [
+            "The Rogers Centre was initially called SkyDome. It changed names only once, in 2005."
+        ],
+        "output": {
+            "pred": "The stadium has changed its name three times.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.1,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "bc383db7-54a2-4ede-b263-262c4c82364f",
+        "question": "when was the country where this variety of rose was first cultivated founded?",
+        "golden_answers": [
+            "china, the country where mini yellow roses were first cultivated, was founded around 2100 b.c.e."
+        ],
+        "output": {
+            "pred": "Based on the information provided, the specific variety of rose in the image is not clearly identified. However, we can infer that the rose in the image could be one of the varieties mentioned in the documents, such as 'Julia Child', 'Crown Princess Margaret', 'Patience', 'White Tibet', 'Playa Blanca', 'White Oharas', 'Vendela', 'White Eskimo', or 'White Modial'.\n\nSince the image does not provide enough detail to identify the exact variety of rose, we cannot proceed further without additional information. Therefore, we cannot determine the country where this variety of rose was first cultivated.\n\n<Search>\nText Retrieval: \"specific variety of rose in the image\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.09345794392523364,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "a236c36d-3233-4fee-9ec0-e0e20492b597",
+        "question": "can i charge my phone there?",
+        "golden_answers": [
+            "yes, you can charge your phone at veltus park, as two of the picnic shelters have electric outlets."
+        ],
+        "output": {
+            "pred": "Thought: The retrieved documents do not explicitly mention charging stations or power outlets. However, given the hotel's location in downtown Glenwood Springs, it is likely that there are public charging stations available in the vicinity. It would be advisable to check with the hotel or visitor information center for more specific details.\n\n<Search> No Retrieval needed.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.028985507246376815,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "804989d1-1780-40f7-8bac-d9877c74a3ca",
+        "question": "what store sells that brand?",
+        "golden_answers": [
+            "kirkland signature is costco's private label brand, featured on a wide array of products sold across costco's warehouses and its website."
+        ],
+        "output": {
+            "pred": "Thought: The retrieved documents provide various pieces of information about brands and their logos, but none of them directly answer the question about which store sells a specific brand. Since the image does not contain any visible branding or logos, it is impossible to determine the brand in question. Therefore, I need to ask for clarification on which brand is being referred to in the original question.\n\n<Search>\nText Retrieval: \"clarification on which brand is being referred to in the original question\"\n<End>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.10416666666666667,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "6911c214-c4e9-4448-a2da-1812f7705ad0",
+        "question": "what's the name of the character who is the archdeacon's wife in this novel?",
+        "golden_answers": [
+            "mrs susan grantly is the archdeacon's wife in the novel barchester towers."
+        ],
+        "output": {
+            "pred": "The name of the character who is the archdeacon's wife in \"Barchester Towers\" is Mrs. Susan Grantly.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.75,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "340abc34-b915-4f92-820d-8775ff620847",
+        "question": "what does it do?",
+        "golden_answers": [
+            "a lth meter measures light, temperature, and humidity."
+        ],
+        "output": {
+            "pred": "The input question \"what does it do?\" seems incomplete. Could you please provide more context or clarify what you are referring to? Without additional details, it's challenging to determine what specific object or item you are asking about. Please specify which object you are interested in, and I will be able to assist you better.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.03278688524590164,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "21467279-7cba-43f4-8bb3-c051a1eb246b",
+        "question": "compare the weight of these animals to the black rhinoceros .",
+        "golden_answers": [
+            "the male indian elephant can reach a massive weight of up to 11,900 pounds, significantly outweighing the black rhinoceros, which typically reaches a maximum weight of 3,090 pounds."
+        ],
+        "output": {
+            "pred": "The weight of an elephant is significantly greater than that of a black rhinoceros.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "af116508-bb2a-4838-bc7a-c10e0715a77b",
+        "question": "which hospitalize more people in alaska every year, these or bears?",
+        "golden_answers": [
+            "moose hospitalize more people in alaska on average every year than bears."
+        ],
+        "output": {
+            "pred": "Bears hospitalize more people in Alaska every year than any other cause.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.75,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "1dde4f5d-9660-4ed9-bb9e-6e1acd847bf0",
+        "question": "when was this plant species first described?",
+        "golden_answers": [
+            "the euphorbia aphylla was first described in 1809."
+        ],
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not directly provide the scientific name of the plant in the image. However, the image appears to show a plant with long, thin, green stems, which could be a species of Euphorbia, which is a genus of succulents. To find the date of description, we should search for the specific plant species using its common or scientific name.\n</Thought>\n<Sub-Question>\nWhat is the scientific name of the plant in the image?\n</Sub-Question>\n<Search>\nText Retrieval: \"scientific name of the plant in the image\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.04938271604938272,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "bfa2eae6-76a8-450f-b3c4-0cd103ece826",
+        "question": "How does the bufotenin concentration in this plant compare to that of Anadenanthera peregrina?",
+        "golden_answers": [
+            "Anadenanthera colubrina has five percent more bufotenin than Anadenanthera peregrina."
+        ],
+        "output": {
+            "pred": "Based on the retrieved documents, the bufotenin concentration in Anadenanthera peregrina is reported to be approximately 0.018-0.020%. However, the bufotenin concentration in the unknown plant cannot be determined from the image alone. To compare the bufotenin concentration between the unknown plant and Anadenanthera peregrina, we would need specific data on the bufotenin concentration in the unknown plant.\n\n<Search>\nText Retrieval: \"bufotenin concentration in unknown plant\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.11940298507462686,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "44c99ae9-2730-420e-bffe-649eef458363",
+        "question": "what is the difference between this kind of hammer and a sledgehammer?",
+        "golden_answers": [
+            "claw hammers are often used to drive nails or remove them from wood, while sledgehammers are commonly used for breaking through drywall or masonry walls during demolition work."
+        ],
+        "output": {
+            "pred": "The main difference between a hammer and a sledgehammer lies in their size, weight, and intended use. A hammer is smaller, lighter, and designed for tasks requiring precision and control, such as driving nails and fitting parts. A sledgehammer, on the other hand, is much larger and heavier, intended for demolition and breaking tasks that require substantial force. It is typically used with both hands due to its size and weight.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.12903225806451613,
+                "acc": 0.0
+            }
+        }
+    },
+    {
+        "id": "64bb59f7-ebd4-4cf3-8525-ee42befb1620",
+        "question": "which state is it located in?",
+        "golden_answers": [
+            "the berkeley pit is located in the state of montana."
+        ],
+        "output": {
+            "pred": "The Bingham Canyon Mine is located in Utah.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.39999999999999997,
+                "acc": 0.0
+            }
+        }
+    }
+]
