@@ -29,7 +29,7 @@ insufficient
 1. Stay focused on the image content. If the student's feedback is unclear, ask for clarification within the <plan> tag.
 2. Only ONE UNIQUE question can be sent to the student each time. That means the content you generate should not contain two questions.
 3. if student does not provide a satisfactory answer, guide him from a different perspective and provide it with another action plan for solving the problem.
-3. When you generate final answer, make sure the answer is BRIEF and ACCURATE! Your answer MUST NOT be long.
+3. When you generate final answer, make sure the answers are PHRASES rather than whole sentences. Your answer MUST NOT be long.
 Now begin!
 Question:
 {question}

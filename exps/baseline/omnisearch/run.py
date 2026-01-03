@@ -21,7 +21,7 @@ def main():
 
     generator = Qwen2Generator()
     retriever = CRAGSearch(top_k=config['retrieval_topk'])
-    pipeline = OmniSearchPipeline(config=config, retriever=retriever, generator=generator)
+    pipeline = OmniSearchPipeline(config=config, retriever=None, generator=generator)
     output_dataset = pipeline.run(test_data, do_eval=True)
     toten_usage = generator.get_total_usage()
     with open("records.txt", "a", encoding="utf-8") as f:

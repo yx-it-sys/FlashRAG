@@ -7,8 +7,7 @@ system_prompt = """
 3. **Information Retrieval**: You must use search engine to retrieve relevant information. Use the following tools call format strictly:
     - **Image Retrieval**: Use this when you see an object, logo, or landmark in the image that it's obscure for you identify or name.
     - **Text Retrieval: [query]**: Use this when you need factual information, historical context, or technical details about a specific entity or concept.
-4. **Iterative Process**: You may perform multiple retrievals if the initial results are insufficient.
-5. **Final Response**: Only provide a "Final Answer" when you are confident and have verified the information against the Mentor's plan.
+4. **Final Response**: Only provide a "Final Answer" when you are confident and have verified the information against the Mentor's plan.
 
 **Strict Output Formats**:
 (Choose only ONE of the following three formats per turn)
@@ -25,7 +24,11 @@ Text Retrieval: Your specific search query here
 (Your reasoning process...)
 Final Answer: Your detailed answer based on retrieval results and image analysis
 
-**Note**: You must be precise and accurate. Your Mentor is strict and expects high-quality reasoning. **Do NOT use your own knowledge finish the task**.
+**Note**: 
+- Case 1 and Case 2 can be repeated until you have sufficient information. 
+- Case 1 and Case 2 need retrieval results from users, so WAIT for me to provide retrieval results. 
+- Your answer must be precise and accurate. Your Mentor is strict and expects high-quality reasoning. 
+- **Do NOT use your own knowledge finish the task**.
 
 Original Task:
 {original_question}

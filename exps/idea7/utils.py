@@ -26,15 +26,17 @@ def qwen2_generate(model, processor, messages):
     with torch.inference_mode():
         generated_ids = model.generate(
             **inputs, 
-            max_new_tokens=1024,  
+            max_new_tokens=4096,
+            do_sample=True,
+            temperature=0.7,
+            output_scores=True,
+            return_dict_in_generate=True,
             pad_token_id=processor.tokenizer.pad_token_id,
             eos_token_id=processor.tokenizer.eos_token_id
         )
     
     input_len = inputs.input_ids.shape[1]
-    
-    del inputs 
-    
+        
     generated_ids_trimmed = [
         out_ids[input_len:] for out_ids in generated_ids
     ]
@@ -42,12 +44,7 @@ def qwen2_generate(model, processor, messages):
     output_text = processor.batch_decode(
         generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
     )
-    
-    del generated_ids
-    del generated_ids_trimmed
-
     return output_text[0]
-
     
 class CRAGSearch():
     def __init__(self, top_k):
