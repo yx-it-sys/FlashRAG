@@ -32,7 +32,7 @@ class Instructor(BasicPipeline):
                         "type": "image",
                         "image": image,
                     },
-                    {"type": "text", "text": self.instructor_prompt['system_prompt'].format(question=question)},
+                    {"type": "text", "text": self.instructor_prompt['system_prompt'].format(question=question, is_first_turn=True)},
                 ],
             }
         ]

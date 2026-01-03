@@ -70,9 +70,9 @@ class Student(BasicPipeline):
         conversation_num, max_turns = 0, 5
         final_answer = "I can't answer."
         while conversation_num < max_turns:
-            print("="*30)
-            print(f"STUDENT Prompt Contexts:\n{messages}")
-            print("="*30)
+            # print("="*30)
+            # print(f"STUDENT Prompt Contexts:\n{messages}")
+            # print("="*30)
             if action_type == "Image Retrieval":
                 print("<Image Retrieval>")
                 search_text = self.retriever.search_by_image(image)
