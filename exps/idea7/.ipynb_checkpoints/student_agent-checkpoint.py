@@ -126,10 +126,10 @@ class Student(BasicPipeline):
                     }]
                 })
             elif action_type == "Final Answer":
-                print("<Final Answer>")
                 final_answer = action
                 logs.append({"current_final_answer": final_answer})
                 break
+        print(f"<answer>\n{final_answer}\n</answer>")
 
         return final_answer, logs
     

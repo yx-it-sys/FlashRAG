@@ -36,9 +36,11 @@ class Instructor(BasicPipeline):
                 ],
             }
         ]
-        print("\n<Instructor>")
+        
         instructor_response = qwen2_generate(self.model, self.processor, messages)
+        print("\n<Instructor>")
         print(f"Instructor first Response: {instructor_response}")
+        print("\n</Instructor>")
         logs.append({"instructor_first_response": instructor_response})
         state, plan = self.parse_from_instructor(instructor_response)
         messages.append({
@@ -47,7 +49,7 @@ class Instructor(BasicPipeline):
                         "type": "text", "text": f"state: {state}, plan: {plan}"
                     }]
                 })
-        if state != "insufficient":
+        if state != "continue":
             print(f"ERROR! The Instructor went on strike! Before he went off, he said: {instructor_response}")
             return "", messages
         else:
@@ -56,20 +58,24 @@ class Instructor(BasicPipeline):
                 # print("="*30)
                 # print(f"INSTRUCTOR Prompt Contexts:\n{messages}")
                 # print("="*30)
-                if state == "sufficient":
+                print(f"State: {state}, Plan: {plan}")
+                if state == "finish":
                     break
                 # messages.append({'role': 'assistant', 'content': instructor_response})
                 print("\n<Student>")
                 feedback, student_logs = self.student.generate(question, image, plan)
                 feedback_list.append(feedback)
                 logs.append({"feedback": feedback})
+                print("<Student>")
+                print(f"Student feedback: {feedback}")
+                print("</Student>")
                 messages.append({
                     "role": "user",
                     "content": [
                         {"type": "text", "text": f"Feedback from student on the current plan '{plan}':\n{feedback}"}
                     ]
                 })
-                print("\n<Instructor>")
+
                 instructor_response = qwen2_generate(self.model, self.processor, messages)
                 # instructor_response = self.check_student_response(feedback_list, plan)
                 messages.append({
@@ -79,7 +85,9 @@ class Instructor(BasicPipeline):
                     }]
                 })
                 logs.append({"instructor_response": instructor_response})
+                print("\n<Instructor>")
                 print(f"Instructor response after student: {instructor_response}")
+                print("\n</Instructor>")
                 state, plan = self.parse_from_instructor(instructor_response)
                 conversation_num += 1
 
@@ -122,7 +130,8 @@ class Instructor(BasicPipeline):
             state_match_text = re.search(state_pattern_text, instructor_response, re.DOTALL | re.IGNORECASE)
             
             if state_match_text:
-                state_content = state_match_text.group(1).strip()
+                state_content = state_match_text.group(1)
+                state_content = state_content.strip(" ,.\"'`\n").lower()
                 
             # 2.2 解析 Text Plan
             # 查找 "plan:" 开头，直到字符串结尾
@@ -130,18 +139,20 @@ class Instructor(BasicPipeline):
             plan_match_text = re.search(plan_pattern_text, instructor_response, re.DOTALL | re.IGNORECASE)
             
             if plan_match_text:
-                plan_content = plan_match_text.group(1).strip()
+                plan_content = plan_match_text.group(1)
+                plan_content = plan_content.strip(" ,.\"'`\n").lower()
+            print(f"没有遵守形式：{state_content}, {plan_content}")
     
         
         if state_content is None:
             print("ERROR! State not found in either XML or Text format")
-            state_content = "insufficient"
+            state_content = "continue"
     
         if plan_content is None:
             # 如果两种策略都没找到 Plan，通常意味着模型输出了非结构化的纯文本
             # 为了不中断流程，将整个回复作为 Plan
             print("ERROR! Plan not found, using full response")
-            state_content = "insufficient"
+            state_content = "continue"
             plan_content = instructor_response
     
         return state_content, plan_content
