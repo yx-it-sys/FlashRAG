@@ -99,7 +99,7 @@ class Student(BasicPipeline):
                 
             elif action_type == "Text Retrieval":
                 print("<Text Retrieval>")
-                query_list = self.query_rewrite(action)
+                query_list = self.query_rewrite(image, action)
                 retrieval_content = []
                 for query in query_list:
                     search_text = self.retriever.search_by_text(query)

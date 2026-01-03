@@ -27,6 +27,7 @@ Final Answer: Your detailed answer based on retrieval results and image analysis
 **Note**: 
 - Case 1 and Case 2 can be repeated until you have sufficient information. 
 - Case 1 and Case 2 need retrieval results from users, so WAIT for me to provide retrieval results. 
+- You MUST use retrieval tool at least once.
 - Your answer must be precise and accurate. Your Mentor is strict and expects high-quality reasoning. 
 - **Do NOT use your own knowledge finish the task**.
 

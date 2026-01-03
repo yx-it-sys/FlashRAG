@@ -53,9 +53,9 @@ class Instructor(BasicPipeline):
         else:
             conversation_num, max_turns = 0, 8
             while conversation_num < max_turns:
-                print("="*30)
-                print(f"INSTRUCTOR Prompt Contexts:\n{messages}")
-                print("="*30)
+                # print("="*30)
+                # print(f"INSTRUCTOR Prompt Contexts:\n{messages}")
+                # print("="*30)
                 if state == "sufficient":
                     break
                 # messages.append({'role': 'assistant', 'content': instructor_response})
@@ -66,7 +66,7 @@ class Instructor(BasicPipeline):
                 messages.append({
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"Feedback from student on the current plan {plan}:\n{feedback}"}
+                        {"type": "text", "text": f"Feedback from student on the current plan '{plan}':\n{feedback}"}
                     ]
                 })
                 print("\n<Instructor>")
@@ -180,10 +180,10 @@ class Instructor(BasicPipeline):
                     
                     continue
     
-                except Exception as e:
-                    print(f"!!! Unknown Error at index {i}, id: {id}: {str(e)}")
-                    prediction_list.append(f"Error: {str(e)}")
-                    continue
+                # except Exception as e:
+                #     print(f"!!! Unknown Error at index {i}, id: {id}: {str(e)}")
+                #     prediction_list.append(f"Error: {str(e)}")
+                #     continue
         
         end_time = time.time()
         total_duration = end_time - start_time

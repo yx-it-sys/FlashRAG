@@ -54,10 +54,10 @@ method2index:
 # ----Environment Settings----
 gpu_id: "0"
 dataset_name: "crag"
-split: ['test']
+split: ['test','dev']
 
 # Sampling configurations for testing
-test_sample_num: 200
+# test_sample_num: 200
 random_sample: True
 save_intermediate_data: True
 # Seed for reproducibility

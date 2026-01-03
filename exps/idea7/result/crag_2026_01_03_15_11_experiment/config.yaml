@@ -50,12 +50,13 @@ method2index:
     bge: null
     bge-m3: null
 data_dir: data/datasets/
-save_dir: result/crag_2025_12_28_10_33_experiment
+save_dir: result/crag_2026_01_03_15_11_experiment
 gpu_id: '0'
 dataset_name: crag
 split:
 - test
-test_sample_num: 200
+- dev
+test_sample_num: null
 random_sample: true
 seed: 2024
 save_intermediate_data: true

@@ -1,0 +1,17 @@
+[
+    {
+        "id": "2dfa614b-e810-400d-b668-1bc41e8ca52b",
+        "question": "which age and sex had the least amount of injury-related unintentional falls reported?",
+        "golden_answers": [
+            "males aged 18-24 had the leaset amount of injury-related unintentional falls reported."
+        ],
+        "output": {
+            "pred": "The total injury-related unintentional fall rate among males was 280.4 visits per 10,000 people, which is lower than the total female rate of 340.2 visits per 10,000 people in the \"Total (crude)\" category.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.1951219512195122,
+                "acc": 0.0
+            }
+        }
+    }
+]

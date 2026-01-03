@@ -23,6 +23,7 @@ class Instructor(BasicPipeline):
 
     def generate(self, question: str, image: Image):
         logs = []
+        feedback_list = []
         messages = [
             {
                 "role": "system",
@@ -52,24 +53,29 @@ class Instructor(BasicPipeline):
         else:
             conversation_num, max_turns = 0, 8
             while conversation_num < max_turns:
+                # print("="*30)
+                # print(f"INSTRUCTOR Prompt Contexts:\n{messages}")
+                # print("="*30)
                 if state == "sufficient":
                     break
-                messages.append({'role': 'assistant', 'content': instructor_response})
+                # messages.append({'role': 'assistant', 'content': instructor_response})
                 print("\n<Student>")
                 feedback, student_logs = self.student.generate(question, image, plan)
+                feedback_list.append(feedback)
                 logs.append({"feedback": feedback})
                 messages.append({
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"Feedback from student on the current plan {plan}:\n{feedback}"}
+                        {"type": "text", "text": f"Feedback from student on the current plan '{plan}':\n{feedback}"}
                     ]
                 })
                 print("\n<Instructor>")
                 instructor_response = qwen2_generate(self.model, self.processor, messages)
+                # instructor_response = self.check_student_response(feedback_list, plan)
                 messages.append({
                     "role": "assistant",
                     "content": [{
-                        "type": "text", "text": f"state: {state}, plan: {plan}"
+                        "type": "text", "text": instructor_response
                     }]
                 })
                 logs.append({"instructor_response": instructor_response})
@@ -82,6 +88,8 @@ class Instructor(BasicPipeline):
             logs.append({"student_logs": student_logs})
             return final_answer, logs
         
+    def check_student_response(self, feedback_list, plan):
+        pass
 
     def parse_from_instructor(self, instructor_response):
         # ==========================================
@@ -172,10 +180,10 @@ class Instructor(BasicPipeline):
                     
                     continue
     
-                except Exception as e:
-                    print(f"!!! Unknown Error at index {i}, id: {id}: {str(e)}")
-                    prediction_list.append(f"Error: {str(e)}")
-                    continue
+                # except Exception as e:
+                #     print(f"!!! Unknown Error at index {i}, id: {id}: {str(e)}")
+                #     prediction_list.append(f"Error: {str(e)}")
+                #     continue
         
         end_time = time.time()
         total_duration = end_time - start_time

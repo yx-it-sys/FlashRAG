@@ -2,10 +2,6 @@ from utils import qwen2_generate
 from flashrag.pipeline import BasicPipeline
 from flashrag.utils import get_retriever
 import tomllib
-from PIL import Image
-import torch
-import json
-import json_repair
 import re
 
 class Student(BasicPipeline):
@@ -18,7 +14,36 @@ class Student(BasicPipeline):
         self.processor = processor
         with open('prompts/student.toml', 'rb') as f:
             self.prompt = tomllib.load(f)
+        with open('prompts/query_rewrite.toml', 'rb') as f:
+            self.query_rewrite_prompt = tomllib.load(f)
 
+    def query_rewrite(self, image, action_content):
+        messages = [
+            {
+                "role": "system",
+                "content": [
+                    {"type": "image", "image": image},
+                    {"type": "text", "text": self.query_rewrite_prompt['system_prompt']},
+                ]
+            },
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": self.query_rewrite_prompt['user_prompt'].format(query=action_content)}
+                ]
+            }
+        ]
+        response = qwen2_generate(self.model, self.processor, messages)
+        print(f"Rewritten Query: {response}")
+        pattern = r"<rewritten_query>(.*?)</rewritten_query>"
+        match = re.search(pattern, response, re.DOTALL)
+        if match:
+            results = match.group(1).strip()
+        else:
+            print("No rewritten query found, using original.")
+            results = [action_content]
+        return results
+    
     def generate(self, question, image, plan):
         logs = []
         messages = [
@@ -45,6 +70,9 @@ class Student(BasicPipeline):
         conversation_num, max_turns = 0, 5
         final_answer = "I can't answer."
         while conversation_num < max_turns:
+            print("="*30)
+            print(f"STUDENT Prompt Contexts:\n{messages}")
+            print("="*30)
             if action_type == "Image Retrieval":
                 print("<Image Retrieval>")
                 search_text = self.retriever.search_by_image(image)
@@ -65,14 +93,19 @@ class Student(BasicPipeline):
                 messages.append({
                     "role": "assistant",
                     "content": [{
-                        "type": "text", "text": "Based on the retrieved content, I still need Image Retrieval."
+                        "type": "text", "text": f"{action_type}: {action}"
                     }]
                 })
                 
             elif action_type == "Text Retrieval":
                 print("<Text Retrieval>")
-                search_text = self.retriever.search_by_image(image)
-                retrieval_content = "\n\n".join([f"Doc{i+1}:\n{text}" for i, text in enumerate(search_text)])
+                query_list = self.query_rewrite(image, action)
+                retrieval_content = []
+                for query in query_list:
+                    search_text = self.retriever.search_by_text(query)
+                    retrieval_content.append("\n\n".join([f"Doc{i+1}:\n{text}" for i, text in enumerate(search_text)]))
+                retrieval_content = "\n\n".join(retrieval_content)
+                print(f"Retrieval Content: {retrieval_content}")
                 logs.append({"text_ret": retrieval_content[:200]})
                 messages.append({
                     "role": "user",
@@ -89,7 +122,7 @@ class Student(BasicPipeline):
                 messages.append({
                     "role": "assistant",
                     "content": [{
-                        "type": "text", "text": f"Based on the retrieved content, I still need Text Retrieval. And the query is {action}"
+                        "type": "text", "text": f"{action_type}: {action}"
                     }]
                 })
             elif action_type == "Final Answer":

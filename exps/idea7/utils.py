@@ -24,7 +24,7 @@ def qwen2_generate(model, processor, messages):
     inputs = inputs.to("cuda")
     
     with torch.inference_mode():
-        generated_ids = model.generate(
+        model_outputs = model.generate(
             **inputs, 
             max_new_tokens=4096,
             do_sample=True,
@@ -35,10 +35,12 @@ def qwen2_generate(model, processor, messages):
             eos_token_id=processor.tokenizer.eos_token_id
         )
     
+    generated_sequences = model_outputs.sequences
+
     input_len = inputs.input_ids.shape[1]
         
     generated_ids_trimmed = [
-        out_ids[input_len:] for out_ids in generated_ids
+        out_ids[input_len:] for out_ids in generated_sequences
     ]
     
     output_text = processor.batch_decode(
