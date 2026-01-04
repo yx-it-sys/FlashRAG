@@ -13,15 +13,12 @@ system_prompt = """
 (Choose only ONE of the following three formats per turn)
 
 - Case 1: **To identify an unknown part of an image**:
-(Your reasoning process...)
 Image Retrieval
 
 - Case 2: **To fetch factual information**:
-(Your reasoning process...)
 Text Retrieval: Your specific search query here
 
 - Case 3:**To provide the solution to the Mentor**:
-(Your reasoning process...)
 Final Answer: Your detailed answer based on retrieval results and image analysis
 
 **Note**: 
@@ -30,6 +27,8 @@ Final Answer: Your detailed answer based on retrieval results and image analysis
 - You MUST use retrieval tool at least once.
 - Your answer must be precise and accurate. Your Mentor is strict and expects high-quality reasoning. 
 - **Do NOT use your own knowledge finish the task**.
+- Do NOT generate markdown markup.
+- Think step by step.
 
 Original Task:
 {original_question}
