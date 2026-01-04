@@ -72,7 +72,7 @@ class Instructor(BasicPipeline):
                 messages.append({
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"Feedback from student on the current plan '{plan}':\n{feedback}"}
+                        {"type": "text", "text": f"Feedback from user: {feedback}\n\n(Reminder: Use this feedback to move towards solving the MAIN QUESTION: '{question}'. If not fully solved, continue asking.)"}
                     ]
                 })
 
