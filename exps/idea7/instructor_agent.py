@@ -32,7 +32,7 @@ class Instructor(BasicPipeline):
                         "type": "image",
                         "image": image,
                     },
-                    {"type": "text", "text": self.instructor_prompt['system_prompt'].format(question=question, is_first_turn=True)},
+                    {"type": "text", "text": self.instructor_prompt['system_prompt'].format(question=question, is_first_turn="True")},
                 ],
             }
         ]
@@ -98,7 +98,7 @@ class Instructor(BasicPipeline):
     def check_student_response(self, feedback_list, plan):
         pass
 
-    def parse_from_instructor(self, instructor_response):        
+    def parse_from_instructor(self, instructor_response):
         json_data = None
         json_str = None
 
@@ -149,7 +149,7 @@ class Instructor(BasicPipeline):
         if state_content not in ["continue", "finish"]:
             print(f"Warning: Unexpected state '{state_content}', defaulting to 'continue'")
             state_content = "continue"
-
+        print(f"State: {state_content}, Plan: {plan_content}")
         return state_content, plan_content
     
     def run(self, dataset, do_eval=True, pred_process_fun=None):

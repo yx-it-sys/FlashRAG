@@ -90,6 +90,7 @@ class Student(BasicPipeline):
                 print(f"Problematic string: {json_str}")
         else:
             print("No JSON object found in response, using original query.")
+        print(f"Rewrite Results: {results}")
         return results
     
     def generate(self, question, image, plan):
@@ -233,5 +234,5 @@ class Student(BasicPipeline):
             else:
                 # 如果存在关键词但没有冒号，这里视情况处理，或者设为空字符串
                 result["content"] = ""
-
+        print(f"Result: {result}")
         return result

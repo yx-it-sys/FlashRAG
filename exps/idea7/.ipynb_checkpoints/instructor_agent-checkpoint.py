@@ -32,7 +32,7 @@ class Instructor(BasicPipeline):
                         "type": "image",
                         "image": image,
                     },
-                    {"type": "text", "text": self.instructor_prompt['system_prompt'].format(question=question, is_first_turn=True)},
+                    {"type": "text", "text": self.instructor_prompt['system_prompt'].format(question=question, is_first_turn="True")},
                 ],
             }
         ]
@@ -72,7 +72,7 @@ class Instructor(BasicPipeline):
                 messages.append({
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"Feedback from student: {feedback}\n\n(Reminder: Use this feedback to move towards solving the MAIN QUESTION: '{question}'. If not fully solved, continue asking.)"}
+                        {"type": "text", "text": f"Feedback from user: {feedback}\n\n(Reminder: Use this feedback to move towards solving the MAIN QUESTION: '{question}'. If not fully solved, continue asking.)"}
                     ]
                 })
 
@@ -92,7 +92,6 @@ class Instructor(BasicPipeline):
                 conversation_num += 1
 
             final_answer = plan
-            context = messages
             logs.append({"student_logs": student_logs})
             return final_answer, logs
         
@@ -100,63 +99,59 @@ class Instructor(BasicPipeline):
         pass
 
     def parse_from_instructor(self, instructor_response):
-        # ==========================================
-        # 策略 1: 尝试解析 XML 风格标签 (<state>...</state>)
-        # ==========================================
+        json_data = None
+        json_str = None
+
+        markdown_pattern = r"```json\s*(\{.*?\})\s*```"
+        match = re.search(markdown_pattern, instructor_response, re.DOTALL | re.IGNORECASE)
         
-        # 1.1 解析 XML State
-        # 使用正向前瞻 (?=...) 兼容闭合标签缺失或直接衔接 <plan> 的情况
-        state_pattern_xml = r"<state>\s*(.*?)\s*(?=</state>|<plan>|$)"
-        state_match_xml = re.search(state_pattern_xml, instructor_response, re.DOTALL | re.IGNORECASE)
+        if match:
+            json_str = match.group(1)
+        else:
+            # 1.2 如果没找到代码块，尝试寻找最外层的花括号 { ... }
+            # 这能处理模型忘记写 ```json 的情况
+            brace_pattern = r"\{.*\}"
+            match = re.search(brace_pattern, instructor_response, re.DOTALL)
+            if match:
+                json_str = match.group(0)
         
-        state_content = None
-        if state_match_xml:
-            state_content = state_match_xml.group(1).strip()
-    
-        # 1.2 解析 XML Plan
-        plan_pattern_xml = r"<plan>\s*(.*?)\s*(?=</plan>|$)"
-        plan_match_xml = re.search(plan_pattern_xml, instructor_response, re.DOTALL | re.IGNORECASE)
-        
-        plan_content = None
-        if plan_match_xml:
-            plan_content = plan_match_xml.group(1).strip()
-    
-        if state_content is None:
-            # print("XML format failed, switching to Text-Key-Value parsing...")
-            
-            # 2.1 解析 Text State
-            # 查找 "state:" 开头，直到遇到 "plan:" 或 字符串结尾
-            state_pattern_text = r"state:\s*(.*?)\s*(?=plan:|$)"
-            state_match_text = re.search(state_pattern_text, instructor_response, re.DOTALL | re.IGNORECASE)
-            
-            if state_match_text:
-                state_content = state_match_text.group(1)
-                state_content = state_content.strip(" ,.\"'`\n").lower()
+        if json_str:
+            try:
+                json_data = json.loads(json_str, strict=False)
                 
-            # 2.2 解析 Text Plan
-            # 查找 "plan:" 开头，直到字符串结尾
-            plan_pattern_text = r"plan:\s*(.*)"
-            plan_match_text = re.search(plan_pattern_text, instructor_response, re.DOTALL | re.IGNORECASE)
+            except json.JSONDecodeError as e:
+                print(f"Warning: JSON extracted but parse failed: {e}")
+                print(f"Bad JSON string: {json_str}")
+                
+        state_content = "continue" # 默认值
+        plan_content = instructor_response # 默认值为原始文本，防止丢失信息
+
+        if json_data and isinstance(json_data, dict):            
+            if "state" in json_data:
+                state_content = str(json_data["state"]).strip().lower()
             
-            if plan_match_text:
-                plan_content = plan_match_text.group(1)
-                plan_content = plan_content.strip(" ,.\"'`\n").lower()
-            print(f"没有遵守形式：{state_content}, {plan_content}")
-    
-        
-        if state_content is None:
-            print("ERROR! State not found in either XML or Text format")
-            state_content = "continue"
-    
-        if plan_content is None:
-            # 如果两种策略都没找到 Plan，通常意味着模型输出了非结构化的纯文本
-            # 为了不中断流程，将整个回复作为 Plan
-            print("ERROR! Plan not found, using full response")
+            if "plan" in json_data:
+                plan_content = str(json_data["plan"]).strip()
+                
+            # (可选) 打印思维链 Thought，用于调试
+            if "thought" in json_data:
+                print(f"[Instructor Thought]: {json_data['thought']}")
+                
+        else:
+            # 3.2 解析彻底失败
+            print("ERROR! No valid JSON object found in response.")
+            # 这种情况下，我们通常假设 state 是 continue，
+            # 并把整个回复当作 plan，或者记录错误日志
             state_content = "continue"
             plan_content = instructor_response
-    
-        return state_content, plan_content
 
+        # 最后的安全检查：确保 state 是我们需要的值
+        if state_content not in ["continue", "finish"]:
+            print(f"Warning: Unexpected state '{state_content}', defaulting to 'continue'")
+            state_content = "continue"
+        print(f"State: {state_content}, Plan: {plan_content}")
+        return state_content, plan_content
+    
     def run(self, dataset, do_eval=True, pred_process_fun=None):
         questions = dataset.question
         ids = dataset.id

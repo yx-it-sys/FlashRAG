@@ -3,6 +3,7 @@ from flashrag.pipeline import BasicPipeline
 from flashrag.utils import get_retriever
 import tomllib
 import re
+import json
 
 class Student(BasicPipeline):
     def __init__(self, model, processor, config, retriever=None):
@@ -18,6 +19,9 @@ class Student(BasicPipeline):
             self.query_rewrite_prompt = tomllib.load(f)
 
     def query_rewrite(self, image, action_content):
+        # 1. 构造 Prompt
+        # 注意：请确保 self.query_rewrite_prompt['system_prompt'] 中的文本
+        # 已经更新为要求输出 JSON 格式，并且包含了你在问题中提供的 JSON 示例。
         messages = [
             {
                 "role": "system",
@@ -33,15 +37,60 @@ class Student(BasicPipeline):
                 ]
             }
         ]
+
+        # 2. 调用模型生成
         response = qwen2_generate(self.model, self.processor, messages)
-        print(f"Rewritten Query: {response}")
-        pattern = r"<rewritten_query>(.*?)</rewritten_query>"
-        match = re.search(pattern, response, re.DOTALL)
+        print(f"Model Raw Response: {response}")
+                
+        json_data = None
+        json_str = None
+        
+        # 策略 A: 优先尝试提取 Markdown 代码块 ```json ... ```
+        # re.DOTALL 让 . 可以匹配换行符
+        markdown_pattern = r"```json\s*(.*?)\s*```"
+        match = re.search(markdown_pattern, response, re.DOTALL | re.IGNORECASE)
+        
         if match:
-            results = match.group(1).strip()
+            json_str = match.group(1)
         else:
-            print("No rewritten query found, using original.")
-            results = [action_content]
+            # 策略 B: 如果没写 markdown，尝试寻找最外层的花括号 { ... }
+            brace_pattern = r"\{.*\}"
+            match = re.search(brace_pattern, response, re.DOTALL)
+            if match:
+                json_str = match.group(0)
+                
+        # 默认兜底：如果解析失败，使用原始 query 放入列表
+        results = [action_content] 
+
+        if json_str:
+            try:
+                # 尝试解析 JSON
+                # strict=False 允许字符串中包含控制字符（提高容错率）
+                data = json.loads(json_str, strict=False)
+                
+                # 1. 打印思维链（如果有的话），用于调试
+                if "reasoning" in data:
+                    print(f"[Rewrite Reasoning]: {data['reasoning']}")
+                
+                # 2. 提取 rewritten_query
+                if "rewritten_query" in data:
+                    extracted_queries = data["rewritten_query"]
+                    
+                    # 类型检查：确保它是一个列表
+                    if isinstance(extracted_queries, list):
+                        results = extracted_queries
+                    elif isinstance(extracted_queries, str):
+                        # 如果模型偶尔只生成了一个字符串，将其包裹为列表
+                        results = [extracted_queries]
+                else:
+                    print("Warning: JSON parsed but key 'rewritten_query' missing.")
+                    
+            except json.JSONDecodeError as e:
+                print(f"JSON Parsing Error: {e}")
+                print(f"Problematic string: {json_str}")
+        else:
+            print("No JSON object found in response, using original query.")
+        print(f"Rewrite Results: {results}")
         return results
     
     def generate(self, question, image, plan):
@@ -132,49 +181,58 @@ class Student(BasicPipeline):
         print(f"<answer>\n{final_answer}\n</answer>")
 
         return final_answer, logs
-    
-    def parse_action(self, response):
-        response = response.strip()
-    
-        # --- 核心修改 ---
-        # 1. (?:^|\n) : 锚定行首（防止匹配到句子中间提到的关键词）。
-        # 2. (?:\*\*)? : 兼容 markdown 加粗。
-        # 3. (Final Answer|...) : 捕获动作类型 (Group 1)。
-        # 4. (?: ... )? : 关键修改！整个“冒号+内容”部分变成了可选组。
-        #    这意味着如果后面没有冒号（例如纯 "Image Retrieval"），正则依然能匹配成功。
-        pattern = r"(?:^|\n)\s*(?:\*\*)?(Final Answer|Image Retrieval|Text Retrieval)(?:\*\*)?(?:\s*[:：]\s*(.*))?"
-    
-        # 使用 re.DOTALL 确保 (.*) 能抓取换行符后的内容
-        match = re.search(pattern, response, re.DOTALL | re.IGNORECASE)
-    
-        if match:
-            action_type = match.group(1).strip()
             
-            # group(2) 是冒号后面的内容。
-            # 如果没有冒号（比如你的 case），group(2) 会是 None，我们需要处理这种情况。
-            content = match.group(2)
-            if content:
-                content = content.strip()
+    def parse_action(self, text):
+        """
+        解析文本的最后一行，判断是否包含指定关键词，并提取 Text Retrieval 的查询内容。
+        """
+        if not text:
+            return {"type": None, "content": None, "raw_line": ""}
+
+        # 1. 提取最后一行
+        # strip() 用于去除整个文本末尾可能存在的空行或空白字符
+        lines = text.strip().split('\n')
+        # 获取最后一行并去除首尾空格
+        last_line = lines[-1].strip()
+
+        result = {
+            "type": None,          # 匹配到的类型
+            "content": None,         # 提取到的 query (仅 Text Retrieval 有效)
+            "raw_line": last_line  # 原始的最后一行文本
+        }
+
+        # 2. 判断关键词并执行提取逻辑
+        
+        # --- Case 1: Text Retrieval ---
+        if "Text Retrieval" in last_line:
+            result["type"] = "Text Retrieval"
+            
+            # 使用正则匹配冒号后面的内容
+            # pattern 解释: 
+            #   Text Retrieval  : 匹配关键词
+            #   \s*:\s*         : 匹配冒号及其前后任意数量的空格
+            #   (.*)            : 捕获组，匹配冒号后的所有内容
+            match = re.search(r"Text Retrieval.*?[:：]\s*(.*)", last_line, re.IGNORECASE)
+            
+            if match:
+                result["content"] = match.group(1).strip()
             else:
-                content = None
-    
-            # --- 特殊逻辑处理 ---
+                # 如果存在关键词但没有冒号，这里视情况处理，或者设为空字符串
+                result["content"] = ""
+
+        # --- Case 2: Image Retrieval ---
+        elif "Image Retrieval" in last_line:
+            result["type"] = "Image Retrieval"
+
+        # --- Case 3: Final Answer ---
+        elif "Final Answer" in last_line:
+            result["type"] = "Final Answer"
+            match = re.search(r"Final Answer.*?[:：]\s*(.*)", last_line, re.IGNORECASE)
             
-            # 1. Image Retrieval 通常不需要参数，或者参数就是图片本身
-            if "Image Retrieval" in action_type:
-                return {"type": "Image Retrieval", "content": None}
-            
-            # 2. Text Retrieval 理论上必须有参数
-            # 如果 content 是 None，说明模型只输出了 "Text Retrieval" 但没给查询词
-            # 这里视你的业务逻辑而定，可以报错，也可以返回 None 让 Agent 决定
-            if "Text Retrieval" in action_type and not content:
-                print("WARNING: Text Retrieval detected but no query provided.")
-                return {"type": "Text Retrieval", "content": ""} # 或者 None
-    
-            # 3. Final Answer
-            return {"type": action_type, "content": content}
-    
-        else:
-            # Fallback
-            print(f"WARNING! No standard action format found. Treating full text as Final Answer.")
-            return {"type": "Final Answer", "content": response}
+            if match:
+                result["content"] = match.group(1).strip()
+            else:
+                # 如果存在关键词但没有冒号，这里视情况处理，或者设为空字符串
+                result["content"] = ""
+        print(f"Result: {result}")
+        return result
