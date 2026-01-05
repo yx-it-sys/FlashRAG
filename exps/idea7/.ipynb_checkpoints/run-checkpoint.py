@@ -34,9 +34,9 @@ def main():
     student = Student(model=model, processor=processor,retriever=retriever, config=config)
     pipeline = Instructor(config=config, model=model, processor=processor, student=student, retriever=retriever)
     output_dataset = pipeline.run(test_data, do_eval=True)
-    toten_usage = generator.get_total_usage()
-    with open("records.txt", "a", encoding="utf-8") as f:
-        f.write(f"Total Usage: Input={toten_usage['total_input']}, Output={toten_usage['total_output']}, All={toten_usage['total_all']}\n")
+    # toten_usage = generator.get_total_usage()
+    # with open("records.txt", "a", encoding="utf-8") as f:
+    #     f.write(f"Total Usage: Input={toten_usage['total_input']}, Output={toten_usage['total_output']}, All={toten_usage['total_all']}\n")
         
 if __name__ == "__main__":    
     main()

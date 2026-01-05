@@ -18,7 +18,7 @@ Strict Output Formats:
     "thinking": "Your internal reasoning here.",
     "tool_call": {{
         "tool": "Image Retrieval",
-        "query": "None"
+        "query": None
     }}
 }}
 ```
@@ -38,7 +38,8 @@ Strict Output Formats:
     "final_answer": "Your final answer to 'Current Task' here."
 }}
 
-Note: 
+Note:
+- Only two values of the key "tool": "Text Retrieval" and "Image Retrieval".
 - Case 1 and Case 2 can be repeated more than one TURN until you have sufficient information. 
 - Case 1 and Case 2 need retrieval results from users, so WAIT for me to provide retrieval results, then you can reasoning again. 
 - You MUST use retrieval tool at least ONCE.

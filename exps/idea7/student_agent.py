@@ -130,7 +130,7 @@ class Student(BasicPipeline):
                 messages.append({
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}"}
+                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}. Response in JSON strictly."}
                     ]
                 })
                 response = qwen2_generate(self.model, self.processor, messages)
@@ -149,17 +149,28 @@ class Student(BasicPipeline):
             elif action_type == "Text Retrieval":
                 print("<Text Retrieval>")
                 query_list = self.query_rewrite(image, action)
+                logs.append({"retriever_queries": query_list})
                 retrieval_content = []
+                seen_blocks = set()
+                
+                # 建议：如果 query_list 本身就有重复词，最好先在这里去重，节省 API 调用
+                query_list = list(dict.fromkeys(query_list)) 
+                
                 for query in query_list:
                     search_text = self.retriever.search_by_text(query)
-                    retrieval_content.append("\n\n".join([f"Doc{i+1}:\n{text}" for i, text in enumerate(search_text)]))
+                    
+                    block_str = "\n\n".join([f"Doc{i+1}:\n{text}" for i, text in enumerate(search_text)])
+                    
+                    if block_str and block_str not in seen_blocks:
+                        retrieval_content.append(block_str)
+                        seen_blocks.add(block_str)
                 retrieval_content = "\n\n".join(retrieval_content)
                 print(f"Retrieval Content: {retrieval_content}")
                 logs.append({"text_ret": retrieval_content[:200]})
                 messages.append({
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}"}
+                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}. Response in JSON strictly."}
                     ]
                 })
                 response = qwen2_generate(self.model, self.processor, messages)
@@ -185,71 +196,79 @@ class Student(BasicPipeline):
     def parse_action(self, text):
         """
         解析文本中的 JSON 输出，提取 Action 类型（Text/Image Retrieval 或 Final Answer）。
+        兼容标准 JSON (null) 和 Python 字典格式 (None)。
         """
         if not text:
             return {"type": None, "content": None, "raw_line": ""}
-
+    
         result = {
             "type": None,
             "content": None,
             "raw_line": ""
         }
-
-        # 1. 尝试提取 JSON 字符串
-        # 策略 A: 优先匹配 Markdown 代码块 ```json ... ``` 或 ``` ... ```
+    
         json_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL | re.IGNORECASE)
         
         if json_match:
             json_str = json_match.group(1)
         else:
-            # 策略 B: 如果没有代码块，尝试寻找最外层的花括号 { ... }
-            # 利用非贪婪匹配或寻找第一个 { 和最后一个 }
             start_idx = text.find('{')
             end_idx = text.rfind('}')
             if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
                 json_str = text[start_idx : end_idx + 1]
             else:
-                # 无法提取到类似 JSON 的结构
-                print(f"Error: No JSON found in text: {text[-100:]}...") # 打印末尾部分用于调试
-                result["raw_line"] = text.strip().split('\n')[-1] # 保留最后一行作为原始记录
+                print(f"Error: No JSON-like structure found.")
+                result['type'] = "Final Answer"
+                result["content"] = text.strip().split('\n')[-1]
+                result["raw_line"] = text.strip().split('\n')[-1]
                 return result
-
+    
         result["raw_line"] = json_str
-
-        # 2. 解析 JSON 并映射字段
+    
+        # 2. 解析逻辑 (增强版)
+        data = None
+        
+        fixed_json_str = json_str.replace("{{", "{").replace("}}", "}")
+        
+        # 使用正则精准替换值部分的 None (避免误伤文本中的单词)
+        fixed_json_str = re.sub(r':\s*None\b', ': null', fixed_json_str)
+        fixed_json_str = re.sub(r':\s*True\b', ': true', fixed_json_str)
+        fixed_json_str = re.sub(r':\s*False\b', ': false', fixed_json_str)
+    
         try:
-            # 清理可能存在的双大括号（如果是 prompt template 格式残留）
-            # 如果确定模型输出是标准 JSON，可以去掉 replace
-            if "{{" in json_str:
-                json_str = json_str.replace("{{", "{").replace("}}", "}")
-                
-            data = json.loads(json_str)
-
-            # --- Case 3: Final Answer ---
+            data = json.loads(fixed_json_str)
+        except json.JSONDecodeError:
+            # --- 尝试 2: 如果标准 JSON 解析失败，尝试作为 Python 字面量解析 ---
+            # ast.literal_eval 可以完美处理 {'key': None} 这种 Python 格式
+            try:
+                # ast.literal_eval 对双花括号敏感，确保使用原始字符串或简单清理后的
+                clean_str = json_str.replace("{{", "{").replace("}}", "}")
+                data = ast.literal_eval(clean_str)
+            except Exception as e:
+                print(f"Parsing failed. Raw string: {json_str}\nError: {e}")
+                return result
+    
+        # 3. 映射字段 (保持不变)
+        if data:
             if "final_answer" in data:
                 result["type"] = "Final Answer"
                 result["content"] = data["final_answer"]
-
-            # --- Case 1 & 2: Tool Calls ---
+    
             elif "tool_call" in data:
                 tool_info = data["tool_call"]
                 tool_name = tool_info.get("tool")
                 query = tool_info.get("query")
-
+    
                 if tool_name == "Text Retrieval":
                     result["type"] = "Text Retrieval"
                     result["content"] = query
                 
                 elif tool_name == "Image Retrieval":
                     result["type"] = "Image Retrieval"
-                    # Image Retrieval 的 query 为 None，这里可以设为 None 或空字符串，视下游需求而定
-                    result["content"] = None 
-
-        except json.JSONDecodeError as e:
-            print(f"JSON Parse Error: {e}")
-            # 解析失败，保持 type 为 None
-        except Exception as e:
-            print(f"Unexpected Error parsing action: {e}")
-
+                    result["content"] = query
+                else:
+                    result["type"] = "Final Answer"
+                    result["content"] = "I can't answer"
+    
         print(f"Result: {result}")
-        return result 
+        return result

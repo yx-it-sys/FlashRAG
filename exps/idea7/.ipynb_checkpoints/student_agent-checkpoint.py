@@ -130,7 +130,7 @@ class Student(BasicPipeline):
                 messages.append({
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}"}
+                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}. Response in JSON strictly."}
                     ]
                 })
                 response = qwen2_generate(self.model, self.processor, messages)
@@ -149,17 +149,28 @@ class Student(BasicPipeline):
             elif action_type == "Text Retrieval":
                 print("<Text Retrieval>")
                 query_list = self.query_rewrite(image, action)
+                logs.append({"retriever_queries": query_list})
                 retrieval_content = []
+                seen_blocks = set()
+                
+                # 建议：如果 query_list 本身就有重复词，最好先在这里去重，节省 API 调用
+                query_list = list(dict.fromkeys(query_list)) 
+                
                 for query in query_list:
                     search_text = self.retriever.search_by_text(query)
-                    retrieval_content.append("\n\n".join([f"Doc{i+1}:\n{text}" for i, text in enumerate(search_text)]))
+                    
+                    block_str = "\n\n".join([f"Doc{i+1}:\n{text}" for i, text in enumerate(search_text)])
+                    
+                    if block_str and block_str not in seen_blocks:
+                        retrieval_content.append(block_str)
+                        seen_blocks.add(block_str)
                 retrieval_content = "\n\n".join(retrieval_content)
                 print(f"Retrieval Content: {retrieval_content}")
                 logs.append({"text_ret": retrieval_content[:200]})
                 messages.append({
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}"}
+                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}. Response in JSON strictly."}
                     ]
                 })
                 response = qwen2_generate(self.model, self.processor, messages)
@@ -181,58 +192,83 @@ class Student(BasicPipeline):
         print(f"<answer>\n{final_answer}\n</answer>")
 
         return final_answer, logs
-            
+
     def parse_action(self, text):
         """
-        解析文本的最后一行，判断是否包含指定关键词，并提取 Text Retrieval 的查询内容。
+        解析文本中的 JSON 输出，提取 Action 类型（Text/Image Retrieval 或 Final Answer）。
+        兼容标准 JSON (null) 和 Python 字典格式 (None)。
         """
         if not text:
             return {"type": None, "content": None, "raw_line": ""}
-
-        # 1. 提取最后一行
-        # strip() 用于去除整个文本末尾可能存在的空行或空白字符
-        lines = text.strip().split('\n')
-        # 获取最后一行并去除首尾空格
-        last_line = lines[-1].strip()
-
+    
         result = {
-            "type": None,          # 匹配到的类型
-            "content": None,         # 提取到的 query (仅 Text Retrieval 有效)
-            "raw_line": last_line  # 原始的最后一行文本
+            "type": None,
+            "content": None,
+            "raw_line": ""
         }
-
-        # 2. 判断关键词并执行提取逻辑
+    
+        json_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL | re.IGNORECASE)
         
-        # --- Case 1: Text Retrieval ---
-        if "Text Retrieval" in last_line:
-            result["type"] = "Text Retrieval"
-            
-            # 使用正则匹配冒号后面的内容
-            # pattern 解释: 
-            #   Text Retrieval  : 匹配关键词
-            #   \s*:\s*         : 匹配冒号及其前后任意数量的空格
-            #   (.*)            : 捕获组，匹配冒号后的所有内容
-            match = re.search(r"Text Retrieval.*?[:：]\s*(.*)", last_line, re.IGNORECASE)
-            
-            if match:
-                result["content"] = match.group(1).strip()
+        if json_match:
+            json_str = json_match.group(1)
+        else:
+            start_idx = text.find('{')
+            end_idx = text.rfind('}')
+            if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                json_str = text[start_idx : end_idx + 1]
             else:
-                # 如果存在关键词但没有冒号，这里视情况处理，或者设为空字符串
-                result["content"] = ""
-
-        # --- Case 2: Image Retrieval ---
-        elif "Image Retrieval" in last_line:
-            result["type"] = "Image Retrieval"
-
-        # --- Case 3: Final Answer ---
-        elif "Final Answer" in last_line:
-            result["type"] = "Final Answer"
-            match = re.search(r"Final Answer.*?[:：]\s*(.*)", last_line, re.IGNORECASE)
-            
-            if match:
-                result["content"] = match.group(1).strip()
-            else:
-                # 如果存在关键词但没有冒号，这里视情况处理，或者设为空字符串
-                result["content"] = ""
+                print(f"Error: No JSON-like structure found.")
+                result['type'] = "Final Answer"
+                result["content"] = text.strip().split('\n')[-1]
+                result["raw_line"] = text.strip().split('\n')[-1]
+                return result
+    
+        result["raw_line"] = json_str
+    
+        # 2. 解析逻辑 (增强版)
+        data = None
+        
+        fixed_json_str = json_str.replace("{{", "{").replace("}}", "}")
+        
+        # 使用正则精准替换值部分的 None (避免误伤文本中的单词)
+        fixed_json_str = re.sub(r':\s*None\b', ': null', fixed_json_str)
+        fixed_json_str = re.sub(r':\s*True\b', ': true', fixed_json_str)
+        fixed_json_str = re.sub(r':\s*False\b', ': false', fixed_json_str)
+    
+        try:
+            data = json.loads(fixed_json_str)
+        except json.JSONDecodeError:
+            # --- 尝试 2: 如果标准 JSON 解析失败，尝试作为 Python 字面量解析 ---
+            # ast.literal_eval 可以完美处理 {'key': None} 这种 Python 格式
+            try:
+                # ast.literal_eval 对双花括号敏感，确保使用原始字符串或简单清理后的
+                clean_str = json_str.replace("{{", "{").replace("}}", "}")
+                data = ast.literal_eval(clean_str)
+            except Exception as e:
+                print(f"Parsing failed. Raw string: {json_str}\nError: {e}")
+                return result
+    
+        # 3. 映射字段 (保持不变)
+        if data:
+            if "final_answer" in data:
+                result["type"] = "Final Answer"
+                result["content"] = data["final_answer"]
+    
+            elif "tool_call" in data:
+                tool_info = data["tool_call"]
+                tool_name = tool_info.get("tool")
+                query = tool_info.get("query")
+    
+                if tool_name == "Text Retrieval":
+                    result["type"] = "Text Retrieval"
+                    result["content"] = query
+                
+                elif tool_name == "Image Retrieval":
+                    result["type"] = "Image Retrieval"
+                    result["content"] = query
+                else:
+                    result["type"] = "Final Answer"
+                    result["content"] = "I can't answer"
+    
         print(f"Result: {result}")
         return result
