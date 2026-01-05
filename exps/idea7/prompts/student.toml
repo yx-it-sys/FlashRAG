@@ -18,7 +18,7 @@ Strict Output Formats:
     "thinking": "Your internal reasoning here.",
     "tool_call": {{
         "tool": "Image Retrieval",
-        "query": None
+        "query": "None"
     }}
 }}
 ```

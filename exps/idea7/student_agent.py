@@ -243,7 +243,7 @@ class Student(BasicPipeline):
                 elif tool_name == "Image Retrieval":
                     result["type"] = "Image Retrieval"
                     # Image Retrieval 的 query 为 None，这里可以设为 None 或空字符串，视下游需求而定
-                    result["content"] = query 
+                    result["content"] = None 
 
         except json.JSONDecodeError as e:
             print(f"JSON Parse Error: {e}")
