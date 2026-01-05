@@ -181,58 +181,75 @@ class Student(BasicPipeline):
         print(f"<answer>\n{final_answer}\n</answer>")
 
         return final_answer, logs
-            
+
     def parse_action(self, text):
         """
-        解析文本的最后一行，判断是否包含指定关键词，并提取 Text Retrieval 的查询内容。
+        解析文本中的 JSON 输出，提取 Action 类型（Text/Image Retrieval 或 Final Answer）。
         """
         if not text:
             return {"type": None, "content": None, "raw_line": ""}
 
-        # 1. 提取最后一行
-        # strip() 用于去除整个文本末尾可能存在的空行或空白字符
-        lines = text.strip().split('\n')
-        # 获取最后一行并去除首尾空格
-        last_line = lines[-1].strip()
-
         result = {
-            "type": None,          # 匹配到的类型
-            "content": None,         # 提取到的 query (仅 Text Retrieval 有效)
-            "raw_line": last_line  # 原始的最后一行文本
+            "type": None,
+            "content": None,
+            "raw_line": ""
         }
 
-        # 2. 判断关键词并执行提取逻辑
+        # 1. 尝试提取 JSON 字符串
+        # 策略 A: 优先匹配 Markdown 代码块 ```json ... ``` 或 ``` ... ```
+        json_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL | re.IGNORECASE)
         
-        # --- Case 1: Text Retrieval ---
-        if "Text Retrieval" in last_line:
-            result["type"] = "Text Retrieval"
-            
-            # 使用正则匹配冒号后面的内容
-            # pattern 解释: 
-            #   Text Retrieval  : 匹配关键词
-            #   \s*:\s*         : 匹配冒号及其前后任意数量的空格
-            #   (.*)            : 捕获组，匹配冒号后的所有内容
-            match = re.search(r"Text Retrieval.*?[:：]\s*(.*)", last_line, re.IGNORECASE)
-            
-            if match:
-                result["content"] = match.group(1).strip()
+        if json_match:
+            json_str = json_match.group(1)
+        else:
+            # 策略 B: 如果没有代码块，尝试寻找最外层的花括号 { ... }
+            # 利用非贪婪匹配或寻找第一个 { 和最后一个 }
+            start_idx = text.find('{')
+            end_idx = text.rfind('}')
+            if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                json_str = text[start_idx : end_idx + 1]
             else:
-                # 如果存在关键词但没有冒号，这里视情况处理，或者设为空字符串
-                result["content"] = ""
+                # 无法提取到类似 JSON 的结构
+                print(f"Error: No JSON found in text: {text[-100:]}...") # 打印末尾部分用于调试
+                result["raw_line"] = text.strip().split('\n')[-1] # 保留最后一行作为原始记录
+                return result
 
-        # --- Case 2: Image Retrieval ---
-        elif "Image Retrieval" in last_line:
-            result["type"] = "Image Retrieval"
+        result["raw_line"] = json_str
 
-        # --- Case 3: Final Answer ---
-        elif "Final Answer" in last_line:
-            result["type"] = "Final Answer"
-            match = re.search(r"Final Answer.*?[:：]\s*(.*)", last_line, re.IGNORECASE)
-            
-            if match:
-                result["content"] = match.group(1).strip()
-            else:
-                # 如果存在关键词但没有冒号，这里视情况处理，或者设为空字符串
-                result["content"] = ""
+        # 2. 解析 JSON 并映射字段
+        try:
+            # 清理可能存在的双大括号（如果是 prompt template 格式残留）
+            # 如果确定模型输出是标准 JSON，可以去掉 replace
+            if "{{" in json_str:
+                json_str = json_str.replace("{{", "{").replace("}}", "}")
+                
+            data = json.loads(json_str)
+
+            # --- Case 3: Final Answer ---
+            if "final_answer" in data:
+                result["type"] = "Final Answer"
+                result["content"] = data["final_answer"]
+
+            # --- Case 1 & 2: Tool Calls ---
+            elif "tool_call" in data:
+                tool_info = data["tool_call"]
+                tool_name = tool_info.get("tool")
+                query = tool_info.get("query")
+
+                if tool_name == "Text Retrieval":
+                    result["type"] = "Text Retrieval"
+                    result["content"] = query
+                
+                elif tool_name == "Image Retrieval":
+                    result["type"] = "Image Retrieval"
+                    # Image Retrieval 的 query 为 None，这里可以设为 None 或空字符串，视下游需求而定
+                    result["content"] = query 
+
+        except json.JSONDecodeError as e:
+            print(f"JSON Parse Error: {e}")
+            # 解析失败，保持 type 为 None
+        except Exception as e:
+            print(f"Unexpected Error parsing action: {e}")
+
         print(f"Result: {result}")
-        return result
+        return result 

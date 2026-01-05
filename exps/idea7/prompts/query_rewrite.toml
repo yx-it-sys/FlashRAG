@@ -9,12 +9,13 @@ Please follow these guidelines when rewriting the query:
 6. Search Engine Optimization: Use keywords and phrases that are likely to yield the best search results.
 Following the following format STRICTLY:
 ```json
-{{
+{
     "reasoning": "Think step by step and generate your thinking process here.",
     "rewritten_query": "Provide the rewritten query here. Originize the rewrited query in list format [\"query1\", \"query2\", ...]."
-}}
+}
 ```
 """
+
 user_prompt = """
 User's Query: {query}
 Rewritten Query:

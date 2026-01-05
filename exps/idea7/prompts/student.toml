@@ -13,22 +13,37 @@ Strict Output Formats:
 (Choose only ONE of the following three formats per turn)
 
 - Case 1: To identify an unknown part of an image:
-**Image Retrieval**
-
+```json
+{{
+    "thinking": "Your internal reasoning here.",
+    "tool_call": {{
+        "tool": "Image Retrieval",
+        "query": None
+    }}
+}}
+```
 - Case 2: To fetch factual information:
-**Text Retrieval:** Your specific search query here.
+{{
+
+    "thinking": "Your internal reasoning here.",
+    "tool_call": {{
+        "tool": "Text Retrieval",
+        "query": "Your specific search query here."
+    }}
+}}
 
 - Case 3: To provide the solution to the Mentor:
-**Final Answer:** Your answer based on retrieval results and image analysis.
+{{
+    "thinking": "Your internal reasoning here.",
+    "final_answer": "Your final answer to 'Current Task' here."
+}}
 
 Note: 
-- Case 1 and Case 2 can be repeated until you have sufficient information. 
-- Case 1 and Case 2 need retrieval results from users, so WAIT for me to provide retrieval results. 
-- You MUST use retrieval tool at least once.
+- Case 1 and Case 2 can be repeated more than one TURN until you have sufficient information. 
+- Case 1 and Case 2 need retrieval results from users, so WAIT for me to provide retrieval results, then you can reasoning again. 
+- You MUST use retrieval tool at least ONCE.
 - Your answer must be precise and accurate. Your Mentor is strict and expects high-quality reasoning. 
 - Do NOT use your own knowledge finish the task.
-- Do NOT generate markdown markup.
-- Think step by step.
 
 Original Task:
 {original_question}
