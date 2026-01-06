@@ -19,6 +19,7 @@ class Instructor(BasicPipeline):
         self.model = model
         self.processor = processor
         self.student = student
+        self.uncertain_threshold = 0.0
         with open('prompts/instructor.toml', 'rb') as f:
             self.instructor_prompt = tomllib.load(f)
 
@@ -127,7 +128,6 @@ class Instructor(BasicPipeline):
             v_outputs = self.model(**v_inputs, output_hidden_states=True)
             v_feat = v_outputs.hidden_states[-1].mean(dim=1)
 
-        # 2. 提取问题特征 (纯文本路径通常不需要 template，但保持格式统一更好)
         t_inputs = self.processor(
             text=[f"Question: {question}"], 
             return_tensors="pt"
@@ -214,17 +214,17 @@ class Instructor(BasicPipeline):
                     
                     uncertainty_score = self.estimate_uncertainty(question, img)
                     print(f"Estimated uncertainty score: {uncertainty_score:.4f}")
-                    # if uncertainty_score > self.uncertainty_threshold:
-                    #     final_answer, context = self.instud_generate(question, img)
-                    # else:
-                    #     final_answer, context = self.generate(question, img)
-                    # prediction_list.append(final_answer)
+                    if uncertainty_score > self.uncertain_threshold:
+                        final_answer, context = self.instud_generate(question, img)
+                    else:
+                        final_answer, context = self.student.generate(question, img)
+                    prediction_list.append(final_answer)
     
-                    # logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
-                    # f.write(json.dumps(logs, ensure_ascii=False) + "\n")
+                    logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
+                    f.write(json.dumps(logs, ensure_ascii=False) + "\n")
                     
-                    # if i % 10 == 0:
-                    #     f.flush()
+                    if i % 10 == 0:
+                        f.flush()
     
                 except torch.cuda.OutOfMemoryError:
                     print(f"!!! CUDA OOM Error at index {i}, id: {id}. Clearing cache and skipping...")
