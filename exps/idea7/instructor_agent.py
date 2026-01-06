@@ -100,21 +100,51 @@ class Instructor(BasicPipeline):
         pass
 
     def estimate_uncertainty(self, question, img):
-        v_inputs = self.processor(images=img, text=["<|vision_start|><|vision_end|>What is in this image?"], return_tensors="pt").to("cuda")
+        # 1. 构造标准的对话格式，让 processor 自动处理占位符
+        v_messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image", "image": img},
+                    {"type": "text", "text": "What is in this image?"},
+                ],
+            }
+        ]
+        
+        # 使用 apply_chat_template 得到包含正确数量占位符的文本
+        v_prompt = self.processor.apply_chat_template(
+            v_messages, tokenize=False, add_generation_prompt=True
+        )
+        
+        # 这样得到的 v_inputs 就会包含正确的 input_ids (包含数千个 pad tokens)
+        v_inputs = self.processor(
+            text=[v_prompt], 
+            images=[img], # 注意这里用列表包装一下
+            return_tensors="pt"
+        ).to("cuda")
+
         with torch.no_grad():
             v_outputs = self.model(**v_inputs, output_hidden_states=True)
             v_feat = v_outputs.hidden_states[-1].mean(dim=1)
-        t_inputs = self.processor(text=[f"Question: {question}"], return_tensors="pt").to("cuda")
+
+        # 2. 提取问题特征 (纯文本路径通常不需要 template，但保持格式统一更好)
+        t_inputs = self.processor(
+            text=[f"Question: {question}"], 
+            return_tensors="pt"
+        ).to("cuda")
+
         with torch.no_grad():
             t_outputs = self.model(**t_inputs, output_hidden_states=True)
             t_feat = t_outputs.hidden_states[-1][:, -1, :]
 
+        # 3. 计算相似度
         norm_v = F.normalize(v_feat, p=2, dim=1)
-        norm_t = F.normalize(t_feat, p=2, dim=1)    
-        similarity = F.cosine_similarity(norm_v, norm_t.t()).item()
-        residual = 1 - similarity
-        return residual
-
+        norm_t = F.normalize(t_feat, p=2, dim=1)
+        
+        # 注意：cosine_similarity 里的 dim 参数，如果 v_feat 和 t_feat 都是 [1, D]
+        similarity = F.cosine_similarity(norm_v, norm_t).item()
+        return 1 - similarity
+    
     def parse_from_instructor(self, instructor_response):
         json_data = None
         json_str = None
