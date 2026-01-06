@@ -132,7 +132,7 @@ class Student(BasicPipeline):
                 messages.append({
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}. Response in JSON strictly."}
+                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}."}
                     ]
                 })
                 response, entropy = qwen2_generate(self.model, self.processor, messages)
@@ -147,10 +147,12 @@ class Student(BasicPipeline):
                         "type": "text", "text": f"{action_type}: {action}"
                     }]
                 })
+                conversation_num += 1
                 
             elif action_type == "Text Retrieval":
                 print("<Text Retrieval>")
-                query_list = self.query_rewrite(image, action)
+                # query_list = self.query_rewrite(image, action)
+                query_list = [action]
                 logs.append({"retriever_queries": query_list})
                 retrieval_content = []
                 seen_blocks = set()
@@ -172,7 +174,7 @@ class Student(BasicPipeline):
                 messages.append({
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}. Response in JSON strictly."}
+                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}."}
                     ]
                 })
                 response, entropy = qwen2_generate(self.model, self.processor, messages)
@@ -187,9 +189,12 @@ class Student(BasicPipeline):
                         "type": "text", "text": f"{action_type}: {action}"
                     }]
                 })
+                conversation_num += 1
             elif action_type == "Final Answer":
                 final_answer = action
                 logs.append({"current_final_answer": final_answer})
+                break
+            else:
                 break
         print(f"<answer>\n{final_answer}\n</answer>")
 
@@ -215,7 +220,7 @@ class Student(BasicPipeline):
 
         # 1. 优先匹配 Final Answer (支持多行)
         # 匹配逻辑：找到 "Final Answer"，忽略后面的符号(如 **)，直到遇到冒号，然后捕获后面所有内容
-        fa_match = re.search(r"Final Answer\W*[:：]\s*(.*)", text, re.IGNORECASE | re.DOTALL)
+        fa_match = re.search(r"Conclusion\W*[:：]\s*(.*)", text, re.IGNORECASE | re.DOTALL)
         if fa_match:
             result["type"] = "Final Answer"
             result["content"] = fa_match.group(1).strip()

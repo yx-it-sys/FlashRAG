@@ -57,7 +57,7 @@ dataset_name: "crag"
 split: ['test']
 
 # Sampling configurations for testing
-test_sample_num: 700
+test_sample_num: 600
 random_sample: True
 save_intermediate_data: True
 # Seed for reproducibility

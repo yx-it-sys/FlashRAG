@@ -39,7 +39,7 @@ class Student(BasicPipeline):
         ]
 
         # 2. 调用模型生成
-        response = qwen2_generate(self.model, self.processor, messages)
+        response, entropy = qwen2_generate(self.model, self.processor, messages)
         print(f"Model Raw Response: {response}")
                 
         json_data = None
@@ -93,7 +93,9 @@ class Student(BasicPipeline):
         print(f"Rewrite Results: {results}")
         return results
     
-    def generate(self, question, image, plan):
+    def generate(self, question, image, plan=None):
+        if plan is None:
+            plan = question
         logs = []
         messages = [
             {
@@ -104,7 +106,7 @@ class Student(BasicPipeline):
                 ],
             }
         ]
-        response = qwen2_generate(self.model, self.processor, messages)
+        response, entropy = qwen2_generate(self.model, self.processor, messages)
         print(f"Student first Response: {response}")
         logs.append({"student_first_response": response})
         messages.append({
@@ -130,10 +132,10 @@ class Student(BasicPipeline):
                 messages.append({
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}. Response in JSON strictly."}
+                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}."}
                     ]
                 })
-                response = qwen2_generate(self.model, self.processor, messages)
+                response, entropy = qwen2_generate(self.model, self.processor, messages)
                 print(f"Student response after image retrieval: {response}")
                 logs.append({"student_response": response})
                 action = self.parse_action(response)
@@ -145,10 +147,12 @@ class Student(BasicPipeline):
                         "type": "text", "text": f"{action_type}: {action}"
                     }]
                 })
+                conversation_num += 1
                 
             elif action_type == "Text Retrieval":
                 print("<Text Retrieval>")
-                query_list = self.query_rewrite(image, action)
+                # query_list = self.query_rewrite(image, action)
+                query_list = [action]
                 logs.append({"retriever_queries": query_list})
                 retrieval_content = []
                 seen_blocks = set()
@@ -170,10 +174,10 @@ class Student(BasicPipeline):
                 messages.append({
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}. Response in JSON strictly."}
+                        {"type": "text", "text": f"Here are retrieved information:{retrieval_content}."}
                     ]
                 })
-                response = qwen2_generate(self.model, self.processor, messages)
+                response, entropy = qwen2_generate(self.model, self.processor, messages)
                 print(f"Student response after text retrieval: {response}")
                 logs.append({"student_response": response})
                 action = self.parse_action(response)
@@ -185,15 +189,63 @@ class Student(BasicPipeline):
                         "type": "text", "text": f"{action_type}: {action}"
                     }]
                 })
+                conversation_num += 1
             elif action_type == "Final Answer":
                 final_answer = action
                 logs.append({"current_final_answer": final_answer})
+                break
+            else:
                 break
         print(f"<answer>\n{final_answer}\n</answer>")
 
         return final_answer, logs
 
+
     def parse_action(self, text):
+        """
+        解析 LLM 生成的文本，提取 Action。
+        兼容关键词被 markdown 符号包裹的情况 (如 **Text Retrieval**: )。
+        """
+        result = {
+            "type": None,
+            "content": text
+        }
+        
+        if not text:
+            return result
+
+        # --- 策略：使用 \W* 忽略关键词前后的符号 ---
+        # \W* 匹配零个或多个"非单词字符" (即忽略 *, [, ], ", ', 空格 等)
+        # [::：] 匹配英文冒号或中文冒号
+
+        # 1. 优先匹配 Final Answer (支持多行)
+        # 匹配逻辑：找到 "Final Answer"，忽略后面的符号(如 **)，直到遇到冒号，然后捕获后面所有内容
+        fa_match = re.search(r"Conclusion\W*[:：]\s*(.*)", text, re.IGNORECASE | re.DOTALL)
+        if fa_match:
+            result["type"] = "Final Answer"
+            result["content"] = fa_match.group(1).strip()
+            return result
+
+        # 2. 匹配 Text Retrieval (单行)
+        # 匹配逻辑：同上，找到 "Text Retrieval" 后紧接冒号的内容
+        tr_match = re.search(r"Text Retrieval\W*[:：]\s*(.*)", text, re.IGNORECASE)
+        if tr_match:
+            result["type"] = "Text Retrieval"
+            result["content"] = tr_match.group(1).strip()
+            return result
+
+        # 3. 匹配 Image Retrieval (通常无参数)
+        # 匹配逻辑：只要文本中包含 "Image Retrieval" 这个短语（允许周围有符号），就命中
+        # 使用 re.search 会自动忽略前面的符号（如 "**Image Retrieval"）
+        if re.search(r"Image Retrieval", text, re.IGNORECASE):
+            result["type"] = "Image Retrieval"
+            result["content"] = None
+            return result
+        
+        print("ERROR: No action type matched.")
+        return result        
+
+    def parse_action_json(self, text):
         """
         解析文本中的 JSON 输出，提取 Action 类型（Text/Image Retrieval 或 Final Answer）。
         兼容标准 JSON (null) 和 Python 字典格式 (None)。
