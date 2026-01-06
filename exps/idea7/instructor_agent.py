@@ -213,15 +213,16 @@ class Instructor(BasicPipeline):
                     with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
                         writer = csv.writer(tsv_f, delimiter='\t')
                         writer.writerow([str(id), uncertainty_score])
+                        print(f"id: {str(id)}, uncertainty_score: {uncertainty_score}")
                         
-                    if uncertainty_score > self.uncertain_threshold:
-                        final_answer, context = self.instud_generate(question, img)
-                    else:
-                        final_answer, context = self.student.generate(question, img)
-                    prediction_list.append(final_answer)
+                    # if uncertainty_score > self.uncertain_threshold:
+                    #     final_answer, context = self.instud_generate(question, img)
+                    # else:
+                    #     final_answer, context = self.student.generate(question, img)
+                    # prediction_list.append(final_answer)
     
-                    logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
-                    f.write(json.dumps(logs, ensure_ascii=False) + "\n")
+                    # logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
+                    # f.write(json.dumps(logs, ensure_ascii=False) + "\n")
                     
                     if i % 10 == 0:
                         f.flush()

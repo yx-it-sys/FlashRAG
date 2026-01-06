@@ -108,7 +108,7 @@ class Instructor(BasicPipeline):
                 "role": "user",
                 "content": [
                     {"type": "image", "image": img},
-                    {"type": "text", "text": "What is in this image?"},
+                    {"type": "text", "text": "Describe this image in detail."},
                 ],
             }
         ]
@@ -127,23 +127,14 @@ class Instructor(BasicPipeline):
 
         with torch.no_grad():
             v_outputs = self.model(**v_inputs, output_hidden_states=True)
-            v_feat = v_outputs.hidden_states[-1].mean(dim=1)
-
-        t_inputs = self.processor(
-            text=[f"Question: {question}"], 
-            return_tensors="pt"
-        ).to("cuda")
-
+            v_feat = v_outputs.hidden_states[-1][:,-1,:]
+            
+        t_messages = [{"role": "user", "content": f"Question: {question}"}]
+        t_prompt = self.processor.apply_chat_template(t_messages, tokenize=False, add_generation_prompt=True)
+        t_inputs = self.processor(text=[t_prompt], return_tensors="pt").to("cuda")
         with torch.no_grad():
-            t_outputs = self.model(**t_inputs, output_hidden_states=True)
-            t_feat = t_outputs.hidden_states[-1][:, -1, :]
-
-        # 3. 计算相似度
-        norm_v = F.normalize(v_feat, p=2, dim=1)
-        norm_t = F.normalize(t_feat, p=2, dim=1)
-        
-        # 注意：cosine_similarity 里的 dim 参数，如果 v_feat 和 t_feat 都是 [1, D]
-        similarity = F.cosine_similarity(norm_v, norm_t).item()
+            t_feat = self.model(**t_inputs, output_hidden_states=True).hidden_states[-1][:, -1, :]
+        similarity = F.cosine_similarity(v_feat, t_feat).item()
         return 1 - similarity
     
     def parse_from_instructor(self, instructor_response):
@@ -222,15 +213,16 @@ class Instructor(BasicPipeline):
                     with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
                         writer = csv.writer(tsv_f, delimiter='\t')
                         writer.writerow([str(id), uncertainty_score])
+                        print(f"id: {str(id)}, uncertainty_score: {uncertainty_score}")
                         
-                    if uncertainty_score > self.uncertain_threshold:
-                        final_answer, context = self.instud_generate(question, img)
-                    else:
-                        final_answer, context = self.student.generate(question, img)
-                    prediction_list.append(final_answer)
+                    # if uncertainty_score > self.uncertain_threshold:
+                    #     final_answer, context = self.instud_generate(question, img)
+                    # else:
+                    #     final_answer, context = self.student.generate(question, img)
+                    # prediction_list.append(final_answer)
     
-                    logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
-                    f.write(json.dumps(logs, ensure_ascii=False) + "\n")
+                    # logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
+                    # f.write(json.dumps(logs, ensure_ascii=False) + "\n")
                     
                     if i % 10 == 0:
                         f.flush()
