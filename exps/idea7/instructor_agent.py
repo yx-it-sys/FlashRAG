@@ -9,6 +9,7 @@ import json
 import torch
 import torch.nn.functional as F
 import time
+import csv
 
 class Instructor(BasicPipeline):
     def __init__(self, student, model, processor, config, retriever=None):
@@ -19,7 +20,7 @@ class Instructor(BasicPipeline):
         self.model = model
         self.processor = processor
         self.student = student
-        self.uncertain_threshold = 0.0
+        self.uncertain_threshold = 1.0
         with open('prompts/instructor.toml', 'rb') as f:
             self.instructor_prompt = tomllib.load(f)
 
@@ -204,6 +205,10 @@ class Instructor(BasicPipeline):
         ids = dataset.id
         prediction_list = []
         start_time = time.time()
+        with open("uncertainty_scores.tsv", "w", newline='', encoding="utf-8") as tsv_f:
+            writer = csv.writer(tsv_f, delimiter='\t')
+            writer.writerow(["id", "uncertainty_score"])
+             
         with open("intermediate_logs.jsonl", "w", encoding="utf-8") as f:
             for i, (question, id) in enumerate(zip(questions, ids)):
                 print(f"[{i}/{len(questions)}] question: {question}")
@@ -213,7 +218,11 @@ class Instructor(BasicPipeline):
                     img = Image.open(img_path).convert("RGB")
                     
                     uncertainty_score = self.estimate_uncertainty(question, img)
-                    print(f"Estimated uncertainty score: {uncertainty_score:.4f}")
+                    # print(f"Estimated uncertainty score: {uncertainty_score:.4f}")
+                    with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
+                        writer = csv.writer(tsv_f, delimiter='\t')
+                        writer.writerow([str(id), uncertainty_score])
+                        
                     if uncertainty_score > self.uncertain_threshold:
                         final_answer, context = self.instud_generate(question, img)
                     else:

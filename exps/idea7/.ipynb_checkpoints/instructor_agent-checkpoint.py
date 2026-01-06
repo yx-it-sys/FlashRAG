@@ -7,7 +7,9 @@ import re
 from tqdm import tqdm
 import json
 import torch
+import torch.nn.functional as F
 import time
+import csv
 
 class Instructor(BasicPipeline):
     def __init__(self, student, model, processor, config, retriever=None):
@@ -18,10 +20,11 @@ class Instructor(BasicPipeline):
         self.model = model
         self.processor = processor
         self.student = student
+        self.uncertain_threshold = 1.0
         with open('prompts/instructor.toml', 'rb') as f:
             self.instructor_prompt = tomllib.load(f)
 
-    def generate(self, question: str, image: Image):
+    def instud_generate(self, question: str, image: Image):
         logs = []
         feedback_list = []
         messages = [
@@ -37,7 +40,7 @@ class Instructor(BasicPipeline):
             }
         ]
         
-        instructor_response = qwen2_generate(self.model, self.processor, messages)
+        instructor_response, entropy = qwen2_generate(self.model, self.processor, messages)
         print("\n<Instructor>")
         print(f"Instructor first Response: {instructor_response}")
         print("\n</Instructor>")
@@ -76,7 +79,7 @@ class Instructor(BasicPipeline):
                     ]
                 })
 
-                instructor_response = qwen2_generate(self.model, self.processor, messages)
+                instructor_response, entropy = qwen2_generate(self.model, self.processor, messages)
                 # instructor_response = self.check_student_response(feedback_list, plan)
                 messages.append({
                     "role": "assistant",
@@ -94,10 +97,55 @@ class Instructor(BasicPipeline):
             final_answer = plan
             logs.append({"student_logs": student_logs})
             return final_answer, logs
-        
-    def check_student_response(self, feedback_list, plan):
+    
+    def generate(self, question: str, image: Image):
         pass
 
+    def estimate_uncertainty(self, question, img):
+        # 1. 构造标准的对话格式，让 processor 自动处理占位符
+        v_messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image", "image": img},
+                    {"type": "text", "text": "What is in this image?"},
+                ],
+            }
+        ]
+        
+        # 使用 apply_chat_template 得到包含正确数量占位符的文本
+        v_prompt = self.processor.apply_chat_template(
+            v_messages, tokenize=False, add_generation_prompt=True
+        )
+        
+        # 这样得到的 v_inputs 就会包含正确的 input_ids (包含数千个 pad tokens)
+        v_inputs = self.processor(
+            text=[v_prompt], 
+            images=[img], # 注意这里用列表包装一下
+            return_tensors="pt"
+        ).to("cuda")
+
+        with torch.no_grad():
+            v_outputs = self.model(**v_inputs, output_hidden_states=True)
+            v_feat = v_outputs.hidden_states[-1].mean(dim=1)
+
+        t_inputs = self.processor(
+            text=[f"Question: {question}"], 
+            return_tensors="pt"
+        ).to("cuda")
+
+        with torch.no_grad():
+            t_outputs = self.model(**t_inputs, output_hidden_states=True)
+            t_feat = t_outputs.hidden_states[-1][:, -1, :]
+
+        # 3. 计算相似度
+        norm_v = F.normalize(v_feat, p=2, dim=1)
+        norm_t = F.normalize(t_feat, p=2, dim=1)
+        
+        # 注意：cosine_similarity 里的 dim 参数，如果 v_feat 和 t_feat 都是 [1, D]
+        similarity = F.cosine_similarity(norm_v, norm_t).item()
+        return 1 - similarity
+    
     def parse_from_instructor(self, instructor_response):
         json_data = None
         json_str = None
@@ -157,6 +205,10 @@ class Instructor(BasicPipeline):
         ids = dataset.id
         prediction_list = []
         start_time = time.time()
+        with open("uncertainty_scores.tsv", "w", newline='', encoding="utf-8") as tsv_f:
+            writer = csv.writer(tsv_f, delimiter='\t')
+            writer.writerow(["id", "uncertainty_score"])
+             
         with open("intermediate_logs.jsonl", "w", encoding="utf-8") as f:
             for i, (question, id) in enumerate(zip(questions, ids)):
                 print(f"[{i}/{len(questions)}] question: {question}")
@@ -165,7 +217,16 @@ class Instructor(BasicPipeline):
                     img_path = f"data/datasets/crag/images/{id}.jpg"
                     img = Image.open(img_path).convert("RGB")
                     
-                    final_answer, context = self.generate(question, img)
+                    uncertainty_score = self.estimate_uncertainty(question, img)
+                    # print(f"Estimated uncertainty score: {uncertainty_score:.4f}")
+                    with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
+                        writer = csv.writer(tsv_f, delimiter='\t')
+                        writer.writerow([str(id), uncertainty_score])
+                        
+                    if uncertainty_score > self.uncertain_threshold:
+                        final_answer, context = self.instud_generate(question, img)
+                    else:
+                        final_answer, context = self.student.generate(question, img)
                     prediction_list.append(final_answer)
     
                     logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
