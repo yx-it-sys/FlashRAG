@@ -39,7 +39,7 @@ class Student(BasicPipeline):
         ]
 
         # 2. 调用模型生成
-        response = qwen2_generate(self.model, self.processor, messages)
+        response, entropy = qwen2_generate(self.model, self.processor, messages)
         print(f"Model Raw Response: {response}")
                 
         json_data = None
@@ -104,7 +104,7 @@ class Student(BasicPipeline):
                 ],
             }
         ]
-        response = qwen2_generate(self.model, self.processor, messages)
+        response, entropy = qwen2_generate(self.model, self.processor, messages)
         print(f"Student first Response: {response}")
         logs.append({"student_first_response": response})
         messages.append({
@@ -133,7 +133,7 @@ class Student(BasicPipeline):
                         {"type": "text", "text": f"Here are retrieved information:{retrieval_content}. Response in JSON strictly."}
                     ]
                 })
-                response = qwen2_generate(self.model, self.processor, messages)
+                response, entropy = qwen2_generate(self.model, self.processor, messages)
                 print(f"Student response after image retrieval: {response}")
                 logs.append({"student_response": response})
                 action = self.parse_action(response)
@@ -173,7 +173,7 @@ class Student(BasicPipeline):
                         {"type": "text", "text": f"Here are retrieved information:{retrieval_content}. Response in JSON strictly."}
                     ]
                 })
-                response = qwen2_generate(self.model, self.processor, messages)
+                response, entropy = qwen2_generate(self.model, self.processor, messages)
                 print(f"Student response after text retrieval: {response}")
                 logs.append({"student_response": response})
                 action = self.parse_action(response)

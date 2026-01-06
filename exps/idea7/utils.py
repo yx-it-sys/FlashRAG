@@ -1,5 +1,6 @@
 from transformers import Qwen2_5_VLForConditionalGeneration, AutoTokenizer, AutoProcessor
 from qwen_vl_utils import process_vision_info
+import torch.nn.functional as F
 from cragmm_search.search import UnifiedSearchPipeline
 import torch
 import re
@@ -34,11 +35,13 @@ def qwen2_generate(model, processor, messages):
             pad_token_id=processor.tokenizer.pad_token_id,
             eos_token_id=processor.tokenizer.eos_token_id
         )
-    
-    generated_sequences = model_outputs.sequences
+    first_token_logits = model_outputs.scores[0]
+    probs = F.softmax(first_token_logits, dim=-1)
+    entropy = -torch.sum(probs * torch.log(probs + 1e-10), dim=-1)
+    first_token_entropy = entropy.item()
 
+    generated_sequences = model_outputs.sequences
     input_len = inputs.input_ids.shape[1]
-        
     generated_ids_trimmed = [
         out_ids[input_len:] for out_ids in generated_sequences
     ]
@@ -46,7 +49,7 @@ def qwen2_generate(model, processor, messages):
     output_text = processor.batch_decode(
         generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
     )
-    return output_text[0]
+    return output_text[0], first_token_entropy
     
 class CRAGSearch():
     def __init__(self, top_k):

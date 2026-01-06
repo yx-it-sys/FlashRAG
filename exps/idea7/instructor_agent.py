@@ -7,6 +7,7 @@ import re
 from tqdm import tqdm
 import json
 import torch
+import torch.nn.functional as F
 import time
 
 class Instructor(BasicPipeline):
@@ -21,7 +22,7 @@ class Instructor(BasicPipeline):
         with open('prompts/instructor.toml', 'rb') as f:
             self.instructor_prompt = tomllib.load(f)
 
-    def generate(self, question: str, image: Image):
+    def instud_generate(self, question: str, image: Image):
         logs = []
         feedback_list = []
         messages = [
@@ -37,7 +38,7 @@ class Instructor(BasicPipeline):
             }
         ]
         
-        instructor_response = qwen2_generate(self.model, self.processor, messages)
+        instructor_response, entropy = qwen2_generate(self.model, self.processor, messages)
         print("\n<Instructor>")
         print(f"Instructor first Response: {instructor_response}")
         print("\n</Instructor>")
@@ -76,7 +77,7 @@ class Instructor(BasicPipeline):
                     ]
                 })
 
-                instructor_response = qwen2_generate(self.model, self.processor, messages)
+                instructor_response, entropy = qwen2_generate(self.model, self.processor, messages)
                 # instructor_response = self.check_student_response(feedback_list, plan)
                 messages.append({
                     "role": "assistant",
@@ -94,9 +95,25 @@ class Instructor(BasicPipeline):
             final_answer = plan
             logs.append({"student_logs": student_logs})
             return final_answer, logs
-        
-    def check_student_response(self, feedback_list, plan):
+    
+    def generate(self, question: str, image: Image):
         pass
+
+    def estimate_uncertainty(self, question, img):
+        v_inputs = self.processor(images=img, text=["<|vision_start|><|vision_end|>What is in this image?"], return_tensors="pt").to("cuda")
+        with torch.no_grad():
+            v_outputs = self.model(**v_inputs, output_hidden_states=True)
+            v_feat = v_outputs.hidden_states[-1].mean(dim=1)
+        t_inputs = self.processor(text=[f"Question: {question}"], return_tensors="pt").to("cuda")
+        with torch.no_grad():
+            t_outputs = self.model(**t_inputs, output_hidden_states=True)
+            t_feat = t_outputs.hidden_states[-1][:, -1, :]
+
+        norm_v = F.normalize(v_feat, p=2, dim=1)
+        norm_t = F.normalize(t_feat, p=2, dim=1)    
+        similarity = F.cosine_similarity(norm_v, norm_t.t()).item()
+        residual = 1 - similarity
+        return residual
 
     def parse_from_instructor(self, instructor_response):
         json_data = None
@@ -165,14 +182,19 @@ class Instructor(BasicPipeline):
                     img_path = f"data/datasets/crag/images/{id}.jpg"
                     img = Image.open(img_path).convert("RGB")
                     
-                    final_answer, context = self.generate(question, img)
-                    prediction_list.append(final_answer)
+                    uncertainty_score = self.estimate_uncertainty(question, img)
+                    print(f"Estimated uncertainty score: {uncertainty_score:.4f}")
+                    # if uncertainty_score > self.uncertainty_threshold:
+                    #     final_answer, context = self.instud_generate(question, img)
+                    # else:
+                    #     final_answer, context = self.generate(question, img)
+                    # prediction_list.append(final_answer)
     
-                    logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
-                    f.write(json.dumps(logs, ensure_ascii=False) + "\n")
+                    # logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
+                    # f.write(json.dumps(logs, ensure_ascii=False) + "\n")
                     
-                    if i % 10 == 0:
-                        f.flush()
+                    # if i % 10 == 0:
+                    #     f.flush()
     
                 except torch.cuda.OutOfMemoryError:
                     print(f"!!! CUDA OOM Error at index {i}, id: {id}. Clearing cache and skipping...")
