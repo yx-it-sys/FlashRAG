@@ -129,18 +129,7 @@ class Instructor(BasicPipeline):
             v_outputs = self.model(**v_inputs, output_hidden_states=True)
             v_feat = v_outputs.hidden_states[-1][:,-1,:]
 
-        t_messages = [
-            {
-                "role": "user", 
-                "content": f"""
-                Analyze the following question: '{question}'. 
-                Does answering this question primarily rely on describing visual details (colors, shapes, objects) or requires external encyclopedic knowledge (names, dates, history, origin) that cannot be directly seen?
-                
-                - If it requires visual details, describe what the image should look like.
-                - If it requires external knowledge, simply output: "External Encyclopedic Knowledge".
-                """
-            }
-        ]
+        t_messages = [{"role": "user", "content": f"Analyze the question: '{question}'. What visual information is strictly visible in the image to support the answer? If the answer requires external knowledge not visible, state 'External Knowledge'."}]
         t_prompt = self.processor.apply_chat_template(t_messages, tokenize=False, add_generation_prompt=True)
         t_inputs = self.processor(text=[t_prompt], return_tensors="pt").to("cuda")
         with torch.no_grad():
@@ -201,7 +190,8 @@ class Instructor(BasicPipeline):
             state_content = "continue"
         print(f"State: {state_content}, Plan: {plan_content}")
         return state_content, plan_content
-    
+    def naive_generate(self, question: str, image: Image):
+        
     def run(self, dataset, do_eval=True, pred_process_fun=None):
         questions = dataset.question
         ids = dataset.id
@@ -221,26 +211,26 @@ class Instructor(BasicPipeline):
                     
                     uncertainty_score = self.estimate_uncertainty(question, img)
                     # print(f"Estimated uncertainty score: {uncertainty_score:.4f}")
-                    with open("uncertainty_scores1.tsv", "a", newline='', encoding="utf-8") as tsv_f:
+                    with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
                         writer = csv.writer(tsv_f, delimiter='\t')
                         writer.writerow([str(id), uncertainty_score])
                         print(f"id: {str(id)}, uncertainty_score: {uncertainty_score}")
                         
-                    # if uncertainty_score > self.uncertain_threshold:
-                    #     final_answer, context = self.instud_generate(question, img)
-                    # else:
-                    #     final_answer, context = self.student.generate(question, img)
-                    # prediction_list.append(final_answer)
+                    if uncertainty_score > self.uncertain_threshold:
+                        final_answer, context = self.instud_generate(question, img)
+                    else:
+                        final_answer, context = self.naive_generate(question, img)
+                    prediction_list.append(final_answer)
     
-                    # logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
-                    # f.write(json.dumps(logs, ensure_ascii=False) + "\n")
+                    logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
+                    f.write(json.dumps(logs, ensure_ascii=False) + "\n")
                     
                     if i % 10 == 0:
                         f.flush()
     
                 except torch.cuda.OutOfMemoryError:
                     print(f"!!! CUDA OOM Error at index {i}, id: {id}. Clearing cache and skipping...")
-                    with open("uncertainty_scores1.tsv", "a", newline='', encoding="utf-8") as tsv_f:
+                    with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
                         writer = csv.writer(tsv_f, delimiter='\t')
                         writer.writerow([str(id), 0.0])
                         print(f"id: {str(id)}, uncertainty_score: {0.0}")

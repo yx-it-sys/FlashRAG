@@ -128,8 +128,8 @@ class Instructor(BasicPipeline):
         with torch.no_grad():
             v_outputs = self.model(**v_inputs, output_hidden_states=True)
             v_feat = v_outputs.hidden_states[-1][:,-1,:]
-            
-        t_messages = [{"role": "user", "content": f"Question: {question}"}]
+
+        t_messages = [{"role": "user", "content": f"Analyze the question: '{question}'. What visual information is strictly visible in the image to support the answer? If the answer requires external knowledge not visible, state 'External Knowledge'."}]
         t_prompt = self.processor.apply_chat_template(t_messages, tokenize=False, add_generation_prompt=True)
         t_inputs = self.processor(text=[t_prompt], return_tensors="pt").to("cuda")
         with torch.no_grad():
@@ -215,14 +215,14 @@ class Instructor(BasicPipeline):
                         writer.writerow([str(id), uncertainty_score])
                         print(f"id: {str(id)}, uncertainty_score: {uncertainty_score}")
                         
-                    # if uncertainty_score > self.uncertain_threshold:
-                    #     final_answer, context = self.instud_generate(question, img)
-                    # else:
-                    #     final_answer, context = self.student.generate(question, img)
-                    # prediction_list.append(final_answer)
+                    if uncertainty_score > self.uncertain_threshold:
+                        final_answer, context = self.instud_generate(question, img)
+                    else:
+                        final_answer, context = self.naive_generate(question, img)
+                    prediction_list.append(final_answer)
     
-                    # logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
-                    # f.write(json.dumps(logs, ensure_ascii=False) + "\n")
+                    logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
+                    f.write(json.dumps(logs, ensure_ascii=False) + "\n")
                     
                     if i % 10 == 0:
                         f.flush()
