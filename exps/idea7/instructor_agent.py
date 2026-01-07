@@ -129,7 +129,18 @@ class Instructor(BasicPipeline):
             v_outputs = self.model(**v_inputs, output_hidden_states=True)
             v_feat = v_outputs.hidden_states[-1][:,-1,:]
 
-        t_messages = [{"role": "user", "content": f"Analyze the question: '{question}'. What visual information is strictly visible in the image to support the answer? If the answer requires external knowledge not visible, state 'External Knowledge'."}]
+        t_messages = [
+            {
+                "role": "user", 
+                "content": f"""
+                Analyze the following question: '{question}'. 
+                Does answering this question primarily rely on describing visual details (colors, shapes, objects) or requires external encyclopedic knowledge (names, dates, history, origin) that cannot be directly seen?
+                
+                - If it requires visual details, describe what the image should look like.
+                - If it requires external knowledge, simply output: "External Encyclopedic Knowledge".
+                """
+            }
+        ]
         t_prompt = self.processor.apply_chat_template(t_messages, tokenize=False, add_generation_prompt=True)
         t_inputs = self.processor(text=[t_prompt], return_tensors="pt").to("cuda")
         with torch.no_grad():
@@ -210,7 +221,7 @@ class Instructor(BasicPipeline):
                     
                     uncertainty_score = self.estimate_uncertainty(question, img)
                     # print(f"Estimated uncertainty score: {uncertainty_score:.4f}")
-                    with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
+                    with open("uncertainty_scores1.tsv", "a", newline='', encoding="utf-8") as tsv_f:
                         writer = csv.writer(tsv_f, delimiter='\t')
                         writer.writerow([str(id), uncertainty_score])
                         print(f"id: {str(id)}, uncertainty_score: {uncertainty_score}")
@@ -229,7 +240,7 @@ class Instructor(BasicPipeline):
     
                 except torch.cuda.OutOfMemoryError:
                     print(f"!!! CUDA OOM Error at index {i}, id: {id}. Clearing cache and skipping...")
-                    with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
+                    with open("uncertainty_scores1.tsv", "a", newline='', encoding="utf-8") as tsv_f:
                         writer = csv.writer(tsv_f, delimiter='\t')
                         writer.writerow([str(id), 0.0])
                         print(f"id: {str(id)}, uncertainty_score: {0.0}")
