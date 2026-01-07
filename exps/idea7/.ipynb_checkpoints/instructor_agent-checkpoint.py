@@ -20,7 +20,7 @@ class Instructor(BasicPipeline):
         self.model = model
         self.processor = processor
         self.student = student
-        self.uncertain_threshold = 1.0
+        self.uncertain_threshold = 0.0
         with open('prompts/instructor.toml', 'rb') as f:
             self.instructor_prompt = tomllib.load(f)
 
@@ -52,51 +52,51 @@ class Instructor(BasicPipeline):
                         "type": "text", "text": f"state: {state}, plan: {plan}"
                     }]
                 })
-        if state != "continue":
-            print(f"ERROR! The Instructor went on strike! Before he went off, he said: {instructor_response}")
-            return "", messages
-        else:
-            conversation_num, max_turns = 0, 8
-            while conversation_num < max_turns:
-                # print("="*30)
-                # print(f"INSTRUCTOR Prompt Contexts:\n{messages}")
-                # print("="*30)
-                print(f"State: {state}, Plan: {plan}")
-                if state == "finish":
-                    break
-                # messages.append({'role': 'assistant', 'content': instructor_response})
-                print("\n<Student>")
-                feedback, student_logs = self.student.generate(question, image, plan)
-                feedback_list.append(feedback)
-                logs.append({"feedback": feedback})
-                print("<Student>")
-                print(f"Student feedback: {feedback}")
-                print("</Student>")
-                messages.append({
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": f"Feedback from user: {feedback}\n\n(Reminder: Use this feedback to move towards solving the MAIN QUESTION: '{question}'. If not fully solved, continue asking. Your response must be JSON.)"}
-                    ]
-                })
+        # if state != "continue":
+        #     print(f"ERROR! The Instructor went on strike! Before he went off, he said: {instructor_response}")
+        #     return "", messages
+        # else:
+        conversation_num, max_turns = 0, 5
+        while conversation_num < max_turns:
+            # print("="*30)
+            # print(f"INSTRUCTOR Prompt Contexts:\n{messages}")
+            # print("="*30)
+            print(f"State: {state}, Plan: {plan}")
+            if state == "finish":
+                break
+            # messages.append({'role': 'assistant', 'content': instructor_response})
+            print("\n<Student>")
+            feedback, student_logs = self.student.generate(question, image, plan)
+            feedback_list.append(feedback)
+            logs.append({"feedback": feedback})
+            print("<Student>")
+            print(f"Student feedback: {feedback}")
+            print("</Student>")
+            messages.append({
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": f"Feedback from user: {feedback}\n\n(Reminder: Use this feedback to move towards solving the MAIN QUESTION: '{question}'. If not fully solved, continue asking. Your response must be JSON.)"}
+                ]
+            })
 
-                instructor_response, entropy = qwen2_generate(self.model, self.processor, messages)
-                # instructor_response = self.check_student_response(feedback_list, plan)
-                messages.append({
-                    "role": "assistant",
-                    "content": [{
-                        "type": "text", "text": instructor_response
-                    }]
-                })
-                logs.append({"instructor_response": instructor_response})
-                print("\n<Instructor>")
-                print(f"Instructor response after student: {instructor_response}")
-                print("\n</Instructor>")
-                state, plan = self.parse_from_instructor(instructor_response)
-                conversation_num += 1
+            instructor_response, entropy = qwen2_generate(self.model, self.processor, messages)
+            # instructor_response = self.check_student_response(feedback_list, plan)
+            messages.append({
+                "role": "assistant",
+                "content": [{
+                    "type": "text", "text": instructor_response
+                }]
+            })
+            logs.append({"instructor_response": instructor_response})
+            print("\n<Instructor>")
+            print(f"Instructor response after student: {instructor_response}")
+            print("\n</Instructor>")
+            state, plan = self.parse_from_instructor(instructor_response)
+            conversation_num += 1
 
-            final_answer = plan
-            logs.append({"student_logs": student_logs})
-            return final_answer, logs
+        final_answer = plan
+        logs.append({"student_logs": student_logs})
+        return final_answer, logs
     
     def generate(self, question: str, image: Image):
         pass
@@ -190,11 +190,27 @@ class Instructor(BasicPipeline):
             state_content = "continue"
         print(f"State: {state_content}, Plan: {plan_content}")
         return state_content, plan_content
+    def naive_generate(self, question: str, image: Image):
+        messages = [
+            {
+                "role": "system",
+                "content": [
+                    {
+                        "type": "image",
+                        "image": image,
+                    },
+                    {"type": "text", "text": f"You are a helpful assistant. Answer the question based on the image provided. Question: {question}"},
+                ],
+            }
+        ]
+        response, uncertainty = qwen2_generate(self.model, self.processor, messages)
+        return response, uncertainty
     
     def run(self, dataset, do_eval=True, pred_process_fun=None):
         questions = dataset.question
         ids = dataset.id
         prediction_list = []
+        entropy_list = []
         start_time = time.time()
         with open("uncertainty_scores.tsv", "w", newline='', encoding="utf-8") as tsv_f:
             writer = csv.writer(tsv_f, delimiter='\t')
@@ -208,19 +224,19 @@ class Instructor(BasicPipeline):
                     img_path = f"data/datasets/crag/images/{id}.jpg"
                     img = Image.open(img_path).convert("RGB")
                     
-                    uncertainty_score = self.estimate_uncertainty(question, img)
+                    # uncertainty_score = self.estimate_uncertainty(question, img)
                     # print(f"Estimated uncertainty score: {uncertainty_score:.4f}")
-                    with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
-                        writer = csv.writer(tsv_f, delimiter='\t')
-                        writer.writerow([str(id), uncertainty_score])
-                        print(f"id: {str(id)}, uncertainty_score: {uncertainty_score}")
-                        
+                    # with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
+                    #     writer = csv.writer(tsv_f, delimiter='\t')
+                    #     writer.writerow([str(id), uncertainty_score])
+                    #     print(f"id: {str(id)}, uncertainty_score: {uncertainty_score}")
+                    uncertainty_score = 0.1
                     if uncertainty_score > self.uncertain_threshold:
                         final_answer, context = self.instud_generate(question, img)
                     else:
-                        final_answer, context = self.naive_generate(question, img)
+                        final_answer, entropy = self.naive_generate(question, img)
                     prediction_list.append(final_answer)
-    
+
                     logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
                     f.write(json.dumps(logs, ensure_ascii=False) + "\n")
                     
@@ -251,11 +267,11 @@ class Instructor(BasicPipeline):
         total_duration = end_time - start_time
         count = len(questions)
             
-        # dataset.update_output("pred", prediction_list)
-        # dataset = self.evaluate(dataset, do_eval=do_eval)
-        # avg_time = total_duration / count if count > 0 else 0
+        dataset.update_output("pred", prediction_list)
+        dataset = self.evaluate(dataset, do_eval=do_eval)
+        avg_time = total_duration / count if count > 0 else 0
 
-        # print(f"\n[Timing] Total: {total_duration:.2f}s | Count: {count} | Avg per item: {avg_time:.4f}s")
-        # with open("records.txt", "a", encoding="utf-8") as f:
-        #     f.write(f"\n[Timing] Total: {total_duration:.2f}s | Count: {count} | Avg per item: {avg_time:.4f}s")
+        print(f"\n[Timing] Total: {total_duration:.2f}s | Count: {count} | Avg per item: {avg_time:.4f}s")
+        with open("records.txt", "a", encoding="utf-8") as f:
+            f.write(f"\n[Timing] Total: {total_duration:.2f}s | Count: {count} | Avg per item: {avg_time:.4f}s")
         return dataset

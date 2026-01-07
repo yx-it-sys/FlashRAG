@@ -9,7 +9,7 @@ system_prompt = """
     - **Text Retrieval: [query]**: Use this when you need factual information, historical context, or technical details about a specific entity or concept.
 4. **Final Response**: Only provide a "Conclusion" when you are confident and have verified the information against the Mentor's plan.
 
-**Strict Output Formats**, Choose only ONE of the following three formats per turn:
+**Strict Output Formats**, Choose only one of the following three formats per turn:
 
 - Case 1: **To identify an unknown part of an image**:
 First, generate Your reasoning process here...
