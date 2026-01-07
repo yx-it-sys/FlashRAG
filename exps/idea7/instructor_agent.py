@@ -191,11 +191,26 @@ class Instructor(BasicPipeline):
         print(f"State: {state_content}, Plan: {plan_content}")
         return state_content, plan_content
     def naive_generate(self, question: str, image: Image):
-        
+        messages = [
+            {
+                "role": "system",
+                "content": [
+                    {
+                        "type": "image",
+                        "image": image,
+                    },
+                    {"type": "text", "text": f"You are a helpful assistant. Answer the question based on the image provided. Question: {question}"},
+                ],
+            }
+        ]
+        response, uncertainty = qwen2_generate(self.model, self.processor, messages)
+        return response, uncertainty
+    
     def run(self, dataset, do_eval=True, pred_process_fun=None):
         questions = dataset.question
         ids = dataset.id
         prediction_list = []
+        entropy_list = []
         start_time = time.time()
         with open("uncertainty_scores.tsv", "w", newline='', encoding="utf-8") as tsv_f:
             writer = csv.writer(tsv_f, delimiter='\t')
@@ -209,20 +224,20 @@ class Instructor(BasicPipeline):
                     img_path = f"data/datasets/crag/images/{id}.jpg"
                     img = Image.open(img_path).convert("RGB")
                     
-                    uncertainty_score = self.estimate_uncertainty(question, img)
+                    # uncertainty_score = self.estimate_uncertainty(question, img)
                     # print(f"Estimated uncertainty score: {uncertainty_score:.4f}")
-                    with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
-                        writer = csv.writer(tsv_f, delimiter='\t')
-                        writer.writerow([str(id), uncertainty_score])
-                        print(f"id: {str(id)}, uncertainty_score: {uncertainty_score}")
-                        
+                    # with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
+                    #     writer = csv.writer(tsv_f, delimiter='\t')
+                    #     writer.writerow([str(id), uncertainty_score])
+                    #     print(f"id: {str(id)}, uncertainty_score: {uncertainty_score}")
+                    uncertainty_score = 0.0
                     if uncertainty_score > self.uncertain_threshold:
                         final_answer, context = self.instud_generate(question, img)
                     else:
-                        final_answer, context = self.naive_generate(question, img)
+                        final_answer, entropy = self.naive_generate(question, img)
                     prediction_list.append(final_answer)
-    
-                    logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
+
+                    logs = {"id": id, "question": question, "prediction": final_answer, "entropy": entropy}
                     f.write(json.dumps(logs, ensure_ascii=False) + "\n")
                     
                     if i % 10 == 0:
