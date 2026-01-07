@@ -118,7 +118,7 @@ class Student(BasicPipeline):
         action = self.parse_action(response)
         action_type = action['type']
         action = action['content']
-        conversation_num, max_turns = 0, 5
+        conversation_num, max_turns = 0, 3
         final_answer = "I can't answer."
         while conversation_num < max_turns:
             # print("="*30)
