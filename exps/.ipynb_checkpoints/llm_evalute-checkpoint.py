@@ -15,7 +15,7 @@ sys_prompt = f"You are an expert evaluator for question answering systems. Your 
 # intermediate_logs = "baseline/omnisearch/result/crag_2025_12_17_16_06_experiment/intermediate_data.json"
 # intermediate_logs = "baseline/mRAG/crag_whole_mRAG/intermediate_data.json"
 # intermediate_logs = "baseline/naiveRAG/crag_whole_naive/intermediate_data.json"
-intermediate_logs = "idea7/result/crag_omni_600/intermediate_data.json"
+intermediate_logs = "idea7/result/crag_naiive/intermediate_data.json"
 
 print(f"Type: {intermediate_logs}")
 
