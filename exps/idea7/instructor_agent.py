@@ -229,7 +229,10 @@ class Instructor(BasicPipeline):
     
                 except torch.cuda.OutOfMemoryError:
                     print(f"!!! CUDA OOM Error at index {i}, id: {id}. Clearing cache and skipping...")
-                    
+                    with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
+                        writer = csv.writer(tsv_f, delimiter='\t')
+                        writer.writerow([str(id), 0.0])
+                        print(f"id: {str(id)}, uncertainty_score: {0.0}")
                     torch.cuda.empty_cache()
                     
                     prediction_list.append("Error: CUDA OOM")
@@ -248,11 +251,11 @@ class Instructor(BasicPipeline):
         total_duration = end_time - start_time
         count = len(questions)
             
-        dataset.update_output("pred", prediction_list)
-        dataset = self.evaluate(dataset, do_eval=do_eval)
-        avg_time = total_duration / count if count > 0 else 0
+        # dataset.update_output("pred", prediction_list)
+        # dataset = self.evaluate(dataset, do_eval=do_eval)
+        # avg_time = total_duration / count if count > 0 else 0
 
-        print(f"\n[Timing] Total: {total_duration:.2f}s | Count: {count} | Avg per item: {avg_time:.4f}s")
-        with open("records.txt", "a", encoding="utf-8") as f:
-            f.write(f"\n[Timing] Total: {total_duration:.2f}s | Count: {count} | Avg per item: {avg_time:.4f}s")
+        # print(f"\n[Timing] Total: {total_duration:.2f}s | Count: {count} | Avg per item: {avg_time:.4f}s")
+        # with open("records.txt", "a", encoding="utf-8") as f:
+        #     f.write(f"\n[Timing] Total: {total_duration:.2f}s | Count: {count} | Avg per item: {avg_time:.4f}s")
         return dataset

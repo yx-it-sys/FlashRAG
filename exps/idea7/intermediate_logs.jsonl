@@ -3,3 +3,28 @@
 {"id": "46a94765-4d21-4107-9dd6-17a4b4daf166", "question": "Can this car be eco-friendly?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
 {"id": "49121bf6-60e2-4784-b909-f5545a009ecc", "question": "Is this temple located in a country that uses the Euro as its official currency?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
 {"id": "e7ad1649-b235-4d6c-b860-ff6d70a55294", "question": "How much taller is Merderka 118 than this tower?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "55822ee6-c30c-4312-a60e-dd317d7b65ef", "question": "what country was this sports car first introduced in?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "e3b5c28d-e9b8-47fe-9ca3-d663e2d94d6e", "question": "How many months of the year does this flower typically bloom?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "5570f15c-bf56-460a-a392-19a43fc6a3c8", "question": "who manages this iconic stadium?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "59f130cf-34bd-4d64-832d-77e0bb1ab4a9", "question": "Which three-row SUV has a more spacious third row, this vehicle or the Toyota Highlander?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "f8c2b3a1-6acc-479b-88c9-39a657807234", "question": "Where is this endemic to, and when was it first formally described?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "ee241c2b-9707-482e-a4fe-577282eb26aa", "question": "what type of leaves does this plant have?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "fc76890d-f1f2-4ff5-8d02-f3723efdd45a", "question": "Who is the current archbishop of the diocese where this church is located?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "eb6cd63c-b64a-4aae-b20c-a01514f066b7", "question": "How does this lily differ from Lilium candidum in appearance?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "a1fc60af-d736-4d02-a897-43ad01094774", "question": "How many species in total belong to the family of this tree?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "9d727db7-d66f-4072-b414-2d91d1ccd457", "question": "how are the leaves typically arranged on this plant?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "7bd0ca23-385e-476b-bd72-8bece5dc9a84", "question": "Where is this plant endemic to?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "ae9b07fa-0538-4eb0-ae84-cbbc72f918af", "question": "When does this orchid species bloom?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "302d5282-b86a-47f8-97b6-536c8cf79fcb", "question": "Which one of the extinct marsupials, this animal or Thylacoleo was a larger predator?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "bb8e045a-ad09-49fe-b9e4-8ba5549868cc", "question": "What is the primary method of movement for this type of crustacean?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "78c307f8-b2d5-4f90-b409-4ace509e6912", "question": "Can this plant grow in North America?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "546a00a6-c85e-4e35-8d64-43b232dc7372", "question": "what is the normal size for this plant?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "23115839-40c5-405d-915c-382abd604245", "question": "What type of structure does this plant have?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "919c46e0-7847-4d01-b295-bda285fbcc8e", "question": "When did the sultan, for whom this mosque is named, conquer Constantinople?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "61ac6454-1a11-47e4-af0e-5a659f15ff4a", "question": "How many species were named by the one who defined this species?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "23dec3b8-9673-4b09-8ca2-1a95b815fc37", "question": "Which accepted varieties of this tree grow to a height of approximately 30 feet?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "fde83c29-86d9-4720-83b4-67ce5bfd9b52", "question": "What is the typical number of flowers on this orchid's stem?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "76b006a4-f118-4eed-adc7-93906983099c", "question": "what is the social structure of these creatures?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "d7d4e0f9-3358-4845-a00f-563c6b5736ab", "question": "Would this Mexican dish be appropriate for a keto diet?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "d130bd2b-f065-44bf-ad43-f3c30c772293", "question": "How many species are in the family of that plant?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
+{"id": "fb76b222-0126-4050-93c0-4b76dee36244", "question": "What type of environment does this plant typically thrive in?", "prediction": "I can't answer.", "logs": "CUDA OOM Error - Skipped"}
