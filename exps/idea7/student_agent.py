@@ -102,7 +102,7 @@ class Student(BasicPipeline):
                 "role": "system",
                 "content": [
                     {"type": "image", "image": image},
-                    {"type": "text", "text": self.prompt['system_prompt'].format(original_question=question, current_task=plan)},
+                    {"type": "text", "text": self.prompt['system_prompt'].format(current_task=plan)},
                 ],
             }
         ]

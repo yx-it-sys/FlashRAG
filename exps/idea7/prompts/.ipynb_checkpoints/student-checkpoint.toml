@@ -29,9 +29,6 @@ Conclusion: Your brief, concise answer based on retrieval results and image anal
 - The last sentence of your answer must START with the "Conclusion", "Text Retrieval" or "Image Retrieval".
 - You MUST use retrieval tool at least ONCE. *Do NOT use your own knowledge finish the task**.
 
-Original Task:
-{original_question}
-
 Current Task:
 {current_task}
 """
@@ -83,9 +80,6 @@ Note:
 - You MUST use retrieval tool at least ONCE.
 - Your answer must be precise and accurate. Your Mentor is strict and expects high-quality reasoning. 
 - Do NOT use your own knowledge finish the task.
-
-Original Task:
-{original_question}
 
 Current Task:
 {current_task}

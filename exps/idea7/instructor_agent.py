@@ -20,7 +20,7 @@ class Instructor(BasicPipeline):
         self.model = model
         self.processor = processor
         self.student = student
-        self.uncertain_threshold = 0.0
+        self.uncertain_threshold = 1.0
         with open('prompts/instructor.toml', 'rb') as f:
             self.instructor_prompt = tomllib.load(f)
 
@@ -41,9 +41,7 @@ class Instructor(BasicPipeline):
         ]
         
         instructor_response, entropy = qwen2_generate(self.model, self.processor, messages)
-        print("\n<Instructor>")
-        print(f"Instructor first Response: {instructor_response}")
-        print("\n</Instructor>")
+        
         logs.append({"instructor_first_response": instructor_response})
         state, plan = self.parse_from_instructor(instructor_response)
         messages.append({
@@ -58,14 +56,12 @@ class Instructor(BasicPipeline):
         # else:
         conversation_num, max_turns = 0, 5
         while conversation_num < max_turns:
-            # print("="*30)
-            # print(f"INSTRUCTOR Prompt Contexts:\n{messages}")
-            # print("="*30)
+            print("\n<Instructor>")
             print(f"State: {state}, Plan: {plan}")
+            print("\n</Instructor>")
             if state == "finish":
                 break
             # messages.append({'role': 'assistant', 'content': instructor_response})
-            print("\n<Student>")
             feedback, student_logs = self.student.generate(question, image, plan)
             feedback_list.append(feedback)
             logs.append({"feedback": feedback})
@@ -88,10 +84,8 @@ class Instructor(BasicPipeline):
                 }]
             })
             logs.append({"instructor_response": instructor_response})
-            print("\n<Instructor>")
-            print(f"Instructor response after student: {instructor_response}")
-            print("\n</Instructor>")
             state, plan = self.parse_from_instructor(instructor_response)
+            
             conversation_num += 1
 
         final_answer = plan
@@ -188,7 +182,6 @@ class Instructor(BasicPipeline):
         if state_content not in ["continue", "finish"]:
             print(f"Warning: Unexpected state '{state_content}', defaulting to 'continue'")
             state_content = "continue"
-        print(f"State: {state_content}, Plan: {plan_content}")
         return state_content, plan_content
     def naive_generate(self, question: str, image: Image):
         messages = [
@@ -237,7 +230,7 @@ class Instructor(BasicPipeline):
                         final_answer, entropy = self.naive_generate(question, img)
                     prediction_list.append(final_answer)
 
-                    logs = {"id": id, "question": question, "prediction": final_answer, "logs": context}
+                    logs = {"id": id, "question": question, "prediction": final_answer}
                     f.write(json.dumps(logs, ensure_ascii=False) + "\n")
                     
                     if i % 10 == 0:
