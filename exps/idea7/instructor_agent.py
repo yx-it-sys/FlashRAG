@@ -128,8 +128,8 @@ class Instructor(BasicPipeline):
         with torch.no_grad():
             v_outputs = self.model(**v_inputs, output_hidden_states=True)
             v_feat = v_outputs.hidden_states[-1][:,-1,:]
-            
-        t_messages = [{"role": "user", "content": f"Question: {question}"}]
+
+        t_messages = [{"role": "user", "content": f"Analyze the question: '{question}'. What visual information is strictly visible in the image to support the answer? If the answer requires external knowledge not visible, state 'External Knowledge'."}]
         t_prompt = self.processor.apply_chat_template(t_messages, tokenize=False, add_generation_prompt=True)
         t_inputs = self.processor(text=[t_prompt], return_tensors="pt").to("cuda")
         with torch.no_grad():
