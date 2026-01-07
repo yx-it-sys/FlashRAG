@@ -258,10 +258,10 @@ class Instructor(BasicPipeline):
                     
                     continue
     
-                # except Exception as e:
-                #     print(f"!!! Unknown Error at index {i}, id: {id}: {str(e)}")
-                #     prediction_list.append(f"Error: {str(e)}")
-                #     continue
+                except Exception as e:
+                    print(f"!!! Unknown Error at index {i}, id: {id}: {str(e)}")
+                    prediction_list.append(f"Error: {str(e)}")
+                    continue
         
         end_time = time.time()
         total_duration = end_time - start_time
