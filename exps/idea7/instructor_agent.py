@@ -96,7 +96,6 @@ class Instructor(BasicPipeline):
         pass
 
     def estimate_uncertainty(self, question, img):
-        # 1. 构造标准的对话格式，让 processor 自动处理占位符
         v_messages = [
             {
                 "role": "user",
@@ -107,28 +106,63 @@ class Instructor(BasicPipeline):
             }
         ]
         
-        # 使用 apply_chat_template 得到包含正确数量占位符的文本
         v_prompt = self.processor.apply_chat_template(
             v_messages, tokenize=False, add_generation_prompt=True
         )
         
-        # 这样得到的 v_inputs 就会包含正确的 input_ids (包含数千个 pad tokens)
         v_inputs = self.processor(
             text=[v_prompt], 
-            images=[img], # 注意这里用列表包装一下
+            images=[img], 
             return_tensors="pt"
         ).to("cuda")
 
         with torch.no_grad():
-            v_outputs = self.model(**v_inputs, output_hidden_states=True)
-            v_feat = v_outputs.hidden_states[-1][:,-1,:]
+            v_outputs = self.model.generate(
+                **v_inputs,
+                max_new_tokens=100,
+                do_sample=False,
+                output_hidden_states=True,
+                return_dict_in_generate=True
+            )
+        
 
-        t_messages = [{"role": "user", "content": f"Analyze the question: '{question}'. What visual information is strictly visible in the image to support the answer? If the answer requires external knowledge not visible, state 'External Knowledge'."}]
-        t_prompt = self.processor.apply_chat_template(t_messages, tokenize=False, add_generation_prompt=True)
-        t_inputs = self.processor(text=[t_prompt], return_tensors="pt").to("cuda")
+        v_text = self.processor.batch_decode(v_outputs.sequences, skip_special_tokens=True)[0]
+        print(f"\n[Visual Probe Output]: {v_text}")
+
+        v_feat = v_outputs.hidden_states[-1][-1][:, -1, :]
+
+        # --- 2. Text Probe (T分支) ---
+        t_messages = [{
+            "role": "user", 
+            "content": f"To answer the question '{question}', describe what the image should look like. Imagine the visual scene details."
+        }]
+        
+        t_prompt = self.processor.apply_chat_template(
+            t_messages, tokenize=False, add_generation_prompt=True
+        )
+        
+        t_inputs = self.processor(
+            text=[t_prompt], 
+            return_tensors="pt"
+        ).to("cuda")
+
         with torch.no_grad():
-            t_feat = self.model(**t_inputs, output_hidden_states=True).hidden_states[-1][:, -1, :]
+            t_outputs = self.model.generate(
+                **t_inputs,
+                max_new_tokens=100,
+                do_sample=False,
+                output_hidden_states=True,
+                return_dict_in_generate=True
+            )
+
+        t_text = self.processor.batch_decode(t_outputs.sequences, skip_special_tokens=True)[0]
+        print(f"[Text Probe Output]  : {t_text}")
+
+        t_feat = t_outputs.hidden_states[-1][-1][:, -1, :]
+
         similarity = F.cosine_similarity(v_feat, t_feat).item()
+        
+        print(f"[Uncertainty Score]  : {1 - similarity:.4f} (Sim: {similarity:.4f})")
         return 1 - similarity
     
     def parse_from_instructor(self, instructor_response):
