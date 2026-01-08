@@ -119,7 +119,7 @@ class Instructor(BasicPipeline):
         with torch.no_grad():
             v_outputs = self.model.generate(
                 **v_inputs,
-                max_new_tokens=100,
+                max_new_tokens=512,
                 do_sample=False,
                 output_hidden_states=True,
                 return_dict_in_generate=True
@@ -134,7 +134,7 @@ class Instructor(BasicPipeline):
         # --- 2. Text Probe (T分支) ---
         t_messages = [{
             "role": "user", 
-            "content": f"To answer the question '{question}', describe what the image should look like. Imagine the visual scene details."
+            "content": f"To answer the question '{question}', describe what the image should look like. Imagine the visual scene details. Only generate your imagination, don't generate irrelevant words or markdown markups."
         }]
         
         t_prompt = self.processor.apply_chat_template(
@@ -149,7 +149,7 @@ class Instructor(BasicPipeline):
         with torch.no_grad():
             t_outputs = self.model.generate(
                 **t_inputs,
-                max_new_tokens=100,
+                max_new_tokens=512,
                 do_sample=False,
                 output_hidden_states=True,
                 return_dict_in_generate=True
@@ -246,21 +246,21 @@ class Instructor(BasicPipeline):
                     img_path = f"data/datasets/crag/images/{id}.jpg"
                     img = Image.open(img_path).convert("RGB")
                     
-                    # uncertainty_score = self.estimate_uncertainty(question, img)
-                    # print(f"Estimated uncertainty score: {uncertainty_score:.4f}")
-                    # with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
-                    #     writer = csv.writer(tsv_f, delimiter='\t')
-                    #     writer.writerow([str(id), uncertainty_score])
-                    #     print(f"id: {str(id)}, uncertainty_score: {uncertainty_score}")
-                    uncertainty_score = 0.1
-                    if uncertainty_score > self.uncertain_threshold:
-                        final_answer, context = self.instud_generate(question, img)
-                    else:
-                        final_answer, entropy = self.naive_generate(question, img)
-                    prediction_list.append(final_answer)
+                    uncertainty_score = self.estimate_uncertainty(question, img)
+                    print(f"Estimated uncertainty score: {uncertainty_score:.4f}")
+                    with open("uncertainty_scores.tsv", "a", newline='', encoding="utf-8") as tsv_f:
+                        writer = csv.writer(tsv_f, delimiter='\t')
+                        writer.writerow([str(id), uncertainty_score])
+                        print(f"id: {str(id)}, uncertainty_score: {uncertainty_score}")
+                    # uncertainty_score = 0.1
+                    # if uncertainty_score > self.uncertain_threshold:
+                    #     final_answer, context = self.instud_generate(question, img)
+                    # else:
+                    #     final_answer, entropy = self.naive_generate(question, img)
+                    # prediction_list.append(final_answer)
 
-                    logs = {"id": id, "question": question, "prediction": final_answer}
-                    f.write(json.dumps(logs, ensure_ascii=False) + "\n")
+                    # logs = {"id": id, "question": question, "prediction": final_answer}
+                    # f.write(json.dumps(logs, ensure_ascii=False) + "\n")
                     
                     if i % 10 == 0:
                         f.flush()
