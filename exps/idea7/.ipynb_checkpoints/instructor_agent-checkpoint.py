@@ -126,10 +126,10 @@ class Instructor(BasicPipeline):
             )
         
 
-        v_text = self.processor.batch_decode(v_outputs.sequences, skip_special_tokens=True)[0]
-        print(f"\n[Visual Probe Output]: {v_text}")
+        # v_text = self.processor.batch_decode(v_outputs.sequences, skip_special_tokens=True)[0]
+        # print(f"\n[Visual Probe Output]: {v_text}")
 
-        v_feat = v_outputs.hidden_states[-1][-1][:, -1, :]
+        v_feat = v_outputs.hidden_states[-1][20][:, -1, :]
 
         # --- 2. Text Probe (T分支) ---
         t_messages = [{
@@ -155,10 +155,10 @@ class Instructor(BasicPipeline):
                 return_dict_in_generate=True
             )
 
-        t_text = self.processor.batch_decode(t_outputs.sequences, skip_special_tokens=True)[0]
-        print(f"[Text Probe Output]  : {t_text}")
+        # t_text = self.processor.batch_decode(t_outputs.sequences, skip_special_tokens=True)[0]
+        # print(f"[Text Probe Output]  : {t_text}")
 
-        t_feat = t_outputs.hidden_states[-1][-1][:, -1, :]
+        t_feat = t_outputs.hidden_states[-1][20][:, -1, :]
 
         similarity = F.cosine_similarity(v_feat, t_feat).item()
         
