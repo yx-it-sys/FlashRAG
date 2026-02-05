@@ -53,7 +53,7 @@ method2index:
 
 # ----Environment Settings----
 gpu_id: "0"
-dataset_name: "hotpotqa"
+dataset_name: "infoseek_val"
 split: ['validation','test','dev']
 
 # Sampling configurations for testing
@@ -64,12 +64,12 @@ save_intermediate_data: True
 seed: 2024
 
 # Directory paths for data and outputs
-data_dir: "data/datasets/"
+data_dir: "/mnt/data/you/datasets/"
 #save_dir: "/data00/jiajie_jin/test_project/output"
 save_dir: "result/"
 
 # ----Retrieval Settings----
-retrieval_method: "e5" # name or path of the retrieval model
+retrieval_method: "bge" # name or path of the retrieval model
 index_path: ~ # Set automatically if not provided
 corpus_path: ~
 retrieval_pooling_method: ~
@@ -113,6 +113,5 @@ metric_setting:
 save_metric_score: True #　whether to save the metric score into txt file
 
 # DFA Config
-dfa_vqa_prompt_path: "/root/FlashRAG/exps/idea1/prompts/dfa_vqa_prompts.toml"
-dfa_qa_prompt_path: "/root/FlashRAG/exps/idea1/prompts/dfa_qa_prompts_json.toml"
-omni_qa_prompt_path: "/root/FlashRAG/exps/baseline/prompts/omni_qa_prompt_new.toml"
+system_prompt_path: "/home/you/FlashRAG/exps/baseline/prompts/omni_prompt.toml"
+user_prompt_path: None

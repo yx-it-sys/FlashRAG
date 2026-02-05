@@ -1,12 +1,16 @@
 import re
 import os
 from PIL import Image
+import tomllib
 
 class MMPromptTemplate:
     BASE_USER_PROMPT = '{reference}\nBased on the above examples, answer the following question. Only give me the final choices.\nQuestion: {question}\nAnswer: '
     def __init__(self, config, system_prompt=None, user_prompt=None):
         self.config = config
-        self.system_prompt = system_prompt
+        if system_prompt is None:
+            # tomllib.load expects a binary file object; do not pass an encoding when using 'rb'
+            with open(self.config['system_prompt_path'], 'rb') as f:
+                self.system_prompt = tomllib.load(f)['system_prompt']['multimodal_qa']
         self.user_prompt = user_prompt if user_prompt is not None else self.BASE_USER_PROMPT
     
     def add_question_and_image(self, input_question, pil_image):
@@ -47,7 +51,6 @@ class MMPromptTemplate:
         #         content_list.append({'type': 'image', 'image': item['image']})
         #         reference_str += f'Example {idx+1}: {item["text"]}\n'
         content_list.append({'type': 'image', 'image': question_image})
-        content_list.append({'type': 'text', 'text': self.user_prompt.format(input_question=question)})
         messages.append({"role": "user", "content": content_list})
         return messages
     
