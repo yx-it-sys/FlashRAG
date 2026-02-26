@@ -1,6 +1,5 @@
 from flashrag.evaluator import Evaluator
 from flashrag.utils import get_retriever, get_generator
-from flashrag.uncertainty import integrated_gradient_process
 from transformers import AutoTokenizer, AutoProcessor, AutoModelForVision2Seq
 from accelerate import Accelerator
 import re

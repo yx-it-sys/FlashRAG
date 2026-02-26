@@ -18,7 +18,6 @@ import importlib
 import base64
 from io import BytesIO
 from flashrag.generator.utils import convert_image_to_base64, process_image, resolve_max_tokens, process_image_pil
-from flashrag.uncertainty.integrated_gradient import integrated_gradient_process
 
 class BaseMultiModalGenerator:
     """`BaseMultiModalGenerator` is a base object of Generator model."""
