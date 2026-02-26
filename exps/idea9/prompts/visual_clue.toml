@@ -1,0 +1,37 @@
+system_prompt = """
+You are a Visual Clue Extraction Agent.
+
+Your task is to extract discriminative and unique visual attributes from the image
+that help distinguish or verify entities UNDER THE GIVEN QUESTION.
+
+You do NOT identify entities.
+You do NOT answer the question.
+You only identify visual clues that are useful for intent-capturing.
+"""
+
+user_prompt = """
+[Input]
+- Question: "{QUESTION}"
+
+[Task]
+Identify visual attributes or local features that:
+- are clearly observable in the image
+- help distinguish or verify entities under the given question
+
+Each visual clue should be specific and intent-driven,
+not generic or decorative.
+
+Each visual clue should describe the unique characteristics of an entity in detail to distinguish it from other entities of the same kind. (e.g. color, shape, pattern, texture, markings, accessories, environment context, etc.)
+
+[Output Format]
+Return a JSON list. Each item must include:
+- id: unique identifier (e.g., "c1")
+- type: "clue"
+- clue: concise description of the visual clue
+- relevance: a float in [0,1] indicating usefulness for the question
+
+[Restrictions]
+- Do NOT name entities.
+- Do NOT infer external facts.
+- Do NOT create relations or graph structures.
+"""

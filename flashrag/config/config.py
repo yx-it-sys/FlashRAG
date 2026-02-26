@@ -238,6 +238,8 @@ class Config:
     def _prepare_dir(self):
         save_note = self.final_config["save_note"]
         save_dir = self.final_config['save_dir']
+        dataset_image_dir = os.path.join(self.final_config['dataset_name'], "images")
+        self.final_config['dataset_image_dir'] = dataset_image_dir
         if not save_dir.endswith("/"):
             save_dir += "/"
 

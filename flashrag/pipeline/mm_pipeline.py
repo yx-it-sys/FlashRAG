@@ -173,7 +173,7 @@ class MMCluePipeline(BasicMultiModalPipeline):
 
     def get_clue(self, dataset):
         input_prompts = [
-            self.visual_clue_prompt_template.get_string(item) for item in dataset
+            self.visual_clue_prompt_template.get_string_for_visual_clues(item) for item in dataset
         ]
         clue_list = self.generator.generate(input_prompts)
         

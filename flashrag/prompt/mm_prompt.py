@@ -8,89 +8,46 @@ class MMPromptTemplate:
         self.config = config
         self.system_prompt = system_prompt
         self.user_prompt = user_prompt if user_prompt is not None else self.BASE_USER_PROMPT
-    
-    def add_question_and_image(self, input_question, pil_image):
-        messages = []
-        if self.system_prompt is not None:
-            messages.append({"role": "system", "content": self.system_prompt.format(input_question=input_question)})
-        content_list = []
-        content_list.append({'type': 'image', 'image': pil_image})
-        content_list.append({'type': 'text', 'text': self.user_prompt.format(input_question=input_question)})
-        messages.append({"role": "user", "content": content_list})
-        return messages
-    
-    def get_string(self, item, config):
+    def get_string(self, item):
         question = item.question if item.question is not None else item.text
-        image_folder = config["image_path"]
-        image_filename = f"{item.image_id}.jpg"
-        full_image_path = os.path.join(image_folder, image_filename)
-        raw_image = Image.open(full_image_path)
-        question_image = raw_image.convert("RGB")
-
+        question_image = item.image
         # retrieval_result = item.retrieval_result
-        # try:
-        #     retrieval_result = item.retrieval_result
-        # except:
-        #     retrieval_result = []
+        try:
+            retrieval_result = item.retrieval_result
+        except:
+            retrieval_result = []
 
         messages = []
         if self.system_prompt is not None:
-            messages.append({"role": "system", "content": self.system_prompt.format(input_question=question)})
-        # reference_str = ""
+            messages.append({"role": "system", "content": self.system_prompt})
+        reference_str = ""
         content_list = []
-        # for idx, item in enumerate(retrieval_result):
-        #     # item is multimodal data or raw text
-        #     if 'image' not in item:
-        #         # raw text item
-        #         reference_str += f'Example {idx+1}: {item["contents"]}\n'
-        #     else:
-        #         content_list.append({'type': 'image', 'image': item['image']})
-        #         reference_str += f'Example {idx+1}: {item["text"]}\n'
+        for idx, item in enumerate(retrieval_result):
+            # item is multimodal data or raw text
+            if 'image' not in item:
+                # raw text item
+                reference_str += f'Example {idx+1}: {item["contents"]}\n'
+            else:
+                content_list.append({'type': 'image', 'image': item['image']})
+                reference_str += f'Example {idx+1}: {item["text"]}\n'
         content_list.append({'type': 'image', 'image': question_image})
-        content_list.append({'type': 'text', 'text': self.user_prompt.format(input_question=question)})
+        content_list.append({'type': 'text', 'text': self.user_prompt.format(question=question, reference=reference_str)})
         messages.append({"role": "user", "content": content_list})
         return messages
-    
-    def get_string_for_dfa(self, config, prompt, state_type, run_state: dict):
-        question = run_state['initial_query']
-        image_folder = config["image_path"]
-        image_filename = f"{run_state['id']}.jpg"
-        full_image_path = os.path.join(image_folder, image_filename)
-        raw_image = Image.open(full_image_path)
-        question_image = raw_image.convert("RGB")
+    def get_string_for_visual_clues(self, item):
+        question = item.question if item.question is not None else item.text
+        question_image_id = item.image
         messages = []
-        messages.append({'role': "system", 'content': prompt["system"]["prompt"].format(input_question=question)})
+        if self.system_prompt is not None:
+            messages.append({"role": "system", "content": self.system_prompt})
+            image_path = os.path.join(f'{self.config["dataset_image_dir"]}', f'{question_image_id}.jpg')
+            question_image = Image.open(image_path)
         content_list = []
         content_list.append({'type': 'image', 'image': question_image})
-        if state_type == "plan":
-            if run_state['further_analysis'] is not None:
-                further_analysis = run_state['further_analysis']
-            else:
-                further_analysis = ""
-            content_list.append({'type': 'text', 'text': prompt["tasks"][state_type].format(query=run_state['initial_query'], further_analysis=further_analysis)})
-        elif state_type == "assess":
-            query = run_state['current_query']
-            docs = run_state['retrieved_docs']
-            content_list.append({'type': 'text', 'text': prompt["tasks"][state_type].format(query=query, docs='\n'.join(docs))})
-        elif state_type == "refine":
-            query = run_state['current_query']
-            reason = run_state['s_assessment_reason']
-            content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(query=query, reason=reason)})
-        elif state_type == "generate":
-            initial_query = question
-            docs = run_state["retrieved_docs"]
-            if len(docs) > 0:
-                content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(current_query=initial_query, docs='\n'.join(docs))})
-            else:
-                content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(current_query=initial_query, docs='')})
-        elif state_type == "judge":
-            query = question
-            answer = run_state['s_generate_response']
-            content_list.append({'type': 'text', 'text': prompt['tasks'][state_type].format(initial_query=query, generated_answer=answer)})
-        
-        messages.append({'role': 'user', 'content': content_list})
+        content_list.append({'type': 'text', 'text': self.user_prompt.format(question=question)})
+        messages.append({"role": "user", "content": content_list})
         return messages
-    
+
 class GAOKAOMMPromptTemplate(MMPromptTemplate):
     BASE_USER_PROMPT = "请你做一道{subject}选择题\n请你结合文字和图片一步一步思考,并将思考过程写在【解析】和<eoe>之间。{instruction}\n例如：{example}\n请你严格按照上述格式作答。\n你可以参考一些知识: {reference}。题目如下：{question}"
     INSTRUCTION_DICT = {
