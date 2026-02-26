@@ -164,3 +164,29 @@ class MMSequentialPipeline(BasicMultiModalPipeline):
         dataset = self.evaluate(dataset, do_eval=do_eval)                 
         return dataset
 
+class MMCluePipeline(BasicMultiModalPipeline):
+    def __init__(self, config, visual_clue_prompt_template, prompt_template=None, retriever=None, generator=None):
+        super().__init__(config, prompt_template)
+        self.visual_clue_prompt_template = visual_clue_prompt_template
+        self.generator = get_generator(config) if generator is None else generator
+        self.retriever = get_retriever(config) if retriever is None else retriever 
+
+    def get_clue(self, dataset):
+        input_prompts = [
+            self.visual_clue_prompt_template.get_string(item) for item in dataset
+        ]
+        clue_list = self.generator.generate(input_prompts)
+        
+        # 保存clue_list到clue.jsonl
+        clue_jsonl_path = os.path.join(self.config.get('output_dir', '.'), 'clue.jsonl')
+        with open(clue_jsonl_path, 'w', encoding='utf-8') as f:
+            for item, clue in zip(dataset, clue_list):
+                json.dump({
+                    'data_id': getattr(item, 'data_id', getattr(item, 'question_id', None)),
+                    'image_id': getattr(item, 'image_id', getattr(item, 'id', None)),
+                    'question': getattr(item, 'question', None),
+                    'clue': clue,
+                }, f, ensure_ascii=False)
+                f.write('\n')
+        return clue_list
+
