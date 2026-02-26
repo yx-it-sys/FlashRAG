@@ -462,7 +462,7 @@ class DenseRetriever(BaseTextRetriever):
         scores = scores.tolist()
         idxs = idxs.tolist()
 
-        flat_idxs = sum(idxs, [])
+        flat_idxs = [idx for sublist in idxs for idx in sublist]
         results = load_docs(self.corpus, flat_idxs)
         results = [results[i * num : (i + 1) * num] for i in range(len(idxs))]
 
@@ -570,7 +570,7 @@ class MultiModalRetriever(BaseRetriever):
             batch_scores = batch_scores.tolist()
             batch_idxs = batch_idxs.tolist()
 
-            flat_idxs = sum(batch_idxs, [])
+            flat_idxs = flat_idxs = [idx for sublist in batch_idxs for idx in sublist]
             batch_results = load_docs(self.corpus, flat_idxs)
             batch_results = [batch_results[i * num : (i + 1) * num] for i in range(len(batch_idxs))]
 
