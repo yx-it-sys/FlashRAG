@@ -55,7 +55,7 @@ def get_generator(config, **params):
         is_mm = True
     
     if is_mm:
-        return getattr(importlib.import_module("flashrag.generator"), "HFMultiModalGenerator")(config, **params)
+        return getattr(importlib.import_module("flashrag.generator"), "VLLMMMGenerator")(config, **params)
     else:
         if config["framework"] == "vllm":
             return getattr(importlib.import_module("flashrag.generator"), "VLLMGenerator")(config, **params)

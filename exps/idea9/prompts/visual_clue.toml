@@ -11,7 +11,7 @@ You only identify visual clues that are useful for intent-capturing.
 
 user_prompt = """
 [Input]
-- Question: "{QUESTION}"
+- Question: "{question}"
 
 [Task]
 Identify visual attributes or local features that:
@@ -24,7 +24,7 @@ not generic or decorative.
 Each visual clue should describe the unique characteristics of an entity in detail to distinguish it from other entities of the same kind. (e.g. color, shape, pattern, texture, markings, accessories, environment context, etc.)
 
 [Output Format]
-Return a JSON list. Each item must include:
+Return a JSON list starting with "```json". Each item must include:
 - id: unique identifier (e.g., "c1")
 - type: "clue"
 - clue: concise description of the visual clue

@@ -36,7 +36,7 @@ class MMPromptTemplate:
         return messages
     def get_string_for_visual_clues(self, item):
         question = item.question if item.question is not None else item.text
-        question_image_id = item.image
+        question_image_id = item.image_id
         messages = []
         if self.system_prompt is not None:
             messages.append({"role": "system", "content": self.system_prompt})

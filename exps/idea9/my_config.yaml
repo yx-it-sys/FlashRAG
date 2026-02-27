@@ -57,7 +57,7 @@ dataset_name: "infoseek_val"
 split: ['validation']
 
 # Sampling configurations for testing
-test_sample_num: 10
+test_sample_num: 1600
 random_sample: True
 save_intermediate_data: True
 # Seed for reproducibility
@@ -72,8 +72,8 @@ save_dir: "data/result/"
 # ----Retrieval Settings----
 use_multi_retriever: False
 # retrieval_method: "e5" # name or path of the retrieval model
-index_path: ~ # Set automatically if not provided
-corpus_path: ~
+index_path: "data/datasets/infoseek_val/indexes/bge-large-en-v1.5_Flat.index" # Set automatically if not provided
+corpus_path: "data/datasets/infoseek_val/wiki_100k_flatten.jsonl"
 retrieval_pooling_method: ~
 
 retrieval_topk: 5
@@ -94,18 +94,21 @@ rerank_max_length: 512
 rerank_batch_size: 256
 
 # ----Generator Settings----
-framework: hf # inference frame work of LLM, supporting: 'hf','vllm','fschat'
+framework: vllm # inference frame work of LLM, supporting: 'hf','vllm','fschat'
 generator_model: "Qwen2.5-VL-7B-Instruct"  # name or path of the generator
 generator_model_path: "/mnt/data/you/modelscope/Qwen2.5-VL-7B-Instruct"
-generator_max_input_len: 32768
-generator_batch_size: 4
+generator_max_input_len: 4096
+generator_batch_size: 1
 generation_params:
   do_sample: False
-  max_tokens: 200
+  max_tokens: 4096
   temperature: 0.1
   top_p: 1.0
+# vLLM specific setting
 vllm_gpu_memory_utilization: 0.95
-
+tensor_parallel_size: 1
+max_model_len: 6144
+vllm_enforce_eager: true
 # ----Evaluation Settings----
 # Metrics to evaluate the result
 metrics: ['em','f1','acc','precision','recall','input_tokens', 'gpt'] 

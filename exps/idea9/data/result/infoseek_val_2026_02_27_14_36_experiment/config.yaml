@@ -50,22 +50,22 @@ method2index:
     bge: null
     bge-m3: null
 data_dir: data/datasets/
-save_dir: data/result/infoseek_val_2026_02_26_20_16_experiment
+save_dir: data/result/infoseek_val_2026_02_27_14_36_experiment
 gpu_id: '0'
 dataset_name: infoseek_val
 split:
 - validation
-test_sample_num: 10
+test_sample_num: 1600
 random_sample: true
 seed: 2024
 save_intermediate_data: true
 save_note: experiment
 retrieval_method: e5
 retrieval_model_path: intfloat/e5-base-v2
-index_path: null
+index_path: data/datasets/infoseek_val/indexes/bge-large-en-v1.5_Flat.index
 multimodal_index_path_dict: null
 faiss_gpu: false
-corpus_path: null
+corpus_path: data/datasets/infoseek_val/wiki_100k_flatten.jsonl
 instruction: null
 retrieval_topk: 5
 retrieval_batch_size: 256
@@ -133,16 +133,16 @@ multi_retriever_setting:
         retrieval_cache_path: null
         save_retrieval_cache: false
         use_retrieval_cache: false
-framework: hf
-generator_model: Qwen2.5-7B-Instruct
+framework: vllm
+generator_model: Qwen2.5-VL-7B-Instruct
 openai_setting:
     api_key: null
     base_url: null
-generator_model_path: Qwen2.5-7B-Instruct
-generator_max_input_len: 32768
-generator_batch_size: 4
+generator_model_path: /mnt/data/you/modelscope/Qwen2.5-VL-7B-Instruct
+generator_max_input_len: 4096
+generator_batch_size: 1
 generation_params:
-    max_tokens: 200
+    max_tokens: 4096
     do_sample: false
     temperature: 0.1
     top_p: 1.0
@@ -162,8 +162,11 @@ metric_setting:
 save_metric_score: true
 save_new_dir: true
 vllm_gpu_memory_utilization: 0.95
+tensor_parallel_size: 1
+max_model_len: 6144
+vllm_enforce_eager: true
 visual_clue_prompt_file: prompts/visual_clue.toml
 dataset_path: data/datasets/infoseek_val
 gpu_num: 1
 device: cuda
-dataset_image_dir: infoseek_val/images
+dataset_image_dir: data/datasets/infoseek_val/images

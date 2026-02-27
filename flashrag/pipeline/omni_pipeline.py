@@ -2,8 +2,6 @@ from flashrag.evaluator import Evaluator
 from flashrag.utils import get_retriever, get_generator
 from flashrag.pipeline import BasicMultiModalPipeline
 from flashrag.prompt import MMPromptTemplate, PromptTemplate
-from transformers import AutoTokenizer, AutoProcessor, AutoModelForVision2Seq
-from accelerate import Accelerator
 import re
 import os
 import json

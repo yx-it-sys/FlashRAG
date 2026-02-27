@@ -1,12 +1,11 @@
 from flashrag.evaluator import Evaluator
 from flashrag.utils import get_retriever, get_generator
-from transformers import AutoTokenizer, AutoProcessor, AutoModelForVision2Seq
-from accelerate import Accelerator
 import re
 import os
 import json
 import torch
 from PIL import Image
+from tqdm import tqdm
 
 class BasicMultiModalPipeline:
     """Base object of all multimodal pipelines. A pipeline includes the overall process of RAG.
@@ -168,24 +167,66 @@ class MMCluePipeline(BasicMultiModalPipeline):
         super().__init__(config, prompt_template)
         self.visual_clue_prompt_template = visual_clue_prompt_template
         self.generator = get_generator(config) if generator is None else generator
-        self.retriever = get_retriever(config) if retriever is None else retriever 
-
+        self.retriever = retriever
+    def _parse_json_string(self, raw_str):
+        if not isinstance(raw_str, str):
+            return raw_str
+        content = raw_str.strip()
+        json_pattern = re.compile(r'(\[.*\]|\{.*\})', re.DOTALL)
+        match = json_pattern.search(content)
+        if match:
+            json_str = match.group(1)
+        else:
+            json_str = content.replace("```json", "").replace("```", "").strip()
+        try:
+            return json.loads(json_str)
+        except json.JSONDecodeError:
+            print(f"Warning: Failed to parse JSON string. Raw snippet: {json_str}...")
+            return f"Failure JSON:{json_str}"
     def get_clue(self, dataset):
         input_prompts = [
             self.visual_clue_prompt_template.get_string_for_visual_clues(item) for item in dataset
-        ]
-        clue_list = self.generator.generate(input_prompts)
+        ]   
+        raw_clue_list = self.generator.generate(input_prompts)
+        parsed_clue_list = [self._parse_json_string(c) for c in raw_clue_list]
+        output_dir = self.config['output_dir'] if 'output_dir' in self.config and self.config['output_dir'] else self.config['save_dir']
+        os.makedirs(output_dir, exist_ok=True)
+        clue_jsonl_path = os.path.join(output_dir, 'clue.jsonl')
+        perf_stats = self.generator.get_performance_stats(reset=True)
+        with open(os.path.join(output_dir, 'generate_stats.json'), 'w', encoding='utf-8') as f:
+            json.dump(perf_stats, f, ensure_ascii=False, indent=4)
         
-        # 保存clue_list到clue.jsonl
-        clue_jsonl_path = os.path.join(self.config.get('output_dir', '.'), 'clue.jsonl')
         with open(clue_jsonl_path, 'w', encoding='utf-8') as f:
-            for item, clue in zip(dataset, clue_list):
+            for item, parsed_clue in tqdm(zip(dataset, parsed_clue_list), desc="Saving clues", total=len(dataset)):
                 json.dump({
-                    'data_id': getattr(item, 'data_id', getattr(item, 'question_id', None)),
-                    'image_id': getattr(item, 'image_id', getattr(item, 'id', None)),
-                    'question': getattr(item, 'question', None),
-                    'clue': clue,
+                    'data_id': item.data_id,
+                    'image_id': item.image_id,
+                    'question': item.question,
+                    'clue': parsed_clue, 
                 }, f, ensure_ascii=False)
                 f.write('\n')
-        return clue_list
+                
+        return parsed_clue_list
+    
+    def img_retrieval(self, clue_path, dataset):
+        if self.retriever is None:
+            raise ValueError("Retriever is not provided for image retrieval.")
+        
+        image_query_id_list = dataset.image_id
+        results_list = []
+        for img_id in image_query_id_list:
+            if img_id not in id_to_clue:
+                print(f"Warning: No clue found for image ID {img_id}. Using empty clue.")
+                id_to_clue[img_id] = ""
+            image_path = os.path.join(f'{self.config["dataset_image_dir"]}', f'{img_id}.jpg')
+            retrieval_result = self.retriever.search(image_path, target_modal="text")
+            results_list.append({"id"})
+
+
+        
+            
+
+            
+
+
 

@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Union
 import os
 import json
 import importlib
@@ -18,7 +18,7 @@ import importlib
 import base64
 from io import BytesIO
 from flashrag.generator.utils import convert_image_to_base64, process_image, resolve_max_tokens, process_image_pil
-
+import time
 class BaseMultiModalGenerator:
     """`BaseMultiModalGenerator` is a base object of Generator model."""
 
@@ -76,23 +76,68 @@ class BaseInferenceEngine:
     def generate(self, input_list: list, batch_size=None, **params):
         pass
 
-class Qwen2VLInferenceEngine(BaseInferenceEngine):
+class Qwen2_5VLInferenceEngine(BaseInferenceEngine):
+    from modelscope import Qwen2_5_VLForConditionalGeneration, AutoTokenizer, AutoProcessor
     def _load_model(self):
-        from transformers import Qwen2_5_VLProcessor, Qwen2_5_VLForConditionalGeneration
-        self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+        self.model = self.Qwen2_5_VLForConditionalGeneration.from_pretrained(
             self.model_path,
             torch_dtype=torch.bfloat16,
+            # attn_implementation="flash_attention_2",
+            # device_map="auto",
+        )
+        self.processor = AutoProcessor.from_pretrained(self.model_path)
+        self._cost_stats = []
+
+    @torch.inference_mode(mode=True)
+    def generate(self, input_list, **params):
+        # convert image to base64
+        for messages in input_list:
+            for message in messages:
+                if isinstance(message['content'], list):
+                    for content_dict in message['content']:
+                        if content_dict['type'] == 'image':
+                            content_dict['image'] = convert_image_to_base64(content_dict['image'])
+        from qwen_vl_utils import process_vision_info
+        texts = [self.processor.apply_chat_template(messages, add_generation_prompt=True, tokenize=False) for messages in input_list]
+        image_inputs, video_inputs = process_vision_info(input_list)
+        inputs = self.processor(text=texts, images=image_inputs, videos=video_inputs, padding=True, return_tensors="pt").to(self.model.device)
+        # input token统计
+        input_tokens = [len(input_id) for input_id in inputs.input_ids]
+        start_time = time.time()
+        outputs = self.model.generate(
+            **inputs,
+            **params
+        )
+        end_time = time.time()
+        generated_ids_trimmed = [out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, outputs)]
+        output_tokens = [len(out_ids) for out_ids in generated_ids_trimmed]
+        output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
+        # 记录token消耗
+        for inp, outp in zip(input_tokens, output_tokens):
+            self._cost_stats.append({"input_tokens": inp, "output_tokens": outp, "total_tokens": inp+outp, "latency(s)": end_time - start_time})
+        return output_text
+    def cost_stats(self):
+        cost_stats = self._cost_stats
+        self._cost_stats = []
+        return cost_stats
+    
+class Qwen2VLInferenceEngine(BaseInferenceEngine):
+    def _load_model(self):
+        from transformers import Qwen2VLForConditionalGeneration
+        self.model = Qwen2VLForConditionalGeneration.from_pretrained(
+            self.model_path,
+            torch_dtype='auto',
             device_map='auto',
             trust_remote_code=True
         ).eval()
-
         min_pixels = 3136
         max_pixels = 12845056
-        self.processor = Qwen2_5_VLProcessor.from_pretrained(self.model_path, trust_remote_code=True, min_pixels=min_pixels, max_pixels=max_pixels)
+        self.processor = AutoProcessor.from_pretrained(self.model_path, trust_remote_code=True, min_pixels=min_pixels, max_pixels=max_pixels)
         self.processor.tokenizer.model_max_length = self.max_input_len
         self.tokenizer = self.processor.tokenizer
-    
-    def generate(self, input_list, uncertainty_type=None, get_hidden_states=False, **params):
+    @torch.inference_mode(mode=True)
+    def generate(self, input_list, **params):
+        # convert image to base64
         for messages in input_list:
             for message in messages:
                 if isinstance(message['content'], list):
@@ -100,71 +145,22 @@ class Qwen2VLInferenceEngine(BaseInferenceEngine):
                         if content_dict['type'] == 'image':
                             content_dict['image'] = convert_image_to_base64(content_dict['image'])
 
+        from qwen_vl_utils import process_vision_info
         texts = [self.processor.apply_chat_template(messages, add_generation_prompt=True, tokenize=False) for messages in input_list]
-        # image_inputs, video_inputs = process_vision_info(input_list)    
-        inputs = self.processor(text=texts, images=input_list[0][1]['content'][0]['image'], padding=True, return_tensors="pt").to(self.model.device)
-        
-        output_dict = {}
-
-        if uncertainty_type=="entropy":
-            params['return_dict_in_generate']=True
-            params['output_scores']=True
-            outputs_obj = self.model.generate(
-                **inputs,
-                eos_token_id=self.tokenizer.eos_token_id,
-                pad_token_id=self.tokenizer.pad_token_id,
-                **params
-            )
-            outputs = outputs_obj.sequences
-            generated_ids_trimmed = [out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, outputs)]
-            scores = outputs_obj.scores
-            stacked_scores = torch.stack(scores, dim=0)
-            per_step_logits = stacked_scores.permute(1, 0, 2)
-            per_step_logits = F.softmax(per_step_logits, dim=-1)
-            step_entropies = torch.distributions.Categorical(probs=per_step_logits).entropy()
-            average_entropies = []
-            for i, gen_ids in enumerate(generated_ids_trimmed):
-                if len(gen_ids) > 0:
-                    valid_entropies = step_entropies[i, :len(gen_ids)]
-                    average_entropies.append(valid_entropies.mean().item())
-                else:
-                    average_entropies.append(0.0)
-            output_dict["generation_entropy"] = average_entropies[0] if len(average_entropies) == 1 else average_entropies
-            
-            output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
-            output_dict["output_text"] = output_text
-
-        else:   
-            outputs = self.model.generate(
-                **inputs,
-                eos_token_id=self.tokenizer.eos_token_id,
-                pad_token_id=self.tokenizer.pad_token_id,
-                **params
-            )
-            generated_ids_trimmed = [out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, outputs)]
-            output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
-            output_dict = {}
-            # Get Hidden_states
-            if get_hidden_states == True:
-                full_sequence_ids = outputs
-                full_attention_mask = (full_sequence_ids != self.tokenizer.pad_token_id).long()
-                with torch.no_grad():
-                    outputs_with_states = self.model(
-                        input_ids=full_sequence_ids,
-                        attention_mask=full_attention_mask,
-                        output_hidden_states=True
-                    )
-                hidden_states = outputs_with_states.hidden_states
-                k=100
-                top_k_logits_values, top_k_indices = torch.topk(outputs_with_states.logits, k, dim=-1)
-                output_dict["hidden_states"] = hidden_states
-                output_dict["top_k_logits_values"] = top_k_logits_values
-                output_dict["top_k_logits_indices"] = top_k_indices
-                output_dict["full_sequence_ids"] = outputs
-        
-            output_dict["output_text"] = output_text
-        return output_dict
-        
+        image_inputs, video_inputs = process_vision_info(input_list)    
+        inputs = self.processor(text=texts, images=image_inputs, videos=video_inputs, padding=True, return_tensors="pt").to(self.model.device)
+        # print(inputs)
+        # print(inputs['input_ids'].shape,inputs['attention_mask'].shape,inputs['pixel_values'].shape,inputs['image_grid_thw'].shape)
+        outputs = self.model.generate(
+            **inputs,
+            eos_token_id=self.tokenizer.eos_token_id,
+            pad_token_id=self.tokenizer.pad_token_id,
+            **params
+        )
+        generated_ids_trimmed = [out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, outputs)]
+        output_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)
+        return output_text
+    
 class InternVL2InferenceEngine(BaseInferenceEngine):
     def _load_model(self):
         import torch
@@ -411,6 +407,7 @@ class LlavaInferenceEngine(BaseInferenceEngine):
 
 class HFModelInferenceEngineFactory:
     _engine_map = {
+        'qwen2_5_vl': Qwen2_5VLInferenceEngine,
         'qwen': Qwen2VLInferenceEngine,
         'llava': LlavaInferenceEngine,
         'internvl': InternVL2InferenceEngine,
@@ -499,7 +496,239 @@ class HFMultiModalGenerator(BaseMultiModalGenerator):
         else:
             return output_responses
 
+class VLLMMMGenerator(BaseMultiModalGenerator):
+    """Class for decoder-only multimodal generator, based on vllm."""
 
+    def __init__(self, config):
+        super().__init__(config)
+        self.use_lora = False
+        self._perf_stats = []
+        # vLLM related setting
+        self.tensor_parallel_size = config['tensor_parallel_size'] if 'tensor_parallel_size' in config else 1
+        self.gpu_memory_utilization = config['vllm_gpu_memory_utilization'] if 'vllm_gpu_memory_utilization' in config else 0.85
+        self.max_model_len = config['max_model_len'] if 'max_model_len' in config else self.max_input_len
+        self.limit_mm_per_prompt = config['limit_mm_per_prompt'] if 'limit_mm_per_prompt' in config else {"image": 5}
+        self.mm_processor_kwargs = config['mm_processor_kwargs'] if 'mm_processor_kwargs' in config else {"min_pixels": 3136, "max_pixels": 12845056}
+        self.enforce_eager = config['vllm_enforce_eager'] if 'vllm_enforce_eager' in config else True
+
+        try:
+            from transformers.configuration_utils import PretrainedConfig
+            if not hasattr(PretrainedConfig, "standardize_rope_params"):
+                PretrainedConfig.standardize_rope_params = lambda self: None
+            if not hasattr(PretrainedConfig, "validate_rope"):
+                PretrainedConfig.validate_rope = lambda self: None
+        except Exception:
+            pass
+
+        from vllm import LLM
+        mm_config = {
+            "model": self.model_path,
+            "tensor_parallel_size": self.tensor_parallel_size,
+            "gpu_memory_utilization": self.gpu_memory_utilization,
+            "max_model_len": self.max_model_len,
+            "trust_remote_code": True,
+            "limit_mm_per_prompt": self.limit_mm_per_prompt,
+            "mm_processor_kwargs": self.mm_processor_kwargs,
+            "enforce_eager": self.enforce_eager,
+        }
+
+        if self.use_lora:
+            mm_config.update({
+                "enable_lora": True,
+                "max_lora_rank": 64,
+                "max_logprobs": 32016,
+            })
+
+        self.model = LLM(**mm_config)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_path, trust_remote_code=True)
+
+    def _record_perf(self, outputs, batch_size, latency_seconds):
+        input_tokens = 0
+        output_tokens = 0
+
+        for output in outputs:
+            prompt_token_ids = getattr(output, "prompt_token_ids", None)
+            if prompt_token_ids is not None:
+                input_tokens += len(prompt_token_ids)
+
+            output_items = getattr(output, "outputs", [])
+            if len(output_items) > 0:
+                token_ids = getattr(output_items[0], "token_ids", None)
+                if token_ids is not None:
+                    output_tokens += len(token_ids)
+
+        total_tokens = input_tokens + output_tokens
+        stat = {
+            "batch_size": batch_size,
+            "latency_seconds": latency_seconds,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "total_tokens": total_tokens,
+            "input_tokens_per_second": (input_tokens / latency_seconds) if latency_seconds > 0 else 0.0,
+            "output_tokens_per_second": (output_tokens / latency_seconds) if latency_seconds > 0 else 0.0,
+            "total_tokens_per_second": (total_tokens / latency_seconds) if latency_seconds > 0 else 0.0,
+            "timestamp": time.time(),
+        }
+        self._perf_stats.append(stat)
+
+    def get_performance_stats(self, reset=False):
+        stats = self._perf_stats
+        run_count = len(stats)
+        total_samples = sum(item["batch_size"] for item in stats)
+        total_latency = sum(item["latency_seconds"] for item in stats)
+        total_input_tokens = sum(item["input_tokens"] for item in stats)
+        total_output_tokens = sum(item["output_tokens"] for item in stats)
+        total_tokens = sum(item["total_tokens"] for item in stats)
+
+        result = {
+            "runs": run_count,
+            "total_samples": total_samples,
+            "total_latency_seconds": total_latency,
+            "avg_latency_seconds_per_run": (total_latency / run_count) if run_count > 0 else 0.0,
+            "avg_latency_seconds_per_sample": (total_latency / total_samples) if total_samples > 0 else 0.0,
+            "input_tokens": total_input_tokens,
+            "output_tokens": total_output_tokens,
+            "total_tokens": total_tokens,
+            "input_tokens_per_second": (total_input_tokens / total_latency) if total_latency > 0 else 0.0,
+            "output_tokens_per_second": (total_output_tokens / total_latency) if total_latency > 0 else 0.0,
+            "total_tokens_per_second": (total_tokens / total_latency) if total_latency > 0 else 0.0,
+            "last_run": stats[-1] if run_count > 0 else None,
+            "history": stats,
+        }
+
+        if reset:
+            self._perf_stats = []
+
+        return result
+
+    def update_additional_setting(self):
+        if "gpu_memory_utilization" not in self._config:
+            self.gpu_memory_utilization = 0.85
+        else:
+            self.gpu_memory_utilization = self._config["gpu_memory_utilization"]
+        if self.gpu_num != 1 and self.gpu_num % 2 != 0:
+            self.tensor_parallel_size = self.gpu_num - 1
+        else:
+            self.tensor_parallel_size = self.gpu_num
+
+        self.lora_path = None if "generator_lora_path" not in self._config else self._config["generator_lora_path"]
+        self.use_lora = False
+        if self.lora_path is not None:
+            self.use_lora = True
+        self.max_model_len = self._config['generator_max_input_len']
+    from vllm.multimodal import MultiModalDataDict
+    def _prepare_multimodal_input(self, input_data: Union[str, List[Dict]]) -> Dict:
+        """
+        解析标准 Qwen messages 格式
+        input_data 示例: 
+        [
+            {"role": "user", "content": [{"type": "image", "image": "..."}, {"type": "text", "text": "Describe this image."}]}
+        ]
+        """
+        if isinstance(input_data, str):
+            return {"prompt": input_data}
+
+        if isinstance(input_data, list):
+            images = []
+            for message in input_data:
+                content = message.get("content", [])
+                if isinstance(content, list):
+                    for item in content:
+                        if item.get("type") == "image":
+                            # 支持 "image" 键或 OpenAI 风格的 "image_url" 键
+                            img_source = item.get("image") or item.get("image_url", {}).get("url")
+                            if img_source:
+                                images.append(img_source)
+                elif isinstance(content, str):
+                    continue
+
+            # 2. 使用 Tokenizer 应用对话模板
+            # apply_chat_template 会自动处理 <|im_start|>, <|vision_start|> 等特殊标记
+            prompt = self.tokenizer.apply_chat_template(
+                input_data,
+                tokenize=False,
+                add_generation_prompt=True
+            )
+
+            # 3. 构造 vLLM 多模态输入字典
+            mm_data = {}
+            if images:
+                # 如果是多图，传入列表；单图则传入单个元素
+                mm_data["image"] = images[0] if len(images) == 1 else images
+
+            return {
+                "prompt": prompt,
+                "multi_modal_data": mm_data
+            }
+        
+        return {"prompt": str(input_data)}
+    def generate(
+        self,
+        input_list: List[Union[str, Dict]], # 支持字符串或包含图像信息的字典
+        return_raw_output=False,
+        return_scores=False,
+        **params,
+    ):
+        from vllm import SamplingParams
+
+        if isinstance(input_list, (str, dict)):
+            input_list = [input_list]
+
+        # 1. 构建符合 vLLM 多模态要求的输入列表
+        vllm_inputs = [self._prepare_multimodal_input(item) for item in input_list]
+
+        generation_params = deepcopy(self.generation_params)
+        generation_params.update(params)
+        
+        if not generation_params.get("do_sample", True):
+            generation_params["temperature"] = 0
+        generation_params.pop("do_sample", None)
+        
+        generation_params["seed"] = self.config['seed'] if 'seed' in self.config else 42
+
+        # 处理停止词 (针对 Qwen/Llama 系列)
+        stop_words = generation_params.get("stop", [])
+        for sw in ["<|im_end|>", "<|endoftext|>", "<|eot_id|>"]:
+            if sw not in stop_words:
+                stop_words.append(sw)
+        generation_params["stop"] = stop_words
+
+        if return_scores:
+            generation_params["logprobs"] = generation_params.get("logprobs", 5)
+
+        sampling_params = SamplingParams(**generation_params)
+        start_time = time.time()
+
+        # 2. 调用 vLLM 推理
+        if self.use_lora:
+            from vllm.lora.request import LoRARequest
+            outputs = self.model.generate(
+                vllm_inputs,
+                sampling_params,
+                lora_request=LoRARequest("lora_module", 1, self.lora_path),
+            )
+        else:
+            outputs = self.model.generate(vllm_inputs, sampling_params)
+        end_time = time.time()
+        self._record_perf(outputs, len(vllm_inputs), end_time - start_time)
+
+        # 3. 后处理输出
+        if return_raw_output:
+            return outputs
+
+        generated_texts = [output.outputs[0].text for output in outputs]
+        
+        if return_scores:
+            scores = []
+            for output in outputs:
+                try:
+                    logprob_list = [list(lp.values())[0].logprob for lp in output.outputs[0].logprobs]
+                    scores.append(np.exp(logprob_list).tolist())
+                except:
+                    scores.append([])
+            return generated_texts, scores
+        
+        return generated_texts
 
 
 
