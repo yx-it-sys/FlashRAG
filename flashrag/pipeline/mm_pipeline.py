@@ -207,20 +207,69 @@ class MMCluePipeline(BasicMultiModalPipeline):
                 f.write('\n')
                 
         return parsed_clue_list
-    
-    def img_retrieval(self, clue_path, dataset):
+    def img_retrieval(self, dataset):
         if self.retriever is None:
             raise ValueError("Retriever is not provided for image retrieval.")
+        output_dir = self.config['output_dir'] if 'output_dir' in self.config and self.config['output_dir'] else self.config['save_dir']
+        os.makedirs(output_dir, exist_ok=True)
+        retrieval_jsonl_path = os.path.join(output_dir, 'retrieval_results.jsonl')
         
-        image_query_id_list = dataset.image_id
-        results_list = []
-        for img_id in image_query_id_list:
-            if img_id not in id_to_clue:
-                print(f"Warning: No clue found for image ID {img_id}. Using empty clue.")
-                id_to_clue[img_id] = ""
-            image_path = os.path.join(f'{self.config["dataset_image_dir"]}', f'{img_id}.jpg')
-            retrieval_result = self.retriever.search(image_path, target_modal="text")
-            results_list.append({"id"})
+        with open(retrieval_jsonl_path, 'w', encoding='utf-8') as f:
+            for item in tqdm(dataset, desc="Image Retrieval", total=len(dataset)):
+                data_id = item.data_id
+                image_id = item.image_id
+                image_path = os.path.join(f'{self.config["dataset_image_dir"]}', f'{image_id}.jpg')
+                retrieval_result = self.retriever.search(image_path, target_modal="text")
+                
+                json.dump({
+                    'data_id': data_id,
+                    'image_id': image_id,
+                    'retrieval_results': retrieval_result,
+                }, f, ensure_ascii=False)
+                f.write('\n')
+    def reranking(self, clue_path, retrieval_results_path):
+        with open(clue_path, 'r', encoding='utf-8') as f:
+            clue_data = [json.loads(line) for line in f]
+        with open(retrieval_results_path, 'r', encoding='utf-8') as f:
+            retrieval_data = {json.loads(line)['data_id']: json.loads(line) for line in f}
+        
+        reranked_results = []
+        for item in clue_data:
+            data_id = item['data_id']
+            clue = item['clue']
+            retrieval_results = retrieval_data.get(data_id, {}).get('retrieval_results', [])
+            if not retrieval_results:
+                print(f"Warning: No retrieval results found for data_id {data_id}. Skipping reranking.")
+                continue
+            
+        #     messages = [
+        #         {
+        #             "role": "system",
+        #             "content": [
+        #                 {"type": "text", "text": "You are an intelligent assistant for reranking retrieved documents based on the visual clue. Given the visual clue and retrieved documents, you need to rerank the retrieved documents based on their relevance to the visual clue. Please return the top 3 most relevant documents."}
+        #             ]
+        #         },
+        #         {
+        #             "role": "user",
+        #             "content": [
+        #                 {"type": "text", "text": f"Visual Clue:\n{clue}\nRetrieved Documents:\n" + "\n\n".join([f"Doc{i+1}:\n{text}" for i, text in enumerate(retrieval_results)])}
+        #             ]
+        #         }
+        #     ]
+        #     response = self.generator.generate(messages)
+        #     reranked_results.append({
+        #         'data_id': data_id,
+        #         'reranked_results': response
+        #     })
+        # output_dir = self.config['output_dir'] if 'output_dir' in self.config and self.config['output_dir'] else self.config['save_dir']
+        # os.makedirs(output_dir, exist_ok=True)
+        # reranked_jsonl_path = os.path.join(output_dir, 'reranked_results.jsonl')
+        # with open(reranked_jsonl_path, 'w', encoding='utf-8') as f:
+        #     for item in reranked_results:
+        #         json.dump(item, f, ensure_ascii=False)
+        #         f.write('\n')
+
+    
 
 
         
