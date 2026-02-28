@@ -37,12 +37,17 @@ def _cleanup_runtime(generator=None):
 def main():
     from flashrag.prompt import MMPromptTemplate
     from flashrag.config import Config
-    from flashrag.utils import get_dataset, get_generator
+    from flashrag.utils import get_dataset, get_generator, get_retriever
     from flashrag.pipeline.mm_pipeline import MMCluePipeline
 
     generator = None
     try:
-        config = Config("my_config.yaml")
+        config = Config(
+            config_file_path = 'my_config.yaml'
+        )
+        # retriever = DenseRetriever(config)
+        retriever = get_retriever(config)
+
         all_split = get_dataset(config)
         test_data = all_split["validation"]
 
@@ -52,18 +57,18 @@ def main():
             usr_prompt = prompt_dict['user_prompt']
         generator = get_generator(config)
         visual_clue_prompt_template = MMPromptTemplate(config, system_prompt=sys_prompt, user_prompt=usr_prompt)
-        pipeline = MMCluePipeline(config=config, visual_clue_prompt_template=visual_clue_prompt_template, generator=generator)
+        pipeline = MMCluePipeline(config=config, visual_clue_prompt_template=visual_clue_prompt_template, generator=generator, retriever=retriever)
         
-        # Phase I: Clue Mining
-        clue_list = pipeline.get_clue(test_data)
-        # # Phase II: Image Retrieval
-        # pipeline.img_retrieval(test_data)
+        # # Phase I: Clue Mining
+        # clue_list = pipeline.get_clue(test_data)
+        # Phase II: Image Retrieval
+        pipeline.img_retrieval(test_data)
         # # Phase III: Reranking
         # output_dir = config['output_dir'] if 'output_dir' in config and config['output_dir'] else config['save_dir']
         # clue_path = os.path.join(output_dir, "clue.jsonl")
         # retrieval_results_path = os.path.join(output_dir, "retrieval_results.jsonl")
         # pipeline.reranking(clue_path=clue_path, retrieval_results_path=retrieval_results_path)
-        return clue_list
+        return 0
     finally:
         _cleanup_runtime(generator)
 

@@ -57,7 +57,7 @@ dataset_name: "infoseek_val"
 split: ['validation']
 
 # Sampling configurations for testing
-test_sample_num: 1600
+test_sample_num: 10
 random_sample: True
 save_intermediate_data: True
 # Seed for reproducibility
@@ -70,19 +70,35 @@ save_new_dir: True
 save_dir: "data/result/"
 
 # ----Retrieval Settings----
+# Base retriever config
+retrieval_method: "clip-vit-large-patch14"
+retrieval_topk: 5
+index_path: "/mnt/data/you/datasets/infoseek_val/indexes/clip_Flat_text.index"
+corpus_path: "/mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl"
+save_retrieval_cache: True
+use_retrieval_cache: False
+retrieval_cache_path: "./output/retrieval_cache.json"
+silent_retrieval: False
+multimodal_index_path_dict: {
+    "text": "/mnt/data/you/datasets/infoseek_val/indexes/clip_Flat_text.index",
+    "image": None
+}
+retrieval_query_max_length: 64,
+retrieval_pooling_method: "cls"
+retrieval_use_fp16: True
+retrieval_batch_size: 16
+instruction: None
+retrieval_model_path: "/mnt/data/you/modelscope/clip-vit-large-patch14"
+use_sentence_transformer: False
+faiss_gpu: False
+
 use_multi_retriever: False
 # retrieval_method: "e5" # name or path of the retrieval model
-index_path: "data/datasets/infoseek_val/indexes/bge-large-en-v1.5_Flat.index" # Set automatically if not provided
-corpus_path: "data/datasets/infoseek_val/wiki_100k_flatten.jsonl"
-retrieval_pooling_method: ~
+# index_path: "data/datasets/infoseek_val/indexes/bge-large-en-v1.5_Flat.index" # Set automatically if not provided
+# corpus_path: "data/datasets/infoseek_val/wiki_100k_flatten.jsonl"
+# retrieval_pooling_method: ~
 
-retrieval_topk: 5
-retrieval_batch_size: 256
-retrieval_use_fp16: True
-retrieval_query_max_length: 128
-save_retrieval_cache: False
-use_retrieval_cache: False
-retrieval_cache_path: ~
+# retrieval_batch_size: 256
 
 use_reranker: False
 rerank_model_name: e5
