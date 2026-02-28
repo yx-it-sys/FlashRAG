@@ -1,0 +1,8 @@
+system_prompt = """
+
+"""
+
+user_prompt = """
+Reference: {reference}
+Question: {question}
+"""

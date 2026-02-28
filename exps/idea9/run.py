@@ -44,7 +44,7 @@ def main():
     try:
         config = Config('my_config.yaml')
         retriever = get_retriever(config)
-        # generator = get_generator(config)
+        generator = get_generator(config)
 
         all_split = get_dataset(config)
         test_data = all_split["validation"]
@@ -53,8 +53,15 @@ def main():
             prompt_dict = tomllib.load(f)
             sys_prompt = prompt_dict['system_prompt']
             usr_prompt = prompt_dict['user_prompt']
-        visual_clue_prompt_template = MMPromptTemplate(config, system_prompt=sys_prompt, user_prompt=usr_prompt)
-        pipeline = MMCluePipeline(config=config, visual_clue_prompt_template=visual_clue_prompt_template, generator=None, retriever=retriever)
+            visual_clue_prompt_template = MMPromptTemplate(config, system_prompt=sys_prompt, user_prompt=usr_prompt)
+        
+        with open(config['rag_prompt_file'], 'rb') as f:
+            prompt_dict = tomllib.load(f)
+            sys_prompt = prompt_dict['system_prompt']
+            usr_prompt = prompt_dict['user_prompt']
+            iterative_prompt_template = MMPromptTemplate(config, system_prompt=sys_prompt, user_prompt=usr_prompt)
+        
+        pipeline = MMCluePipeline(config=config, visual_clue_prompt_template=visual_clue_prompt_template, prompt_template=iterative_prompt_template, generator=generator, retriever=retriever)
         
         # # Phase I: Clue Mining
         # clue_list = pipeline.get_clue(test_data)
@@ -66,6 +73,10 @@ def main():
         clue_path = "data/result/infoseek/phase1_clue_mining/clue.jsonl"
         retrieval_results_path = "data/result/infoseek/phase2_image_retrieval/retrieval_results.jsonl"
         pipeline.reranking(clue_path=clue_path, retrieval_results_path=retrieval_results_path)
+
+        # # Phase IV: Iterative Answer Generation
+        # reranked_results_path = "data/result/infoseek/phase3_reranking/reranked_results.jsonl"
+        # pipeline.run(test_data, reranked_results_path=reranked_results_path, do_eval=True)
         return 0
     finally:
         _cleanup_runtime(generator)

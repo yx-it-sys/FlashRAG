@@ -172,7 +172,8 @@ class MMCluePipeline(BasicMultiModalPipeline):
     def __init__(self, config, visual_clue_prompt_template, prompt_template=None, retriever=None, generator=None):
         super().__init__(config, prompt_template)
         self.visual_clue_prompt_template = visual_clue_prompt_template
-        # self.generator = get_generator(config) if generator is None else generator
+        self.iterative_prompt_template = prompt_template
+        self.generator = get_generator(config) if generator is None else generator
         self.retriever = retriever
     def _parse_json_string(self, raw_str):
         if not isinstance(raw_str, str):
@@ -233,21 +234,21 @@ class MMCluePipeline(BasicMultiModalPipeline):
                     'retrieval_results': retrieval_result,
                 }, f, ensure_ascii=False)
                 f.write('\n')
-    def reranking(self, clue_path, retrieval_results_path, total_budget=100):
+    def reranking(self, clue_path, retrieval_results_path, total_budget=1000):
         stats = {}  # 用于存储性能数据
         overall_start = time.time()
 
         # 1. 数据读取阶段 (仅读取前10行)
         io_start = time.time()
-        with open(clue_path, 'r', encoding='utf-8') as f:
-            clue_data = [json.loads(line) for line in f]
-        with open(retrieval_results_path, 'r', encoding='utf-8') as f:
-            retrieval_data = {json.loads(line)['data_id']: json.loads(line) for line in f}
-
         # with open(clue_path, 'r', encoding='utf-8') as f:
-        #     clue_data = [json.loads(line) for line in islice(f, 10)]
+        #     clue_data = [json.loads(line) for line in f]
         # with open(retrieval_results_path, 'r', encoding='utf-8') as f:
-        #     retrieval_data = {json.loads(line)['data_id']: json.loads(line) for line in islice(f, 10)}
+        #     retrieval_data = {json.loads(line)['data_id']: json.loads(line) for line in f}
+
+        with open(clue_path, 'r', encoding='utf-8') as f:
+            clue_data = [json.loads(line) for line in islice(f, 1)]
+        with open(retrieval_results_path, 'r', encoding='utf-8') as f:
+            retrieval_data = {json.loads(line)['data_id']: json.loads(line) for line in islice(f, 1)}
         stats['io_read_time'] = time.time() - io_start
 
         reranked_results = []
@@ -291,14 +292,17 @@ class MMCluePipeline(BasicMultiModalPipeline):
             # Reranking process
             doc_scores = np.sum(voting_matrix, axis=0)
             sorted_doc_indices = np.argsort(-doc_scores)
-            reranked = [retrieval_results[idx] for idx in sorted_doc_indices]
             # --- 计算逻辑结束 ---
 
             reranked_results.append({
                 'data_id': data_id,
                 'image_id': item.get('image_id'),
-                'reranked_results': reranked,
-                'doc_scores': [float(doc_scores[idx]) for idx in sorted_doc_indices],
+                'reranked_results': [
+                    {
+                        'text': retrieval_results[idx],
+                        'score': float(doc_scores[idx])
+                    } for idx in sorted_doc_indices
+                ],
             })
             
             processing_times.append(time.time() - item_start)
@@ -351,6 +355,24 @@ class MMCluePipeline(BasicMultiModalPipeline):
         doc_emb = embeddings[1]
         denominator = np.linalg.norm(clue_emb) * np.linalg.norm(doc_emb) + 1e-8
         return float(np.dot(clue_emb, doc_emb) / denominator)
+    def iterative_infer(self, item, reranked_docs):
+        pass
+    def run(self, dataset, reranked_results_path, do_eval=True, pred_process_func=None):
+        reranked_results = {}
+        with open(reranked_results_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                item = json.loads(line)
+                reranked_results[item['data_id']] = item['reranked_results']
+        pred_answer_list = []
+        for item in dataset:
+            data_id = item.data_id
+            reranked_docs = reranked_results[data_id][0]
+            prediction = self.iterative_infer(item, reranked_docs)
+            pred_answer_list.append(prediction)
+
+        dataset.update_output("pred", pred_answer_list)
+        dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
+        return dataset
 
 
 
