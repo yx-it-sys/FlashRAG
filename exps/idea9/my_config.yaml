@@ -81,7 +81,7 @@ retrieval_cache_path: "./output/retrieval_cache.json"
 silent_retrieval: False
 multimodal_index_path_dict: {
     "text": "/mnt/data/you/datasets/infoseek_val/indexes/clip_Flat_text.index",
-    "image": None
+    "image": ~
 }
 retrieval_query_max_length: 64,
 retrieval_pooling_method: "cls"

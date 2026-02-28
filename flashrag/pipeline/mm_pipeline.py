@@ -167,7 +167,7 @@ class MMCluePipeline(BasicMultiModalPipeline):
     def __init__(self, config, visual_clue_prompt_template, prompt_template=None, retriever=None, generator=None):
         super().__init__(config, prompt_template)
         self.visual_clue_prompt_template = visual_clue_prompt_template
-        self.generator = get_generator(config) if generator is None else generator
+        # self.generator = get_generator(config) if generator is None else generator
         self.retriever = retriever
     def _parse_json_string(self, raw_str):
         if not isinstance(raw_str, str):
@@ -220,7 +220,8 @@ class MMCluePipeline(BasicMultiModalPipeline):
                 data_id = item.data_id
                 image_id = item.image_id
                 image_path = os.path.join(f'{self.config["dataset_image_dir"]}', f'{image_id}.jpg')
-                retrieval_result = self.retriever.search(image_path, target_modal="text")
+                retrieval_result = self.retriever._search(image_path, target_modal="text")
+                retrieval_result = [result['text'] for result in retrieval_result]
                 json.dump({
                     'data_id': data_id,
                     'image_id': image_id,

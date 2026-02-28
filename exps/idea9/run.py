@@ -42,11 +42,9 @@ def main():
 
     generator = None
     try:
-        config = Config(
-            config_file_path = 'my_config.yaml'
-        )
-        # retriever = DenseRetriever(config)
+        config = Config('my_config.yaml')
         retriever = get_retriever(config)
+        # generator = get_generator(config)
 
         all_split = get_dataset(config)
         test_data = all_split["validation"]
@@ -55,19 +53,19 @@ def main():
             prompt_dict = tomllib.load(f)
             sys_prompt = prompt_dict['system_prompt']
             usr_prompt = prompt_dict['user_prompt']
-        generator = get_generator(config)
         visual_clue_prompt_template = MMPromptTemplate(config, system_prompt=sys_prompt, user_prompt=usr_prompt)
-        pipeline = MMCluePipeline(config=config, visual_clue_prompt_template=visual_clue_prompt_template, generator=generator, retriever=retriever)
+        pipeline = MMCluePipeline(config=config, visual_clue_prompt_template=visual_clue_prompt_template, generator=None, retriever=retriever)
         
         # # Phase I: Clue Mining
         # clue_list = pipeline.get_clue(test_data)
-        # Phase II: Image Retrieval
-        pipeline.img_retrieval(test_data)
-        # # Phase III: Reranking
-        # output_dir = config['output_dir'] if 'output_dir' in config and config['output_dir'] else config['save_dir']
-        # clue_path = os.path.join(output_dir, "clue.jsonl")
-        # retrieval_results_path = os.path.join(output_dir, "retrieval_results.jsonl")
-        # pipeline.reranking(clue_path=clue_path, retrieval_results_path=retrieval_results_path)
+
+        # # Phase II: Image Retrieval
+        # pipeline.img_retrieval(test_data)
+
+        # Phase III: Rerankingos.path.join(output_dir, "clue.jsonl")
+        clue_path = "data/result/infoseek/phase1_clue_mining/clue.jsonl"
+        retrieval_results_path = "data/result/infoseek/phase2_image_retrieval/retrieval_results.jsonl"
+        pipeline.reranking(clue_path=clue_path, retrieval_results_path=retrieval_results_path)
         return 0
     finally:
         _cleanup_runtime(generator)

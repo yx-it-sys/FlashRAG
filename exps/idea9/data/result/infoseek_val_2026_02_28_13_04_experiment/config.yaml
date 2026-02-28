@@ -50,7 +50,7 @@ method2index:
     bge: null
     bge-m3: null
 data_dir: data/datasets/
-save_dir: ./output/infoseek_val_2026_02_28_11_27_experiment
+save_dir: data/result/infoseek_val_2026_02_28_13_04_experiment
 gpu_id: '0'
 dataset_name: infoseek_val
 split:
@@ -68,11 +68,11 @@ multimodal_index_path_dict:
     image: null
 faiss_gpu: false
 corpus_path: /mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl
-instruction: null
+instruction: None
 retrieval_topk: 5
 retrieval_batch_size: 16
 retrieval_use_fp16: true
-retrieval_query_max_length: 64
+retrieval_query_max_length: 64,
 save_retrieval_cache: true
 use_retrieval_cache: false
 retrieval_cache_path: ./output/retrieval_cache.json
@@ -108,7 +108,7 @@ multi_retriever_setting:
         use_sentence_transformer: false
         retrieval_pooling_method: mean
         retrieval_use_fp16: true
-        retrieval_query_max_length: 64
+        retrieval_query_max_length: 64,
         faiss_gpu: false
         retrieval_batch_size: 16
         rerank_model_name: e5
@@ -127,7 +127,7 @@ multi_retriever_setting:
         use_sentence_transformer: false
         retrieval_pooling_method: mean
         retrieval_use_fp16: true
-        retrieval_query_max_length: 64
+        retrieval_query_max_length: 64,
         faiss_gpu: false
         retrieval_batch_size: 16
         rerank_model_name: e5
