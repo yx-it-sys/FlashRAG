@@ -53,7 +53,16 @@ def main():
         generator = get_generator(config)
         visual_clue_prompt_template = MMPromptTemplate(config, system_prompt=sys_prompt, user_prompt=usr_prompt)
         pipeline = MMCluePipeline(config=config, visual_clue_prompt_template=visual_clue_prompt_template, generator=generator)
+        
+        # Phase I: Clue Mining
         clue_list = pipeline.get_clue(test_data)
+        # # Phase II: Image Retrieval
+        # pipeline.img_retrieval(test_data)
+        # # Phase III: Reranking
+        # output_dir = config['output_dir'] if 'output_dir' in config and config['output_dir'] else config['save_dir']
+        # clue_path = os.path.join(output_dir, "clue.jsonl")
+        # retrieval_results_path = os.path.join(output_dir, "retrieval_results.jsonl")
+        # pipeline.reranking(clue_path=clue_path, retrieval_results_path=retrieval_results_path)
         return clue_list
     finally:
         _cleanup_runtime(generator)

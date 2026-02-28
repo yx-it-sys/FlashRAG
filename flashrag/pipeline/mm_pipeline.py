@@ -4,6 +4,7 @@ import re
 import os
 import json
 import torch
+import numpy as np
 from PIL import Image
 from tqdm import tqdm
 
@@ -239,43 +240,73 @@ class MMCluePipeline(BasicMultiModalPipeline):
             if not retrieval_results:
                 print(f"Warning: No retrieval results found for data_id {data_id}. Skipping reranking.")
                 continue
-            for clue in clues:
-                budget = total_budget * clue.get('importance', 0.0)
-                n_v = 
-        #     messages = [
-        #         {
-        #             "role": "system",
-        #             "content": [
-        #                 {"type": "text", "text": "You are an intelligent assistant for reranking retrieved documents based on the visual clue. Given the visual clue and retrieved documents, you need to rerank the retrieved documents based on their relevance to the visual clue. Please return the top 3 most relevant documents."}
-        #             ]
-        #         },
-        #         {
-        #             "role": "user",
-        #             "content": [
-        #                 {"type": "text", "text": f"Visual Clue:\n{clue}\nRetrieved Documents:\n" + "\n\n".join([f"Doc{i+1}:\n{text}" for i, text in enumerate(retrieval_results)])}
-        #             ]
-        #         }
-        #     ]
-        #     response = self.generator.generate(messages)
-        #     reranked_results.append({
-        #         'data_id': data_id,
-        #         'reranked_results': response
-        #     })
-        # output_dir = self.config['output_dir'] if 'output_dir' in self.config and self.config['output_dir'] else self.config['save_dir']
-        # os.makedirs(output_dir, exist_ok=True)
-        # reranked_jsonl_path = os.path.join(output_dir, 'reranked_results.jsonl')
-        # with open(reranked_jsonl_path, 'w', encoding='utf-8') as f:
-        #     for item in reranked_results:
-        #         json.dump(item, f, ensure_ascii=False)
-        #         f.write('\n')
+            # Build Budget Matrix
+            budget_matrix = np.zeros((1, len(clues)))
+            for i, clue in enumerate(clues):
+                budget_matrix[0, i] = total_budget * clue.get('importance', 0.0) / (sum(c.get('importance', 0.0) for c in clues) + 1e-8)
+            # Build preference matrix
+            preference_matrix = np.zeros((len(clues), len(retrieval_results)))
+            for i, clue in enumerate(clues):
+                clue = clue.get('clue', '')
+                for j, doc in enumerate(retrieval_results):
+                    preference = self.cosine_similarity(clue, doc)
+                    preference_matrix[i, j] = preference
+            # Build Voting Matrix
+            voting_matrix = np.zeros((len(clues), len(retrieval_results)))
+            for i in range(len(clues)):
+                row_scores = preference_matrix[i]
+                denominator = np.sqrt(np.sum(np.square(row_scores))) + 1e-8
+                voting_matrix[i] = (
+                    np.square(row_scores) * np.sqrt(max(budget_matrix[0, i], 0.0)) / denominator
+                )
+            # Reranking process
+            doc_scores = np.sum(voting_matrix, axis=0)
+            sorted_doc_indices = np.argsort(-doc_scores)
+            reranked = [retrieval_results[idx] for idx in sorted_doc_indices]
 
-    
+            reranked_results.append({
+                'data_id': data_id,
+                'image_id': item.get('image_id'),
+                'reranked_results': reranked,
+                'doc_scores': [float(doc_scores[idx]) for idx in sorted_doc_indices],
+            })
+
+        output_dir = self.config['output_dir'] if 'output_dir' in self.config and self.config['output_dir'] else self.config['save_dir']
+        os.makedirs(output_dir, exist_ok=True)
+        rerank_jsonl_path = os.path.join(output_dir, 'reranked_results.jsonl')
+        with open(rerank_jsonl_path, 'w', encoding='utf-8') as f:
+            for row in reranked_results:
+                json.dump(row, f, ensure_ascii=False)
+                f.write('\n')
+
+        return reranked_results
+
+    def cosine_similarity(self, clue, doc):
+        if not clue or not doc:
+            return 0.0
+
+        encoder = getattr(self.retriever, 'encoder', None)
+        if encoder is None:
+            raise ValueError('Retriever does not expose encoder; cannot compute embedding cosine similarity.')
+
+        input_texts = [clue, doc]
+        try:
+            embeddings = encoder.encode(input_texts, modal='text')
+        except TypeError:
+            embeddings = encoder.encode(input_texts, is_query=True)
+
+        embeddings = np.asarray(embeddings, dtype=np.float32)
+        if embeddings.shape[0] < 2:
+            return 0.0
+
+        clue_emb = embeddings[0]
+        doc_emb = embeddings[1]
+        denominator = np.linalg.norm(clue_emb) * np.linalg.norm(doc_emb) + 1e-8
+        return float(np.dot(clue_emb, doc_emb) / denominator)
 
 
-        
-            
 
-            
+
 
 
 

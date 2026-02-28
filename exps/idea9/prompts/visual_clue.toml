@@ -27,7 +27,7 @@ Each visual clue should describe the unique characteristics of an entity in deta
 Return a JSON list starting with "```json". Each item must include:
 - id: unique identifier (e.g., "c1")
 - type: "clue"
-- clue: concise description of the visual clue
+- clue: concise description of the visual clue (Wikipedia style).
 - importance: a float in [0,1] indicating usefulness for answering the question
 
 [Restrictions]
