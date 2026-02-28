@@ -169,10 +169,12 @@ class MMSequentialPipeline(BasicMultiModalPipeline):
         return dataset
 
 class MMCluePipeline(BasicMultiModalPipeline):
-    def __init__(self, config, visual_clue_prompt_template, prompt_template=None, retriever=None, generator=None):
-        super().__init__(config, prompt_template)
+    def __init__(self, config, visual_clue_prompt_template, naive_prompt_template, rag_prompt_template, query_generate_prompt_template,retriever=None, generator=None):
+        super().__init__(config, naive_prompt_template)
         self.visual_clue_prompt_template = visual_clue_prompt_template
-        self.iterative_prompt_template = prompt_template
+        self.naive_prompt_template = naive_prompt_template
+        self.query_generate_prompt_template = query_generate_prompt_template
+        self.rag_prompt_template = rag_prompt_template
         self.generator = get_generator(config) if generator is None else generator
         # self.retriever = retriever
     def _parse_json_string(self, raw_str):
@@ -355,7 +357,20 @@ class MMCluePipeline(BasicMultiModalPipeline):
         doc_emb = embeddings[1]
         denominator = np.linalg.norm(clue_emb) * np.linalg.norm(doc_emb) + 1e-8
         return float(np.dot(clue_emb, doc_emb) / denominator)
-    def run(self, dataset, reranked_results_path, do_eval=True, pred_process_func=None):
+
+    def _compute_normalized_nll(self, token_probs_list):
+        normalized_nll = []
+        for token_probs in token_probs_list:
+            if not token_probs:
+                normalized_nll.append(None)
+                continue
+            probs = np.asarray(token_probs, dtype=np.float64)
+            probs = np.clip(probs, 1e-12, 1.0)
+            normalized_nll.append(float(-np.mean(np.log(probs))))
+        return normalized_nll
+
+    def run(self, dataset, retrieval_threshold=0.0, reranked_results_path=None, do_eval=True, pred_process_func=None):
+        # To Do: 需要统计性能
         reranked_results = {}
         with open(reranked_results_path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -366,10 +381,28 @@ class MMCluePipeline(BasicMultiModalPipeline):
         input_prompts = [
             self.visual_clue_prompt_template.get_string_for_rag_retrieval(item, reference_doc) for item, reference_doc in zip(dataset, entity_docs)
         ]   
-        pred_answer_list = self.generator.generate(input_prompts)
+        token_probs = None
+        pred_answer_list, token_probs = self.generator.generate(input_prompts, return_scores=True)
+
+        normalized_nll = self._compute_normalized_nll(token_probs)
+
+        items_need_retrieval = [
+            {"item":item, "reranked_doc": reranked_results[item.data_id][0]} for item, nll in zip(dataset.data, normalized_nll)
+            if nll is not None and nll > retrieval_threshold
+        ]
+
+        # Text Query Generator
+        input_prompts_for_query_gen = [
+            self.query_generate_prompt_template.get_string_for_query_generation(item["item"], item["reranked_doc"]) for item in items_need_retrieval
+        ]
+        generated_queries = self.generator.generate(input_prompts_for_query_gen)
+        # To Do: Text Retrieval
         dataset.update_output("pred", pred_answer_list)
-        dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
-        return dataset
+        # To Do: RAG Pipeline
+
+        # To Do: Update pred_answer_list with RAG results for items that exceed the NLL threshold
+
+
 
 
 
