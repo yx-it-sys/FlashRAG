@@ -174,7 +174,7 @@ class MMCluePipeline(BasicMultiModalPipeline):
         self.visual_clue_prompt_template = visual_clue_prompt_template
         self.iterative_prompt_template = prompt_template
         self.generator = get_generator(config) if generator is None else generator
-        self.retriever = retriever
+        # self.retriever = retriever
     def _parse_json_string(self, raw_str):
         if not isinstance(raw_str, str):
             return raw_str
@@ -240,15 +240,15 @@ class MMCluePipeline(BasicMultiModalPipeline):
 
         # 1. 数据读取阶段 (仅读取前10行)
         io_start = time.time()
-        # with open(clue_path, 'r', encoding='utf-8') as f:
-        #     clue_data = [json.loads(line) for line in f]
-        # with open(retrieval_results_path, 'r', encoding='utf-8') as f:
-        #     retrieval_data = {json.loads(line)['data_id']: json.loads(line) for line in f}
-
         with open(clue_path, 'r', encoding='utf-8') as f:
-            clue_data = [json.loads(line) for line in islice(f, 1)]
+            clue_data = [json.loads(line) for line in f]
         with open(retrieval_results_path, 'r', encoding='utf-8') as f:
-            retrieval_data = {json.loads(line)['data_id']: json.loads(line) for line in islice(f, 1)}
+            retrieval_data = {json.loads(line)['data_id']: json.loads(line) for line in f}
+
+        # with open(clue_path, 'r', encoding='utf-8') as f:
+        #     clue_data = [json.loads(line) for line in islice(f, 1)]
+        # with open(retrieval_results_path, 'r', encoding='utf-8') as f:
+        #     retrieval_data = {json.loads(line)['data_id']: json.loads(line) for line in islice(f, 1)}
         stats['io_read_time'] = time.time() - io_start
 
         reranked_results = []
