@@ -7,6 +7,11 @@ import torch
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
+import json
+import time
+from itertools import islice
+
+
 
 class BasicMultiModalPipeline:
     """Base object of all multimodal pipelines. A pipeline includes the overall process of RAG.
@@ -229,29 +234,51 @@ class MMCluePipeline(BasicMultiModalPipeline):
                 }, f, ensure_ascii=False)
                 f.write('\n')
     def reranking(self, clue_path, retrieval_results_path, total_budget=100):
+        stats = {}  # 用于存储性能数据
+        overall_start = time.time()
+
+        # 1. 数据读取阶段 (仅读取前10行)
+        io_start = time.time()
         with open(clue_path, 'r', encoding='utf-8') as f:
             clue_data = [json.loads(line) for line in f]
         with open(retrieval_results_path, 'r', encoding='utf-8') as f:
             retrieval_data = {json.loads(line)['data_id']: json.loads(line) for line in f}
+
+        # with open(clue_path, 'r', encoding='utf-8') as f:
+        #     clue_data = [json.loads(line) for line in islice(f, 10)]
+        # with open(retrieval_results_path, 'r', encoding='utf-8') as f:
+        #     retrieval_data = {json.loads(line)['data_id']: json.loads(line) for line in islice(f, 10)}
+        stats['io_read_time'] = time.time() - io_start
+
         reranked_results = []
+        processing_times = [] # 记录单条数据的处理时间
+
+        # 2. 核心重排序阶段
         for item in clue_data:
+            item_start = time.time()
+            
             data_id = item['data_id']
             clues = item['clue']
             retrieval_results = retrieval_data.get(data_id, {}).get('retrieval_results', [])
+            
             if not retrieval_results:
                 print(f"Warning: No retrieval results found for data_id {data_id}. Skipping reranking.")
                 continue
+
+            # --- 计算逻辑开始 ---
             # Build Budget Matrix
             budget_matrix = np.zeros((1, len(clues)))
+            total_importance = sum(c.get('importance', 0.0) for c in clues) + 1e-8
             for i, clue in enumerate(clues):
-                budget_matrix[0, i] = total_budget * clue.get('importance', 0.0) / (sum(c.get('importance', 0.0) for c in clues) + 1e-8)
+                budget_matrix[0, i] = total_budget * clue.get('importance', 0.0) / total_importance
+
             # Build preference matrix
             preference_matrix = np.zeros((len(clues), len(retrieval_results)))
             for i, clue in enumerate(clues):
-                clue = clue.get('clue', '')
+                clue_text = clue.get('clue', '')
                 for j, doc in enumerate(retrieval_results):
-                    preference = self.cosine_similarity(clue, doc)
-                    preference_matrix[i, j] = preference
+                    preference_matrix[i, j] = self.cosine_similarity(clue_text, doc)
+
             # Build Voting Matrix
             voting_matrix = np.zeros((len(clues), len(retrieval_results)))
             for i in range(len(clues)):
@@ -260,10 +287,12 @@ class MMCluePipeline(BasicMultiModalPipeline):
                 voting_matrix[i] = (
                     np.square(row_scores) * np.sqrt(max(budget_matrix[0, i], 0.0)) / denominator
                 )
+
             # Reranking process
             doc_scores = np.sum(voting_matrix, axis=0)
             sorted_doc_indices = np.argsort(-doc_scores)
             reranked = [retrieval_results[idx] for idx in sorted_doc_indices]
+            # --- 计算逻辑结束 ---
 
             reranked_results.append({
                 'data_id': data_id,
@@ -271,17 +300,35 @@ class MMCluePipeline(BasicMultiModalPipeline):
                 'reranked_results': reranked,
                 'doc_scores': [float(doc_scores[idx]) for idx in sorted_doc_indices],
             })
+            
+            processing_times.append(time.time() - item_start)
 
-        output_dir = self.config['output_dir'] if 'output_dir' in self.config and self.config['output_dir'] else self.config['save_dir']
+        # 统计计算阶段数据
+        stats['avg_item_processing_time'] = np.mean(processing_times) if processing_times else 0
+        stats['total_processing_time'] = sum(processing_times)
+        stats['num_items_processed'] = len(reranked_results)
+
+        # 3. 保存结果阶段
+        save_start = time.time()
+        output_dir = self.config['save_dir']
         os.makedirs(output_dir, exist_ok=True)
+        
+        # 保存重排序结果
         rerank_jsonl_path = os.path.join(output_dir, 'reranked_results.jsonl')
         with open(rerank_jsonl_path, 'w', encoding='utf-8') as f:
             for row in reranked_results:
-                json.dump(row, f, ensure_ascii=False)
-                f.write('\n')
+                f.write(json.dumps(row, ensure_ascii=False) + '\n')
+                
+        stats['io_write_time'] = time.time() - save_start
+        stats['overall_total_time'] = time.time() - overall_start
 
+        # 4. 保存性能统计到 JSONL
+        stats_path = os.path.join(output_dir, 'performance_stats.jsonl')
+        with open(stats_path, 'a', encoding='utf-8') as f:
+            f.write(json.dumps(stats, ensure_ascii=False) + '\n')
+
+        print(f"Reranking complete. Stats saved to {stats_path}")
         return reranked_results
-
     def cosine_similarity(self, clue, doc):
         if not clue or not doc:
             return 0.0

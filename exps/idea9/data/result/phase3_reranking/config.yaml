@@ -50,7 +50,7 @@ method2index:
     bge: null
     bge-m3: null
 data_dir: data/datasets/
-save_dir: data/result/infoseek_val_2026_02_28_13_04_experiment
+save_dir: data/result/infoseek_val_2026_02_28_14_20_experiment
 gpu_id: '0'
 dataset_name: infoseek_val
 split:
