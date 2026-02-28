@@ -220,28 +220,28 @@ class MMCluePipeline(BasicMultiModalPipeline):
                 image_id = item.image_id
                 image_path = os.path.join(f'{self.config["dataset_image_dir"]}', f'{image_id}.jpg')
                 retrieval_result = self.retriever.search(image_path, target_modal="text")
-                
                 json.dump({
                     'data_id': data_id,
                     'image_id': image_id,
                     'retrieval_results': retrieval_result,
                 }, f, ensure_ascii=False)
                 f.write('\n')
-    def reranking(self, clue_path, retrieval_results_path):
+    def reranking(self, clue_path, retrieval_results_path, total_budget=100):
         with open(clue_path, 'r', encoding='utf-8') as f:
             clue_data = [json.loads(line) for line in f]
         with open(retrieval_results_path, 'r', encoding='utf-8') as f:
             retrieval_data = {json.loads(line)['data_id']: json.loads(line) for line in f}
-        
         reranked_results = []
         for item in clue_data:
             data_id = item['data_id']
-            clue = item['clue']
+            clues = item['clue']
             retrieval_results = retrieval_data.get(data_id, {}).get('retrieval_results', [])
             if not retrieval_results:
                 print(f"Warning: No retrieval results found for data_id {data_id}. Skipping reranking.")
                 continue
-            
+            for clue in clues:
+                budget = total_budget * clue.get('importance', 0.0)
+                n_v = 
         #     messages = [
         #         {
         #             "role": "system",

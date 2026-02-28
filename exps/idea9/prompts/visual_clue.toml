@@ -28,7 +28,7 @@ Return a JSON list starting with "```json". Each item must include:
 - id: unique identifier (e.g., "c1")
 - type: "clue"
 - clue: concise description of the visual clue
-- relevance: a float in [0,1] indicating usefulness for the question
+- importance: a float in [0,1] indicating usefulness for answering the question
 
 [Restrictions]
 - Do NOT name entities.
