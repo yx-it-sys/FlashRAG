@@ -44,7 +44,7 @@ def main():
     try:
         config = Config('my_config.yaml')
         retriever = get_retriever(config)
-        generator = get_generator(config)
+        # generator = get_generator(config)
 
         all_split = get_dataset(config)
         test_data = all_split["validation"]
@@ -69,14 +69,14 @@ def main():
         # # Phase II: Image Retrieval
         # pipeline.img_retrieval(test_data)
 
-        # Phase III: Rerankingos.path.join(output_dir, "clue.jsonl")
-        clue_path = "data/result/infoseek/phase1_clue_mining/clue.jsonl"
-        retrieval_results_path = "data/result/infoseek/phase2_image_retrieval/retrieval_results.jsonl"
-        pipeline.reranking(clue_path=clue_path, retrieval_results_path=retrieval_results_path)
+        # # Phase III: Reranking
+        # clue_path = "data/result/infoseek/phase1_clue_mining/clue.jsonl"
+        # retrieval_results_path = "data/result/infoseek/phase2_image_retrieval/retrieval_results.jsonl"
+        # pipeline.reranking(clue_path=clue_path, retrieval_results_path=retrieval_results_path)
 
-        # # Phase IV: Iterative Answer Generation
-        # reranked_results_path = "data/result/infoseek/phase3_reranking/reranked_results.jsonl"
-        # pipeline.run(test_data, reranked_results_path=reranked_results_path, do_eval=True)
+        # Phase IV: Iterative Answer Generation
+        reranked_results_path = "data/result/infoseek/phase3_reranking/reranked_results.jsonl"
+        pipeline.run(test_data, reranked_results_path=reranked_results_path, do_eval=True)
         return 0
     finally:
         _cleanup_runtime(generator)
