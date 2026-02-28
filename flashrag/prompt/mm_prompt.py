@@ -47,7 +47,20 @@ class MMPromptTemplate:
         content_list.append({'type': 'text', 'text': self.user_prompt.format(question=question)})
         messages.append({"role": "user", "content": content_list})
         return messages
-
+    def get_string_for_rag_retrieval(self, item, reference):
+        question = item.question if item.question is not None else item.text
+        question_image_id = item.image_id
+        messages = []
+        if self.system_prompt is not None:
+            messages.append({"role": "system", "content": self.system_prompt})
+            image_path = os.path.join(f'{self.config["dataset_image_dir"]}', f'{question_image_id}.jpg')
+            question_image = Image.open(image_path)
+        content_list = []
+        content_list.append({'type': 'image', 'image': question_image})
+        content_list.append({'type': 'text', 'text': self.user_prompt.format(reference=reference, question=question)})
+        messages.append({"role": "user", "content": content_list})
+        return messages
+    
 class GAOKAOMMPromptTemplate(MMPromptTemplate):
     BASE_USER_PROMPT = "请你做一道{subject}选择题\n请你结合文字和图片一步一步思考,并将思考过程写在【解析】和<eoe>之间。{instruction}\n例如：{example}\n请你严格按照上述格式作答。\n你可以参考一些知识: {reference}。题目如下：{question}"
     INSTRUCTION_DICT = {

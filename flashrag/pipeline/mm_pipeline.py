@@ -355,8 +355,6 @@ class MMCluePipeline(BasicMultiModalPipeline):
         doc_emb = embeddings[1]
         denominator = np.linalg.norm(clue_emb) * np.linalg.norm(doc_emb) + 1e-8
         return float(np.dot(clue_emb, doc_emb) / denominator)
-    def iterative_infer(self, item, reranked_docs):
-        pass
     def run(self, dataset, reranked_results_path, do_eval=True, pred_process_func=None):
         reranked_results = {}
         with open(reranked_results_path, 'r', encoding='utf-8') as f:
@@ -367,7 +365,7 @@ class MMCluePipeline(BasicMultiModalPipeline):
         for item in dataset:
             data_id = item.data_id
             reranked_docs = reranked_results[data_id][0]
-            prediction = self.iterative_infer(item, reranked_docs)
+            
             pred_answer_list.append(prediction)
 
         dataset.update_output("pred", pred_answer_list)
