@@ -362,12 +362,11 @@ class MMCluePipeline(BasicMultiModalPipeline):
                 item = json.loads(line)
                 reranked_results[item['data_id']] = item['reranked_results']
         pred_answer_list = []
-        for item in dataset:
-            data_id = item.data_id
-            reranked_docs = reranked_results[data_id][0]
-            
-            pred_answer_list.append(prediction)
-
+        entity_docs = [reranked_results[item.data_id][0] for item in dataset]
+        input_prompts = [
+            self.visual_clue_prompt_template.get_string_for_rag_retrieval(item, reference_doc) for item, reference_doc in zip(dataset, entity_docs)
+        ]   
+        pred_answer_list = self.generator.generate(input_prompts)
         dataset.update_output("pred", pred_answer_list)
         dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
         return dataset
