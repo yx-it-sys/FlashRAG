@@ -1,5 +1,5 @@
-# ----Global Paths----
-# Paths to retrieval models
+# ---- Global Paths ----
+# Paths to models
 model2path:
   e5: intfloat/e5-base-v2
   bge: BAAI/bge-base-en-v1.5
@@ -34,7 +34,7 @@ model2path:
   chinese-clip: OFA-Sys/chinese-clip-vit-large-patch14
   jina-clip-v2: jinaai/jina-clip-v2
 
-# Pooling methods for each embedding model
+# Pooling methods for embedding models
 model2pooling:
   default: "pooler"
   e5: "mean"
@@ -43,7 +43,7 @@ model2pooling:
   contriever: "mean"
   bge-m3: "cls"
 
-# Indexes path for retrieval models
+# Index paths for retrieval methods
 method2index:
   e5: ~
   bm25: ~
@@ -51,62 +51,39 @@ method2index:
   bge: ~
   bge-m3: ~
 
-# ----Environment Settings----
+# ---- Environment Settings ----
 gpu_id: "0"
 dataset_name: "infoseek_val"
-split: ['validation']
+split: ["validation"]
 
-# Sampling configurations for testing
+# Sampling configs
 test_sample_num: 10
 random_sample: True
 save_intermediate_data: True
 save_note: "experiment"
-# Seed for reproducibility
 seed: 2024
 
-# Directory paths for data and outputs
+# Data/output paths
 data_dir: "data/datasets/"
 save_new_dir: True
 save_dir: "data/result/"
 
-# ----Retrieval Settings----
-# Base retriever config
-retrieval_method: "clip-vit-large-patch14"
-retrieval_topk: 5
-index_path: "/mnt/data/you/datasets/infoseek_val/indexes/clip_Flat_text.index"
-corpus_path: "/mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl"
+# ---- Retrieval Settings ----
 save_retrieval_cache: True
 use_retrieval_cache: False
 retrieval_cache_path: "./output/retrieval_cache.json"
 silent_retrieval: False
-multimodal_index_path_dict: {
-    "text": "/mnt/data/you/datasets/infoseek_val/indexes/clip_Flat_text.index",
-    "image": ~
-}
-retrieval_query_max_length: 64,
+multimodal_index_path_dict:
+  text: "/mnt/data/you/datasets/infoseek_val/indexes/clip_Flat_text.index"
+  image: ~
+retrieval_query_max_length: 64
 retrieval_pooling_method: "cls"
 retrieval_use_fp16: True
 retrieval_batch_size: 16
-instruction: None
+instruction: ~
 retrieval_model_path: "/mnt/data/you/modelscope/clip-vit-large-patch14"
 use_sentence_transformer: False
 faiss_gpu: False
-
-use_multi_retriever: False # whether to use multi retrievers
-multi_retriever_setting:
-  merge_method: "concat" # support 'concat', 'rrf', 'rerank'
-  topk: 5 # final remain documents, only used in 'rrf' and 'rerank' merge
-  rerank_model_name: ~
-  rerank_model_path: ~
-  retriever_list:
-    - retrieval_method: "e5"
-      retrieval_topk: 5
-      index_path: ~
-      retrieval_model_path: ~
-    - retrieval_method: "bm25"
-      retrieval_topk: 5
-      index_path: ~
-      retrieval_model_path: ~
 
 use_reranker: False
 rerank_model_name: e5
@@ -117,9 +94,9 @@ rerank_topk: 5
 rerank_max_length: 512
 rerank_batch_size: 256
 
-# ----Generator Settings----
-framework: vllm # inference frame work of LLM, supporting: 'hf','vllm','fschat'
-generator_model: "Qwen2.5-VL-7B-Instruct"  # name or path of the generator
+# ---- Generator Settings ----
+framework: vllm # supports: 'hf', 'vllm', 'fschat'
+generator_model: "Qwen2.5-VL-7B-Instruct"
 generator_model_path: "/mnt/data/you/modelscope/Qwen2.5-VL-7B-Instruct"
 generator_max_input_len: 4096
 generator_batch_size: 1
@@ -128,19 +105,19 @@ generation_params:
   max_tokens: 4096
   temperature: 0.1
   top_p: 1.0
-# vLLM specific setting
+
+# vLLM-specific settings
 vllm_gpu_memory_utilization: 0.95
 tensor_parallel_size: 1
 max_model_len: 6144
 vllm_enforce_eager: true
-# ----Evaluation Settings----
-# Metrics to evaluate the result
-metrics: ['em','f1','acc','precision','recall','input_tokens', 'gpt'] 
-# Specify setting for metric, will be called within certain metrics
-metric_setting: 
-  retrieval_recall_topk: 5
-  tokenizer_name: 'gpt-4'
-save_metric_score: True #　whether to save the metric score into txt file
 
-# ----Prompt Settings----
+# ---- Evaluation Settings ----
+metrics: ["em", "f1", "acc", "precision", "recall", "input_tokens", "gpt"]
+metric_setting:
+  retrieval_recall_topk: 5
+  tokenizer_name: "gpt-4"
+save_metric_score: True
+
+# ---- Prompt Settings ----
 visual_clue_prompt_file: "prompts/visual_clue.toml"
