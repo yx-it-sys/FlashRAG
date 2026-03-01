@@ -60,12 +60,12 @@ split: ['validation']
 test_sample_num: 10
 random_sample: True
 save_intermediate_data: True
+save_note: "experiment"
 # Seed for reproducibility
 seed: 2024
 
 # Directory paths for data and outputs
 data_dir: "data/datasets/"
-#save_dir: "/data00/jiajie_jin/test_project/output"
 save_new_dir: True
 save_dir: "data/result/"
 
@@ -92,13 +92,21 @@ retrieval_model_path: "/mnt/data/you/modelscope/clip-vit-large-patch14"
 use_sentence_transformer: False
 faiss_gpu: False
 
-use_multi_retriever: False
-# retrieval_method: "e5" # name or path of the retrieval model
-# index_path: "data/datasets/infoseek_val/indexes/bge-large-en-v1.5_Flat.index" # Set automatically if not provided
-# corpus_path: "data/datasets/infoseek_val/wiki_100k_flatten.jsonl"
-# retrieval_pooling_method: ~
-
-# retrieval_batch_size: 256
+use_multi_retriever: False # whether to use multi retrievers
+multi_retriever_setting:
+  merge_method: "concat" # support 'concat', 'rrf', 'rerank'
+  topk: 5 # final remain documents, only used in 'rrf' and 'rerank' merge
+  rerank_model_name: ~
+  rerank_model_path: ~
+  retriever_list:
+    - retrieval_method: "e5"
+      retrieval_topk: 5
+      index_path: ~
+      retrieval_model_path: ~
+    - retrieval_method: "bm25"
+      retrieval_topk: 5
+      index_path: ~
+      retrieval_model_path: ~
 
 use_reranker: False
 rerank_model_name: e5

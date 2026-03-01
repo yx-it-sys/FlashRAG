@@ -176,7 +176,7 @@ class MMCluePipeline(BasicMultiModalPipeline):
         self.query_generate_prompt_template = query_generate_prompt_template
         self.rag_prompt_template = rag_prompt_template
         self.generator = get_generator(config) if generator is None else generator
-        # self.retriever = retriever
+        self.retriever = get_retriever(config) if retriever is None else retriever
     def _parse_json_string(self, raw_str):
         if not isinstance(raw_str, str):
             return raw_str
@@ -369,38 +369,95 @@ class MMCluePipeline(BasicMultiModalPipeline):
             normalized_nll.append(float(-np.mean(np.log(probs))))
         return normalized_nll
 
+    def _extract_reference_text(self, doc):
+        if isinstance(doc, str):
+            return doc
+        if isinstance(doc, dict):
+            if "text" in doc and doc["text"] is not None:
+                return doc["text"]
+            if "contents" in doc and doc["contents"] is not None:
+                return doc["contents"]
+        return ""
+
     def run(self, dataset, retrieval_threshold=0.0, reranked_results_path=None, do_eval=True, pred_process_func=None):
-        # To Do: 需要统计性能
-        reranked_results = {}
-        with open(reranked_results_path, 'r', encoding='utf-8') as f:
-            for line in f:
-                item = json.loads(line)
-                reranked_results[item['data_id']] = item['reranked_results']
-        pred_answer_list = []
-        entity_docs = [reranked_results[item.data_id][0] for item in dataset]
+        reference_docs = []
+        if reranked_results_path is not None and os.path.exists(reranked_results_path):
+            reranked_results = {}
+            with open(reranked_results_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    item = json.loads(line)
+                    reranked_results[item['data_id']] = item['reranked_results']
+            for item in dataset:
+                docs = reranked_results.get(item.data_id, [])
+                reference_docs.append(docs[0] if len(docs) > 0 else "")
+        else:
+            reference_docs = [""] * len(dataset)
+
         input_prompts = [
-            self.visual_clue_prompt_template.get_string_for_rag_retrieval(item, reference_doc) for item, reference_doc in zip(dataset, entity_docs)
-        ]   
-        token_probs = None
-        pred_answer_list, token_probs = self.generator.generate(input_prompts, return_scores=True)
+            self.visual_clue_prompt_template.get_string_for_rag_retrieval(item, self._extract_reference_text(reference_doc))
+            for item, reference_doc in zip(dataset, reference_docs)
+        ]
+
+        try:
+            pred_answer_list, token_probs = self.generator.generate(input_prompts, return_scores=True)
+        except Exception:
+            pred_answer_list = self.generator.generate(input_prompts)
+            token_probs = [[] for _ in pred_answer_list]
 
         normalized_nll = self._compute_normalized_nll(token_probs)
 
-        items_need_retrieval = [
-            {"item":item, "reranked_doc": reranked_results[item.data_id][0]} for item, nll in zip(dataset.data, normalized_nll)
-            if nll is not None and nll > retrieval_threshold
-        ]
+        items_need_retrieval = []
+        for idx, (item, nll, ref_doc) in enumerate(zip(dataset.data, normalized_nll, reference_docs)):
+            if nll is not None and nll > retrieval_threshold:
+                items_need_retrieval.append(
+                    {
+                        "idx": idx,
+                        "item": item,
+                        "reference_doc": ref_doc,
+                    }
+                )
 
-        # Text Query Generator
-        input_prompts_for_query_gen = [
-            self.query_generate_prompt_template.get_string_for_query_generation(item["item"], item["reranked_doc"]) for item in items_need_retrieval
-        ]
-        generated_queries = self.generator.generate(input_prompts_for_query_gen)
-        # To Do: Text Retrieval
+        generated_queries = []
+        retrieval_result_text = [None] * len(dataset)
+        if len(items_need_retrieval) > 0:
+            input_prompts_for_query_gen = [
+                self.query_generate_prompt_template.get_string_for_query_generation(
+                    data["item"],
+                    self._extract_reference_text(data["reference_doc"]),
+                )
+                for data in items_need_retrieval
+            ]
+            generated_queries = self.generator.generate(input_prompts_for_query_gen)
+
+            if self.retriever is None:
+                raise ValueError("Retriever is not provided for text retrieval.")
+
+            text_retrieval_results = self.retriever.batch_search(generated_queries, target_modal="text")
+            rag_input_prompts = []
+            rag_target_indices = []
+            for data, retrieved_docs in zip(items_need_retrieval, text_retrieval_results):
+                top_doc = retrieved_docs[0] if len(retrieved_docs) > 0 else ""
+                top_doc_text = self._extract_reference_text(top_doc)
+                retrieval_result_text[data["idx"]] = top_doc_text
+                rag_input_prompts.append(
+                    self.rag_prompt_template.get_string_for_rag_retrieval(data["item"], top_doc_text)
+                )
+                rag_target_indices.append(data["idx"])
+
+            rag_pred_answer_list = self.generator.generate(rag_input_prompts)
+            for idx, new_pred in zip(rag_target_indices, rag_pred_answer_list):
+                pred_answer_list[idx] = new_pred
+
+        query_list_by_item = [None] * len(dataset)
+        for data, query in zip(items_need_retrieval, generated_queries):
+            query_list_by_item[data["idx"]] = query
+
+        dataset.update_output("normalized_nll", normalized_nll)
+        dataset.update_output("generated_query", query_list_by_item)
+        dataset.update_output("retrieved_text", retrieval_result_text)
         dataset.update_output("pred", pred_answer_list)
-        # To Do: RAG Pipeline
-
-        # To Do: Update pred_answer_list with RAG results for items that exceed the NLL threshold
+        dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)
+        return dataset
 
 
 
