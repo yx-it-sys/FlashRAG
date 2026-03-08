@@ -1,0 +1,110 @@
+# ------------------------------------------------Global Paths------------------------------------------------#
+# Paths to various models
+model2path:
+  e5: "intfloat/e5-base-v2"
+  bge: "BAAI/bge-base-en-v1.5"
+  contriever: "facebook/contriever"
+  llama2-7B-chat: "meta-llama/Llama-2-7b-chat-hf"
+  llama2-7B: "meta-llama/Llama-2-7b-hf"
+  llama2-13B: "meta-llama/Llama-2-13b-hf"
+  llama2-13B-chat: "meta-llama/Llama-2-13b-chat-hf"
+
+# Pooling methods for each embedding model
+model2pooling:
+  e5: "mean"
+  bge: "cls"
+  contriever: "mean"
+  jina: "mean"
+  dpr: "pooler"
+
+# Indexes path for retrieval models
+method2index:
+  e5: ~
+  bm25: ~
+  contriever: ~
+  clip:
+    "text": "path/to/text_index"
+    "image": "path/to/image_index"
+
+# ------------------------------------------------Environment Settings------------------------------------------------#
+gpu_id: ["0", "1"]
+dataset_name: "infoseek_val"
+split: ["validation"]
+
+# Sampling configs
+test_sample_num: 1600
+random_sample: True
+save_intermediate_data: True
+save_note: "experiment"
+seed: 2024
+
+# Data/output paths
+data_dir: "data/datasets/"
+save_new_dir: True
+save_dir: "data/result/"
+note: "experiment"
+# -------------------------------------------------Retrieval Settings------------------------------------------------#
+# If set the name, the model path will be find in global paths
+# retrieval_method: "e5" # name or path of the retrieval model.
+retrieval_model_path: "/mnt/data/you/modelscope/bge-large-en-v1.5" # path to the retrieval model
+index_path: /mnt/data/you/datasets/infoseek_val/indexes/bge_Flat.index # set automatically if not provided.
+faiss_gpu: False # whether use gpu to hold index
+corpus_path: "/mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl"
+
+instruction: ~ # instruction for the retrieval model
+retrieval_topk: 3 # number of retrieved documents
+retrieval_batch_size: 256 # batch size for retrieval
+retrieval_use_fp16: True # whether to use fp16 for retrieval model
+retrieval_query_max_length: 128 # max length of the query
+save_retrieval_cache: False # whether to save the retrieval cache
+use_retrieval_cache: False # whether to use the retrieval cache
+retrieval_cache_path: ~ # path to the retrieval cache
+retrieval_pooling_method: ~ # set automatically if not provided
+use_sentence_transformer: False
+silent_retrieval: True # whether to silent the retrieval process
+
+# -------------------------------------------------Reranker Settings------------------------------------------------#
+phase3_cluster_topk: 5
+use_reranker: False
+rerank_model_name: e5
+rerank_model_path: ~
+rerank_pooling_method: ~
+rerank_use_fp16: True
+rerank_topk: 5
+rerank_max_length: 512
+rerank_batch_size: 256
+
+# ---- Generator Settings ----
+framework: vllm # supports: 'hf', 'vllm', 'fschat'
+generator_model: "Qwen2.5-VL-7B-Instruct"
+generator_model_path: "/mnt/data/you/modelscope/Qwen2.5-VL-7B-Instruct"
+generator_max_input_len: 4096
+generator_batch_size: 1
+phase4_query_ref_max_chars: 800
+phase4_naive_ref_max_chars: 800
+phase4_rag_doc_max_chars: 200
+generation_params:
+  do_sample: False
+  max_tokens: 4096
+  temperature: 0.1
+  top_p: 1.0
+
+# vLLM-specific settings
+vllm_gpu_memory_utilization: 0.88
+tensor_parallel_size: 1
+max_model_len: 12000
+vllm_enforce_eager: true
+
+# ---- Evaluation Settings ----
+metrics: ["em", "f1", "acc", "precision", "recall", "input_tokens"]
+metric_setting:
+  retrieval_recall_topk: 5
+  tokenizer_name: "gpt-4"
+save_metric_score: True
+
+# ---- Prompt Settings ----
+visual_clue_prompt_file: "prompts/visual_clue.toml"
+rag_prompt_file: "prompts/rag_prompt.toml"
+naive_prompt_file: "prompts/naive_prompt.toml"
+query_generate_prompt_file: "prompts/query_generation.toml"
+omni_vqa_prompt_path: "/home/you/FlashRAG/exps/baseline/omnisearch/prompts/omni_prompt.toml"

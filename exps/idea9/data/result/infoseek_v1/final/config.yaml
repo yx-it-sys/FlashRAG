@@ -1,0 +1,151 @@
+model2path:
+    e5: intfloat/e5-base-v2
+    bge: BAAI/bge-base-en-v1.5
+    contriever: facebook/contriever
+    llama2-7B-chat: meta-llama/Llama-2-7b-chat-hf
+    llama2-7B: meta-llama/Llama-2-7b-hf
+    llama2-13B: meta-llama/Llama-2-13b-hf
+    llama2-13B-chat: meta-llama/Llama-2-13b-chat-hf
+model2pooling:
+    e5: mean
+    bge: cls
+    contriever: mean
+    jina: mean
+    dpr: pooler
+method2index:
+    e5: null
+    bm25: null
+    contriever: null
+    clip:
+        text: path/to/text_index
+        image: path/to/image_index
+data_dir: data/datasets/
+save_dir: data/result/infoseek_val_2026_03_02_14_18_experiment
+gpu_id:
+- '0'
+- '1'
+dataset_name: infoseek_val
+split:
+- validation
+test_sample_num: 1600
+random_sample: true
+seed: 2024
+save_intermediate_data: true
+save_note: experiment
+retrieval_method: e5
+retrieval_model_path: /mnt/data/you/modelscope/bge-large-en-v1.5
+index_path: /mnt/data/you/datasets/infoseek_val/indexes/bge_Flat.index
+multimodal_index_path_dict: null
+faiss_gpu: false
+corpus_path: /mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl
+instruction: null
+retrieval_topk: 5
+retrieval_batch_size: 256
+retrieval_use_fp16: true
+retrieval_query_max_length: 128
+save_retrieval_cache: false
+use_retrieval_cache: false
+retrieval_cache_path: null
+retrieval_pooling_method: mean
+bm25_backend: bm25s
+use_sentence_transformer: false
+silent_retrieval: true
+seismic_query_cut: 10
+seismic_heap_factor: 0.8
+use_reranker: false
+rerank_model_name: e5
+rerank_model_path: intfloat/e5-base-v2
+rerank_pooling_method: mean
+rerank_topk: 5
+rerank_max_length: 512
+rerank_batch_size: 256
+rerank_use_fp16: true
+use_multi_retriever: false
+multi_retriever_setting:
+    merge_method: concat
+    topk: 5
+    rerank_model_name: null
+    rerank_model_path: null
+    retriever_list:
+    -   retrieval_method: e5
+        retrieval_topk: 5
+        index_path: null
+        retrieval_model_path: intfloat/e5-base-v2
+        instruction: null
+        bm25_backend: bm25s
+        use_reranker: false
+        corpus_path: null
+        use_sentence_transformer: false
+        retrieval_pooling_method: mean
+        retrieval_use_fp16: true
+        retrieval_query_max_length: 128
+        faiss_gpu: false
+        retrieval_batch_size: 256
+        rerank_model_name: e5
+        rerank_model_path: intfloat/e5-base-v2
+        retrieval_cache_path: null
+        save_retrieval_cache: false
+        use_retrieval_cache: false
+    -   retrieval_method: bm25
+        retrieval_topk: 5
+        index_path: null
+        retrieval_model_path: bm25
+        instruction: null
+        bm25_backend: bm25s
+        use_reranker: false
+        corpus_path: null
+        use_sentence_transformer: false
+        retrieval_pooling_method: mean
+        retrieval_use_fp16: true
+        retrieval_query_max_length: 128
+        faiss_gpu: false
+        retrieval_batch_size: 256
+        rerank_model_name: e5
+        rerank_model_path: intfloat/e5-base-v2
+        retrieval_cache_path: null
+        save_retrieval_cache: false
+        use_retrieval_cache: false
+framework: vllm
+generator_model: Qwen2.5-VL-7B-Instruct
+openai_setting:
+    api_key: null
+    base_url: null
+generator_model_path: /mnt/data/you/modelscope/Qwen2.5-VL-7B-Instruct
+generator_max_input_len: 4096
+generator_batch_size: 1
+generation_params:
+    max_tokens: 4096
+    do_sample: false
+    temperature: 0.1
+    top_p: 1.0
+use_fid: false
+gpu_memory_utilization: 0.85
+metrics:
+- em
+- f1
+- acc
+- precision
+- recall
+- input_tokens
+metric_setting:
+    retrieval_recall_topk: 5
+    tokenizer_name: gpt-4
+save_metric_score: true
+save_new_dir: true
+note: experiment
+phase4_query_ref_max_chars: 800
+phase4_naive_ref_max_chars: 800
+phase4_rag_doc_max_chars: 200
+vllm_gpu_memory_utilization: 0.88
+tensor_parallel_size: 1
+max_model_len: 12000
+vllm_enforce_eager: true
+visual_clue_prompt_file: prompts/visual_clue.toml
+rag_prompt_file: prompts/rag_prompt.toml
+naive_prompt_file: prompts/naive_prompt.toml
+query_generate_prompt_file: prompts/query_generation.toml
+omni_vqa_prompt_path: /home/you/FlashRAG/exps/baseline/omnisearch/prompts/omni_prompt.toml
+dataset_path: data/datasets/infoseek_val
+gpu_num: 2
+device: cuda
+dataset_image_dir: data/datasets/infoseek_val/images

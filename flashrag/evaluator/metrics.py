@@ -1,4 +1,5 @@
 import re
+import json
 import numpy as np
 import warnings
 from collections import Counter
@@ -30,9 +31,41 @@ class BaseMetric:
         """
         return {}, []
 
+    def _canonicalize_answer(self, answer):
+        if answer is None:
+            return ""
+        if isinstance(answer, dict):
+            if "wikidata" in answer:
+                return str(answer["wikidata"])
+            if "text" in answer:
+                return str(answer["text"])
+            if "value" in answer:
+                return str(answer["value"])
+            return json.dumps(answer, ensure_ascii=False)
+        return str(answer)
+
+    def _canonicalize_answer_list(self, answers):
+        if isinstance(answers, list):
+            return [self._canonicalize_answer(answer) for answer in answers]
+        return [self._canonicalize_answer(answers)]
+
     def get_dataset_answer(self, data):
         if any(choice == [] for choice in data.choices):
             golden_answers_list = data.golden_answers
+            if any(not answers for answers in golden_answers_list):
+                answer_eval_list = getattr(data, "answer_eval", None)
+                if answer_eval_list is not None:
+                    golden_answers_list = [
+                        answers if answers else (answer_eval if isinstance(answer_eval, list) else [answer_eval])
+                        for answers, answer_eval in zip(golden_answers_list, answer_eval_list)
+                    ]
+                if any(not answers for answers in golden_answers_list):
+                    answer_list = getattr(data, "answer", None)
+                    if answer_list is not None:
+                        golden_answers_list = [
+                            answers if answers else (answer if isinstance(answer, list) else [answer])
+                            for answers, answer in zip(golden_answers_list, answer_list)
+                        ]
         else:
             # multi-choice dataset
             all_choices_list = data.choices
@@ -41,6 +74,8 @@ class BaseMetric:
                 [choices[idx] for idx in idx_list]
                 for choices, idx_list in zip(all_choices_list, golden_choice_idx_list)
             ]
+
+        golden_answers_list = [self._canonicalize_answer_list(answers) for answers in golden_answers_list]
 
         return golden_answers_list
 
@@ -657,13 +692,38 @@ class CountToken(BaseMetric):
         self.tokenizer = tokenizer
         self.is_hf_tokenizer = is_hf_tokenizer
 
+    def _prompt_to_text(self, prompt):
+        if isinstance(prompt, str):
+            return prompt
+
+        if isinstance(prompt, list):
+            text_chunks = []
+            for message in prompt:
+                if not isinstance(message, dict):
+                    continue
+                content = message.get("content", "")
+                if isinstance(content, str):
+                    text_chunks.append(content)
+                elif isinstance(content, list):
+                    for item in content:
+                        if isinstance(item, dict) and item.get("type") == "text":
+                            text_chunks.append(item.get("text", ""))
+            return "\n".join([chunk for chunk in text_chunks if chunk])
+
+        return str(prompt)
+
     def calculate_metric(self, data):
-        input_prompts = data.prompt
+        try:
+            input_prompts = data.prompt
+        except AttributeError:
+            return {"avg_input_tokens": 0.0}, [0.0 for _ in data]
+
+        prompt_texts = [self._prompt_to_text(prompt) for prompt in input_prompts]
         if self.is_hf_tokenizer:
-            token_counts = [len(self.tokenizer.tokenize(text)) for text in input_prompts]
+            token_counts = [len(self.tokenizer.tokenize(text)) for text in prompt_texts]
         else:
-            token_counts = [len(self.tokenizer.encode(text)) for text in input_prompts]
-        avg_tokens = sum(token_counts) / len(token_counts)
+            token_counts = [len(self.tokenizer.encode(text)) for text in prompt_texts]
+        avg_tokens = sum(token_counts) / len(token_counts) if len(token_counts) > 0 else 0.0
 
         return {"avg_input_tokens": avg_tokens}, token_counts
 

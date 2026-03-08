@@ -52,12 +52,12 @@ method2index:
   bge-m3: ~
 
 # ---- Environment Settings ----
-gpu_id: "0"
+gpu_id: ["0"]
 dataset_name: "infoseek_val"
 split: ["validation"]
 
 # Sampling configs
-test_sample_num: 10
+test_sample_num: 500
 random_sample: True
 save_intermediate_data: True
 save_note: "experiment"
@@ -73,9 +73,11 @@ save_retrieval_cache: True
 use_retrieval_cache: False
 retrieval_cache_path: "./output/retrieval_cache.json"
 silent_retrieval: False
+corpus_path: "/mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl"
 multimodal_index_path_dict:
   text: "/mnt/data/you/datasets/infoseek_val/indexes/clip_Flat_text.index"
   image: ~
+retrieval_topk: 3
 retrieval_query_max_length: 64
 retrieval_pooling_method: "cls"
 retrieval_use_fp16: True
@@ -87,6 +89,9 @@ faiss_gpu: False
 
 use_reranker: False
 rerank_model_name: e5
+phase3_preference_threshold: 0.5
+phase3_cluster_doc_topk: 2
+phase3_early_stop_topk: 3 #越小，剪枝越激进，停的越快
 rerank_model_path: ~
 rerank_pooling_method: ~
 rerank_use_fp16: True
@@ -107,9 +112,9 @@ generation_params:
   top_p: 1.0
 
 # vLLM-specific settings
-vllm_gpu_memory_utilization: 0.95
+vllm_gpu_memory_utilization: 0.88
 tensor_parallel_size: 1
-max_model_len: 6144
+max_model_len: 24576
 vllm_enforce_eager: true
 
 # ---- Evaluation Settings ----
@@ -121,3 +126,4 @@ save_metric_score: True
 
 # ---- Prompt Settings ----
 visual_clue_prompt_file: "prompts/visual_clue.toml"
+rag_prompt_file: "prompts/rag_prompt.toml"

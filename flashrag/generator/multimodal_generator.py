@@ -722,8 +722,22 @@ class VLLMMMGenerator(BaseMultiModalGenerator):
             scores = []
             for output in outputs:
                 try:
-                    logprob_list = [list(lp.values())[0].logprob for lp in output.outputs[0].logprobs]
-                    scores.append(np.exp(logprob_list).tolist())
+                    generated = output.outputs[0]
+                    token_ids = getattr(generated, "token_ids", [])
+                    token_logprobs = getattr(generated, "logprobs", [])
+
+                    prob_list = []
+                    for token_id, logprob_dict in zip(token_ids, token_logprobs):
+                        selected = None
+                        if isinstance(logprob_dict, dict):
+                            selected = logprob_dict.get(token_id)
+                            if selected is None and len(logprob_dict) > 0:
+                                selected = max(logprob_dict.values(), key=lambda x: getattr(x, "logprob", float("-inf")))
+                        if selected is None:
+                            continue
+                        prob_list.append(float(np.exp(selected.logprob)))
+
+                    scores.append(prob_list)
                 except:
                     scores.append([])
             return generated_texts, scores

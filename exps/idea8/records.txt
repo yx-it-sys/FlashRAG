@@ -1,6 +1,0 @@
-
-[Timing] Total: 199.87s | Count: 1 | Avg per item: 199.8666s
-[Timing] Total: 72.31s | Count: 1 | Avg per item: 72.3111s
-[Timing] Total: 58.85s | Count: 1 | Avg per item: 58.8456s
-[Timing] Total: 58.54s | Count: 1 | Avg per item: 58.5411s
-[Timing] Total: 59.00s | Count: 1 | Avg per item: 59.0026s

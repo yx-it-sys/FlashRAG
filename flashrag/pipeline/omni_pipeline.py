@@ -1,14 +1,9 @@
-from flashrag.evaluator import Evaluator
 from flashrag.utils import get_retriever, get_generator
 from flashrag.pipeline import BasicMultiModalPipeline
-from flashrag.prompt import MMPromptTemplate, PromptTemplate
 import re
 import os
 import json
-import tomllib
 import torch
-from PIL import Image
-from transformers import AutoTokenizer
 
 class OmniSearchPipeline(BasicMultiModalPipeline):
     def __init__(self, config, prompt_template=None, retriever=None, generator=None):
@@ -17,9 +12,9 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         self.generator = get_generator(config) if generator is None else generator
         self.retriever = get_retriever(config) if retriever is None else retriever
     
-    def iterative_infer(self, input_prompt, get_hidden_states=False, uncertainty_type=None):
-        response_dict = self.generator.generate([input_prompt], get_hidden_states=get_hidden_states, uncertainty_type=uncertainty_type)[0]
-        response = response_dict["output_text"][0]
+    def iterative_infer(self, input_prompt):
+        response_dict = self.generator.generate([input_prompt])
+        response = response_dict[0]
         print(f"First Response: {response}")
         input_prompt["input_prompt"].append({'role': 'assistant', 'content': response})
         
@@ -55,204 +50,13 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
                 input_prompt["input_prompt"].append({'role': 'user', 'content': contents})
 
                 try:
-                    response_dict = self.generator.generate([input_prompt], get_hidden_states=get_hidden_states, uncertainty_type=uncertainty_type)[0]
-                    response = response_dict["output_text"][0]
-                    print(f"response: {response}")
-                    input_prompt["input_prompt"].append({"role":"assistant", "content": response})
-                except Exception as e:
-                    print("Inference error, hidden states ignored:", e)
-                    return response_dict, input_prompt["input_prompt"]
-            else:
-                conversation_num += 1
-                break
-            conversation_num += 1
-        
-        if get_hidden_states == True:
-            dict_to_save = response_dict.copy()
-            dict_to_save.pop('output_text', None)
-            file_path = f"{self.config['save_dir']}/hidden_states"
-            os.makedirs(file_path, exist_ok=True)
-            filename = f"{file_path}/hidden_states_{input_prompt['id']}.pth"
-            torch.save(dict_to_save, filename)
-            print(f"字典已成功保存到: {filename}")
-        else:
-            pattern = r'(?:<Final Answer>|Final Answer:)\s*(.*?)(?=<|$)'
-            final_answer_match = re.search(pattern, response, re.DOTALL)
-
-            if final_answer_match:
-                final_answer = final_answer_match.group(1).strip()
-                final_answer = final_answer.replace('\n', '')
-                print(f"Final Answer: {final_answer}")
-                return final_answer, response_dict, input_prompt
-            else:
-                print(f"Warning: reached end of agent loop for item {conversation_num} without a 'Final Answer'. returning last response")
-                return response, response_dict, input_prompt
-      
-    def safe_write(self, file_path: str, data: dict):
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        with open(file_path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(data, ensure_ascii=False) + "\n")
-            
-    def run(self, dataset, do_eval=True, pred_process_func=None, uncertainty_type=None):
-        data_items_list = []
-        data_list = list(dataset)
-        for item in dataset:
-            data_items_list.append({
-                "id": item.id,
-                "question": item.question,
-                "answers": item.golden_answers,
-                "input_prompt": self.prompt_template.get_string(item, self.config)
-                }
-            )
-        pred_answer_list = []
-        context_list = []
-        uncertainty_score_list = []
-
-        for i, input_prompt in enumerate(data_items_list):
-            answer, response_dict, context = self.iterative_infer(input_prompt, get_hidden_states=False, uncertainty_type=uncertainty_type)
-            remove_image_context = context['input_prompt'][2:]
-            pred_answer_list.append(answer)
-            if uncertainty_type == "entropy":
-                uncertainty_score_list.append(response_dict["generation_entropy"])
-            elif uncertainty_type == "ig_text":
-                uncertainty_score_list.append(response_dict["ig_score"])
-            context_list.append(remove_image_context)
-            # print(f"Answer: {answer}")
-        result_data = {}
-        for i, item in enumerate(data_list):
-            result_data["id"] = item.id
-            result_data["question"] = item.question
-            result_data["image_id"] = item.image_id
-            result_data["ans_full"] = item.golden_answers
-            result_data["prediction"] = pred_answer_list[i]
-            result_data["context"] = context_list[i]
-            if uncertainty_type == "entropy":
-                result_data["generation_entropy"] = uncertainty_score_list[i]
-            elif uncertainty_type == "ig_text":
-                result_data["ig_text_entropy"] = uncertainty_score_list[i]
-            file_path = os.path.join(self.config["save_dir"], "output.jsonl")
-            print(f"Saving to {file_path}")
-            self.safe_write(file_path, result_data)
-        
-        dataset.update_output("pred", pred_answer_list)
-        dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
-        return dataset
-
-    def naive_run(self, dataset, do_eval=True, pred_process_func=None, uncertainty_type=None):        
-        input_prompts = []
-        items_list = list(dataset)
-        for item in dataset:
-            input_prompts.append({
-                "id": item.id,
-                "question": item.question,
-                "answers": item.golden_answers[0],
-                "input_prompt": self.prompt_template.get_string(item, self.config)
-                }
-            )
-        pred_answer_list = []
-        uncertainty_score_list = []
-
-        for i, input_prompt in enumerate(input_prompts):
-            pred_answer = self.generator.generate([input_prompt], uncertainty_type=uncertainty_type)
-            pred_answer_list.append(pred_answer[0]['output_text'][0])
-            if uncertainty_type == "entropy":
-                uncertainty_score_list.append(pred_answer[0]["generation_entropy"])
-            elif uncertainty_type == "ig_text":
-                uncertainty_score_list.append(pred_answer[0]["ig_score"])
-        
-        result_data = {}
-        for i, item in enumerate(items_list):
-            result_data["id"] = item.id
-            result_data["question"] = item.question
-            result_data["image_id"] = item.image_id
-            result_data["ans_full"] = item.golden_answers
-            result_data["prediction"] = pred_answer_list[i]
-            if uncertainty_type == "entropy":
-                result_data["generation_entropy"] = uncertainty_score_list[i]
-            elif uncertainty_type == "ig_text":
-                result_data["ig_text_entropy"] = uncertainty_score_list[i]
-            file_path = os.path.join(self.config["save_dir"], "output.jsonl")
-            print(f"Saving to {file_path}")
-            self.safe_write(file_path, result_data)
-        
-        dataset.update_output("pred", pred_answer_list)
-        dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
-        return dataset
-
-class OmniSearchQAPipeline(BasicMultiModalPipeline):
-    def __init__(self, config, prompt_template=None, retriever=None, generator=None):
-        super().__init__(config, prompt_template)
-        self.config = config
-        prompt_path = self.config['omni_qa_prompt_path']
-        self.model_path = self.config['generator_model_path']
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
-        with open(prompt_path, "rb") as f:
-            self.prompt = tomllib.load(f)
-
-        if prompt_template is None:
-            prompt_template = PromptTemplate(config)
-        self.prompt_template = prompt_template
-
-        self.generator = get_generator(config) if generator is None else generator
-        self.retriever = get_retriever(config) if retriever is None else retriever
-    
-    def iterative_infer(self, input_prompt):
-        prompt = input_prompt["input_prompt"]
-        inputs = self.tokenizer.apply_chat_template(
-                prompt, 
-                tokenize=False, # Important: We want a string back, not token IDs yet.
-                add_generation_prompt=True 
-            )
-        response_dict = self.generator.generate(inputs)
-        response = response_dict[0]
-        print(f"First Response: {response}")
-        input_prompt["input_prompt"].append({'role': 'assistant', 'content': response})
-        
-        conversation_num, max_turns = 0, 5
-        while conversation_num < max_turns:
-            if "Final Answer" in response or "<Final Answer>" in response:
-                break
-            need_txt_ret = "Text Retrieval" in response
-            if need_txt_ret:
-                print("Start text retrieval...")
-                pattern = r'Text Retrieval[:\s"]*(.*?)(?=<|$)'
-                match = re.search(pattern, response, re.DOTALL)
-                query_txt = ""
-                if match:
-                    query_txt = match.group(1).strip()
-                    print(f"Query Text: {query_txt}")
-                if query_txt == "":
-                    print(f"Query_txt is None")
-                    search_results = self.retriever.search(input_prompt["question"], 3)
-                else:
-                    search_results = self.retriever.search([query_txt], 1)
-
-                search_text_list = []
-                for result in search_results:
-                    search_text_list.append(result['contents'])
-                search_texts = "\n\n".join(search_text_list)
-
-                if search_texts:
-                    contents = f"Contents of retrieved documents:\n{search_texts}"
-                else:
-                    contents = "No relevant information found."    
-                
-                print(f"Retrieved Contents:\n{contents}")
-                input_prompt["input_prompt"].append({'role': 'user', 'content': contents})
-
-                try:
-                    inputs = self.tokenizer.apply_chat_template(
-                        input_prompt['input_prompt'], 
-                        tokenize=False, # Important: We want a string back, not token IDs yet.
-                        add_generation_prompt=True 
-                    )
-                    response_dict = self.generator.generate(inputs)
+                    response_dict = self.generator.generate([input_prompt])
                     response = response_dict[0]
                     print(f"response: {response}")
                     input_prompt["input_prompt"].append({"role":"assistant", "content": response})
                 except Exception as e:
                     print("Inference error, hidden states ignored:", e)
-                    return None, response_dict, input_prompt["input_prompt"]
+                    return response_dict, input_prompt["input_prompt"]
             else:
                 conversation_num += 1
                 break
@@ -269,40 +73,76 @@ class OmniSearchQAPipeline(BasicMultiModalPipeline):
         else:
             print(f"Warning: reached end of agent loop for item {conversation_num} without a 'Final Answer'. returning last response")
             return response, response_dict, input_prompt
-    
+      
     def safe_write(self, file_path: str, data: dict):
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(data, ensure_ascii=False) + "\n")
             
-    def run(self, dataset, do_eval=True):
-        pred_answer_list = []
+    def run(self, dataset, do_eval=True, pred_process_func=None):
+        data_items_list = []
+        data_list = list(dataset)
         for item in dataset:
-            data_items = {
+            data_items_list.append({
+                "id": item.id,
                 "question": item.question,
-                "input_prompt": self.prompt_template.get_string_for_omni(item, self.prompt)
+                "answers": item.golden_answers,
+                "input_prompt": self.prompt_template.get_string(item, self.config)
                 }
+            )
+        pred_answer_list = []
+        context_list = []
 
-            result_data = {}
-            answer, response_dict, context = self.iterative_infer(data_items)
+        for i, input_prompt in enumerate(data_items_list):
+            answer, response_dict, context = self.iterative_infer(input_prompt)
+            remove_image_context = context['input_prompt'][2:]
+            pred_answer_list.append(answer)
+            context_list.append(remove_image_context)
+            # print(f"Answer: {answer}")
+        result_data = {}
+        for i, item in enumerate(data_list):
             result_data["id"] = item.id
             result_data["question"] = item.question
+            result_data["image_id"] = item.image_id
             result_data["ans_full"] = item.golden_answers
-            result_data["prediction"] = answer
-            pred_answer_list.append(answer)
-            result_data["context"] = context['input_prompt']
+            result_data["prediction"] = pred_answer_list[i]
+            result_data["context"] = context_list[i]
             file_path = os.path.join(self.config["save_dir"], "output.jsonl")
+            print(f"Saving to {file_path}")
             self.safe_write(file_path, result_data)
         
         dataset.update_output("pred", pred_answer_list)
-        dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=None)                 
+        dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
         return dataset
 
-    def run_with_question_only(self, question: str):
-        data_items = {
-            "question": question,
-            "input_prompt": self.prompt_template.get_string_for_omni_question_only(question, self.prompt)
-            }
-        answer, response_dict, context = self.iterative_infer(data_items)
-        return answer, context
+    def naive_run(self, dataset, do_eval=True, pred_process_func=None):        
+        input_prompts = []
+        items_list = list(dataset)
+        for item in dataset:
+            input_prompts.append({
+                "id": item.id,
+                "question": item.question,
+                "answers": item.golden_answers[0],
+                "input_prompt": self.prompt_template.get_string(item, self.config)
+                }
+            )
+        pred_answer_list = []
 
+        for i, input_prompt in enumerate(input_prompts):
+            pred_answer = self.generator.generate([input_prompt])[0]
+            pred_answer_list.append(pred_answer)
+        
+        result_data = {}
+        for i, item in enumerate(items_list):
+            result_data["id"] = item.id
+            result_data["question"] = item.question
+            result_data["image_id"] = item.image_id
+            result_data["ans_full"] = item.golden_answers
+            result_data["prediction"] = pred_answer_list[i]
+            file_path = os.path.join(self.config["save_dir"], "output.jsonl")
+            print(f"Saving to {file_path}")
+            self.safe_write(file_path, result_data)
+        
+        dataset.update_output("pred", pred_answer_list)
+        dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)                 
+        return dataset

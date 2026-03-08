@@ -15,7 +15,12 @@ class Item:
     def __init__(self, item_dict: Dict[str, Any]) -> None:
         self.id: Optional[str] = item_dict.get("id", None)
         self.question: Optional[str] = item_dict.get("question", None)
-        self.golden_answers: List[str] = item_dict.get("golden_answers", [])
+        golden_answers = item_dict.get("golden_answers", None)
+        if not golden_answers:
+            golden_answers = item_dict.get("answer_eval", None)
+        if not golden_answers:
+            golden_answers = item_dict.get("answer", [])
+        self.golden_answers: List[str] = golden_answers
         self.choices: List[str] = item_dict.get("choices", [])
         self.metadata: Dict[str, Any] = item_dict.get("metadata", {})
         self.output: Dict[str, Any] = item_dict.get("output", {})

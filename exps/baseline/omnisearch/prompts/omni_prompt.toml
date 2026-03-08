@@ -24,6 +24,9 @@ Extra notes:
 1. Do not use you own knowledge to analyse input image or answer questions
 2. After you give each <Search> action, STOP generation and WAIT for me to provide you with the answer to the sub-question, after receiving my answers, think about the next thought carefully.
 3. The answers to the questions can be found on the internet and are not private.
+4. The answer must be short, concise, but precise.
+
+Input Question: {question}
 '''
 
 

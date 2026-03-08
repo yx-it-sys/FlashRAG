@@ -99,7 +99,11 @@ class Config:
     def _init_device(self):
         gpu_id = self.final_config["gpu_id"]
         if gpu_id is not None:
-            os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+            if isinstance(gpu_id, (list, tuple)):
+                gpu_id_str = ",".join(str(gid).strip() for gid in gpu_id)
+            else:
+                gpu_id_str = str(gpu_id).strip()
+            os.environ["CUDA_VISIBLE_DEVICES"] = gpu_id_str
         try:
             # import pynvml 
             # pynvml.nvmlInit()

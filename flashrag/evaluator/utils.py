@@ -3,6 +3,11 @@ import string
 
 
 def normalize_answer(s):
+    if s is None:
+        s = ""
+    elif not isinstance(s, str):
+        s = str(s)
+
     def remove_articles(text):
         return re.sub(r"\b(a|an|the)\b", " ", text)
 
