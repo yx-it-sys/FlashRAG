@@ -52,12 +52,12 @@ method2index:
   bge-m3: ~
 
 # ---- Environment Settings ----
-gpu_id: ["0"]
+gpu_id: ["0","1"]
 dataset_name: "infoseek_val"
 split: ["validation"]
 
 # Sampling configs
-test_sample_num: 500
+test_sample_num: 1600
 random_sample: True
 save_intermediate_data: True
 save_note: "experiment"
@@ -103,19 +103,22 @@ rerank_batch_size: 256
 framework: vllm # supports: 'hf', 'vllm', 'fschat'
 generator_model: "Qwen2.5-VL-7B-Instruct"
 generator_model_path: "/mnt/data/you/modelscope/Qwen2.5-VL-7B-Instruct"
-generator_max_input_len: 4096
-generator_batch_size: 1
+generator_max_input_len: 2048
+generator_batch_size: 4
 generation_params:
   do_sample: False
-  max_tokens: 4096
+  max_tokens: 1024
   temperature: 0.1
   top_p: 1.0
 
 # vLLM-specific settings
-vllm_gpu_memory_utilization: 0.88
+vllm_gpu_memory_utilization: 0.88  # Reduced from 0.88 to be more conservative
 tensor_parallel_size: 1
-max_model_len: 24576
+max_model_len: 20000
 vllm_enforce_eager: true
+vllm_max_num_batched_tokens: 4096
+vllm_max_num_seqs: 256
+vllm_max_num_seqs_kv: 256
 
 # ---- Evaluation Settings ----
 metrics: ["em", "f1", "acc", "precision", "recall", "input_tokens", "gpt"]

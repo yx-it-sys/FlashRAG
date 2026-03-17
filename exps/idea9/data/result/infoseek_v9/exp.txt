@@ -1,0 +1,1 @@
+v8版本caption Retrieval路径在mm_pipeline.py中写死了，成v6了，乱套了。于是废弃。

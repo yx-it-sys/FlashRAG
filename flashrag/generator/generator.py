@@ -254,9 +254,10 @@ class VLLMGenerator(BaseGenerator):
                 input_list,
                 sampling_params,
                 lora_request=LoRARequest("lora_module", 1, self.lora_path),
+                use_tqdm=False,
             )
         else:
-            outputs = self.model.generate(input_list, sampling_params)
+            outputs = self.model.generate(input_list, sampling_params, use_tqdm=False)
 
         if return_raw_output:
             base_output = outputs

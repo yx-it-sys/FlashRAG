@@ -27,7 +27,7 @@ method2index:
     "image": "path/to/image_index"
 
 # ------------------------------------------------Environment Settings------------------------------------------------#
-gpu_id: ["0", "1"]
+gpu_id: ["0"]
 dataset_name: "infoseek_val"
 split: ["validation"]
 

@@ -12,7 +12,6 @@ import time
 from itertools import islice
 
 
-
 class BasicMultiModalPipeline:
     """Base object of all multimodal pipelines. A pipeline includes the overall process of RAG.
     If you want to implement a pipeline, you should inherit this class.
@@ -253,9 +252,11 @@ class MMCluePipeline(BasicMultiModalPipeline):
 
     def get_clue(self, dataset):
         input_prompts = [
-            self.visual_clue_prompt_template.get_string_for_visual_clues(item) for item in dataset
-        ]   
+            self.visual_clue_prompt_template.get_string_no_retrieval(item) for item in dataset
+        ]
+        print("Generating clues for dataset...")   
         raw_clue_list = self.generator.generate(input_prompts)
+        print("Raw clues generated. Parsing clues...")
         parsed_clue_list = [self._parse_json_string(c) for c in raw_clue_list]
         clue_jsonl_rows = []
         perf_stats = self.generator.get_performance_stats(reset=True)
@@ -272,15 +273,12 @@ class MMCluePipeline(BasicMultiModalPipeline):
                 
         return parsed_clue_list
     
-    def caption_retrieval(self, dataset):
+    def caption_retrieval(self, dataset, image_phase_dir, caption_phase_dir):
         if self.retriever is None:
             raise ValueError("Retriever is not provided for caption retrieval.")
         if self.generator is None:
             raise ValueError("Generator is not provided for caption retrieval.")
 
-        output_dir = self._get_output_dir()
-        image_phase_dir = os.path.join("data/result/infoseek_v6", "phase2_image_retrieval")
-        caption_phase_dir = os.path.join("data/result/infoseek_v6", "phase2_image_caption_retrieval")
         os.makedirs(image_phase_dir, exist_ok=True)
         os.makedirs(caption_phase_dir, exist_ok=True)
 
@@ -353,11 +351,15 @@ class MMCluePipeline(BasicMultiModalPipeline):
             # Backward compatibility: normalize mixed legacy formats to {id, text}.
             normalized_docs = []
             existing_set = set()
+            def _text_dedup_key(text):
+                # Dedup by actual document text instead of corpus id.
+                return str(text or '').strip()
+
             for doc in existing_docs_dict:
                 doc_id = doc.get('id')
                 doc_text = doc.get('text', '')
 
-                dedup_key = str(doc_id)
+                dedup_key = _text_dedup_key(doc_text)
                 if dedup_key in existing_set:
                     continue
                 existing_set.add(dedup_key)
@@ -366,7 +368,7 @@ class MMCluePipeline(BasicMultiModalPipeline):
             for doc in retrieval_texts:
                 doc_id = doc.get('id')
                 doc_text = doc.get('text', '')
-                dedup_key =  str(doc_id)
+                dedup_key = _text_dedup_key(doc_text)
                 if dedup_key in existing_set:
                     continue
                 existing_set.add(dedup_key)
@@ -408,14 +410,11 @@ class MMCluePipeline(BasicMultiModalPipeline):
                 f.write('\n')
         return retrieval_rows
 
-    def reranking(self, clue_path, retrieval_results_path, total_budget=1000):
+    def quadric_reranking(self, clue_path, retrieval_results_path, total_budget=1000):
         stats = {}  # 用于存储性能数据
         overall_start = time.time()
-        cluster_doc_topk = self._get_int_config("phase3_cluster_doc_topk", 2)
-        early_stop_topk = self._get_int_config("phase3_early_stop_topk", 5)
-        preference_threshold = float(self.config["phase3_preference_threshold"])
 
-        # 1. 数据读取阶段 (仅读取前10行)
+        # 1. 数据读取阶段
         io_start = time.time()
         with open(clue_path, 'r', encoding='utf-8') as f:
             clue_data = [json.loads(line) for line in f]
@@ -425,201 +424,155 @@ class MMCluePipeline(BasicMultiModalPipeline):
                 row = json.loads(line)
                 retrieval_data[row['data_id']] = row
 
-        # with open(clue_path, 'r', encoding='utf-8') as f:
-        #     clue_data = [json.loads(line) for line in islice(f, 1)]
-        # with open(retrieval_results_path, 'r', encoding='utf-8') as f:
-        #     retrieval_data = {json.loads(line)['data_id']: json.loads(line) for line in islice(f, 1)}
-        
         stats['io_read_time'] = time.time() - io_start
 
         reranked_results = []
-        processing_times = [] # 记录单条数据的处理时间
-        total_full_comparisons = 0
-        total_actual_comparisons = 0
-        total_early_stopped_docs = 0
+        vote_logs = []
+        processing_times = []
+        total_comparisons = 0
 
-        # 2. 核心重排序阶段
+        # 2. 核心重排序阶段 (无聚类、无剪枝)
         for item in clue_data:
             item_start = time.time()
-            
+
             data_id = item['data_id']
             clues = item['clue']
             if not clues:
                 print(f"Warning: No clues found for data_id {data_id}. Skipping reranking.")
                 continue
+
             retrieval_row = retrieval_data.get(data_id, {})
             retrieval_results = retrieval_row.get('retrieval_results')
             if not retrieval_results:
                 retrieval_results = retrieval_row.get('caption_retrieval_results', [])
-            
+
             if not retrieval_results:
                 print(f"Warning: No retrieval results found for data_id {data_id}. Skipping reranking.")
                 continue
 
             # --- 计算逻辑开始 ---
-            # Doc-level early stopping: when a doc cannot reach current top-k even with max remaining gain,
-            # stop further clue->doc comparisons for that doc.
             num_docs = len(retrieval_results)
             num_clues = len(clues)
-            total_full_comparisons += num_docs * num_clues
+            total_comparisons += num_docs * num_clues
 
-            importances = [float(c.get('importance', 1.0)) for c in clues]
-            total_importance = sum(importances) + 1e-8
-            clue_budget_weights = [
-                np.sqrt(max(total_budget * (imp / total_importance), 0.0)) for imp in importances
-            ]
+            # 初始化评分矩阵: num_docs x num_clues
+            score_matrix = np.zeros((num_clues, num_docs), dtype=np.float32)
 
-            # Remaining theoretical max gain upper bound from clue i+1 ... end
-            remaining_gain_ub = np.zeros(num_clues + 1, dtype=np.float32)
-            for idx in range(num_clues - 1, -1, -1):
-                remaining_gain_ub[idx] = remaining_gain_ub[idx + 1] + clue_budget_weights[idx]
-
-            doc_scores = np.zeros(num_docs, dtype=np.float32)
-            active_mask = np.ones(num_docs, dtype=bool)
-            item_actual_comparisons = 0
-            item_early_stopped_docs = 0
-
+            # 矩阵计算: 批量计算所有线索对文档的NLI评分
             for clue_idx, clue in enumerate(clues):
-                if not np.any(active_mask):
-                    break
-
                 clue_text = clue.get('clue', '')
-                row_scores = np.zeros(num_docs, dtype=np.float32)
-                active_indices = np.where(active_mask)[0]
+                for doc_idx, doc in enumerate(retrieval_results):
+                    logit = self.llm_nli_judge(clue_text, doc['text'])
+                    score = 1 / (1 + np.exp(-logit))
+                    score_matrix[clue_idx, doc_idx] = score
 
-                for j in active_indices:
-                    # score = self.cosine_similarity(clue_text, retrieval_results[j])
-                    score = self.llm_nli_judge(clue_text, retrieval_results[j]['text'])
-                    item_actual_comparisons += 1
-                    if preference_threshold > 0.0 and score < preference_threshold:
-                        continue
-                    row_scores[j] = score
+            # NEW: Entropy-QV approach for budget weight allocation
+            # ORIGINAL (annotated):
+            # importances = [float(c.get('importance', 1.0)) for c in clues]
+            # total_importance = sum(importances) + 1e-8
+            # clue_budget_weights = np.array([
+            #     np.sqrt(max(total_budget * (imp / total_importance), 0.0)) for imp in importances
+            # ], dtype=np.float32)
+            importances = [float(c.get('importance', 1.0)) for c in clues]
 
-                denominator = np.sqrt(np.sum(np.square(row_scores))) + 1e-8
-                if denominator > 0.0:
-                    row_votes = (np.square(row_scores) * clue_budget_weights[clue_idx]) / denominator
-                    doc_scores += row_votes
+            # 1. Normalize each clue's scores into probability distribution
+            # P_{i,j} = S_{i,j} / sum(S_{i,m})
+            row_sums = np.sum(score_matrix, axis=1, keepdims=True) + 1e-8
+            probability_distributions = score_matrix / row_sums  # (num_clues, num_docs)
 
-                effective_k = min(early_stop_topk, num_docs)
-                if effective_k > 0:
-                    kth_score = float(np.partition(doc_scores, -effective_k)[-effective_k])
-                    future_ub = float(remaining_gain_ub[clue_idx + 1])
-                    cannot_reach_topk = (doc_scores + future_ub) < kth_score
-                    newly_stopped = cannot_reach_topk & active_mask
-                    if np.any(newly_stopped):
-                        active_mask[newly_stopped] = False
-                        item_early_stopped_docs += int(np.sum(newly_stopped))
+            # 2. Calculate Shannon entropy for each clue
+            # H(c_i) = -sum(P_{i,j} * log(P_{i,j}))
+            entropy_values = -np.sum(probability_distributions * np.log(probability_distributions + 1e-8), axis=1)
 
-            total_actual_comparisons += item_actual_comparisons
-            total_early_stopped_docs += item_early_stopped_docs
+            # 3. Calculate discriminative weight
+            # w_i^{dist} = 1 - H(c_i) / log(k)
+            max_entropy = np.log(num_docs)  # log(k) where k = num_docs
+            discriminative_weights = 1 - (entropy_values / max_entropy)
 
-            # Title clustering process (regex-based parsing)
-            title_cluster_scores = {}
-            title_cluster_best_doc_idx = {}
-            title_cluster_doc_indices = {}
-            for j, doc in enumerate(retrieval_results):
-                title = self._extract_doc_title(doc)
-                title_cluster_scores[title] = title_cluster_scores.get(title, 0.0) + float(doc_scores[j])
-                if title not in title_cluster_doc_indices:
-                    title_cluster_doc_indices[title] = []
-                title_cluster_doc_indices[title].append(j)
-                if title not in title_cluster_best_doc_idx or float(doc_scores[j]) > float(doc_scores[title_cluster_best_doc_idx[title]]):
-                    title_cluster_best_doc_idx[title] = j
+            # 4. Calculate revised budget allocation
+            # \hat{I}_i = (r_i * w_i^{dist}) / sum(r_m * w_m^{dist}) * I_{total}
+            # weighted_importances = np.array(importances) * discriminative_weights
+            weighted_importances = discriminative_weights
+            total_weighted_importance = np.sum(weighted_importances) + 1e-8
+            clue_budget_weights = np.array([
+                np.sqrt(max(total_budget * (wi / total_weighted_importance), 0.0))
+                for wi in weighted_importances
+            ], dtype=np.float32)
 
-            sorted_title_clusters = sorted(
-                title_cluster_scores.items(),
-                key=lambda x: x[1],
-                reverse=True
+            # 矩阵计算: 标准化并加权
+            # 对每个线索进行标准化: (score * weight) / sqrt(sum(score^2))
+            row_sq_scores = np.square(score_matrix)  # (num_clues, num_docs)
+            row_norms = np.sqrt(np.sum(row_sq_scores, axis=1, keepdims=True)) + 1e-8  # (num_clues, 1)
+            weighted_scores = (score_matrix * clue_budget_weights[:, np.newaxis]) / row_norms  # (num_clues, num_docs)
+
+            # 累加所有线索的得分
+            doc_scores = np.sum(weighted_scores, axis=0)  # (num_docs,)
+
+            # 获取线索文本列表
+            clue_texts = [c.get('clue', '') for c in clues]
+
+            # 按得分排序文档
+            ranked_indices = sorted(
+                range(num_docs),
+                key=lambda idx: (float(doc_scores[idx]), -idx),
+                reverse=True,
             )
-            best_cluster_title = sorted_title_clusters[0][0] if sorted_title_clusters else ""
 
-            # Keep all clusters; select top-k docs inside each cluster
-            cluster_results = []
+            # 创建重排序结果
             reranked_flat_results = []
-            for title, score in sorted_title_clusters:
-                cluster_doc_indices = title_cluster_doc_indices.get(title, [])
-                cluster_doc_indices = sorted(
-                    cluster_doc_indices,
-                    key=lambda idx: float(doc_scores[idx]),
-                    reverse=True,
-                )
-
-                if cluster_doc_topk > 0:
-                    selected_indices = cluster_doc_indices[:cluster_doc_topk]
-                else:
-                    selected_indices = cluster_doc_indices
-
-                cluster_docs = [
-                    {
-                        'text': retrieval_results[idx],
-                        'title': self._extract_doc_title(retrieval_results[idx]),
-                        'score': float(doc_scores[idx])
-                    }
-                    for idx in selected_indices
-                ]
-
-                cluster_results.append({
-                    'title': title,
-                    'score': float(score),
-                    'docs': cluster_docs,
+            for rank_idx, doc_idx in enumerate(ranked_indices, 1):
+                doc = retrieval_results[doc_idx]
+                score = float(doc_scores[doc_idx])
+                reranked_flat_results.append({
+                    'text': doc,
+                    'title': self._extract_doc_title(doc),
+                    'score': score,
                 })
-                reranked_flat_results.extend(cluster_docs)
 
-            best_cluster_doc_idx = title_cluster_best_doc_idx.get(best_cluster_title)
-            # --- 计算逻辑结束 ---
-            
+                # 创建投票日志 (与 naive_reranking 格式一致)
+                vote_logs.append({
+                    'data_id': data_id,
+                    'image_id': item.get('image_id'),
+                    'text_query': item.get('question'),
+                    'clue': clue_texts,
+                    'doc': doc,
+                    'vote_count': score,  # 使用得分作为投票数
+                    'rank': rank_idx,
+                    'clue_scores': [float(s) for s in score_matrix[:, doc_idx]],  # 每个线索的原始评分
+                })
 
             reranked_results.append({
                 'data_id': data_id,
                 'image_id': item.get('image_id'),
-                'top_title_cluster': best_cluster_title,
-                'top_cluster_best_doc': {
-                    'text': retrieval_results[best_cluster_doc_idx],
-                    'title': self._extract_doc_title(retrieval_results[best_cluster_doc_idx]),
-                    'score': float(doc_scores[best_cluster_doc_idx])
-                } if best_cluster_doc_idx is not None else None,
-                'title_clusters': [
-                    {
-                        'title': title,
-                        'score': float(score)
-                    } for title, score in sorted_title_clusters
-                ],
-                'cluster_results': cluster_results,
                 'reranked_results': reranked_flat_results,
             })
-            
-            processing_times.append(time.time() - item_start)
 
-        # 统计计算阶段数据
+            processing_times.append(time.time() - item_start)
+            # --- 计算逻辑结束 ---
+
+        # 3. 统计数据
         stats['avg_item_processing_time'] = np.mean(processing_times) if processing_times else 0
         stats['total_processing_time'] = sum(processing_times)
         stats['num_items_processed'] = len(reranked_results)
-        stats['full_comparisons'] = int(total_full_comparisons)
-        stats['actual_comparisons'] = int(total_actual_comparisons)
-        stats['saved_comparisons'] = int(max(total_full_comparisons - total_actual_comparisons, 0))
-        stats['comparison_reduction_ratio'] = float(
-            (max(total_full_comparisons - total_actual_comparisons, 0) / total_full_comparisons)
-            if total_full_comparisons > 0 else 0.0
-        )
-        stats['early_stopped_docs'] = int(total_early_stopped_docs)
+        stats['total_comparisons'] = int(total_comparisons)
 
-        # 3. 保存结果阶段
+        # 4. 保存结果
         save_start = time.time()
-        # 保存重排序结果
-        self._save_phase_jsonl('phase3_reranking', reranked_results, file_name='reranked_results.jsonl')
-                
+        self._save_phase_jsonl('phase3_quadric_reranking', reranked_results, file_name='reranked_results.jsonl')
+        self._save_phase_jsonl('phase3_quadric_reranking_vote_logs', vote_logs, file_name='naive_vote_logs.jsonl')
+
         stats['io_write_time'] = time.time() - save_start
         stats['overall_total_time'] = time.time() - overall_start
 
-        # 4. 保存性能统计到 JSONL
-        stats_path = self._save_phase_jsonl('phase3_reranking_stats', stats, file_name='performance_stats.jsonl', append=True)
+        # 5. 保存性能统计
+        stats_path = self._save_phase_jsonl('phase3_quadric_reranking_stats', stats, file_name='performance_stats.jsonl', append=True)
 
-        print(f"Reranking complete. Stats saved to {stats_path}")
+        print(f"Quadric reranking complete. Stats saved to {stats_path}")
         return reranked_results
         
-    def naive_reranking(self, clue_path, retrieval_results_path):
+    def my_reranking_v1(self, clue_path, retrieval_results_path):
         # Naive reranking: for each clue, ask the LLM to vote Yes/No for each retrieved doc,
-        # then rank docs by accumulated votes.
+        # then rank docs by accumulated votes, and cluster by title.
         stats = {}
 
         with open(clue_path, 'r', encoding='utf-8') as f:
@@ -635,7 +588,7 @@ class MMCluePipeline(BasicMultiModalPipeline):
         processing_times = []
         total_binary_judges = 0
 
-        for item in clue_data:
+        for item in tqdm(clue_data, desc="Processing clues"):
             item_start = time.time()
 
             data_id = item.get('data_id')
@@ -677,13 +630,226 @@ class MMCluePipeline(BasicMultiModalPipeline):
             for clue_text in clue_texts:
                 clue_votes = []
                 for doc_idx, doc in enumerate(retrieval_results):
-                    yes_prob = self.llm_nli_judge(clue_text, doc['text'])
-                    vote_yes = yes_prob >= 0.5
-                    vote = 1 if vote_yes else 0
-                    doc_preview = str(doc).replace("\n", " ")[:120]
-                    print(
-                        f"Naive LLM Judge - Clue: {clue_text[:100]}, DocIdx: {doc_idx}, Doc: {doc_preview}, YesProb: {yes_prob:.4f}, Vote: {'Yes' if vote_yes else 'No'}"
+                    output = self.llm_nli_judge_binary(clue_text, doc['text'])
+                    vote = 1 if output == 'Yes' else -0.1
+                    clue_votes.append(vote)
+
+                if len(clue_votes) != len(retrieval_results):
+                    raise RuntimeError(
+                        f"Naive clue vote size mismatch: got {len(clue_votes)}, expected {len(retrieval_results)}"
                     )
+                doc_votes += np.asarray(clue_votes, dtype=np.float32)
+                total_binary_judges += len(clue_votes)
+
+            # Cluster documents by title and rank clusters by accumulated votes.
+            title_clusters = self._cluster_documents_by_title(retrieval_results, doc_votes)
+            reranked_flat_results = self._create_reranked_results_from_clusters(title_clusters)
+            reranked_flat_results = self._apply_listwise_tie_breaks(text_query, image_id, reranked_flat_results)
+
+            for rank_idx, doc_info in enumerate(reranked_flat_results):
+                doc_text = doc_info['text']
+                vote_count = float(doc_info['score'])
+                reranked_flat_results[rank_idx] = {
+                    'text': doc_text,
+                    'title': str(doc_info.get('title', '')),
+                    'score': vote_count,
+                }
+                vote_logs.append({
+                    'data_id': data_id,
+                    'image_id': image_id,
+                    'text_query': text_query,
+                    'clue': clue_texts,
+                    'doc': doc_text,
+                    'vote_count': vote_count,
+                    'rank': rank_idx + 1,
+                })
+
+            reranked_results.append({
+                'data_id': data_id,
+                'image_id': image_id,
+                'reranked_results': reranked_flat_results,
+            })
+
+            processing_times.append(time.time() - item_start)
+
+        stats['total_binary_judges'] = int(total_binary_judges)
+
+        self._save_phase_jsonl('phase3_reranking', reranked_results, file_name='reranked_results.jsonl')
+        self._save_phase_jsonl('phase3_reranking_vote_logs', vote_logs, file_name='naive_vote_logs.jsonl')
+
+        stats_path = self._save_phase_jsonl('phase3_reranking_stats', stats, file_name='performance_stats.jsonl', append=True)
+        print(f"Naive reranking complete. Stats saved to {stats_path}")
+        return reranked_results
+
+    def my_reranking_v0(self, clue_path, retrieval_results_path):
+        # Naive reranking: for each clue, ask the LLM to vote Yes/No for each retrieved doc,
+        # then rank docs by accumulated votes, and cluster by title.
+        stats = {}
+
+        with open(clue_path, 'r', encoding='utf-8') as f:
+            clue_data = [json.loads(line) for line in f]
+        with open(retrieval_results_path, 'r', encoding='utf-8') as f:
+            retrieval_data = {}
+            for line in f:
+                row = json.loads(line)
+                retrieval_data[row['data_id']] = row
+
+        reranked_results = []
+        vote_logs = []
+        processing_times = []
+        total_binary_judges = 0
+
+        for item in tqdm(clue_data, desc="Processing clues"):
+            item_start = time.time()
+
+            data_id = item.get('data_id')
+            image_id = item.get('image_id')
+            raw_clues = item.get('clue', [])
+            if not isinstance(raw_clues, list) or len(raw_clues) == 0:
+                print(f"Warning: No clues found for data_id {data_id}. Skipping reranking.")
+                continue
+
+            retrieval_row = retrieval_data.get(data_id, {})
+            retrieval_results = retrieval_row.get('retrieval_results')
+            if not retrieval_results:
+                retrieval_results = retrieval_row.get('caption_retrieval_results', [])
+            if not isinstance(retrieval_results, list) or len(retrieval_results) == 0:
+                print(f"Warning: No retrieval results found for data_id {data_id}. Skipping reranking.")
+                continue
+
+            # Normalize clues into plain non-empty strings.
+            clue_texts = []
+            for clue in raw_clues:
+                if isinstance(clue, dict):
+                    clue_text = clue.get('clue', '')
+                else:
+                    clue_text = clue
+                clue_text = str(clue_text).strip() if clue_text is not None else ''
+                if clue_text:
+                    clue_texts.append(clue_text)
+
+            if not clue_texts:
+                print(f"Warning: Empty clue texts for data_id {data_id}. Skipping reranking.")
+                continue
+
+            doc_votes = np.zeros(len(retrieval_results), dtype=np.float32)
+            text_query = item.get('question')
+            if text_query is None:
+                text_query = retrieval_row.get('text_query')
+
+            # Process one clue at a time; docs are sent to vLLM in mini-batches.
+            for clue_text in clue_texts:
+                clue_votes = []
+                for doc_idx, doc in enumerate(retrieval_results):
+                    output = self.llm_nli_judge_binary(clue_text, doc['text'])
+                    vote = 1 if output == 'Yes' else 0.0
+                    clue_votes.append(vote)
+
+                if len(clue_votes) != len(retrieval_results):
+                    raise RuntimeError(
+                        f"Naive clue vote size mismatch: got {len(clue_votes)}, expected {len(retrieval_results)}"
+                    )
+                doc_votes += np.asarray(clue_votes, dtype=np.float32)
+                total_binary_judges += len(clue_votes)
+
+            # Cluster documents by title and rank clusters by accumulated votes.
+            title_clusters = self._cluster_documents_by_title(retrieval_results, doc_votes)
+            reranked_flat_results = self._create_reranked_results_from_clusters(title_clusters)
+
+            for rank_idx, doc_info in enumerate(reranked_flat_results):
+                doc_text = doc_info['text']
+                vote_count = float(doc_info['score'])
+                reranked_flat_results[rank_idx] = {
+                    'text': doc_text,
+                    'title': str(doc_info.get('title', '')),
+                    'score': vote_count,
+                }
+                vote_logs.append({
+                    'data_id': data_id,
+                    'image_id': image_id,
+                    'text_query': text_query,
+                    'clue': clue_texts,
+                    'doc': doc_text,
+                    'vote_count': vote_count,
+                    'rank': rank_idx + 1,
+                })
+
+            reranked_results.append({
+                'data_id': data_id,
+                'image_id': image_id,
+                'reranked_results': reranked_flat_results,
+            })
+
+            processing_times.append(time.time() - item_start)
+
+        stats['total_binary_judges'] = int(total_binary_judges)
+
+        self._save_phase_jsonl('phase3_reranking', reranked_results, file_name='reranked_results.jsonl')
+        self._save_phase_jsonl('phase3_reranking_vote_logs', vote_logs, file_name='naive_vote_logs.jsonl')
+
+        stats_path = self._save_phase_jsonl('phase3_reranking_stats', stats, file_name='performance_stats.jsonl', append=True)
+        print(f"Naive reranking complete. Stats saved to {stats_path}")
+        return reranked_results
+
+    def naive_reranking_wo_cluster(self, clue_path, retrieval_results_path):
+        # Naive reranking without clustering: score each document independently.
+        stats = {}
+
+        with open(clue_path, 'r', encoding='utf-8') as f:
+            clue_data = [json.loads(line) for line in f]
+        with open(retrieval_results_path, 'r', encoding='utf-8') as f:
+            retrieval_data = {}
+            for line in f:
+                row = json.loads(line)
+                retrieval_data[row['data_id']] = row
+
+        reranked_results = []
+        vote_logs = []
+        processing_times = []
+        total_binary_judges = 0
+
+        for item in tqdm(clue_data, desc="Processing clues"):
+            item_start = time.time()
+
+            data_id = item.get('data_id')
+            image_id = item.get('image_id')
+            raw_clues = item.get('clue', [])
+            if not isinstance(raw_clues, list) or len(raw_clues) == 0:
+                print(f"Warning: No clues found for data_id {data_id}. Skipping reranking.")
+                continue
+
+            retrieval_row = retrieval_data.get(data_id, {})
+            retrieval_results = retrieval_row.get('retrieval_results')
+            if not retrieval_results:
+                retrieval_results = retrieval_row.get('caption_retrieval_results', [])
+            if not isinstance(retrieval_results, list) or len(retrieval_results) == 0:
+                print(f"Warning: No retrieval results found for data_id {data_id}. Skipping reranking.")
+                continue
+
+            clue_texts = []
+            for clue in raw_clues:
+                if isinstance(clue, dict):
+                    clue_text = clue.get('clue', '')
+                else:
+                    clue_text = clue
+                clue_text = str(clue_text).strip() if clue_text is not None else ''
+                if clue_text:
+                    clue_texts.append(clue_text)
+
+            if not clue_texts:
+                print(f"Warning: Empty clue texts for data_id {data_id}. Skipping reranking.")
+                continue
+
+            doc_votes = np.zeros(len(retrieval_results), dtype=np.float32)
+            text_query = item.get('question')
+            if text_query is None:
+                text_query = retrieval_row.get('text_query')
+
+            for clue_text in clue_texts:
+                clue_votes = []
+                for doc in retrieval_results:
+                    output = self.llm_nli_judge_binary(clue_text, doc['text'])
+                    vote = 1 if output == 'Yes' else 0
                     clue_votes.append(vote)
 
                 if len(clue_votes) != len(retrieval_results):
@@ -701,7 +867,7 @@ class MMCluePipeline(BasicMultiModalPipeline):
 
             reranked_flat_results = []
             for rank_idx, doc_idx in enumerate(ranked_indices):
-                doc_text = retrieval_results[doc_idx]
+                doc_text = retrieval_results[doc_idx]['text']
                 vote_count = float(doc_votes[doc_idx])
                 reranked_flat_results.append({
                     'text': doc_text,
@@ -732,9 +898,238 @@ class MMCluePipeline(BasicMultiModalPipeline):
         self._save_phase_jsonl('phase3_reranking_vote_logs', vote_logs, file_name='naive_vote_logs.jsonl')
 
         stats_path = self._save_phase_jsonl('phase3_reranking_stats', stats, file_name='performance_stats.jsonl', append=True)
-        print(f"Naive reranking complete. Stats saved to {stats_path}")
+        print(f"Naive reranking (wo cluster) complete. Stats saved to {stats_path}")
         return reranked_results
-        
+
+    def _cluster_documents_by_title(self, retrieval_results, doc_votes):
+        """Cluster documents by title and sum voting counts for documents with the same title."""
+        title_clusters = {}
+
+        for doc_idx, doc in enumerate(retrieval_results):
+            title = self._extract_doc_title(doc['text'])
+            if title not in title_clusters:
+                title_clusters[title] = {
+                    'title': title,
+                    'docs': [],
+                    'total_votes': 0.0
+                }
+
+            title_clusters[title]['docs'].append({
+                'text': doc['text'],
+                'vote': doc_votes[doc_idx]
+            })
+            title_clusters[title]['total_votes'] += doc_votes[doc_idx]
+
+        return list(title_clusters.values())
+
+    def _create_reranked_results_from_clusters(self, title_clusters):
+        """Create final reranked results by sorting clusters and splicing their documents."""
+        # Sort clusters by total votes (descending)
+        sorted_clusters = sorted(
+            title_clusters,
+            key=lambda cluster: cluster['total_votes'],
+            reverse=True
+        )
+
+        reranked_results = []
+        for cluster in sorted_clusters:
+            # Sort documents within each cluster by their individual votes (descending)
+            sorted_docs = sorted(
+                cluster['docs'],
+                key=lambda doc_info: doc_info['vote'],
+                reverse=True
+            )
+
+            title = str(cluster.get('title', '')).strip()
+
+            def _strip_same_title_prefix(doc_text, cluster_title):
+                text = str(doc_text or '').strip()
+                if not text:
+                    return ''
+                if not cluster_title:
+                    return text
+
+                escaped_title = re.escape(cluster_title)
+                # Remove leading "<title> - " (allow flexible spaces around '-').
+                pattern = rf'^\s*{escaped_title}\s*-\s*'
+                return re.sub(pattern, '', text, count=1, flags=re.IGNORECASE).strip()
+
+            cleaned_parts = []
+            for doc_info in sorted_docs:
+                body = _strip_same_title_prefix(doc_info.get('text', ''), title)
+                if body:
+                    cleaned_parts.append(body)
+
+            merged_body = "\n\n".join(cleaned_parts)
+            merged_text = f"{title} - {merged_body}" if merged_body else f"{title}"
+
+            # Keep one row per cluster; score is the cluster total vote sum.
+            reranked_results.append({
+                'text': merged_text,
+                'title': title,
+                'score': float(cluster.get('total_votes', 0.0))
+            })
+
+        return reranked_results
+
+    def _get_listwise_cfg(self):
+        cfg = self.config if isinstance(self.config, dict) else {}
+        window_size = int(cfg.get("listwise_window_size", 4))
+        step_size = int(cfg.get("listwise_step_size", 2))
+        num_repeat = int(cfg.get("listwise_num_repeat", 5))
+        max_doc_words = int(cfg.get("listwise_doc_max_words", 200))
+
+        if window_size <= 1:
+            window_size = 2
+        if step_size <= 0:
+            step_size = 1
+        if num_repeat <= 0:
+            num_repeat = 1
+
+        return {
+            'window_size': window_size,
+            'step_size': step_size,
+            'num_repeat': num_repeat,
+            'max_doc_words': max_doc_words,
+        }
+
+    def _clean_listwise_response_to_indices(self, response_text):
+        cleaned = []
+        for ch in str(response_text or ''):
+            cleaned.append(ch if ch.isdigit() else ' ')
+        tokens = "".join(cleaned).split()
+        seen = set()
+        indices = []
+        for tok in tokens:
+            try:
+                idx = int(tok) - 1
+            except Exception:
+                continue
+            if idx not in seen:
+                seen.add(idx)
+                indices.append(idx)
+        return indices
+
+    def _receive_listwise_permutation(self, local_ranking, permutation_text, rank_start, rank_end):
+        indices = self._clean_listwise_response_to_indices(permutation_text)
+        cut_range = list(local_ranking[rank_start:rank_end])
+        original = list(range(len(cut_range)))
+        indices = [i for i in indices if i in original]
+        indices.extend([i for i in original if i not in indices])
+        for pos, src_i in enumerate(indices):
+            local_ranking[rank_start + pos] = cut_range[src_i]
+        return local_ranking
+
+    def _build_listwise_prompt(self, query, image_id, docs, max_doc_words):
+        image_query_path = os.path.join(self.config['dataset_path'], 'images', f'{image_id}.jpg')
+        question_image = Image.open(image_query_path).convert('RGB')
+
+        lines = [
+            "You are RankGPT, an intelligent assistant that can rank passages based on their relevancy to the query.",
+            "",
+            f"I will provide {len(docs)} passages with identifiers [1] ...[{len(docs)}].",
+            f"Query: {query}",
+            "",
+        ]
+        for i, doc in enumerate(docs, 1):
+            doc_text = str(doc.get('text', '') if isinstance(doc, dict) else doc)
+            if max_doc_words > 0:
+                doc_text = ' '.join(doc_text.split()[:max_doc_words])
+            lines.append(f"[{i}] {doc_text}")
+        lines.extend([
+            "",
+            "Rank the passages by relevance to the query in descending order.",
+            "Output format strictly: [x] > [y] > ... > [N]",
+            "Only output identifiers. Do not explain.",
+        ])
+
+        return [{
+            "role": "user",
+            "content": [
+                {'type': 'image', 'image': question_image},
+                {'type': 'text', 'text': "\n".join(lines)},
+            ],
+        }]
+
+    def _listwise_compare(self, query, image_id, docs, max_doc_words):
+        if self.generator is None:
+            raise ValueError("Generator is required for listwise reranking.")
+
+        self.total_compare = getattr(self, 'total_compare', 0) + 1
+        prompt = self._build_listwise_prompt(query, image_id, docs, max_doc_words)
+        tokenizer = getattr(self, 'tokenizer', None)
+        if tokenizer is None:
+            tokenizer = getattr(self.generator, 'tokenizer', None)
+
+        if tokenizer is not None:
+            try:
+                self.total_prompt_tokens = getattr(self, 'total_prompt_tokens', 0) + len(
+                    tokenizer.encode(str(prompt), add_special_tokens=False)
+                )
+            except Exception:
+                pass
+
+        outputs = self.generator.generate([prompt])
+        if not outputs:
+            return ""
+
+        output_text = outputs[0] if isinstance(outputs[0], str) else str(outputs[0])
+        if tokenizer is not None:
+            try:
+                self.total_completion_tokens = getattr(self, 'total_completion_tokens', 0) + len(
+                    tokenizer.encode(output_text, add_special_tokens=False)
+                )
+            except Exception:
+                pass
+        return output_text
+
+    def _apply_listwise_reranking(self, query, image_id, ranking):
+        ranking = list(ranking)
+        if len(ranking) <= 1:
+            return ranking
+
+        cfg = self._get_listwise_cfg()
+        for _ in range(cfg['num_repeat']):
+            end_pos = len(ranking)
+            while end_pos > 0:
+                start_pos = max(end_pos - cfg['window_size'], 0)
+                if end_pos - start_pos <= 1:
+                    break
+                window_docs = ranking[start_pos:end_pos]
+                permutation = self._listwise_compare(query, image_id, window_docs, cfg['max_doc_words'])
+                ranking = self._receive_listwise_permutation(ranking, permutation, start_pos, end_pos)
+                if start_pos == 0:
+                    break
+                end_pos = max(0, end_pos - cfg['step_size'])
+        return ranking
+
+    def _apply_listwise_tie_breaks(self, query, image_id, ranking):
+        ranking = list(ranking)
+        if len(ranking) <= 1:
+            return ranking
+
+        idx = 0
+        while idx < len(ranking):
+            current_score = float(ranking[idx].get('score', 0.0))
+            end_idx = idx + 1
+            while end_idx < len(ranking) and float(ranking[end_idx].get('score', 0.0)) == current_score:
+                end_idx += 1
+
+            if end_idx - idx > 1:
+                tie_block = [{
+                    'text': doc.get('text', ''),
+                    'title': doc.get('title', self._extract_doc_title(doc.get('text', ''))),
+                    'score': current_score,
+                } for doc in ranking[idx:end_idx]]
+                reranked_block = self._apply_listwise_reranking(query, image_id, tie_block)
+                for offset, doc in enumerate(reranked_block):
+                    doc['score'] = current_score
+                    ranking[idx + offset] = doc
+
+            idx = end_idx
+
+        return ranking
+
     def cosine_similarity(self, clue, doc):
         if not clue or not doc:
             return 0.0
@@ -792,7 +1187,6 @@ class MMCluePipeline(BasicMultiModalPipeline):
                 return_raw_output=True,
                 max_tokens=1,
                 temperature=0,
-                logprobs=requested_logprobs,
             )
         except Exception:
             raw_outputs = self.generator.generate(
@@ -838,6 +1232,65 @@ class MMCluePipeline(BasicMultiModalPipeline):
         yes_prob = torch.nn.functional.softmax(yes_tensor, dim=1)[:, 0]
         print(f"LLM NLI Judge - Clue: {clue}, Doc: {doc[:100]}, Yes Prob: {yes_prob.item()}")
         return float(yes_prob.item())
+
+    def llm_nli_judge_binary(self, clue, doc):
+        """Return 'Yes' or 'No' based on the final LLM output instead of logits."""
+        prompt = f"Clue: {clue}\nDocument: {doc}\nQuestion: Does the document support the clue? Answer 'Yes' or 'No'."
+#         prompt = """
+# Role: You are a rigorous fact-checker for aircraft identification.
+
+# Task: Evaluate if the provided Document contains explicit evidence that directly supports the Clue.
+
+# Instructions:
+
+# First, search the Document for any specific identifiers, such as registration codes (e.g., D-XXXX), model names, or serial numbers.
+
+# Compare the identified information in the Document with the Clue.
+
+# If the Clue contains a specific code like a registration (e.g., D-BFDO), you must output 'Yes' ONLY if the Document mentions that exact code or its verified synonymous entity.
+
+# If there is a character mismatch in identifiers or the Document only describes a similar type of aircraft without the specific clue's detail, you MUST output 'No'.
+
+# Do not infer or be "helpful." Be strict.
+
+# Input Data:
+# Clue: {clue}
+# Document: {doc}
+
+# Response Format:
+# Directly output 'Yes' or 'No' as the final judgment.
+# """.format(clue=clue, doc=doc)
+        if self.generator is None:
+            raise ValueError("Generator is required for llm_nli_judge_binary.")
+
+        try:
+            raw_outputs = self.generator.generate(
+                [prompt],
+                return_raw_output=False,
+                max_tokens=5,
+                temperature=0,
+            )
+        except Exception as e:
+            print(f"Error in llm_nli_judge_binary: {e}")
+            return "No"
+
+        if not raw_outputs or len(raw_outputs) == 0:
+            return "No"
+
+        # Get the generated text output
+        output_text = raw_outputs[0].strip() if isinstance(raw_outputs[0], str) else str(raw_outputs[0]).strip()
+
+        # Check if output contains 'Yes' or 'No'
+        if "yes" in output_text.lower():
+            final_output = "Yes"
+        elif "no" in output_text.lower():
+            final_output = "No"
+        else:
+            # Default to 'No' if unclear response
+            final_output = "No"
+
+        # print(f"LLM NLI Judge Binary - Clue: {clue}, Doc: {doc[:100]}, Output: {final_output}")
+        return final_output
 
 
     def _compute_normalized_nll(self, token_probs_list):
@@ -1030,7 +1483,7 @@ class MMCluePipeline(BasicMultiModalPipeline):
         )
         caption_retrieval_path = self.config.get(
             'phase2_caption_retrieval_path',
-            os.path.join('data/result/infoseek_v4', 'phase2_image_caption_retrieval', 'final_retrieval_results.jsonl')
+            os.path.join('data/result/infoseek', 'phase2_image_caption_retrieval', 'final_retrieval_results.jsonl')
         )
         image_retrieval_map = _load_retrieval_map(image_retrieval_path)
         caption_retrieval_map = _load_retrieval_map(caption_retrieval_path)
@@ -1119,7 +1572,6 @@ class MMCluePipeline(BasicMultiModalPipeline):
 
         rag_generated_answers = self.generator.generate(rag_prompts) if rag_prompts else []
         rag_answer_map = {data_id: answer for data_id, answer in zip(rag_data_ids, rag_generated_answers)}
-        rag_prompt_map = {data_id: prompt for data_id, prompt in zip(rag_data_ids, rag_prompts)}
 
         id_to_index = {item.data_id: idx for idx, item in enumerate(data_items)}
         for need_item, rag_answer in zip(items_need_rag, rag_generated_answers):
@@ -1166,3 +1618,1138 @@ class MMCluePipeline(BasicMultiModalPipeline):
 
         dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)
         return dataset
+
+class BaselineMMPipeline(BasicMultiModalPipeline):
+    def __init__(self, config, generator, prompt_template):
+        super().__init__(config)
+        self.prompt_template = prompt_template
+        self.generator = generator
+        self.tokenizer = getattr(self.generator, "tokenizer", None)
+        self.batch_size = int(config.get("batch_size", 8)) if isinstance(config, dict) else 8
+        self.total_compare = 0
+        self.total_completion_tokens = 0
+        self.total_prompt_tokens = 0
+
+    def _get_output_dir(self):
+        output_dir = self.config['output_dir'] if 'output_dir' in self.config and self.config['output_dir'] else self.config['save_dir']
+        os.makedirs(output_dir, exist_ok=True)
+        return output_dir
+
+    def _to_jsonable(self, value):
+        if isinstance(value, (str, int, float, bool)) or value is None:
+            return value
+        if isinstance(value, dict):
+            return {str(k): self._to_jsonable(v) for k, v in value.items()}
+        if isinstance(value, (list, tuple, set)):
+            return [self._to_jsonable(v) for v in value]
+        if isinstance(value, np.ndarray):
+            return value.tolist()
+        if isinstance(value, np.generic):
+            return value.item()
+        if hasattr(value, '__dict__'):
+            return self._to_jsonable(vars(value))
+        return str(value)
+    
+    def _save_phase_jsonl(self, phase_name, records, file_name=None, append=False):
+        output_dir = self._get_output_dir()
+        target_name = file_name if file_name is not None else f"{phase_name}.jsonl"
+        file_path = os.path.join(output_dir, target_name)
+        mode = 'a' if append else 'w'
+
+        if isinstance(records, dict):
+            records = [records]
+
+        with open(file_path, mode, encoding='utf-8') as f:
+            for record in records:
+                json.dump(self._to_jsonable(record), f, ensure_ascii=False)
+                f.write('\n')
+        return file_path
+
+    def _llm_yes_prob(self, item, passage_text):
+        if self.generator is None:
+            raise ValueError("Generator is required for baseline reranking.")
+        if self.tokenizer is None:
+            raise ValueError("Generator does not expose tokenizer; cannot compute Yes/No logits.")
+        
+        pointwise_bin_prompt_template = self.prompt_template
+
+        prompt = pointwise_bin_prompt_template.get_string_sep(item=item, reference=passage_text)
+
+        # Guard against vLLM decoder prompt overflow.
+        max_model_len = int(self.config.get("max_model_len", 0)) if isinstance(self.config, dict) else 0
+        if max_model_len > 0 and isinstance(prompt, str):
+            prompt_ids = self.tokenizer.encode(prompt, add_special_tokens=False)
+            if len(prompt_ids) > max_model_len:
+                # Keep the tail so query/instruction part is preserved.
+                prompt = self.tokenizer.decode(
+                    prompt_ids[-max_model_len:],
+                    skip_special_tokens=False,
+                    clean_up_tokenization_spaces=False,
+                )
+
+        self.total_compare += 1
+
+        yes_candidates = []
+        no_candidates = []
+        for token_text in ["Yes", " Yes"]:
+            encoded = self.tokenizer.encode(token_text, add_special_tokens=False)
+            if len(encoded) == 1:
+                yes_candidates.append(encoded[0])
+        for token_text in ["No", " No"]:
+            encoded = self.tokenizer.encode(token_text, add_special_tokens=False)
+            if len(encoded) == 1:
+                no_candidates.append(encoded[0])
+
+        if not yes_candidates:
+            encoded_yes = self.tokenizer.encode("Yes", add_special_tokens=False)
+            if encoded_yes:
+                yes_candidates = [encoded_yes[0]]
+        if not no_candidates:
+            encoded_no = self.tokenizer.encode("No", add_special_tokens=False)
+            if encoded_no:
+                no_candidates = [encoded_no[0]]
+
+        max_retries = int(self.config.get("pointwise_logprob_retries", 3)) if isinstance(self.config, dict) else 3
+        data_id = getattr(item, "data_id", None) if not isinstance(item, dict) else item.get("data_id")
+        token_logprobs = None
+
+        try:
+            raw_outputs = self.generator.generate(
+                [prompt],
+                return_raw_output=True,
+                max_tokens=1,
+                temperature=0,
+                logprobs=20,
+            )
+        except Exception as e:
+            raise RuntimeError(
+                f"Pointwise reranking generate() failed (data_id={data_id}): {e}"
+            ) from e
+
+        if not raw_outputs:
+            raise RuntimeError(f"generator returned empty raw outputs (data_id={data_id}).")
+
+        raw_output = raw_outputs[0]
+        first_candidates = getattr(raw_output, "outputs", None)
+        if not first_candidates:
+            raise RuntimeError(f"missing candidate outputs in raw result (data_id={data_id}).")
+
+        first_output = first_candidates[0]
+        token_logprobs = getattr(first_output, "logprobs", None)
+        if not token_logprobs:
+            raise RuntimeError(f"missing token logprobs in first candidate (data_id={data_id}).")
+
+        if token_logprobs is None:
+            raise RuntimeError(
+                f"Pointwise reranking failed to obtain token logprobs after {max_retries} tries"
+                f" (data_id={data_id})."
+            )
+
+        first_step = token_logprobs[0] if isinstance(token_logprobs, list) else token_logprobs
+
+        def _get_logprob(step_logprobs, candidate_ids):
+            if not isinstance(step_logprobs, dict):
+                return None
+            for candidate_id in candidate_ids:
+                item_obj = step_logprobs.get(candidate_id)
+                if item_obj is not None:
+                    return float(getattr(item_obj, "logprob", item_obj))
+                item_obj = step_logprobs.get(str(candidate_id))
+                if item_obj is not None:
+                    return float(getattr(item_obj, "logprob", item_obj))
+            return None
+
+        yes_logprob = _get_logprob(first_step, yes_candidates)
+        no_logprob = _get_logprob(first_step, no_candidates)
+        if yes_logprob is None or no_logprob is None:
+            raise RuntimeError("Failed to extract Yes/No token logprobs from first decoding step.")
+
+        logits = torch.tensor([[yes_logprob, no_logprob]], dtype=torch.float32)
+        yes_prob = torch.nn.functional.softmax(logits, dim=1)[:, 0]
+        # print(f"LLM Yes Prob - Prompt: {prompt_preview[:200]}, Yes Prob: {yes_prob.item()}")
+        return float(yes_prob.item())
+
+    def pointwise_bin_reranking(self, dataset, retrieval_results_path):
+        if self.tokenizer is None:
+            raise ValueError("BaselineMMPipeline requires generator tokenizer for reranking.")
+
+        self.total_compare = 0
+        self.total_completion_tokens = 0
+        self.total_prompt_tokens = 0
+        stats = {}
+
+        with open(retrieval_results_path, 'r', encoding='utf-8') as f:
+            retrieval_data = {}
+            for line in f:
+                row = json.loads(line)
+                retrieval_data[row.get('data_id')] = row
+
+        if hasattr(dataset, 'data'):
+            data_items = list(dataset.data)
+        else:
+            data_items = list(dataset)
+
+        def _get_field(item, key, default=None):
+            if isinstance(item, dict):
+                return item.get(key, default)
+            try:
+                return getattr(item, key)
+            except Exception:
+                return default
+
+        def _extract_title(doc_text):
+            text = str(doc_text or '').strip()
+            if not text:
+                return ''
+            parts = text.split(' - ', 1)
+            return parts[0].strip()
+
+        reranked_results = []
+        vote_logs = []
+        for item in tqdm(data_items, desc="Reranking"):
+            data_id = _get_field(item, 'data_id')
+            image_id = _get_field(item, 'image_id')
+            query = _get_field(item, 'question', '')
+
+            retrieval_row = retrieval_data.get(data_id, {})
+            retrieval_results = retrieval_row.get('retrieval_results')
+            if not retrieval_results:
+                retrieval_results = retrieval_row.get('caption_retrieval_results', [])
+            if not isinstance(retrieval_results, list) or len(retrieval_results) == 0:
+                continue
+
+            scored_docs = []
+            for doc in retrieval_results:
+                doc_text = doc.get('text', '') if isinstance(doc, dict) else str(doc)
+
+                score = self._llm_yes_prob(item, doc_text)
+                scored_docs.append({
+                    'text': doc_text,
+                    'title': _extract_title(doc_text),
+                    'score': float(score),
+                })
+
+            scored_docs = sorted(scored_docs, key=lambda x: x['score'], reverse=True)
+            for rank_idx, doc_info in enumerate(scored_docs, 1):
+                vote_logs.append({
+                    'data_id': data_id,
+                    'image_id': image_id,
+                    'text_query': query,
+                    'doc': doc_info['text'],
+                    'vote_count': float(doc_info['score']),
+                    'rank': rank_idx,
+                })
+
+            reranked_results.append({
+                'data_id': data_id,
+                'image_id': image_id,
+                'reranked_results': scored_docs,
+            })
+
+        stats['total_binary_judges'] = int(self.total_compare)
+        self._save_phase_jsonl('phase3_reranking', reranked_results, file_name='reranked_results.jsonl')
+        self._save_phase_jsonl('phase3_reranking_vote_logs', vote_logs, file_name='naive_vote_logs.jsonl')
+        self._save_phase_jsonl('phase3_reranking_stats', stats, file_name='performance_stats.jsonl', append=True)
+
+        return reranked_results
+
+    def _llm_qlm_score(self, item, passage_text):
+        if self.generator is None:
+            raise ValueError("Generator is required for QLM reranking.")
+        if self.tokenizer is None:
+            raise ValueError("Generator does not expose tokenizer; cannot compute QLM score.")
+
+        if isinstance(item, dict):
+            query = item.get('question', '')
+            data_id = item.get('data_id')
+        else:
+            query = getattr(item, 'question', '')
+            data_id = getattr(item, 'data_id', None)
+
+        query = '' if query is None else str(query).strip()
+        if not query:
+            raise RuntimeError(f"Empty query for QLM scoring (data_id={data_id}).")
+
+        context_prompt = f"Passage: {str(passage_text or '')}\nPlease write a question based on this passage."
+        target_suffix = f" {query}"
+        target_ids = self.tokenizer.encode(target_suffix, add_special_tokens=False)
+        if not target_ids:
+            raise RuntimeError(f"Empty target token ids for QLM scoring (data_id={data_id}).")
+
+        cfg = self.config if isinstance(self.config, dict) else {}
+        qlm_target_max_tokens = int(cfg.get("pointwise_qlm_max_target_tokens", 128))
+        if qlm_target_max_tokens > 0 and len(target_ids) > qlm_target_max_tokens:
+            # Keep the tail of query tokens so question intent is preserved.
+            target_ids = target_ids[-qlm_target_max_tokens:]
+
+        context_ids = self.tokenizer.encode(context_prompt, add_special_tokens=False)
+        model_max_len_cfg = int(cfg.get("max_model_len", 0))
+        qlm_max_model_len = int(cfg.get("pointwise_qlm_max_model_len", 4096))
+        effective_model_len = qlm_max_model_len
+        if model_max_len_cfg > 0:
+            effective_model_len = min(model_max_len_cfg, qlm_max_model_len)
+
+        if effective_model_len <= len(target_ids):
+            raise RuntimeError(
+                f"QLM target query is too long for effective max len={effective_model_len} (data_id={data_id})."
+            )
+
+        qlm_max_context_tokens = int(cfg.get("pointwise_qlm_max_context_tokens", 2048))
+        initial_context_cap = min(qlm_max_context_tokens, effective_model_len - len(target_ids))
+        if initial_context_cap <= 0:
+            raise RuntimeError(
+                f"Invalid QLM context cap={initial_context_cap} (data_id={data_id})."
+            )
+
+        configured_k = cfg.get("pointwise_qlm_prompt_logprobs")
+        if configured_k is not None:
+            requested_prompt_logprobs = max(1, int(configured_k))
+        else:
+            # Default to small top-k to minimize memory pressure.
+            requested_prompt_logprobs = 5
+
+        def _build_prompt_with_context_cap(context_cap):
+            capped_context_ids = context_ids[-context_cap:] if len(context_ids) > context_cap else context_ids
+            prompt_ids = capped_context_ids + target_ids
+            return self.tokenizer.decode(
+                prompt_ids,
+                skip_special_tokens=False,
+                clean_up_tokenization_spaces=False,
+            )
+
+        def _extract_score_from_prompt_logprobs(raw_output_obj):
+            prompt_token_ids = getattr(raw_output_obj, "prompt_token_ids", None)
+            prompt_logprobs = getattr(raw_output_obj, "prompt_logprobs", None)
+            if not prompt_token_ids or prompt_logprobs is None:
+                raise RuntimeError(f"missing prompt token logprobs in QLM scoring (data_id={data_id}).")
+
+            if len(target_ids) > len(prompt_token_ids):
+                raise RuntimeError(
+                    f"target ids longer than prompt ids in QLM scoring (data_id={data_id})."
+                )
+
+            start_idx = len(prompt_token_ids) - len(target_ids)
+            qlm_score_val = 0.0
+            missing_count = 0
+
+            for offset, token_id in enumerate(target_ids):
+                idx = start_idx + offset
+                if idx >= len(prompt_logprobs):
+                    raise RuntimeError(
+                        f"prompt logprob index out of range in QLM scoring (data_id={data_id}, idx={idx})."
+                    )
+
+                step_logprobs = prompt_logprobs[idx]
+                if not isinstance(step_logprobs, dict):
+                    raise RuntimeError(
+                        f"invalid prompt logprob step type in QLM scoring (data_id={data_id}, idx={idx})."
+                    )
+
+                item_obj = step_logprobs.get(token_id)
+                if item_obj is None:
+                    item_obj = step_logprobs.get(str(token_id))
+
+                if item_obj is None:
+                    print(f"Warning! item_obj missing for token_id={token_id} at idx={idx} in QLM scoring (data_id={data_id}).")
+                    # vLLM only returns top-k prompt logprobs. If target token is missing,
+                    # approximate with a floor below the worst observed candidate to keep ranking stable.
+                    floor_logprob = -50.0
+                    if len(step_logprobs) > 0:
+                        vals = [float(getattr(v, "logprob", v)) for v in step_logprobs.values()]
+                        floor_logprob = min(vals) - 5.0
+                    qlm_score_val += floor_logprob
+                    missing_count += 1
+                    continue
+
+                qlm_score_val += float(getattr(item_obj, "logprob", item_obj))
+
+            return float(qlm_score_val), int(missing_count), int(len(prompt_token_ids))
+
+        prompt = _build_prompt_with_context_cap(initial_context_cap)
+        try:
+            raw_outputs = self.generator.generate(
+                [prompt],
+                return_raw_output=True,
+                max_tokens=1,
+                temperature=0,
+                prompt_logprobs=requested_prompt_logprobs,
+            )
+        except Exception as e:
+            raise RuntimeError(f"QLM generate() failed (data_id={data_id}): {e}") from e
+
+        if not raw_outputs:
+            raise RuntimeError(f"generator returned empty raw outputs in QLM scoring (data_id={data_id}).")
+
+        raw_output = raw_outputs[0]
+        qlm_score, missing_count, prompt_token_count = _extract_score_from_prompt_logprobs(raw_output)
+
+        self.total_compare += 1
+        self.total_prompt_tokens += int(prompt_token_count)
+
+        if isinstance(self.config, dict) and bool(self.config.get("debug_pointwise_qlm", False)) and missing_count > 0:
+            print(
+                f"[QLM][WARN] data_id={data_id}: {missing_count}/{len(target_ids)} target tokens missing in top-k prompt_logprobs; used floor approximation."
+            )
+
+        return float(qlm_score)
+
+    def _llm_qlm_score_batch(self, item, passage_texts):
+        """Compute QLM scores for multiple passages of one item in a single generate() call."""
+        if self.generator is None:
+            raise ValueError("Generator is required for QLM reranking.")
+        if self.tokenizer is None:
+            raise ValueError("Generator does not expose tokenizer; cannot compute QLM score.")
+
+        if not isinstance(passage_texts, list) or len(passage_texts) == 0:
+            return []
+
+        if isinstance(item, dict):
+            query = item.get('question', '')
+            data_id = item.get('data_id')
+        else:
+            query = getattr(item, 'question', '')
+            data_id = getattr(item, 'data_id', None)
+
+        query = '' if query is None else str(query).strip()
+        if not query:
+            raise RuntimeError(f"Empty query for QLM scoring (data_id={data_id}).")
+
+        target_suffix = f" {query}"
+        target_ids = self.tokenizer.encode(target_suffix, add_special_tokens=False)
+        if not target_ids:
+            raise RuntimeError(f"Empty target token ids for QLM scoring (data_id={data_id}).")
+
+        cfg = self.config if isinstance(self.config, dict) else {}
+        qlm_target_max_tokens = int(cfg.get("pointwise_qlm_max_target_tokens", 128))
+        if qlm_target_max_tokens > 0 and len(target_ids) > qlm_target_max_tokens:
+            target_ids = target_ids[-qlm_target_max_tokens:]
+
+        model_max_len_cfg = int(cfg.get("max_model_len", 0))
+        qlm_max_model_len = int(cfg.get("pointwise_qlm_max_model_len", 4096))
+        effective_model_len = qlm_max_model_len
+        if model_max_len_cfg > 0:
+            effective_model_len = min(model_max_len_cfg, qlm_max_model_len)
+
+        if effective_model_len <= len(target_ids):
+            raise RuntimeError(
+                f"QLM target query is too long for effective max len={effective_model_len} (data_id={data_id})."
+            )
+
+        qlm_max_context_tokens = int(cfg.get("pointwise_qlm_max_context_tokens", 2048))
+        context_cap = min(qlm_max_context_tokens, effective_model_len - len(target_ids))
+        if context_cap <= 0:
+            raise RuntimeError(
+                f"Invalid QLM context cap={context_cap} (data_id={data_id})."
+            )
+
+        configured_k = cfg.get("pointwise_qlm_prompt_logprobs")
+        if configured_k is not None:
+            requested_prompt_logprobs = max(1, int(configured_k))
+        else:
+            requested_prompt_logprobs = 5
+
+        prompts = []
+        for passage_text in passage_texts:
+            context_prompt = f"Passage: {str(passage_text or '')}\nPlease write a question based on this passage."
+            context_ids = self.tokenizer.encode(context_prompt, add_special_tokens=False)
+            capped_context_ids = context_ids[-context_cap:] if len(context_ids) > context_cap else context_ids
+            prompt_ids = capped_context_ids + target_ids
+            prompts.append(
+                self.tokenizer.decode(
+                    prompt_ids,
+                    skip_special_tokens=False,
+                    clean_up_tokenization_spaces=False,
+                )
+            )
+
+        try:
+            raw_outputs = self.generator.generate(
+                prompts,
+                return_raw_output=True,
+                max_tokens=1,
+                temperature=0,
+                prompt_logprobs=requested_prompt_logprobs,
+            )
+        except Exception as e:
+            raise RuntimeError(f"QLM batch generate() failed (data_id={data_id}): {e}") from e
+
+        if not raw_outputs or len(raw_outputs) != len(prompts):
+            got = 0 if not raw_outputs else len(raw_outputs)
+            raise RuntimeError(
+                f"generator returned invalid batch raw outputs in QLM scoring (data_id={data_id}, got={got}, expected={len(prompts)})."
+            )
+
+        def _extract_score_from_prompt_logprobs(raw_output_obj):
+            prompt_token_ids = getattr(raw_output_obj, "prompt_token_ids", None)
+            prompt_logprobs = getattr(raw_output_obj, "prompt_logprobs", None)
+            if not prompt_token_ids or prompt_logprobs is None:
+                raise RuntimeError(f"missing prompt token logprobs in QLM scoring (data_id={data_id}).")
+
+            if len(target_ids) > len(prompt_token_ids):
+                raise RuntimeError(
+                    f"target ids longer than prompt ids in QLM scoring (data_id={data_id})."
+                )
+
+            start_idx = len(prompt_token_ids) - len(target_ids)
+            qlm_score_val = 0.0
+            missing_count = 0
+
+            for offset, token_id in enumerate(target_ids):
+                idx = start_idx + offset
+                if idx >= len(prompt_logprobs):
+                    raise RuntimeError(
+                        f"prompt logprob index out of range in QLM scoring (data_id={data_id}, idx={idx})."
+                    )
+
+                step_logprobs = prompt_logprobs[idx]
+                if not isinstance(step_logprobs, dict):
+                    raise RuntimeError(
+                        f"invalid prompt logprob step type in QLM scoring (data_id={data_id}, idx={idx})."
+                    )
+
+                item_obj = step_logprobs.get(token_id)
+                if item_obj is None:
+                    item_obj = step_logprobs.get(str(token_id))
+
+                if item_obj is None:
+                    floor_logprob = -50.0
+                    if len(step_logprobs) > 0:
+                        vals = [float(getattr(v, "logprob", v)) for v in step_logprobs.values()]
+                        floor_logprob = min(vals) - 5.0
+                    qlm_score_val += floor_logprob
+                    missing_count += 1
+                    continue
+
+                qlm_score_val += float(getattr(item_obj, "logprob", item_obj))
+
+            return float(qlm_score_val), int(missing_count), int(len(prompt_token_ids))
+
+        scores = []
+        total_prompt_tokens = 0
+        total_missing_count = 0
+        for raw_output in raw_outputs:
+            qlm_score, missing_count, prompt_token_count = _extract_score_from_prompt_logprobs(raw_output)
+            scores.append(float(qlm_score))
+            total_prompt_tokens += int(prompt_token_count)
+            total_missing_count += int(missing_count)
+
+        self.total_compare += len(scores)
+        self.total_prompt_tokens += int(total_prompt_tokens)
+
+        if isinstance(self.config, dict) and bool(self.config.get("debug_pointwise_qlm", False)) and total_missing_count > 0:
+            print(
+                f"[QLM][WARN] data_id={data_id}: total missing target tokens={total_missing_count} across {len(scores)} docs; used floor approximation."
+            )
+
+        return scores
+
+    def pointwise_qlm_reranking(self, dataset, retrieval_results_path):
+        if self.tokenizer is None:
+            raise ValueError("BaselineMMPipeline requires generator tokenizer for reranking.")
+
+        self.total_compare = 0
+        self.total_completion_tokens = 0
+        self.total_prompt_tokens = 0
+        stats = {}
+
+        with open(retrieval_results_path, 'r', encoding='utf-8') as f:
+            retrieval_data = {}
+            for line in f:
+                row = json.loads(line)
+                retrieval_data[row.get('data_id')] = row
+
+        if hasattr(dataset, 'data'):
+            data_items = list(dataset.data)
+        else:
+            data_items = list(dataset)
+
+        def _get_field(item, key, default=None):
+            if isinstance(item, dict):
+                return item.get(key, default)
+            try:
+                return getattr(item, key)
+            except Exception:
+                return default
+
+        def _extract_title(doc_text):
+            text = str(doc_text or '').strip()
+            if not text:
+                return ''
+            parts = text.split(' - ', 1)
+            return parts[0].strip()
+
+        reranked_results = []
+        vote_logs = []
+        for item in tqdm(data_items, desc="Reranking"):
+            data_id = _get_field(item, 'data_id')
+            image_id = _get_field(item, 'image_id')
+            query = _get_field(item, 'question', '')
+
+            retrieval_row = retrieval_data.get(data_id, {})
+            retrieval_results = retrieval_row.get('retrieval_results')
+            if not retrieval_results:
+                retrieval_results = retrieval_row.get('caption_retrieval_results', [])
+            if not isinstance(retrieval_results, list) or len(retrieval_results) == 0:
+                continue
+
+            doc_texts = [doc.get('text', '') if isinstance(doc, dict) else str(doc) for doc in retrieval_results]
+            scores = self._llm_qlm_score_batch(item, doc_texts)
+            if len(scores) != len(doc_texts):
+                raise RuntimeError(
+                    f"QLM score size mismatch (data_id={data_id}): got {len(scores)}, expected {len(doc_texts)}."
+                )
+
+            scored_docs = []
+            for doc_text, score in zip(doc_texts, scores):
+                scored_docs.append({
+                    'text': doc_text,
+                    'title': _extract_title(doc_text),
+                    'score': float(score),
+                })
+
+            scored_docs = sorted(scored_docs, key=lambda x: x['score'], reverse=True)
+            for rank_idx, doc_info in enumerate(scored_docs, 1):
+                vote_logs.append({
+                    'data_id': data_id,
+                    'image_id': image_id,
+                    'text_query': query,
+                    'doc': doc_info['text'],
+                    'vote_count': float(doc_info['score']),
+                    'rank': rank_idx,
+                })
+
+            reranked_results.append({
+                'data_id': data_id,
+                'image_id': image_id,
+                'reranked_results': scored_docs,
+            })
+
+        stats['total_qlm_judges'] = int(self.total_compare)
+        stats['total_prompt_tokens'] = int(self.total_prompt_tokens)
+        stats['total_completion_tokens'] = int(self.total_completion_tokens)
+        self._save_phase_jsonl('phase3_reranking', reranked_results, file_name='reranked_results.jsonl')
+        self._save_phase_jsonl('phase3_reranking_vote_logs', vote_logs, file_name='naive_vote_logs.jsonl')
+        self._save_phase_jsonl('phase3_reranking_stats', stats, file_name='performance_stats.jsonl', append=True)
+
+        return reranked_results
+    
+    def listwise_reranking(self, dataset, retrieval_results_path):
+        if self.generator is None:
+            raise ValueError("Generator is required for listwise reranking.")
+
+        self.total_compare = 0
+        self.total_completion_tokens = 0
+        self.total_prompt_tokens = 0
+        stats = {}
+
+        cfg = self._get_listwise_cfg()
+        window_size = cfg['window_size']
+        step_size = cfg['step_size']
+        num_repeat = cfg['num_repeat']
+
+        with open(retrieval_results_path, 'r', encoding='utf-8') as f:
+            retrieval_data = {}
+            for line in f:
+                row = json.loads(line)
+                retrieval_data[row.get('data_id')] = row
+
+        if hasattr(dataset, 'data'):
+            data_items = list(dataset.data)
+        else:
+            data_items = list(dataset)
+
+        def _get_field(item, key, default=None):
+            if isinstance(item, dict):
+                return item.get(key, default)
+            try:
+                return getattr(item, key)
+            except Exception:
+                return default
+
+        reranked_results = []
+        vote_logs = []
+
+        for item in tqdm(data_items, desc="Reranking"):
+            data_id = _get_field(item, 'data_id')
+            image_id = _get_field(item, 'image_id')
+            query = _get_field(item, 'question', '')
+
+            retrieval_row = retrieval_data.get(data_id, {})
+            retrieval_results = retrieval_row.get('retrieval_results')
+            if not retrieval_results:
+                retrieval_results = retrieval_row.get('caption_retrieval_results', [])
+            if not isinstance(retrieval_results, list) or len(retrieval_results) == 0:
+                continue
+
+            ranking = [{
+                'text': doc.get('text', '') if isinstance(doc, dict) else str(doc),
+                'title': self._extract_doc_title(doc.get('text', '') if isinstance(doc, dict) else str(doc)),
+            } for doc in retrieval_results]
+
+            if len(ranking) > 1:
+                ranking = self._apply_listwise_reranking(query, image_id, ranking)
+            else:
+                print(f"ERROR!")
+            scored_docs = []
+            for rank_idx, doc_info in enumerate(ranking, 1):
+                score = float(-(rank_idx - 1))
+                scored_doc = {
+                    'text': doc_info['text'],
+                    'title': doc_info['title'],
+                    'score': score,
+                }
+                scored_docs.append(scored_doc)
+                vote_logs.append({
+                    'data_id': data_id,
+                    'image_id': image_id,
+                    'text_query': query,
+                    'doc': doc_info['text'],
+                    'vote_count': score,
+                    'rank': rank_idx,
+                })
+
+            reranked_results.append({
+                'data_id': data_id,
+                'image_id': image_id,
+                'reranked_results': scored_docs,
+            })
+
+        stats['total_listwise_compares'] = int(self.total_compare)
+        stats['total_prompt_tokens'] = int(self.total_prompt_tokens)
+        stats['total_completion_tokens'] = int(self.total_completion_tokens)
+        stats['listwise_window_size'] = int(window_size)
+        stats['listwise_step_size'] = int(step_size)
+        stats['listwise_num_repeat'] = int(num_repeat)
+
+        self._save_phase_jsonl('phase3_reranking', reranked_results, file_name='reranked_results.jsonl')
+        self._save_phase_jsonl('phase3_reranking_vote_logs', vote_logs, file_name='naive_vote_logs.jsonl')
+        self._save_phase_jsonl('phase3_reranking_stats', stats, file_name='performance_stats.jsonl', append=True)
+
+        return reranked_results
+    
+    def setwise_reranking(self, dataset, retrieval_results_path):
+        if self.generator is None:
+            raise ValueError("Generator is required for setwise reranking.")
+
+        self.total_compare = 0
+        self.total_completion_tokens = 0
+        self.total_prompt_tokens = 0
+        stats = {}
+
+        cfg = self.config if isinstance(self.config, dict) else {}
+        setwise_num_child = int(cfg.get("setwise_num_child", 3))
+        setwise_k = int(cfg.get("setwise_topk", 1))
+        setwise_max_doc_words = int(cfg.get("setwise_doc_max_words", 200))
+        setwise_max_tokens = int(cfg.get("setwise_max_tokens", 4))
+        setwise_chars = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+        if setwise_num_child <= 0:
+            setwise_num_child = 3
+        if setwise_max_tokens <= 0:
+            setwise_max_tokens = 4
+
+        with open(retrieval_results_path, 'r', encoding='utf-8') as f:
+            retrieval_data = {}
+            for line in f:
+                row = json.loads(line)
+                retrieval_data[row.get('data_id')] = row
+
+        if hasattr(dataset, 'data'):
+            data_items = list(dataset.data)
+        else:
+            data_items = list(dataset)
+
+        def _get_field(item, key, default=None):
+            if isinstance(item, dict):
+                return item.get(key, default)
+            try:
+                return getattr(item, key)
+            except Exception:
+                return default
+
+        def _extract_title(doc_text):
+            text = str(doc_text or '').strip()
+            if not text:
+                return ''
+            parts = text.split(' - ', 1)
+            return parts[0].strip()
+
+        def _normalize_doc_text(doc_text):
+            text = str(doc_text or '')
+            if setwise_max_doc_words > 0:
+                text = ' '.join(text.split()[:setwise_max_doc_words])
+            return text
+
+        def _build_setwise_prompt(item, docs):
+            query = item.question
+            image_query_id = item.image_id
+            image_query_path = os.path.join(self.config['dataset_path'], 'images', f'{image_query_id}.jpg')
+            question_image = Image.open(image_query_path).convert('RGB')
+
+            lines = [
+                f"Given a query \"{query}\", which of the following passages is the most relevant one to the query?",
+                "",
+            ]
+            for i, doc in enumerate(docs):
+                label = setwise_chars[i]
+                doc_text = _normalize_doc_text(doc.get('text', '') if isinstance(doc, dict) else doc)
+                lines.extend([
+                    f"Passage {label}: \"{doc_text}\"",
+                    "",
+                ])
+            lines.append("Output only the passage label(A, B, C...) of the most relevant passage:")
+
+            content_list = []
+            content_list.append({'type': 'image', 'image': question_image})
+            content_list.append({'type': 'text', 'text': "\n".join(lines)})
+            messages = []
+            messages.append({"role": "user", "content": content_list})
+            return messages
+
+        def _parse_setwise_output(output_text, num_docs):
+            text = str(output_text or '').strip().upper()
+            valid_chars = set(setwise_chars[:num_docs])
+            if text in valid_chars:
+                return text
+
+            match = re.search(r'PASSAGE\s+([A-Z])', text)
+            if match:
+                candidate = match.group(1)
+                if candidate in valid_chars:
+                    return candidate
+
+            match = re.search(r'\b([A-Z])\b', text)
+            if match:
+                candidate = match.group(1)
+                if candidate in valid_chars:
+                    return candidate
+
+            return setwise_chars[0]
+
+        def _compare(item, docs):
+            self.total_compare += 1
+            prompt = _build_setwise_prompt(item, docs)
+
+            if self.tokenizer is not None:
+                try:
+                    self.total_prompt_tokens += len(self.tokenizer.encode(prompt, add_special_tokens=False))
+                except Exception:
+                    pass
+
+            outputs = self.generator.generate(
+                [prompt],
+                max_tokens=setwise_max_tokens,
+                temperature=0,
+            )
+            if not outputs:
+                return setwise_chars[0]
+
+            output_text = outputs[0] if isinstance(outputs[0], str) else str(outputs[0])
+            if self.tokenizer is not None:
+                try:
+                    self.total_completion_tokens += len(self.tokenizer.encode(output_text, add_special_tokens=False))
+                except Exception:
+                    pass
+
+            return _parse_setwise_output(output_text, len(docs))
+
+        def _heapify(arr, n, i, item):
+            if setwise_num_child * i + 1 < n:
+                end_idx = min((setwise_num_child * (i + 1) + 1), n)
+                docs = [arr[i]] + arr[setwise_num_child * i + 1:end_idx]
+                inds = [i] + list(range(setwise_num_child * i + 1, end_idx))
+                output = _compare(item, docs)
+                try:
+                    best_ind = setwise_chars.index(output)
+                except ValueError:
+                    best_ind = 0
+                try:
+                    largest = inds[best_ind]
+                except IndexError:
+                    largest = i
+                if largest != i:
+                    arr[i], arr[largest] = arr[largest], arr[i]
+                    _heapify(arr, n, largest, item)
+
+        def _heap_sort(arr, item, k):
+            n = len(arr)
+            ranked = 0
+            for i in range(n // setwise_num_child, -1, -1):
+                _heapify(arr, n, i, item)
+            for i in range(n - 1, 0, -1):
+                arr[i], arr[0] = arr[0], arr[i]
+                ranked += 1
+                if ranked == k:
+                    break
+                _heapify(arr, i, 0, item)
+
+        reranked_results = []
+        vote_logs = []
+
+        for item in tqdm(data_items, desc="Reranking"):
+            data_id = _get_field(item, 'data_id')
+            image_id = _get_field(item, 'image_id')
+            query = _get_field(item, 'question', '')
+
+            retrieval_row = retrieval_data.get(data_id, {})
+            retrieval_results = retrieval_row.get('retrieval_results')
+            if not retrieval_results:
+                retrieval_results = retrieval_row.get('caption_retrieval_results', [])
+            if not isinstance(retrieval_results, list) or len(retrieval_results) == 0:
+                continue
+
+            ranking = [{
+                'text': doc.get('text', '') if isinstance(doc, dict) else str(doc),
+                'title': _extract_title(doc.get('text', '') if isinstance(doc, dict) else str(doc)),
+            } for doc in retrieval_results]
+
+            if len(ranking) > 1:
+                original_ranking = list(ranking)
+                k = setwise_k if setwise_k > 0 else len(ranking)
+                k = min(k, len(ranking))
+                _heap_sort(ranking, item, k)
+                ranking = list(reversed(ranking))
+
+                top_reranked = ranking[:k]
+                top_ids = {id(doc_info) for doc_info in top_reranked}
+                remaining = [doc_info for doc_info in original_ranking if id(doc_info) not in top_ids]
+                ranking = top_reranked + remaining
+
+            scored_docs = []
+            for rank_idx, doc_info in enumerate(ranking, 1):
+                score = float(-(rank_idx - 1))
+                scored_doc = {
+                    'text': doc_info['text'],
+                    'title': doc_info['title'],
+                    'score': score,
+                }
+                scored_docs.append(scored_doc)
+                vote_logs.append({
+                    'data_id': data_id,
+                    'image_id': image_id,
+                    'text_query': query,
+                    'doc': doc_info['text'],
+                    'vote_count': score,
+                    'rank': rank_idx,
+                })
+
+            reranked_results.append({
+                'data_id': data_id,
+                'image_id': image_id,
+                'reranked_results': scored_docs,
+            })
+
+        stats['total_setwise_compares'] = int(self.total_compare)
+        stats['total_prompt_tokens'] = int(self.total_prompt_tokens)
+        stats['total_completion_tokens'] = int(self.total_completion_tokens)
+        stats['setwise_num_child'] = int(setwise_num_child)
+        stats['setwise_topk'] = int(setwise_k)
+
+        self._save_phase_jsonl('phase3_reranking', reranked_results, file_name='reranked_results.jsonl')
+        self._save_phase_jsonl('phase3_reranking_vote_logs', vote_logs, file_name='naive_vote_logs.jsonl')
+        self._save_phase_jsonl('phase3_reranking_stats', stats, file_name='performance_stats.jsonl', append=True)
+
+        return reranked_results
+
+
+
+    def pairwise_reranking(self, dataset, retrieval_results_path):
+        if self.generator is None:
+            raise ValueError("Generator is required for pairwise reranking.")
+
+        self.total_compare = 0
+        self.total_completion_tokens = 0
+        self.total_prompt_tokens = 0
+        stats = {}
+
+        cfg = self.config if isinstance(self.config, dict) else {}
+        pairwise_k = int(cfg.get("pairwise_topk", 1))
+        pairwise_max_doc_words = int(cfg.get("pairwise_doc_max_words", 200))
+        pairwise_max_tokens = int(cfg.get("pairwise_max_tokens", 4))
+
+        if pairwise_max_tokens <= 0:
+            pairwise_max_tokens = 4
+
+        with open(retrieval_results_path, 'r', encoding='utf-8') as f:
+            retrieval_data = {}
+            for line in f:
+                row = json.loads(line)
+                retrieval_data[row.get('data_id')] = row
+
+        if hasattr(dataset, 'data'):
+            data_items = list(dataset.data)
+        else:
+            data_items = list(dataset)
+
+        def _get_field(item, key, default=None):
+            if isinstance(item, dict):
+                return item.get(key, default)
+            try:
+                return getattr(item, key)
+            except Exception:
+                return default
+
+        def _extract_title(doc_text):
+            text = str(doc_text or '').strip()
+            if not text:
+                return ''
+            parts = text.split(' - ', 1)
+            return parts[0].strip()
+        
+        def _build_pairwise_prompt(item, doc_a, doc_b):
+            query = item.question
+            image_query_id = item.image_id
+            image_query_path = os.path.join(self.config['dataset_path'], 'images', f'{image_query_id}.jpg')
+            question_image = Image.open(image_query_path).convert('RGB')
+
+            lines = [
+                f"Given a query \"{query}\", which of the following two passages is more relevant to the query?",
+                "",
+                f"Passage A: \"{doc_a}\"",
+                "",
+                f"Passage B: \"{doc_b}\"",
+                "",
+                "Output Passage A or Passage B:",
+            ]
+            content_list = []
+            content_list.append({'type': 'image', 'image': question_image})
+            content_list.append({'type': 'text', 'text': "\n".join(lines)})
+            messages = []
+            messages.append({"role": "user", "content": content_list})
+            return messages
+
+        def _normalize_doc_text(doc_text):
+            text = str(doc_text or '')
+            if pairwise_max_doc_words > 0:
+                text = ' '.join(text.split()[:pairwise_max_doc_words])
+            return text
+
+        def _parse_pairwise_output(output_text):
+            text = str(output_text or '').strip().upper()
+            if "PASSAGE A" in text or text == "A":
+                return "A"
+            if "PASSAGE B" in text or text == "B":
+                return "B"
+            return None
+
+        def _single_compare(item, doc_a, doc_b):
+            self.total_compare += 1
+            prompt = _build_pairwise_prompt(item, doc_a, doc_b)
+
+            if self.tokenizer is not None:
+                try:
+                    self.total_prompt_tokens += len(self.tokenizer.encode(prompt, add_special_tokens=False))
+                except Exception:
+                    pass
+
+            outputs = self.generator.generate(
+                [prompt],
+                max_tokens=pairwise_max_tokens,
+                temperature=0,
+            )
+            if not outputs:
+                return None
+
+            output_text = outputs[0] if isinstance(outputs[0], str) else str(outputs[0])
+            if self.tokenizer is not None:
+                try:
+                    self.total_completion_tokens += len(self.tokenizer.encode(output_text, add_special_tokens=False))
+                except Exception:
+                    pass
+
+            return _parse_pairwise_output(output_text)
+
+        def _compare_pair(item, doc_left, doc_right):
+            out1 = _single_compare(item, doc_left, doc_right)
+            out2 = _single_compare(item, doc_right, doc_left)
+
+            # Follow pairwise_ranker logic: two-direction consistency check.
+            if out1 == "A" and out2 == "B":
+                return "left"
+            if out1 == "B" and out2 == "A":
+                return "right"
+            return "tie"
+
+        reranked_results = []
+        vote_logs = []
+
+        for item in tqdm(data_items, desc="Reranking"):
+            data_id = _get_field(item, 'data_id')
+            image_id = _get_field(item, 'image_id')
+            query = _get_field(item, 'question', '')
+
+            retrieval_row = retrieval_data.get(data_id, {})
+            retrieval_results = retrieval_row.get('retrieval_results')
+            if not retrieval_results:
+                retrieval_results = retrieval_row.get('caption_retrieval_results', [])
+            if not isinstance(retrieval_results, list) or len(retrieval_results) == 0:
+                continue
+
+            ranking = [{
+                'text': doc.get('text', '') if isinstance(doc, dict) else str(doc),
+                'title': _extract_title(doc.get('text', '') if isinstance(doc, dict) else str(doc)),
+            } for doc in retrieval_results]
+
+            if len(ranking) > 1:
+                k = pairwise_k if pairwise_k > 0 else len(ranking)
+                k = min(k, len(ranking))
+
+                # Bubble top-k using pairwise comparator
+                last_end = len(ranking) - 1
+                for i in range(k):
+                    current_ind = last_end
+                    is_change = False
+                    while True:
+                        if current_ind <= i:
+                            break
+                        doc_right = ranking[current_ind].get('text', '')
+                        doc_left = ranking[current_ind - 1].get('text', '')
+                        left_text = _normalize_doc_text(doc_left)
+                        right_text = _normalize_doc_text(doc_right)
+                        winner = _compare_pair(item, left_text, right_text)
+                        if winner == "right":
+                            ranking[current_ind - 1], ranking[current_ind] = ranking[current_ind], ranking[current_ind - 1]
+                            
+                            if not is_change:
+                                is_change = True
+                                # print(f"New ranking for item {data_id} after comparing doc {current_ind-1} and doc {current_ind}: {[doc.get('text', '')[:100] if isinstance(doc, dict) else str(doc) for doc in ranking]}")
+                                if last_end != len(ranking) - 1:
+                                    last_end += 1
+                        if not is_change:
+                            last_end -= 1
+                        current_ind -= 1
+            scored_docs = []
+            for rank_idx, doc_info in enumerate(ranking, 1):
+                score = float(-(rank_idx - 1))
+                scored_doc = {
+                    'text': doc_info['text'],
+                    'title': doc_info['title'],
+                    'score': score,
+                }
+                scored_docs.append(scored_doc)
+                vote_logs.append({
+                    'data_id': data_id,
+                    'image_id': image_id,
+                    'text_query': query,
+                    'doc': doc_info['text'],
+                    'vote_count': score,
+                    'rank': rank_idx,
+                })
+
+            reranked_results.append({
+                'data_id': data_id,
+                'image_id': image_id,
+                'reranked_results': scored_docs,
+            })
+
+        stats['total_pairwise_compares'] = int(self.total_compare)
+        stats['total_prompt_tokens'] = int(self.total_prompt_tokens)
+        stats['total_completion_tokens'] = int(self.total_completion_tokens)
+        stats['pairwise_topk'] = int(pairwise_k)
+
+        self._save_phase_jsonl('phase3_reranking', reranked_results, file_name='reranked_results.jsonl')
+        self._save_phase_jsonl('phase3_reranking_vote_logs', vote_logs, file_name='naive_vote_logs.jsonl')
+        self._save_phase_jsonl('phase3_reranking_stats', stats, file_name='performance_stats.jsonl', append=True)
+
+        return reranked_results
+    

@@ -35,6 +35,22 @@ class MMPromptTemplate:
         messages.append({"role": "user", "content": content_list})
         return messages    
     
+    def get_string_no_retrieval(self, item):
+        question = item.question if item.question is not None else item.text
+        image_query_id = item.image_id
+        image_query_path = os.path.join(self.config['dataset_path'], 'images', f'{image_query_id}.jpg')
+        question_image = Image.open(image_query_path).convert('RGB')
+        
+        messages = []
+        if self.system_prompt is not None:
+            messages.append({"role": "system", "content": self.system_prompt})
+        
+        content_list = []
+        content_list.append({'type': 'image', 'image': question_image})
+        content_list.append({'type': 'text', 'text': self.user_prompt.format(question=question)})
+        messages.append({"role": "user", "content": content_list})
+        return messages
+    
     def get_string_sep(self, item, reference):
         question = item.question if item.question is not None else item.text
         image_query_id = item.image_id

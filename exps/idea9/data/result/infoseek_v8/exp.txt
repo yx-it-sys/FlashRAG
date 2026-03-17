@@ -1,0 +1,8 @@
+==================================================
+Task 2: Judging ranking performance
+==================================================
+
+=== Judgment Statistics ===
+Total data_ids processed: 496
+Has match: 245 (49.40%)
+Ranked first: 162 (32.66%)

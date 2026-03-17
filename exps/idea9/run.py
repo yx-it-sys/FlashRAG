@@ -104,7 +104,7 @@ def phase2_image_retrieval(config_file='my_config.yaml'):
     )
     pipeline.img_retrieval(test_data)
 
-def phase2_caption_retrieval(config_file='phase4_config.yaml'):
+def phase2_caption_retrieval(config_file='phase4_config.yaml', image_phase_dir="data/result/infoseek_v9/phase2_image_retrieval", caption_phase_dir="data/result/infoseek_v9/phase2_image_caption_retrieval"):
     from flashrag.utils import get_dataset, get_retriever, get_generator
     from flashrag.pipeline.mm_pipeline import MMCluePipeline
 
@@ -119,12 +119,12 @@ def phase2_caption_retrieval(config_file='phase4_config.yaml'):
         retriever=retriever,
         generator=generator,
     )
-    pipeline.caption_retrieval(test_data)
+    pipeline.caption_retrieval(test_data, image_phase_dir, caption_phase_dir)
 
 def phase3_reranking(
     config_file='my_config.yaml',
-    clue_path="data/result/infoseek_v6/phase1_clue_mining/clue.jsonl",
-    retrieval_results_path="data/result/infoseek_v6/phase2_image_caption_retrieval/final_retrieval_results.jsonl",
+    clue_path="data/result/infoseek_v9/phase1_clue_mining/clue.jsonl",
+    retrieval_results_path="data/result/infoseek_v9/phase2_image_caption_retrieval/final_retrieval_results.jsonl",
 ):
     from flashrag.utils import get_retriever, get_generator
     from flashrag.pipeline.mm_pipeline import MMCluePipeline
@@ -139,13 +139,13 @@ def phase3_reranking(
         retriever=retriever,
         generator=generator,
     )
-    return pipeline.naive_reranking(clue_path, retrieval_results_path)
-    # return pipeline.reranking(clue_path=clue_path, retrieval_results_path=retrieval_results_path)
+    return pipeline.my_reranking_v1(clue_path, retrieval_results_path)
+    # return pipeline.quadric_reranking(clue_path=clue_path, retrieval_results_path=retrieval_results_path)
 
 
 def phase4_query_gen_retrieval(
     config_file='phase4_config.yaml',
-    reranked_results_path="data/result/infoseek_v6/phase3_reranking_llm_compute_prune5/reranked_results.jsonl",
+    reranked_results_path="data/result/infoseek_v9/phase3_reranking_llm_compute_prune5/reranked_results.jsonl",
 ):
     from flashrag.utils import get_dataset, get_generator, get_retriever
     from flashrag.pipeline.mm_pipeline import MMCluePipeline
@@ -169,7 +169,7 @@ def phase4_query_gen_retrieval(
     finally:
         _cleanup_runtime(generator)
 
-def phase5_rag_generation(dataset, config_file='phase4_config.yaml', reranked_results_path="data/result/infoseek_v6/phase3_reranking_llm_compute_prune5/reranked_results.jsonl"):
+def phase5_rag_generation(dataset, config_file='phase4_config.yaml', reranked_results_path="data/result/infoseek_v9/phase3_reranking_llm_compute_prune5/reranked_results.jsonl"):
     from flashrag.utils import get_generator
     from flashrag.pipeline.mm_pipeline import MMCluePipeline
 
@@ -210,7 +210,7 @@ def main():
 
     if run_phase4:
         dataset = phase4_query_gen_retrieval()
-        phase5_rag_generation(dataset, config_file='phase4_config.yaml', reranked_results_path="data/result/infoseek_v6/phase3_reranking_llm_compute_prune5/reranked_results.jsonl")
+        phase5_rag_generation(dataset, config_file='phase4_config.yaml', reranked_results_path="data/result/infoseek_v9/phase3_reranking_llm_compute_prune5/reranked_results.jsonl")
 
     return 0
 

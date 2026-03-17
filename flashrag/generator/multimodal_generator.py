@@ -706,9 +706,10 @@ class VLLMMMGenerator(BaseMultiModalGenerator):
                 vllm_inputs,
                 sampling_params,
                 lora_request=LoRARequest("lora_module", 1, self.lora_path),
+                use_tqdm=False,
             )
         else:
-            outputs = self.model.generate(vllm_inputs, sampling_params)
+            outputs = self.model.generate(vllm_inputs, sampling_params, use_tqdm=False)
         end_time = time.time()
         self._record_perf(outputs, len(vllm_inputs), end_time - start_time)
 
@@ -743,10 +744,3 @@ class VLLMMMGenerator(BaseMultiModalGenerator):
             return generated_texts, scores
         
         return generated_texts
-
-
-
-
-
-
-
