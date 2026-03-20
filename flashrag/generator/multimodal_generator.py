@@ -539,7 +539,7 @@ class VLLMMMGenerator(BaseMultiModalGenerator):
                 "max_logprobs": 32016,
             })
 
-        self.model = LLM(**mm_config)
+        self.model = LLM(**mm_config, dtype="bfloat16")
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_path, trust_remote_code=True)
 
     def _record_perf(self, outputs, batch_size, latency_seconds):
@@ -744,3 +744,27 @@ class VLLMMMGenerator(BaseMultiModalGenerator):
             return generated_texts, scores
         
         return generated_texts
+    
+from openai import OpenAI  
+class APIGenerator():
+    def __init__(self, config):
+        api_key = config["api_key"]
+        self.model_name = config["generator_model"]
+        self.max_tokens = config["max_tokens"]
+        self.temperature = config['temperature']
+        self.top_p = config["top_p"]
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.siliconflow.cn/v1"
+        )
+
+    def generate(self, input):
+        response = self.client.chat.completions.create(
+            model=self.model_name,
+            messages=input,
+            max_tokens=self.max_tokens,
+            temperature=self.temperature,
+            top_p=self.top_p
+        )
+        response = response.choices[0].message.content
+        return response

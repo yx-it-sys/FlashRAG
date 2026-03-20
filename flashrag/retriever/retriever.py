@@ -1261,6 +1261,88 @@ class SerperRetriever(BaseRetriever):
     def batch_search(self, query_list: List[str], num: int = None):
         return self._batch_search(query_list, num)
 
+import requests
+from PIL import Image
+from io import BytesIO
+from cragmm_search.search import UnifiedSearchPipeline
+from huggingface_hub import snapshot_download
+
+class CRAGRetriever(BaseRetriever):
+    """Retriever based on CRAG model for code search."""
+    from cragmm_search.search import UnifiedSearchPipeline
+    def __init__(self, config):
+        super().__init__(config)
+        # _patch_crag_web_loader()
+        # _patch_crag_image_loader()
+        self.search_pipeline = UnifiedSearchPipeline(
+            image_model_name="openai/clip-vit-large-patch14-336",
+            image_hf_dataset_id="crag-mm-2025/image-search-index-validation",
+            text_model_name="BAAI/bge-large-en-v1.5",
+            web_hf_dataset_id="crag-mm-2025/web-search-index-validation",
+        )
+        self.topk = config["retrieval_topk"]
+
+    def build_entity_evidence(self, retrieval_results):
+        entity_map = {}
+
+        for item in retrieval_results:
+            score = item.get("score", 0.0)
+            url = item.get("url", "")
+            for ent in item.get("entities", []):
+                name = ent.get("entity_name", "Unknown")
+                attrs = ent.get("entity_attributes", {})
+
+                if name not in entity_map:
+                    entity_map[name] = {
+                        "entity_name": name,
+                        "score_max": score,
+                        "match_count": 0,
+                        "urls": [],
+                        "attributes": attrs.copy(),
+                    }
+
+                entity_map[name]["score_max"] = max(entity_map[name]["score_max"], score)
+                entity_map[name]["match_count"] += 1
+                if url:
+                    entity_map[name]["urls"].append(url)
+
+        return list(entity_map.values())
+
+    def entity_evidence_to_text(self, entity_list):
+        chunks = []
+        for i, ent in enumerate(entity_list, 1):
+            attrs = ent["attributes"]
+            lines = [
+                f"{i}. {ent['entity_name']}",
+                f"- best_score: {ent['score_max']:.4f}",
+                f"- match_count: {ent['match_count']}",
+            ]
+            for k in ["building_name", "location", "country", "status",
+                    "religious_affiliation", "architect",
+                    "architecture_style", "established", "year_completed"]:
+                if k in attrs and attrs[k]:
+                    lines.append(f"- {k}: {attrs[k]}")
+            chunks.append("\n".join(lines))
+        return "\n\n".join(chunks)
+
+    def search(self, query, num: int = None, query_type: str = None) -> List[Dict[str, str]]:
+        if num is None:
+            num = self.topk
+        if query_type is None:
+            query_type = "image" if not isinstance(query, str) else "text"
+        if query_type == 'text':
+            results = self.search_pipeline(query, num)
+            final_results = [f"{result.get('page_name')}\n{result.get('page_snippet')}" for result in results]
+            return final_results
+        elif query_type == 'image':
+            results = self.search_pipeline(query, k=num)
+            entities_list = self.build_entity_evidence(results)
+            flatten_texts = self.entity_evidence_to_text(entities_list)
+            return flatten_texts
+        else:
+            raise NotImplementedError("CRAGRetriever currently only supports text query and image query.")
+
+
 def main():
 # Example configuration
     config = {

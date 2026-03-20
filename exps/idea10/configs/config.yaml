@@ -1,0 +1,81 @@
+# ---- Environment Settings ----
+gpu_id: ["0","1"]
+dataset_name: "crag_mm"
+split: ["validation"]
+
+# Sampling configs
+test_sample_num: 100
+random_sample: True
+save_intermediate_data: True
+save_note: "experiment"
+seed: 2024
+
+# Data/output paths
+data_dir: "data/datasets/"
+save_new_dir: True
+save_dir: "data/result/"
+
+# ---- Retrieval Settings ----
+retrieval_method: crag
+save_retrieval_cache: True
+use_retrieval_cache: False
+retrieval_cache_path: "./output/retrieval_cache.json"
+silent_retrieval: False
+corpus_path: "/mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl"
+multimodal_index_path_dict:
+  text: "/mnt/data/you/datasets/infoseek_val/indexes/clip_Flat_text.index"
+  image: ~
+retrieval_topk: 3
+retrieval_query_max_length: 64
+retrieval_pooling_method: "cls"
+retrieval_use_fp16: True
+retrieval_batch_size: 16
+instruction: ~
+retrieval_model_path: "/mnt/data/you/modelscope/clip-vit-large-patch14"
+crag_text_model_name: "/mnt/data/you/modelscope/bge-large-en-v1.5"
+crag_hf_home: "/mnt/data/you/huggingface"
+crag_offline: True
+use_sentence_transformer: False
+faiss_gpu: False
+
+use_reranker: False
+rerank_model_name: e5
+
+# ---- Generator Settings ----
+framework: vllm
+
+## API Settings
+api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
+generator_model: "Qwen/Qwen2.5-VL-72B-Instruct"
+max_tokens: 2048
+temperature: 0.0
+top_p: 0.0
+
+## vllm Settings
+generator_model: "Qwen2.5-VL-7B-Instruct"
+generator_model_path: "/mnt/data/you/modelscope/Qwen2.5-VL-7B-Instruct"
+generator_max_input_len: 2048
+generator_batch_size: 4
+generation_params:
+  do_sample: False
+  max_tokens: 2048
+  temperature: 0.1
+  top_p: 1.0
+
+vllm_gpu_memory_utilization: 0.88  # Reduced from 0.88 to be more conservative
+tensor_parallel_size: 1
+max_model_len: 20000
+vllm_enforce_eager: true
+vllm_max_num_batched_tokens: 4096
+vllm_max_num_seqs: 256
+vllm_max_num_seqs_kv: 256
+
+# ---- Evaluation Settings ----
+metrics: ["em", "f1", "acc", "precision", "recall", "input_tokens"]
+metric_setting:
+  retrieval_recall_topk: 5
+  tokenizer_name: "gpt-4"
+save_metric_score: True
+
+# ---- Prompt Settings ----
+omni_prompt_path: /home/you/FlashRAG/exps/idea10/baseline/prompts/omni_prompt.toml
