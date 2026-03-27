@@ -4,7 +4,6 @@ from flashrag.pipeline import BasicMultiModalPipeline
 import re
 import os
 import json
-import base64
 from PIL import Image
 import tomllib
 from tqdm import tqdm
@@ -18,13 +17,50 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         self.data_dir = self.config['data_dir']
         self.dataset_name = self.config['dataset_name']
         self.generator = get_generator(config) if generator is None else generator
-        self.retriever = get_retriever(config) if retriever is None else retriever
+        if retriever is not None:
+            self.retriever = retriever
+        elif "text_retriever_config" in self.config or "image_retriever_config" in self.config:
+            self.retriever = None
+        else:
+            self.retriever = get_retriever(config)
         prompt_path = self.config['omni_prompt_path']
         with open(prompt_path, 'rb') as f:
             self.prompt = tomllib.load(f)['system_prompt']
         self.output_dir = self.config['output_dir'] if 'output_dir' in self.config and self.config['output_dir'] else self.config['save_dir']
         os.makedirs(self.output_dir, exist_ok=True)
         self.trajectory_path = os.path.join(self.output_dir, "omnisearch_trajectories.jsonl")
+        self.retrieval_char_limit = int(self.config["omni_retrieval_char_limit"])
+
+    def _retriever_device_context(self, device):
+        if device != "cpu":
+            from contextlib import nullcontext
+
+            return nullcontext()
+
+        from contextlib import contextmanager
+        import torch
+        import flashrag.retriever.encoder as retriever_encoder_module
+        import flashrag.retriever.utils as retriever_utils_module
+
+        @contextmanager
+        def cpu_context():
+            original_encoder_get_device = retriever_encoder_module.get_device
+            original_utils_get_device = retriever_utils_module.get_device
+            original_module_cuda = torch.nn.Module.cuda
+            original_tensor_cuda = torch.Tensor.cuda
+            retriever_encoder_module.get_device = lambda: "cpu"
+            retriever_utils_module.get_device = lambda: "cpu"
+            torch.nn.Module.cuda = lambda self, device=None, *args, **kwargs: self.to("cpu")
+            torch.Tensor.cuda = lambda self, device=None, non_blocking=False, memory_format=None: self.to("cpu")
+            try:
+                yield
+            finally:
+                retriever_encoder_module.get_device = original_encoder_get_device
+                retriever_utils_module.get_device = original_utils_get_device
+                torch.nn.Module.cuda = original_module_cuda
+                torch.Tensor.cuda = original_tensor_cuda
+
+        return cpu_context()
 
     def _normalize_generation_output(self, response):
         if isinstance(response, str):
@@ -45,33 +81,156 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         max_retries = 5
         for attempt in range(max_retries):
             try:
-                raw_response = self.generator.generate(messages)
-                return raw_response
+                raw_response = self.generator.generate([messages])
+                return self._normalize_generation_output(raw_response)
             except openai.RateLimitError as e:
                 if attempt == max_retries - 1:
                     raise
                 print(f"Rate limit hit, retrying in {delay}s ...")
                 time.sleep(delay)
                 delay *= 2
-        raw_response = self.generator.generate(messages)
+        raw_response = self.generator.generate([messages])
         return self._normalize_generation_output(raw_response)
 
-    def _format_retrieved_doc(self, doc):
+    def _clip_text(self, text, limit):
+        if text is None:
+            return None
+        text = str(text)
+        if len(text) <= limit:
+            return text
+        clipped = text[:limit]
+        return clipped + "\n\n[Truncated due to prompt length limit]"
+
+    def _build_followup_message(self, retrieval_mode, retrieval_content):
+        if retrieval_mode == "no_retrieval":
+            return (
+                "You chose `No Retrieval`, which means external retrieval is unnecessary for this sub-question. "
+                "Do not say that retrieval failed or that no relevant information was found. "
+                "Continue reasoning from the image and prior conversation, then either output the next step or the final answer."
+            )
+
+        if retrieval_content:
+            return f"Contents of retrieved documents:\n{retrieval_content}"
+
+        return (
+            "Retrieval was attempted but returned no useful results. "
+            "You may refine the query, switch retrieval mode, or conclude if the answer cannot be grounded."
+        )
+
+    def _truncate_after_search(self, response):
+        if not response or "<Search>" not in response:
+            return response
+
+        search_start = response.find("<Search>")
+        search_end = response.find("</Search>", search_start)
+        if search_end != -1:
+            search_end += len("</Search>")
+            tail = response[search_end:]
+            next_markers = [
+                "<Thought>",
+                "</Thought>",
+                "<Sub-Question>",
+                "</Sub-Question>",
+                "<Search>",
+                "<End>",
+                "<Final Answer>",
+                "Final Answer:",
+            ]
+
+            next_positions = []
+            for marker in next_markers:
+                pos = tail.find(marker)
+                if pos != -1:
+                    next_positions.append(pos)
+
+            if not next_positions:
+                return response[:search_end].rstrip()
+
+            cut_pos = search_end + min(next_positions)
+            return response[:cut_pos].rstrip()
+
+        search_body_start = search_start + len("<Search>")
+        tail = response[search_body_start:]
+        next_markers = [
+            "<Thought>",
+            "</Thought>",
+            "<Sub-Question>",
+            "</Sub-Question>",
+            "<Search>",
+            "<End>",
+            "<Final Answer>",
+            "Final Answer:",
+        ]
+
+        next_positions = []
+        for marker in next_markers:
+            pos = tail.find(marker)
+            if pos != -1:
+                next_positions.append(pos)
+
+        if not next_positions:
+            return response
+
+        cut_pos = search_body_start + min(next_positions)
+        return response[:cut_pos].rstrip()
+
+    def _format_retrieved_doc(self, doc, preferred_field=None):
         if isinstance(doc, str):
             return doc
         if isinstance(doc, dict):
-            for key in ("contents", "text", "content", "body", "passage"):
+            if preferred_field:
+                value = doc.get(preferred_field)
+                if value:
+                    return str(value)
+            for key in ("text", "contents", "content", "body", "passage"):
                 value = doc.get(key)
                 if value:
                     return str(value)
             return json.dumps(doc, ensure_ascii=False)
         return str(doc)
 
+    def _format_retrieval_content(self, retrieved_docs, preferred_field=None):
+        if not retrieved_docs:
+            return ""
+        if not isinstance(retrieved_docs, list):
+            retrieved_docs = [retrieved_docs]
+        return "\n\n".join(
+            [f"Doc{i+1}:\n{self._format_retrieved_doc(doc, preferred_field=preferred_field)}" for i, doc in enumerate(retrieved_docs)]
+        )
+
+    def _log_retrieval_preview(self, retrieval_content):
+        if retrieval_content is None:
+            print("Retrieval result: None")
+            return
+        preview_limit = min(self.retrieval_char_limit, 500)
+        preview = str(retrieval_content)
+        if len(preview) > preview_limit:
+            preview = preview[:preview_limit] + "\n\n[Preview truncated in log]"
+        print(f"Retrieval result:\n{preview}")
+
     def _search_text_docs(self, query_txt):
-        return self.retriever.search(query_txt, query_type="text")
+        from copy import deepcopy
+
+        text_cfg = deepcopy(self.config.final_config)
+        text_cfg.update(deepcopy(self.config["text_retriever_config"]))
+        text_device = text_cfg.get("retrieval_device", "cuda")
+        with self._retriever_device_context(text_device):
+            if not hasattr(self, "_text_retriever"):
+                self._text_retriever = get_retriever(text_cfg)
+            return self._text_retriever.search(query_txt)
 
     def _search_image_docs(self, img):
-        return self.retriever.search(img, query_type="image")
+        from copy import deepcopy
+        from flashrag.retriever.retriever import MultiModalRetriever
+
+        image_cfg = deepcopy(self.config.final_config)
+        image_cfg.update(deepcopy(self.config["image_retriever_config"]))
+        target_modal = image_cfg.get("image_retrieval_target_modal", "image")
+        image_device = image_cfg.get("retrieval_device", "cuda")
+        with self._retriever_device_context(image_device):
+            if not hasattr(self, "_image_retriever"):
+                self._image_retriever = MultiModalRetriever(image_cfg)
+            return self._image_retriever.search(img, target_modal=target_modal)
 
     def _serialize_for_log(self, value):
         if isinstance(value, (str, int, float, bool)) or value is None:
@@ -132,21 +291,28 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
     def _record_response_actions(self, trajectory, response):
         trajectory.extend(self._extract_action_nodes(response))
 
+    def _record_retrieval_result(self, trajectory, retrieval_mode, query_txt, retrieval_content):
+        mode_name_map = {
+            "text_retrieval": "text_retrieval_result",
+            "image_retrieval": "image_retrieval_result",
+            "no_retrieval": "no_retrieval_result",
+        }
+        trajectory.append({
+            "action": mode_name_map.get(retrieval_mode, "retrieval_result"),
+            "mode": retrieval_mode,
+            "query": query_txt if query_txt else None,
+            "content": retrieval_content,
+        })
+
     def _write_trajectory(self, record):
         self.safe_write(self.trajectory_path, self._serialize_for_log(record))
     
-    def turn_to_url(self, image_path):
-        with open(image_path, "rb") as f:
-            base64_image = base64.b64encode(f.read()).decode("utf-8")
-            return f"data:image/jpeg;base64,{base64_image}"
-
     def iterative_infer(self, question, id, image_id):
         img_path = os.path.join(self.data_dir, self.dataset_name, "images", f"{image_id}.jpg")
         
         if not os.path.exists(img_path):
             return None
         
-        img_url = self.turn_to_url(img_path)
         img = Image.open(img_path).convert("RGB")
         messages = [
             {"role": "system", "content": [
@@ -154,13 +320,14 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
             ]},
             {"role": "user", "content":[
                 {"type": "text", "text": f"Input Question: {question}"},
-                {"type":  "image_url", "image_url": {"url": img_url}}
+                {"type": "image", "image": img}
             ]}
 
         ]
         trajectory = []
         start_time = time.time()
         response = self._generate_text(messages)
+        response = self._truncate_after_search(response)
         print(f"First Response: {response}")
         self._record_response_actions(trajectory, response)
         messages.append({'role': 'assistant', 'content': response})
@@ -174,10 +341,11 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
             need_no_ret = "No Retrieval" in response
             if need_txt_ret or need_img_ret or need_no_ret:
                 retrieval_content = ""
+                retrieval_mode = None
                 query_txt = ""
-                action = "text_retrieval" if need_txt_ret else "image_retrieval"
                 retrieved_docs = []
                 if need_txt_ret:
+                    retrieval_mode = "text_retrieval"
                     print("Start Text Retrieval...")
                     pattern = r'Text Retrieval[:\s"]*(.*?)(?=<|$)'
                     match = re.search(pattern, response, re.DOTALL)
@@ -187,33 +355,47 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
                     if query_txt == "":
                         print(f"ERROR!!Query_txt is None")
                         retrieved_docs = self._search_text_docs(query_txt)
-                        retrieval_content = "\n\n".join(
-                            [f"Doc{i+1}:\n{self._format_retrieved_doc(text)}" for i, text in enumerate(retrieved_docs)]
-                        )
-                        # print(f"Retrieval result: {retrieval_content}")
+                        retrieval_content = self._format_retrieval_content(retrieved_docs)
+                        retrieval_content = self._clip_text(retrieval_content, self.retrieval_char_limit)
+                        self._log_retrieval_preview(retrieval_content)
                     else:
                         retrieved_docs = self._search_text_docs(query_txt)
-                        retrieval_content = "\n\n".join(
-                            [f"Doc{i+1}:\n{self._format_retrieved_doc(text)}" for i, text in enumerate(retrieved_docs)]
-                        )
-                        print(f"Retrieval result: {retrieval_content[:100]}")
+                        retrieval_content = self._format_retrieval_content(retrieved_docs)
+                        retrieval_content = self._clip_text(retrieval_content, self.retrieval_char_limit)
+                        self._log_retrieval_preview(retrieval_content)
                 elif need_img_ret:
+                    retrieval_mode = "image_retrieval"
                     print("Start Image Retrieval...")
-                    retrieved_content = self._search_image_docs(img)
-                    print(f"Retrieval result: {retrieved_content[:100]}")
+                    retrieved_docs = self._search_image_docs(img)
+                    image_return_field = self.config["image_retriever_config"].get("image_retrieval_return_field", "title")
+                    retrieval_content = self._format_retrieval_content(
+                        retrieved_docs,
+                        preferred_field=image_return_field,
+                    )
+                    retrieval_content = self._clip_text(retrieval_content, self.retrieval_char_limit)
+                    self._log_retrieval_preview(retrieval_content)
                 elif need_no_ret:
+                    retrieval_mode = "no_retrieval"
                     retrieval_content = None
 
+                self._record_retrieval_result(
+                    trajectory=trajectory,
+                    retrieval_mode=retrieval_mode,
+                    query_txt=query_txt,
+                    retrieval_content=retrieval_content,
+                )
+
                 contents = []
-                if retrieval_content:
-                    contents.append({'type': 'text', 'text': f"Contents of retrieved documents:\n{retrieval_content}"})
-                else:
-                    contents.append({'type': 'text', 'text': "No relevant information found."})    
+                contents.append({
+                    'type': 'text',
+                    'text': self._build_followup_message(retrieval_mode, retrieval_content),
+                })
 
                 messages.append({'role': 'user', 'content': contents})
 
                 try:
                     response = self._generate_text(messages)
+                    response = self._truncate_after_search(response)
                     print(f"Response: {response}")
                     self._record_response_actions(trajectory, response)
                     messages.append({"role":"assistant", "content": response})

@@ -1,0 +1,25 @@
+{
+  "sample_level": {
+    "ambiguous_samples": 68,
+    "total_samples": 200,
+    "ratio": 0.34
+  },
+  "query_level": {
+    "ambiguous_queries": 157,
+    "total_text_retrieval_queries": 558,
+    "ratio": 0.28136200716845877
+  },
+  "ambiguity_level_distribution": {
+    "total_ambiguous_queries_with_level": 157,
+    "counts": {
+      "Level 3: Original Query": 113,
+      "Level 0: Description of the entity": 40,
+      "Level 4: Entity Absence": 4
+    },
+    "ratios_within_ambiguous_queries": {
+      "Level 3: Original Query": 0.7197452229299363,
+      "Level 0: Description of the entity": 0.25477707006369427,
+      "Level 4: Entity Absence": 0.025477707006369428
+    }
+  }
+}

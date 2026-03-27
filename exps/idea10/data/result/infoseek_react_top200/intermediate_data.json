@@ -1,0 +1,5187 @@
+[
+    {
+        "data_id": "infoseek_val_00061615",
+        "image_id": "oven_05019275",
+        "question": "Which city or region does this garden locate in?",
+        "answer": [
+            "Howrah"
+        ],
+        "answer_eval": [
+            "Haora",
+            "Haura",
+            "Howrah"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Columbus, Ohio.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00023816",
+        "image_id": "oven_05035644",
+        "question": "What is the closest parent taxonomy of this plant?",
+        "answer": [
+            "Bignoniaceae"
+        ],
+        "answer_eval": [
+            "Bignoniaceae",
+            "Category:Bignonia family plants"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide a clear identification of the plant species in the image. The image shows a plant with orange flowers and green leaves, which does not match the descriptions of the plants in the retrieved documents. I need to search for more specific information about the plant in the image.\n</Thought>\n<Sub-Question>\nWhat is the species of the plant in the image?\n</Sub-Question>\n<Search>\nText Retrieval: Identify the plant species from the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.030303030303030304,
+                "acc": 0.0,
+                "precision": 0.015873015873015872,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00039813",
+        "image_id": "oven_05019925",
+        "question": "What country does this building belong to?",
+        "answer": [
+            "Portugal"
+        ],
+        "answer_eval": [
+            "PRT",
+            "Portugal",
+            "🇵🇹",
+            "República Portuguesa",
+            "PT",
+            "Portuguese Republic"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide a clear name for the lighthouse in the image. However, the image shows a lighthouse on a coastal cliff, which is a common feature in many countries. To determine the country, we need to identify the specific lighthouse and its location.\n</Thought>\n<Sub-Question>\nWhat is the name of the lighthouse in the image?\n</Sub-Question>\n<Search>\nText Retrieval: lighthouse in the image\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00026240",
+        "image_id": "oven_05023515",
+        "question": "What country does this building belong to?",
+        "answer": [
+            "India"
+        ],
+        "answer_eval": [
+            "in",
+            "Bharat",
+            "India",
+            "🇮🇳",
+            "Republic of India",
+            "Hindustan",
+            "IN",
+            "IND",
+            "Bharatvarsh",
+            "Aryavratt"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "India",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00053751",
+        "image_id": "oven_05010148",
+        "question": "What equipment or engine is used by this vehicle to provide power?",
+        "answer": [
+            "gasoline engine"
+        ],
+        "answer_eval": [
+            "petrol engine",
+            "gasoline engine"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The specific engine used in the GMC van shown in the image cannot be determined from the provided information.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.11764705882352941,
+                "acc": 0.0,
+                "precision": 0.06666666666666667,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00034763",
+        "image_id": "oven_05040197",
+        "question": "Which place is this animal endemic to?",
+        "answer": [
+            "Texas"
+        ],
+        "answer_eval": [
+            "State of Texas",
+            "Tex.",
+            "US-TX",
+            "Lone Star State",
+            "TX",
+            "Texas",
+            "Texas, United States"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The spotted turtle is endemic to the eastern Great Lakes and east of the Appalachian Mountains in the eastern US.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.10526315789473684,
+                "acc": 0.0,
+                "precision": 0.0625,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00069885",
+        "image_id": "oven_05060355",
+        "question": "In which year was this item invented or discovered?",
+        "answer": [
+            "1839"
+        ],
+        "answer_eval": [
+            "1838",
+            "1839",
+            "1840"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The first practical photovoltaic cell was demonstrated at Bell Laboratories in 1954.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00032134",
+        "image_id": "oven_05038164",
+        "question": "What is the closest upper taxonomy of this plant?",
+        "answer": [
+            "Nemastylis"
+        ],
+        "answer_eval": [
+            "Nemastylis"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide the specific plant species in the image. However, the image shows a flower with six petals and a yellow center, which is characteristic of the family Iridaceae. To identify the plant species, I need to search for more specific information about the plant in the image.\n</thought>\n<Search>\nText Retrieval: Identify the plant species in the image and its upper taxonomic level.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00065313",
+        "image_id": "oven_05035684",
+        "question": "What is the length of the wingspan in metre of this bird?",
+        "answer": [
+            "1.02"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 1.02,
+                "range": [
+                    0.918,
+                    1.122
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The wingspan of the bird in the image is approximately 74 to 120 cm.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00046422",
+        "image_id": "oven_05018528",
+        "question": "What event does this building commemorate?",
+        "answer": [
+            "The Holocaust"
+        ],
+        "answer_eval": [
+            "the Shoah",
+            "the Holocaust",
+            "The Holocaust",
+            "Holocaust",
+            "Shoah"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The Holocaust Memorial commemorates the victims of the Holocaust.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2857142857142857,
+                "acc": 1.0,
+                "precision": 0.16666666666666666,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00054509",
+        "image_id": "oven_05021747",
+        "question": "Which street is this building located at?",
+        "answer": [
+            "place des Pyramides"
+        ],
+        "answer_eval": [
+            "place des Pyramides"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe building in the image is located in the Palais Royal, which is in the 1st arrondissement of Paris. The street name is not explicitly mentioned in the image, but based on the context, it is likely to be a street in the Palais Royal area. The street name is not provided in the retrieved documents.\n</Thought>\n<Sub-Question>\nWhat is the street name of the building in the image?\n</Sub-Question>\n<Search>\nText Retrieval: street name of the building in the image\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00069118",
+        "image_id": "oven_05011188",
+        "question": "Who occupies this building?",
+        "answer": [
+            "Yenidze Tobacco and Cigarette Factory"
+        ],
+        "answer_eval": [
+            "Yenidze Tobacco and Cigarette Factory"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The Yenidze building in Dresden is currently used as an office building.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.13333333333333333,
+                "acc": 0.0,
+                "precision": 0.1,
+                "recall": 0.2
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00028590",
+        "image_id": "oven_05038123",
+        "question": "What is the spore print color of this plant?",
+        "answer": [
+            "salmon"
+        ],
+        "answer_eval": [
+            "salmon"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe mushroom in the image appears to be a species of Psilocybe, as it has a cap that is brown to yellow-brown in color and a spore print color that ranges from lilac-brown to dark purple-brown. Based on the information provided, the spore print color of this mushroom is dark purplish brown.\n</Thought>\n<Sub-Question>\nWhat is the spore print color of the mushroom in the image?\n</Sub-Question>\n<Search>\nText Retrieval: spore print color of the mushroom in the image\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00040570",
+        "image_id": "oven_05010197",
+        "question": "What is the immediately prior item that this vehicle follows in a series?",
+        "answer": [
+            "Ford Courier"
+        ],
+        "answer_eval": [
+            "Ford Courier"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The image only shows a single vehicle, so there is no immediately prior item in a series.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00071281",
+        "image_id": "oven_05024899",
+        "question": "Which city or region does this bridge locate in?",
+        "answer": [
+            "Pushkin"
+        ],
+        "answer_eval": [
+            "Pushkin"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe Stone Bridge in the painting by Rembrandt is located in the Netherlands, as it is a landscape painting that depicts a stone bridge in a rural setting. The painting is in the collection of the Rijksmuseum in Amsterdam, which is located in the Netherlands.\n</Thought>\n<Sub-Question>\nWhich city or region does the Stone Bridge in the painting by Rembrandt locate in?\n</Sub-Question>\n<Search>\nText Retrieval: Stone Bridge location in the Netherlands\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00043285",
+        "image_id": "oven_05036688",
+        "question": "What is the length of the wingspan in metre of this bird?",
+        "answer": [
+            "0.82"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 0.82,
+                "range": [
+                    0.738,
+                    0.902
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide specific information about the bird in the image. The bird in the image appears to be a small bird, possibly a wading bird, but the exact species is not identifiable from the image. To find the wingspan of this bird, I need to perform a text retrieval to find information about the bird species and its wingspan.\n</Thought>\n<Search>\nText Retrieval: \"wingspan of the bird in the image\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00068072",
+        "image_id": "oven_05016776",
+        "question": "Which city or region does this place locate in?",
+        "answer": [
+            "Sofia"
+        ],
+        "answer_eval": [
+            "Thứ Tư",
+            "Sofia",
+            "Serdica",
+            "Sredets"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe building in the image is the Central Sofia Market Hall, which is located in Sofia, Bulgaria. The architecture and the presence of the tram are characteristic of Sofia.\n</Thought>\n<Sub-Question>\nWhat is the name of the building in the image?\n</Sub-Question>\n<Search>\nText Retrieval: \"name of the building in the image with a clock tower and market hall architecture in Sofia, Bulgaria\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.037037037037037035,
+                "acc": 1.0,
+                "precision": 0.018867924528301886,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00009787",
+        "image_id": "oven_04951328",
+        "question": "What country does this lake belong to?",
+        "answer": [
+            "India"
+        ],
+        "answer_eval": [
+            "in",
+            "Bharat",
+            "India",
+            "🇮🇳",
+            "Republic of India",
+            "Hindustan",
+            "IN",
+            "IND",
+            "Bharatvarsh",
+            "Aryavratt"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "New Zealand",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00027050",
+        "image_id": "oven_05016592",
+        "question": "where is the highest point of this mountain?",
+        "answer": [
+            "Musala"
+        ],
+        "answer_eval": [
+            "Musala"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The highest point of Mount Rockwell is 9,277 feet (2,828 meters) above sea level.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00061411",
+        "image_id": "oven_05028831",
+        "question": "What is the closest parent taxonomy of this animal?",
+        "answer": [
+            "Ondatra"
+        ],
+        "answer_eval": [
+            "Ondatra"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe closest parent taxonomy of beavers is the order Rodentia.\n</Thought>\n<Sub-Question>\nWhat is the closest parent taxonomy of beavers?\n</Sub-Question>\n<Search>\nText Retrieval: Taxonomic classification of beavers\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00019447",
+        "image_id": "oven_05033538",
+        "question": "What is the length in millimetre is the animal in the image?",
+        "answer": [
+            "62"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 62.0,
+                "range": [
+                    55.800000000000004,
+                    68.2
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The length of the lizard in the image is approximately 15 cm.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00069678",
+        "image_id": "oven_05063357",
+        "question": "What is the source that produces this food?",
+        "answer": [
+            "Cucumis melo",
+            "Benincasa",
+            "Cucumis"
+        ],
+        "answer_eval": [
+            "Musk melon",
+            "Musk Melon",
+            "muskmelon",
+            "melon plant",
+            "Benincasa",
+            "Cucumis",
+            "Cucumis melo",
+            "melon"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The source of the melons in the image is likely to be from Iran or India.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 1.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00027867",
+        "image_id": "oven_05021828",
+        "question": "Who is the owner of this building?",
+        "answer": [
+            "Voivode"
+        ],
+        "answer_eval": [
+            "Voivode",
+            "Voivoda",
+            "Voevode",
+            "Vojvoda"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide any specific information about the building in the image. The documents are mostly about different buildings and their definitions, but none of them mention the building in the image. We might need to search for more specific information about the building's location or history to find its owner.\n</Thought>\n<Search>\nText Retrieval: Information about the building in the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00053989",
+        "image_id": "oven_05018983",
+        "question": "How many spans does this bridge have?",
+        "answer": [
+            "63"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 63.0,
+                "range": [
+                    56.7,
+                    69.30000000000001
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The Confederation Bridge has 44 spans.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00007665",
+        "image_id": "oven_04957358",
+        "question": "In which year did this bridge officially open?",
+        "answer": [
+            "1997"
+        ],
+        "answer_eval": [
+            "1997",
+            "1996",
+            "1998"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The Manhattan Bridge officially opened in 1909.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00045802",
+        "image_id": "oven_05009551",
+        "question": "What is the length of this aircraft in metre?",
+        "answer": [
+            "46.6"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 46.6,
+                "range": [
+                    41.940000000000005,
+                    51.260000000000005
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide the specific length of the FedEx Express aircraft. The image shows a FedEx Express aircraft, but the model is not explicitly mentioned. To find the length of the FedEx Express aircraft, we need to search for the specific model and its dimensions.\n</Thought>\n<Search>\nText Retrieval: FedEx Express aircraft model and length\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00054600",
+        "image_id": "oven_05009789",
+        "question": "What is the total quantity of produced items for this type of aircraft?",
+        "answer": [
+            "854"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 854.0,
+                "range": [
+                    768.6,
+                    939.4000000000001
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide the specific model of the aircraft shown in the image. We need more information to identify the aircraft type and its production quantity. The image shows a Polish Airlines aircraft, but the exact model is not clear from the image or the retrieved documents. We need to find more specific information about the aircraft model to proceed.\n</Thought>\n<Sub-Question>\nWhat is the specific model of the aircraft shown in the image?\n</Sub-Question>\n<Search>\nText Retrieval: specific model of the aircraft shown in the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00061064",
+        "image_id": "oven_05010006",
+        "question": "What equipment or engine is used by this aircraft to provide power?",
+        "answer": [
+            "PW100"
+        ],
+        "answer_eval": [
+            "Pratt & Whitney Canada PW100",
+            "PWC PW100",
+            "PW127G",
+            "PW121",
+            "PW100"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents confirm that the Boeing 767 is powered by General Electric CF6 turbofans. The engines have a maximum output of 48,000 pounds-force (210 kN) of thrust. Based on the information provided, the engine used by the Boeing 767 in the image is the General Electric CF6.\n</Thought>\n<Sub-Question>\nWhat is the engine model used by the Boeing 767?\n</Sub-Question>\n<Search>\nText Retrieval: General Electric CF6 engine for Boeing 767\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00016276",
+        "image_id": "oven_04957441",
+        "question": "What is the location of this facility?",
+        "answer": [
+            "Ephesus"
+        ],
+        "answer_eval": [
+            "Ephesos",
+            "Efes",
+            "Ephesus"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The Celsus Library is located in Ephesus, Turkey, near the city of Selçuk.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.16666666666666669,
+                "acc": 1.0,
+                "precision": 0.09090909090909091,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00018214",
+        "image_id": "oven_04953763",
+        "question": "What is the height of this building in metre?",
+        "answer": [
+            "86"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 86.0,
+                "range": [
+                    77.4,
+                    94.60000000000001
+                ]
+            }
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe height of the Wisconsin State Capitol is 284 feet, 5 inches. To convert this to meters, we need to convert the height to feet first. There are 12 inches in a foot, so 5 inches is 5/12 feet. Adding this to 284 feet gives us 284.4167 feet. Now, we multiply this by the conversion factor of 0.3048 meters per foot.\n</Thought>\n<Sub-Question>\nWhat is the height of the Wisconsin State Capitol in meters?\n</Sub-Question>\n<Search>\nNo Retrieval.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00042875",
+        "image_id": "oven_05039054",
+        "question": "What is the closest parent taxonomy of this insect?",
+        "answer": [
+            "Micrathena"
+        ],
+        "answer_eval": [
+            "Micrathena"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents provide information about various spiders and their taxonomic classifications. However, the image does not provide enough detail to determine the specific insect order or class. Therefore, we need to identify the insect in the image and then determine its taxonomic classification.\n</Thought>\n<Sub-Question>\nWhat is the taxonomic classification of the insect in the image?\n</Sub-Question>\n<Search>\nImage Retrieval: Identify the insect in the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00051158",
+        "image_id": "oven_05011176",
+        "question": "which mountain range is this mountain belong to?",
+        "answer": [
+            "Appenzell Alps"
+        ],
+        "answer_eval": [
+            "Appenzell Alps"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The mountain in the image is part of a mountain range, but the specific range cannot be determined from the image alone.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00043362",
+        "image_id": "oven_05010736",
+        "question": "What equipment or engine is used by this vehicle to provide power?",
+        "answer": [
+            "gasoline engine"
+        ],
+        "answer_eval": [
+            "petrol engine",
+            "gasoline engine"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The Chrysler PT Cruiser convertible uses a 2.4 L four-cylinder gasoline engine.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.33333333333333337,
+                "acc": 1.0,
+                "precision": 0.2,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00045258",
+        "image_id": "oven_05032570",
+        "question": "What is the basionym of this plant?",
+        "answer": [
+            "Campanula perfoliata"
+        ],
+        "answer_eval": [
+            "Campanula perfoliata"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Dalea purpurea",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00026364",
+        "image_id": "oven_05009858",
+        "question": "who/what operates this aircraft?",
+        "answer": [
+            "American Airlines"
+        ],
+        "answer_eval": [
+            "AAL",
+            "AA",
+            "American Airlines",
+            "AMR Corporation",
+            "American Airlines, Inc.",
+            "American Airways",
+            "American Air Lines"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Inter European Airways",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4,
+                "acc": 0.0,
+                "precision": 0.3333333333333333,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00042661",
+        "image_id": "oven_05020196",
+        "question": "What is the height of this lake in terms of metre above sea level?",
+        "answer": [
+            "39"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 39.0,
+                "range": [
+                    35.1,
+                    42.900000000000006
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The height of the lake in terms of metres above sea level is 39 metres.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00055942",
+        "image_id": "oven_05009580",
+        "question": "What is the height of this aircraft in metre?",
+        "answer": [
+            "15.8"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 15.8,
+                "range": [
+                    14.22,
+                    17.380000000000003
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The height of the aircraft in the image is approximately 13.5 meters.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00054314",
+        "image_id": "oven_05020174",
+        "question": "What is the height of this lake in terms of metre above sea level?",
+        "answer": [
+            "39"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 39.0,
+                "range": [
+                    35.1,
+                    42.900000000000006
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The height of the lake in the image above sea level cannot be determined with the available information.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00041478",
+        "image_id": "oven_05009871",
+        "question": "What country does this aircraft belong to?",
+        "answer": [
+            "Netherlands"
+        ],
+        "answer_eval": [
+            "Netherlands",
+            "🇳🇱",
+            "NED",
+            "Nederland",
+            "NL",
+            "Holland",
+            "Netherlands (after 1945)",
+            "nl",
+            "the Netherlands"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide information about the airline \"TRANSWISATA\" or its country of origin. We need to search for more specific information about the airline.\n</Thought>\n<Sub-Question>\nWhat is the country of origin for the airline \"TRANSWISATA\"?\n</Sub-Question>\n<Search>\nText Retrieval: Information about the airline TRANSWISATA and its country of origin.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00028056",
+        "image_id": "oven_05025992",
+        "question": "What country does this building belong to?",
+        "answer": [
+            "Germany"
+        ],
+        "answer_eval": [
+            "Germany",
+            "BRD",
+            "de",
+            "GFR",
+            "DE",
+            "Bundesrepublik Deutschland",
+            "Federal Republic of Germany",
+            "GER",
+            "Deutschland",
+            "BR Deutschland"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide a clear answer to the name of the building in the image. However, the image shows a modern building with a distinctive design, which is similar to the Hypo-Haus in Munich. This suggests that the building might be located in Munich, Germany.\n</Thought>\n<Sub-Question>\nWhat is the name of the building in the image?\n</Sub-Question>\n<Search>\nText Retrieval: \"building with distinctive design similar to Hypo-Haus in Munich\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.06060606060606061,
+                "acc": 1.0,
+                "precision": 0.03225806451612903,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00053343",
+        "image_id": "oven_05023199",
+        "question": "What is this building named after?",
+        "answer": [
+            "Ford Motor Company"
+        ],
+        "answer_eval": [
+            "Ford Motor Company",
+            "FoMoCo",
+            "Ford Motors",
+            "Ford",
+            "Ford Motor Corporation",
+            "Ford Motor",
+            "Ford Motor Co."
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents mention that Taylor Swift performed at the stadium on 28 November 2015, playing to a sold-out crowd of 75,980, as part of The 1989 World Tour. The documents also mention that Taylor Swift returned to the stadium on 2 November 2018 as part of her Reputation Stadium Tour, again playing to a sold-out crowd. The documents do not specify the name of the stadium. However, the documents mention that Taylor Swift performed at the stadium on 28 November 2015, which suggests that the building in question is likely a stadium where Taylor Swift performed. The documents also mention that Taylor Swift performed at the stadium on 2 November 2018, which further supports the idea that the building in question is a stadium. The documents do not provide enough information to determine the name of the stadium. We need to search for more specific information about the stadium where Taylor Swift performed.\n</Thought>\n<Search>\nText Retrieval: Taylor Swift performance venue in Australia\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00030028",
+        "image_id": "oven_05066037",
+        "question": "What is this plant named after?",
+        "answer": [
+            "Frédéric-Louis Allamand"
+        ],
+        "answer_eval": [
+            "Frederic-Louis Allamand",
+            "F.Allam.",
+            "Frédéric-Louis Allamand"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The plant in the image is named after the yellow bee plant.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00026803",
+        "image_id": "oven_05024320",
+        "question": "Which culture is associated with this building?",
+        "answer": [
+            "Inca Empire"
+        ],
+        "answer_eval": [
+            "Inca Empire"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Inca culture.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0,
+                "precision": 0.5,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00005306",
+        "image_id": "oven_04953433",
+        "question": "What place inflows lake?",
+        "answer": [
+            "Aare",
+            "Lütschine"
+        ],
+        "answer_eval": [
+            "Lütschine",
+            "Lutschine",
+            "Aare",
+            "Aar"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The inflows to the lake in the image are likely rivers, streams, or tributaries that flow into the lake.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00029519",
+        "image_id": "oven_05015700",
+        "question": "Which city or region does this mountain locate in?",
+        "answer": [
+            "Thoiry"
+        ],
+        "answer_eval": [
+            "Thoiry"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents provide information about various mountains, but none of them match the mountain in the image. The image shows a mountain with a radio tower on top, which is not mentioned in the retrieved documents. Since the image does not provide enough context, I will use \"Image Retrieval\" to find more information about the mountain in the image.\n</thought>\n<Search>\nImage Retrieval\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00002545",
+        "image_id": "oven_04954483",
+        "question": "Which continent does this park belong to?",
+        "answer": [
+            "North America"
+        ],
+        "answer_eval": [
+            "North America",
+            "NA"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "Glacier National Park belongs to the continent of North America.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3636363636363636,
+                "acc": 1.0,
+                "precision": 0.2222222222222222,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00033931",
+        "image_id": "oven_05009644",
+        "question": "In which year was this aircraft retired from operational service?",
+        "answer": [
+            "1961"
+        ],
+        "answer_eval": [
+            "1960",
+            "1962",
+            "1961"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide a specific year for the retirement of the Supermarine Spitfire aircraft. To find the exact year, we need to look for more detailed historical records or official documents that detail the retirement of the Spitfire. The next step is to search for more detailed historical records or official documents.\n</Thought>\n<Sub-Question>\nIn which year was the Supermarine Spitfire aircraft retired from operational service?\n</Sub-Question>\n<Search>\nText Retrieval: Supermarine Spitfire retirement year official document\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00066275",
+        "image_id": "oven_05016103",
+        "question": "What is this park named after?",
+        "answer": [
+            "Windsor"
+        ],
+        "answer_eval": [
+            "Windsor, Berkshire",
+            "Windsor"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide the name of the park in the image. The image appears to be of a Lego-themed park, which is not listed in the retrieved documents. We need more specific information or a different search query to identify the name of the park.\n</Thought>\n<Sub-Question>\nWhat is the name of the park in the image?\n</Sub-Question>\n<Search>\nText Retrieval: \"name of the park in the image\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00041841",
+        "image_id": "oven_05025430",
+        "question": "What is the location of this park?",
+        "answer": [
+            "Agua Dulce"
+        ],
+        "answer_eval": [
+            "Agua Dulce, California",
+            "Agua Dulce",
+            "Agua Dulce, CA"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Valley of Fire State Park is located 16 miles south of Overton, Nevada, and 50 miles northeast of Las Vegas. It is situated in the Mojave Desert and abuts the Lake Mead National Recreation Area on the east at the Virgin River confluence.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00055187",
+        "image_id": "oven_05026892",
+        "question": "On what date did this bridge officially open?",
+        "answer": [
+            "2001 12 20"
+        ],
+        "answer_eval": [
+            "20 December 2002",
+            "12 20 2001",
+            "December 20 2000",
+            "12 20 2002",
+            "2001 December 20",
+            "20 12 2002",
+            "2001 12 20",
+            "December 20 2002",
+            "2002 December 20",
+            "20 12 2000",
+            "20 December 2000",
+            "2001",
+            "12 20 2000",
+            "December 20 2001",
+            "20 12 2001",
+            "2000",
+            "2000 December 20",
+            "2002",
+            "2002 12 20",
+            "2000 12 20",
+            "20 December 2001"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "December 20, 2001",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00014684",
+        "image_id": "oven_04955531",
+        "question": "Which diocese does this building belong to?",
+        "answer": [
+            "Georgian Orthodox Church"
+        ],
+        "answer_eval": [
+            "Georgian Orthodox Church"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide any information about the location of the building in the image. We need to search for more specific information about the building's location to determine its diocese.\n</thought>\n<Search>\nText Retrieval: Information about the location of the building in the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00043401",
+        "image_id": "oven_05025978",
+        "question": "What country does this building belong to?",
+        "answer": [
+            "Germany"
+        ],
+        "answer_eval": [
+            "Germany",
+            "BRD",
+            "de",
+            "GFR",
+            "DE",
+            "Bundesrepublik Deutschland",
+            "Federal Republic of Germany",
+            "GER",
+            "Deutschland",
+            "BR Deutschland"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Germany",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00030225",
+        "image_id": "oven_05022034",
+        "question": "Which diocese does this building belong to?",
+        "answer": [
+            "Eparchy of Raška and Prizren"
+        ],
+        "answer_eval": [
+            "Eparchy of Raška and Prizren"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide the name of the building in the image. We need to identify the building in the image to determine which diocese it belongs to.\n</Thought>\n<Sub-Question>\nWhat is the name of the building in the image?\n</Sub-Question>\n<Search>\nImage Retrieval: Building in the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.0425531914893617,
+                "acc": 0.0,
+                "precision": 0.023809523809523808,
+                "recall": 0.2
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00030943",
+        "image_id": "oven_05026270",
+        "question": "How wide is the building in the image? answer in metre",
+        "answer": [
+            "108"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 108.0,
+                "range": [
+                    97.2,
+                    118.80000000000001
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The width of the building in the image cannot be determined from the provided information.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00060852",
+        "image_id": "oven_05064520",
+        "question": "What country does this drink belong to?",
+        "answer": [
+            "France"
+        ],
+        "answer_eval": [
+            "FRA",
+            "FR",
+            "fr",
+            "French Republic",
+            "the Hexagon",
+            "La France",
+            "République française",
+            "France",
+            "Republic of France"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "France",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00047934",
+        "image_id": "oven_05023845",
+        "question": "What is the area in hectare occupied by this building?",
+        "answer": [
+            "1512.24"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 1512.24,
+                "range": [
+                    1361.016,
+                    1663.4640000000002
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide the specific area of Alnwick Castle in hectares. However, we can infer that the castle is quite large and likely occupies a significant area. To find the exact area, we would need to search for more specific information about the castle's dimensions or the land it occupies.\n</Thought>\n<Search>\nText Retrieval: Alnwick Castle area hectares\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00017839",
+        "image_id": "oven_04958024",
+        "question": "What is the architectural style of this building?",
+        "answer": [
+            "Romanesque architecture"
+        ],
+        "answer_eval": [
+            "Romanesque style",
+            "Romanesque architecture"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The architectural style of the building in the image is Gothic.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2,
+                "acc": 0.0,
+                "precision": 0.125,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00026619",
+        "image_id": "oven_05009580",
+        "question": "Who is the developer of this aircraft?",
+        "answer": [
+            "Airbus"
+        ],
+        "answer_eval": [
+            "Airbus",
+            "Airbus Commercial Aircraft"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Airbus",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00048336",
+        "image_id": "oven_05013605",
+        "question": "What is the installed power capacity of this in megawatt?",
+        "answer": [
+            "500"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 500.0,
+                "range": [
+                    450.0,
+                    550.0
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The installed power capacity of Battersea Power Station is 509 megawatts.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00064663",
+        "image_id": "oven_05070332",
+        "question": "What is the vertex figure of this object?",
+        "answer": [
+            "triangle"
+        ],
+        "answer_eval": [
+            "2-simplex",
+            "triangle",
+            "∆",
+            "3-gon"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Triangle",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00018533",
+        "image_id": "oven_04966514",
+        "question": "What is the conservation status of this animal? (The status is assigned by the international union for conservation of nature. Choose one among Endangered,Least Concern,Critically Endangered,extinct species,extinct in the wild,Vulnerable,Near Threatened,Data Deficient)",
+        "answer": [
+            "Vulnerable"
+        ],
+        "answer_eval": [
+            "vulnerable species",
+            "Vulnerable",
+            "VU"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "Vulnerable",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00034332",
+        "image_id": "oven_05024787",
+        "question": "the building in the image participated in which conflict?",
+        "answer": [
+            "Siege of Osaka"
+        ],
+        "answer_eval": [
+            "Siege of Osaka"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe unification of Japan refers to the process by which Japan was reunified under the Tokugawa shogunate in 1603, following a century-long period of civil war. This unification was achieved through the efforts of Toyotomi Hideyoshi and Toyotomi Hideyori, who established a centralized government under the Tokugawa clan. The Tokugawa shogunate ruled Japan from 1603 to 1868, during which time Japan experienced a period of relative peace and stability.\n</Thought>\n<Sub-Question>\nWhat was the Tokugawa shogunate?\n</Sub-Question>\n<Search>\nText Retrieval: Tokugawa shogunate\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.025974025974025972,
+                "acc": 0.0,
+                "precision": 0.013513513513513514,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00050760",
+        "image_id": "oven_05014973",
+        "question": "Which (geo)physical feature is the bridge located in or on?",
+        "answer": [
+            "île de la Cité"
+        ],
+        "answer_eval": [
+            "ile de la Cite",
+            "Île de la Cité",
+            "Île-de-la-Fraternité",
+            "île de la Cité"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The bridge is located on the river.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00044205",
+        "image_id": "oven_05011089",
+        "question": "Who are the structure engineers of this place?",
+        "answer": [
+            "Flint & Neill"
+        ],
+        "answer_eval": [
+            "Flint & Neill"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Flint and Neill.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.8,
+                "acc": 0.0,
+                "precision": 0.6666666666666666,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00043974",
+        "image_id": "oven_05013603",
+        "question": "Who commissioned this facility?",
+        "answer": [
+            "London Power Company"
+        ],
+        "answer_eval": [
+            "London Power Company"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The London Power Company (LPC) commissioned Battersea Power Station.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5454545454545454,
+                "acc": 1.0,
+                "precision": 0.375,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00060943",
+        "image_id": "oven_05010453",
+        "question": "What is the height of this vehicle in millimetre?",
+        "answer": [
+            "1842"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 1842.0,
+                "range": [
+                    1657.8,
+                    2026.2000000000003
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The exact height of the GMC Acadia in millimeters cannot be determined from the provided image and documents.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00022258",
+        "image_id": "oven_05051586",
+        "question": "What type of wing is designed for this object?",
+        "answer": [
+            "fixed-wing"
+        ],
+        "answer_eval": [
+            "fixed-wing",
+            "rigid wing",
+            "fixed wing"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Swept-back wing.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0,
+                "precision": 0.5,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00017302",
+        "image_id": "oven_04957474",
+        "question": "which mountain range is this mountain belong to?",
+        "answer": [
+            "Western Ghats"
+        ],
+        "answer_eval": [
+            "Western Ghat mountain ranges",
+            "Western Ghat mountain range",
+            "Sahyadri Mountains",
+            "Western Ghats of Maharashtra",
+            "Western Ghauts",
+            "Sahya Mountains",
+            "Sahya Parvatham",
+            "Sahyadri mountain range",
+            "Western coast mountain range of india",
+            "Sahayadri",
+            "Sahya Parvat",
+            "West coast mountain range of India",
+            "Tamhini Ghat",
+            "The Western Ghats",
+            "Western Ghâts",
+            "Western Ghats",
+            "Western Ghat mountains",
+            "Sahya Parvatam",
+            "Sahyadri",
+            "Western Ghāts",
+            "Sahayadri Hills",
+            "Sahyadris",
+            "Sahyadri mountain ranges"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The mountain in the image is part of the Western Ghats mountain range.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 1.0,
+                "precision": 0.4,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00043491",
+        "image_id": "oven_05011097",
+        "question": "In which year did this place officially open?",
+        "answer": [
+            "1986"
+        ],
+        "answer_eval": [
+            "1987",
+            "1986",
+            "1985"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "1987",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00027120",
+        "image_id": "oven_05019942",
+        "question": "In which year did this building come into service?",
+        "answer": [
+            "1772"
+        ],
+        "answer_eval": [
+            "1772",
+            "1773",
+            "1771"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "1772",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00008578",
+        "image_id": "oven_04984385",
+        "question": "the equipment in the image participated in which conflict?",
+        "answer": [
+            "World War II",
+            "Korean War"
+        ],
+        "answer_eval": [
+            "WW2",
+            "WW II",
+            "Second World War",
+            "World War II",
+            "WW 2",
+            "War to Resist US Aggression and Aid Korea",
+            "World War 2",
+            "the Second World War",
+            "II World War",
+            "Korean War",
+            "2nd World War",
+            "World War Two",
+            "WWII"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe image shows a piece of equipment that appears to be a part of a larger military device, possibly a weapon or a component of a vehicle. Based on the context, it is likely related to a specific conflict. To identify the conflict, I need to determine the type of equipment shown in the image.\n</Thought>\n<Sub-Question>\nWhat type of equipment is shown in the image?\n</Sub-Question>\n<Search>\nNo Retrieval.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.029850746268656716,
+                "acc": 0.0,
+                "precision": 0.01694915254237288,
+                "recall": 0.125
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00012843",
+        "image_id": "oven_04966776",
+        "question": "Where is this bird native to?",
+        "answer": [
+            "Thol Lake"
+        ],
+        "answer_eval": [
+            "Thol Lake",
+            "Thol Bird Sanctuary",
+            "Thol Lake Bird Sanctuary"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The sand martin is native to Europe, the Mediterranean countries, and across the Palearctic to the Pacific Ocean. It is also found in North America and winters in eastern and southern Africa, South America, and the Indian Subcontinent.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00022772",
+        "image_id": "oven_05011533",
+        "question": "What is this building named after?",
+        "answer": [
+            "John Radcliffe"
+        ],
+        "answer_eval": [
+            "John Radcliffe"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The Radcliffe Camera is named after Sir Hans Sloane.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2,
+                "acc": 0.0,
+                "precision": 0.125,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00000565",
+        "image_id": "oven_04980929",
+        "question": "Which country does this animal come from?",
+        "answer": [
+            "Turkey"
+        ],
+        "answer_eval": [
+            "Türkiye",
+            "TUR",
+            "TR",
+            "Turkey",
+            "Republic of Türkiye",
+            "Republic of Turkey",
+            "Türkiye Cumhuriyeti"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "Turkey",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00019747",
+        "image_id": "oven_05020926",
+        "question": "Which city or region does this bridge locate in?",
+        "answer": [
+            "Paris"
+        ],
+        "answer_eval": [
+            "Gay Paree",
+            "Lutetia",
+            "City of Light",
+            "Paris",
+            "City of Love",
+            "Paris, France",
+            "Gay Paris"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The bridge is located in Paris, France.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 1.0,
+                "precision": 0.3333333333333333,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00057427",
+        "image_id": "oven_05011119",
+        "question": "In which year did this place officially open?",
+        "answer": [
+            "1986"
+        ],
+        "answer_eval": [
+            "1987",
+            "1986",
+            "1985"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "1987",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00030891",
+        "image_id": "oven_05044892",
+        "question": "What is the closest parent taxonomy of this plant?",
+        "answer": [
+            "Arctostaphylos"
+        ],
+        "answer_eval": [
+            "manzanita",
+            "Arctostaphylos"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide a clear identification of the plant in the image. I need to focus on the plant's characteristics to determine its species.\n</Thought>\n<Sub-Question>\nWhat are the key characteristics of the plant in the image?\n</Sub-Question>\n<Search>\nText Retrieval: key characteristics of the plant in the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00045912",
+        "image_id": "oven_00000945",
+        "question": "what is the date this aircraft took the first flight?",
+        "answer": [
+            "1981 9 26"
+        ],
+        "answer_eval": [
+            "9 26 1981",
+            "1980 9 26",
+            "26 September 1981",
+            "1980",
+            "9 26 1982",
+            "September 26 1980",
+            "26 9 1981",
+            "1981 September 26",
+            "1980 September 26",
+            "1981",
+            "1982",
+            "26 9 1980",
+            "1982 9 26",
+            "1982 September 26",
+            "9 26 1980",
+            "26 September 1980",
+            "1981 9 26",
+            "September 26 1982",
+            "September 26 1981",
+            "26 September 1982",
+            "26 9 1982"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide specific information about the first flight of the Ansett Australia aircraft. The documents are mostly about Qantas and other airlines, and do not mention Ansett Australia's first flight. We need to search for more specific information about Ansett Australia.\n</Thought>\n<Search>\nText Retrieval: Ansett Australia first flight date\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00029955",
+        "image_id": "oven_05038266",
+        "question": "What is the closest upper taxonomy of this bird?",
+        "answer": [
+            "Amazilia"
+        ],
+        "answer_eval": [
+            "Amazilia"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The closest upper taxonomy of the bird is the order Apodiformes.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00010674",
+        "image_id": "oven_04958215",
+        "question": "What is the sea level in metre of this mountain?",
+        "answer": [
+            "1993"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 1993.0,
+                "range": [
+                    1793.7,
+                    2192.3
+                ]
+            }
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide the specific mountain in question. We need more information to identify the mountain and its sea level. The image shows a river and hills, but it does not specify the mountain. We need to know the name of the mountain to proceed.\n</Thought>\n<Sub-Question>\nWhat is the name of the mountain in the image?\n</Sub-Question>\n<Search>\nText Retrieval: \"mountain in the image with a river and hills\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00025643",
+        "image_id": "oven_05012268",
+        "question": "What country does this river belong to?",
+        "answer": [
+            "Mexico"
+        ],
+        "answer_eval": [
+            "🇲🇽",
+            "United Mexican States",
+            "MX",
+            "MEX",
+            "US of M",
+            "Aztec nation",
+            "mx",
+            "Mexicans",
+            "Mexican Republic",
+            "Mexican federal",
+            "Mexico",
+            "MXN"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The river in the image belongs to Mexico.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2857142857142857,
+                "acc": 1.0,
+                "precision": 0.16666666666666666,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00037255",
+        "image_id": "oven_05020378",
+        "question": "Which historic county does this lake belong to?",
+        "answer": [
+            "Cumberland"
+        ],
+        "answer_eval": [
+            "Cumberland"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The historic county of the Walensee is the Canton of St. Gallen.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00031363",
+        "image_id": "oven_05054926",
+        "question": "In which year was this item invented or discovered?",
+        "answer": [
+            "1834"
+        ],
+        "answer_eval": [
+            "1833",
+            "1834",
+            "1835"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe first practical DC motor was invented by Frank Julian Sprague in 1886.\n</Thought>\n<Sub-Question>\nIn which year was the first practical DC motor invented?\n</Sub-Question>\n<Search>\nText Retrieval: \"first practical DC motor invention year\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00060445",
+        "image_id": "oven_05009586",
+        "question": "What is the length of this aircraft in metre?",
+        "answer": [
+            "46.6"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 46.6,
+                "range": [
+                    41.940000000000005,
+                    51.260000000000005
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide the specific aircraft model and its length. The image does not show the aircraft model either. I need to identify the aircraft model from the image and then search for its length.\n</thought>\n<Search>\nImage Retrieval: \"Aircraft model identification\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00034553",
+        "image_id": "oven_05019132",
+        "question": "what has this bridge crossed over?",
+        "answer": [
+            "Daugava"
+        ],
+        "answer_eval": [
+            "Düna",
+            "Daugava River",
+            "Western Dvina",
+            "Daugava"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The bridge has crossed over a river.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.28571428571428575,
+                "acc": 0.0,
+                "precision": 0.2,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00063182",
+        "image_id": "oven_05012747",
+        "question": "What country does this building belong to?",
+        "answer": [
+            "Germany"
+        ],
+        "answer_eval": [
+            "Germany",
+            "BRD",
+            "de",
+            "GFR",
+            "DE",
+            "Bundesrepublik Deutschland",
+            "Federal Republic of Germany",
+            "GER",
+            "Deutschland",
+            "BR Deutschland"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Germany",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00068642",
+        "image_id": "oven_04949820",
+        "question": "What is the genre of this building?",
+        "answer": [
+            "drama film"
+        ],
+        "answer_eval": [
+            "drama film",
+            "drama movie"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The image does not depict a building, so the genre of the building cannot be determined.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00057149",
+        "image_id": "oven_05068572",
+        "question": "What is the closest upper taxonomy of this plant?",
+        "answer": [
+            "Caprifoliaceae"
+        ],
+        "answer_eval": [
+            "Caprifoliaceae"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Caprifoliaceae",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00054382",
+        "image_id": "oven_05038099",
+        "question": "What is the length of the incubation period (in day) of this bird's egg?",
+        "answer": [
+            "27"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 27.0,
+                "range": [
+                    24.3,
+                    29.700000000000003
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe incubation period of the great egret's egg is 23–26 days. The great egret is a large heron with all-white plumage, standing up to 1 m tall, and has a wingspan of 131 to 170 cm. It is not the same as the great blue or grey heron, which is slightly smaller. The great egret is not normally a vocal bird; it gives a low, hoarse croak when disturbed, and at breeding colonies, it often gives a loud croaking cuk cuk cuk and higher-pitched squawks.\n</Thought>\n<Sub-Question>\nWhat is the incubation period (in days) of the great egret's egg?\n</Sub-Question>\n<Search>\nText Retrieval: incubation period of the great egret's egg.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00026337",
+        "image_id": "oven_05048345",
+        "question": "where is this bird originally discovered?",
+        "answer": [
+            "Brazil"
+        ],
+        "answer_eval": [
+            "Federative Republic of Brazil",
+            "Brazil",
+            "BRA",
+            "BR",
+            "br",
+            "🇧🇷"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not contain the name of the bird in the image. I need to identify the bird first to find its original discovery location.\n</Thought>\n<Sub-Question>\nWhat is the name of the bird in the image?\n</Sub-Question>\n<Search>\nImage Retrieval: bird identification from the image\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.04444444444444444,
+                "acc": 0.0,
+                "precision": 0.024390243902439025,
+                "recall": 0.25
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00009286",
+        "image_id": "oven_04958471",
+        "question": "How many people died in total in the event of the building in the image?",
+        "answer": [
+            "65000"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 65000.0,
+                "range": [
+                    58500.0,
+                    71500.0
+                ]
+            }
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The total number of people who died in the Auschwitz concentration camp is 1.1 million.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00039501",
+        "image_id": "oven_00002228",
+        "question": "Who is the manufacturer of this aircraft?",
+        "answer": [
+            "Boeing Commercial Airplanes"
+        ],
+        "answer_eval": [
+            "Boeing Commercial Airplanes",
+            "Boeing Commercial Airplanes, BCA",
+            "BCA"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The manufacturer of the aircraft is Boeing.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.25,
+                "acc": 0.0,
+                "precision": 0.2,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00039649",
+        "image_id": "oven_05038539",
+        "question": "Where is the habitat of this plant?",
+        "answer": [
+            "hardwood forest"
+        ],
+        "answer_eval": [
+            "hardwood forest"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The habitat of the bigleaf maple is in fairly well-hydrated hardwood forests, occurring with red alder, black cottonwood, and willows, and it is found west of British Columbia's Coast Ranges and the Cascade Range, from Vancouver Island to California.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.05263157894736842,
+                "acc": 1.0,
+                "precision": 0.027777777777777776,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00036493",
+        "image_id": "oven_05020342",
+        "question": "which mountain range is this lake belong to?",
+        "answer": [
+            "Lake District"
+        ],
+        "answer_eval": [
+            "Lakeland",
+            "Lake District",
+            "The Lakes"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe lake in the image is not clearly identified in the retrieved documents. However, the image shows a frozen lake with mountains in the background, which suggests it could be a mountain lake. To identify the mountain range, I need to determine the location of the lake.\n</Thought>\n<Sub-Question>\nWhat is the location of the lake in the image?\n</Sub-Question>\n<Search>\nText Retrieval: Identify the location of the lake in the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.03333333333333333,
+                "acc": 0.0,
+                "precision": 0.017241379310344827,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00017795",
+        "image_id": "oven_04978684",
+        "question": "What is the maximum weight of this animal in kilogram?",
+        "answer": [
+            "11.3"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 11.3,
+                "range": [
+                    10.170000000000002,
+                    12.430000000000001
+                ]
+            }
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The maximum weight of a Bullmastiff is 50 kg.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00032771",
+        "image_id": "oven_05033721",
+        "question": "What is the closest upper taxonomy of this bird?",
+        "answer": [
+            "waterthrush"
+        ],
+        "answer_eval": [
+            "waterthrush",
+            "Parkesia"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe bird in the image is a small, brown and white bird with a short beak and a small body. Based on the description of the bird, it is likely a species of warbler. Warblers are a group of small, insectivorous birds that are part of the family Parulidae. The closest upper taxonomic group for a warbler would be the order Passeriformes, which includes all passerine birds.\n</Thought>\n<Sub-Question>\nWhat is the order of the bird in the image?\n</Sub-Question>\n<Search>\nText Retrieval: order of the bird in the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00069116",
+        "image_id": "oven_04944631",
+        "question": "What is this mountain named after?",
+        "answer": [
+            "William McKinley"
+        ],
+        "answer_eval": [
+            "William M'Kinley",
+            "W. McKinley, Jr.",
+            "President William McKinley",
+            "William McKinley",
+            "W. McKinley",
+            "President McKinley",
+            "William McKinley, Jr."
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The mountain range in the image is the Rocky Mountains.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00013187",
+        "image_id": "oven_04951635",
+        "question": "What is the architectural style of this building?",
+        "answer": [
+            "Gothic art"
+        ],
+        "answer_eval": [
+            "Gothic art"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The architectural style of the building is Gothic.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.25,
+                "acc": 0.0,
+                "precision": 0.16666666666666666,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00064909",
+        "image_id": "oven_05025881",
+        "question": "What is the length in metre is the bridge in the image?",
+        "answer": [
+            "515.76"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 515.76,
+                "range": [
+                    464.184,
+                    567.336
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide the specific length of the Charles Bridge in metres. The documents are about the economy of the region, Prague Castle, and the Charles Bridge, but they do not contain the required information. We need to find an image that clearly shows the Charles Bridge and its length.\n</Thought>\n<Search>\nImage Retrieval\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00028663",
+        "image_id": "oven_05055738",
+        "question": "Who is the creator of this object?",
+        "answer": [
+            "Florence K. Upton"
+        ],
+        "answer_eval": [
+            "Florence K. Upton",
+            "Florence Kate Upton"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The creator of the \"Original Friends Dolls\" is Rebecca Roth.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00025616",
+        "image_id": "oven_05018770",
+        "question": "Which city or region does this park locate in?",
+        "answer": [
+            "Nassau County"
+        ],
+        "answer_eval": [
+            "Nassau County",
+            "Nassau County, Florida",
+            "Nassau County, FL"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The park is located in Buenos Aires, Argentina.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00050934",
+        "image_id": "oven_05018044",
+        "question": "What is the sea level in metre of this river?",
+        "answer": [
+            "570"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 570.0,
+                "range": [
+                    513.0,
+                    627.0
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide specific information about the sea level of the River Nith. The documents mention the river's length and its flow into the Solway Firth, but they do not mention the sea level. To find the specific sea level of the River Nith, we need to look for additional information that might be available in other sources.\n</thought>\n<Sub-Question>\nWhat is the sea level of the River Nith?\n</Sub-Question>\n<Search>\nText Retrieval: sea level of the River Nith\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00023084",
+        "image_id": "oven_05039662",
+        "question": "What is the closest parent taxonomy of this insect?",
+        "answer": [
+            "Idia"
+        ],
+        "answer_eval": [
+            "Idia"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The closest parent taxonomy of the insect in the image is Lepidoptera.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00067537",
+        "image_id": "oven_05015553",
+        "question": "the building in the image participated in which conflict?",
+        "answer": [
+            "Hussite Wars"
+        ],
+        "answer_eval": [
+            "Hussite Wars",
+            "Hussite Revolution",
+            "Hussite wars",
+            "Bohemian Wars"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide direct information about the building in the image. We need to identify the building in the image to proceed with the question.\n</Thought>\n<Sub-Question>\nWhat is the name of the building in the image?\n</Sub-Question>\n<Search>\nImage Retrieval\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00029260",
+        "image_id": "oven_05022738",
+        "question": "Which protected area is this place usually located in?",
+        "answer": [
+            "Niagara Falls State Park"
+        ],
+        "answer_eval": [
+            "Niagara Falls State Park"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Niagara Falls State Park",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00041936",
+        "image_id": "oven_05047029",
+        "question": "What is the closest upper taxonomy of this animal?",
+        "answer": [
+            "Gymnotidae"
+        ],
+        "answer_eval": [
+            "Gymnotidae"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Gymnotidae",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00046479",
+        "image_id": "oven_05009721",
+        "question": "What equipment or engine is used by this aircraft to provide power?",
+        "answer": [
+            "PW118"
+        ],
+        "answer_eval": [
+            "PW118",
+            "Pratt & Whitney Canada PW118"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents mention the Antonov An-10, Tupolev Tu-154, and Tupolev Tu-134, but do not provide specific information about the Air Moldova aircraft in the image. We need to focus on the aircraft's model and manufacturer details to identify the engine type.\n</Thought>\n<Sub-Question>\nWhat is the manufacturer of the aircraft in the image?\n</Sub-Question>\n<Search>\nText Retrieval: Manufacturer of the Air Moldova aircraft in the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00005978",
+        "image_id": "oven_04971856",
+        "question": "What is the magnitude of the velocity of this animal kilometre per hour?",
+        "answer": [
+            "120"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 120.0,
+                "range": [
+                    108.0,
+                    132.0
+                ]
+            }
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe commonly quoted maximum speed of a cheetah in kilometres per hour is 112 km/h.\n</Thought>\n<Sub-Question>\nWhat is the commonly quoted maximum speed of a cheetah in kilometres per hour?\n</Sub-Question>\n<Search>\nText Retrieval: cheetah commonly quoted maximum speed km/h\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00071324",
+        "image_id": "oven_05009642",
+        "question": "In which year was this aircraft retired from operational service?",
+        "answer": [
+            "1961"
+        ],
+        "answer_eval": [
+            "1960",
+            "1962",
+            "1961"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide a specific year for the retirement of the Spitfire aircraft. To find the exact year, we need to search for more specific historical records or databases that detail the operational history of the Spitfire.\n</Thought>\n<Sub-Question>\nIn which year was the Spitfire aircraft retired from operational service?\n</Sub-Question>\n<Search>\nText Retrieval: Spitfire aircraft retirement year specific\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00049408",
+        "image_id": "oven_05033670",
+        "question": "What is the closest upper taxonomy of this insect?",
+        "answer": [
+            "Dythemis"
+        ],
+        "answer_eval": [
+            "Dythemis"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe closest upper taxonomy of a dragonfly is the class Insecta.\n</Thought>\n<Sub-Question>\nWhat is the closest upper taxonomy of a dragonfly?\n</Sub-Question>\n<Search>\nText Retrieval: dragonfly taxonomy\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00009616",
+        "image_id": "oven_04952040",
+        "question": "What is the location of this place?",
+        "answer": [
+            "Karachi"
+        ],
+        "answer_eval": [
+            "Kurrachee",
+            "The Lighting City",
+            "Karachi",
+            "Heart of Pakistan"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe mausoleum in the image is the Pantheon of Illustrious Sailors, which is located in Spain. The structure is a mausoleum and memorial to all the mariners of the Spanish Navy, especially prominent ones, and to the Spanish Navy and all its ships, battles and explorations in general.\n</Thought>\n<Sub-Question>\nWhat is the name of the mausoleum in the image?\n</Sub-Question>\n<Search>\nText Retrieval: mausoleum in the image with a large dome and people in traditional attire.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.028985507246376812,
+                "acc": 0.0,
+                "precision": 0.015151515151515152,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00015538",
+        "image_id": "oven_04952799",
+        "question": "What country does this river belong to?",
+        "answer": [
+            "Switzerland"
+        ],
+        "answer_eval": [
+            "Confoederatio Helvetica",
+            "SUI",
+            "Schweiz",
+            "Swiss Confederation",
+            "CHE",
+            "Svizzera",
+            "CH",
+            "Switzerland",
+            "Suisse",
+            "Swiss"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "Switzerland",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00030087",
+        "image_id": "oven_05041185",
+        "question": "How many days does the gestation of this animal take?",
+        "answer": [
+            "9.0-9.5"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 9.25,
+                "range": [
+                    9.0,
+                    9.5
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The gestation period of the animal in the image is around 9 months.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00007309",
+        "image_id": "oven_04950737",
+        "question": "How wide is the vehicle in the image? answer in millimetre",
+        "answer": [
+            "1920"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 1920.0,
+                "range": [
+                    1728.0,
+                    2112.0
+                ]
+            }
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide the specific width of the Chevrolet Camaro in millimeters. To find the exact width, I need to search for more detailed specifications of the Camaro.\n</Thought>\n<Search>\nText Retrieval: Chevrolet Camaro width in millimeters\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00067860",
+        "image_id": "oven_05019010",
+        "question": "In which year did this building officially open?",
+        "answer": [
+            "1916"
+        ],
+        "answer_eval": [
+            "1916",
+            "1917",
+            "1915"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The International Criminal Court officially opened in 2002.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00016446",
+        "image_id": "oven_04966509",
+        "question": "What is the conservation status of this animal? (The status is assigned by the international union for conservation of nature. Choose one among Endangered,Least Concern,Critically Endangered,extinct species,extinct in the wild,Vulnerable,Near Threatened,Data Deficient)",
+        "answer": [
+            "Vulnerable"
+        ],
+        "answer_eval": [
+            "vulnerable species",
+            "Vulnerable",
+            "VU"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The conservation status of the horseshoe crab is Vulnerable.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.25,
+                "acc": 1.0,
+                "precision": 0.14285714285714285,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00027556",
+        "image_id": "oven_05010809",
+        "question": "Which city or region does this town locate in?",
+        "answer": [
+            "City of Cape Town"
+        ],
+        "answer_eval": [
+            "City of Cape Town Metropolitan Municipality",
+            "City of Cape Town",
+            "Cape Town Municipality",
+            "Cape Town Metropolitan Municipality",
+            "City of Cape Town Metro",
+            "Cape Town Metro",
+            "Cape Town Unicity",
+            "Cape Metropolitan Council",
+            "City of Cape Town Municipality",
+            "Cape Metropolitan Administration"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Cape Town, South Africa.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5714285714285715,
+                "acc": 0.0,
+                "precision": 0.5,
+                "recall": 0.6666666666666666
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00011517",
+        "image_id": "oven_04954831",
+        "question": "What is the height of this place in metre?",
+        "answer": [
+            "10.5"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 10.5,
+                "range": [
+                    9.450000000000001,
+                    11.55
+                ]
+            }
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The height of the Fürstenzug mural is 10.5 metres.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.25,
+                "acc": 1.0,
+                "precision": 0.14285714285714285,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00066078",
+        "image_id": "oven_05044868",
+        "question": "Where is this insect native to?",
+        "answer": [
+            "New Zealand"
+        ],
+        "answer_eval": [
+            "nz",
+            "Dominion of New Zealand",
+            "🇳🇿",
+            "New Zealand",
+            "Aotearoa",
+            "NZ",
+            "Aotearoa New Zealand",
+            "NZL"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents provide information about the species Spilosoma virginica, including its diet and life cycle. However, they do not explicitly mention the native habitat of the insect. Since the caterpillar in the image is black and fuzzy, it is likely the caterpillar of Spilosoma virginica. Therefore, the native habitat of the insect in the image is likely the native habitat of Spilosoma virginica.\n</Thought>\n<Sub-Question>\nWhat is the native habitat of Spilosoma virginica?\n</Sub-Question>\n<Search>\nText Retrieval: Native habitat of Spilosoma virginica.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.025974025974025972,
+                "acc": 0.0,
+                "precision": 0.0136986301369863,
+                "recall": 0.25
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00022774",
+        "image_id": "oven_05020714",
+        "question": "which mountain range is this mountain belong to?",
+        "answer": [
+            "Glarus Alps"
+        ],
+        "answer_eval": [
+            "Glarus Alps"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The mountain in the image is part of the Alps.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.22222222222222224,
+                "acc": 0.0,
+                "precision": 0.14285714285714285,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00030966",
+        "image_id": "oven_05018402",
+        "question": "What is this lake named after?",
+        "answer": [
+            "Pfäffikon"
+        ],
+        "answer_eval": [
+            "Pfaeffikon",
+            "Pfaffikon",
+            "Pfäffikon",
+            "Pfäffikon ZH"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe lake in the image is identified as Walensee based on the retrieved documents. The lake is known for its scenic beauty and is located in Switzerland. The lake is also the inspiration for a solo piano piece by Franz Liszt.\n</Thought>\n<Sub-Question>\nWhat is the name of the lake in the image?\n</Sub-Question>\n<Search>\nText Retrieval: lake name in the image with boats and mountains in the background.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00063969",
+        "image_id": "oven_05012918",
+        "question": "What is the time zone of this island?",
+        "answer": [
+            "UTC+02:00"
+        ],
+        "answer_eval": [
+            "utc+2",
+            "Eastern European Time",
+            "South African Standard Time",
+            "Central Africa Time",
+            "Central European Summer Time",
+            "CEST",
+            "Israel Standard Time",
+            "West Africa Summer Time",
+            "UTC+02:00"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "CET",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00021636",
+        "image_id": "oven_05021998",
+        "question": "Who is the owner of this building?",
+        "answer": [
+            "Safra Group"
+        ],
+        "answer_eval": [
+            "Safra Group"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents indicate that the primary occupant of the 30 St Mary Axe building is Swiss Re, which had the building commissioned as the head office for its UK operation. However, the documents do not provide information about the current owner of the building. To find the current owner, I need to search for more recent information.\n</Thought>\n<Search>\nText Retrieval: \"30 St Mary Axe current owner\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00021238",
+        "image_id": "oven_05065463",
+        "question": "What is the closest upper taxonomy of this plant?",
+        "answer": [
+            "Pinus"
+        ],
+        "answer_eval": [
+            "the pine genus",
+            "pines",
+            "Pinus"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide any information about the plant in the background of the image. The documents are about wildlife and forests, but none of them mention the plant. We need more information or a clearer image of the plant in question to determine its taxonomy.\n</Thought>\n<Sub-Question>\nWhat is the plant in the background of the image?\n</Sub-Question>\n<Search>\nImage Retrieval: plant in the background of the image with trees and bears.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00011375",
+        "image_id": "oven_04952418",
+        "question": "Which historic county does this place belong to?",
+        "answer": [
+            "Lancashire"
+        ],
+        "answer_eval": [
+            "County of Lancaster",
+            "Lancashire",
+            "County Palatine of Lancaster"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "Shropshire",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00016425",
+        "image_id": "oven_04964521",
+        "question": "What is the weight of a female of this bird in gram?",
+        "answer": [
+            "990"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 990.0,
+                "range": [
+                    891.0,
+                    1089.0
+                ]
+            }
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe weight of a female mallard is 0.7–1.6 kg (1.5–3.5 lb).\n</Thought>\n<Sub-Question>\nWhat is the weight of a female mallard in grams?\n</Sub-Question>\n<Search>\nText Retrieval: Weight of a female mallard in grams.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00013670",
+        "image_id": "oven_04951449",
+        "question": "What is this park named after?",
+        "answer": [
+            "Jacob Riis"
+        ],
+        "answer_eval": [
+            "Jacob A. Riis",
+            "Jacob August Riis",
+            "Jacob August Riss",
+            "Jacob Riis"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide the name of the park shown in the image. The image shows a beachside area with a boardwalk and a signpost, but the text on the signpost is not visible in the image. Therefore, we need to search for the name of the park based on the visible elements in the image.\n</Thought>\n<Sub-Question>\nWhat is the name of the park shown in the image?\n</Sub-Question>\n<Search>\nText Retrieval: park name in the image\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00003955",
+        "image_id": "oven_04957090",
+        "question": "What place is the lake outflow to?",
+        "answer": [
+            "Wda"
+        ],
+        "answer_eval": [
+            "Wda"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide specific information about the lake shown in the image and its outflow destination. We need more specific information about the lake to determine its outflow destination.\n</Thought>\n<Search>\nText Retrieval: Information about the lake shown in the image and its outflow destination.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00014150",
+        "image_id": "oven_04954962",
+        "question": "In which year did this building officially open?",
+        "answer": [
+            "1957"
+        ],
+        "answer_eval": [
+            "1958",
+            "1957",
+            "1956"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents provide information about the Milwaukee Art Museum, including its founding and the opening of its new building. The key information is that the new building, the Shields Building, was officially opened in November 2015.\n</Thought>\n<Sub-Question>\nIn which year did the new building of the Milwaukee Art Museum, the Shields Building, officially open?\n</Sub-Question>\n<Search>\nText Retrieval: Milwaukee Art Museum Shields Building opening year\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00073404",
+        "image_id": "oven_05009793",
+        "question": "What product does this organization produce?",
+        "answer": [
+            "airplane"
+        ],
+        "answer_eval": [
+            "plane",
+            "✈️",
+            "airplane, aeroplane, plane",
+            "fixed-wing airplane",
+            "fixed-wing aeroplane",
+            "airplanes",
+            "planes",
+            "fixed-wing powered aircraft",
+            "aeroplane",
+            "airplane",
+            "aeroplanes",
+            "powered fixed-wing aircraft"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The organization produces aircraft.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3333333333333333,
+                "acc": 0.0,
+                "precision": 0.3333333333333333,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00023570",
+        "image_id": "oven_05025860",
+        "question": "What is the length in metre is the bridge in the image?",
+        "answer": [
+            "515.76"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 515.76,
+                "range": [
+                    464.184,
+                    567.336
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The length of the Charles Bridge in Prague is 516 meters.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00071340",
+        "image_id": "oven_05026895",
+        "question": "On what date did this bridge officially open?",
+        "answer": [
+            "2001 12 20"
+        ],
+        "answer_eval": [
+            "20 December 2002",
+            "12 20 2001",
+            "December 20 2000",
+            "12 20 2002",
+            "2001 December 20",
+            "20 12 2002",
+            "2001 12 20",
+            "December 20 2002",
+            "2002 December 20",
+            "20 12 2000",
+            "20 December 2000",
+            "2001",
+            "12 20 2000",
+            "December 20 2001",
+            "20 12 2001",
+            "2000",
+            "2000 December 20",
+            "2002",
+            "2002 12 20",
+            "2000 12 20",
+            "20 December 2001"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "December 20, 2001",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00041253",
+        "image_id": "oven_05042596",
+        "question": "What is the spore print color of this plant?",
+        "answer": [
+            "cream"
+        ],
+        "answer_eval": [
+            "cream"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The spore print color of a morel mushroom is black.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00000060",
+        "image_id": "oven_04971099",
+        "question": "What is the closest parent taxonomy of this bird?",
+        "answer": [
+            "Nestor"
+        ],
+        "answer_eval": [
+            "Nestor"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "Parrot",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00016104",
+        "image_id": "oven_04955271",
+        "question": "Which city or region does this place locate in?",
+        "answer": [
+            "Maui County"
+        ],
+        "answer_eval": [
+            "Maui County, HI",
+            "County of Maui",
+            "Maui County, Hawaii",
+            "Maui",
+            "Maui County",
+            "Maui County, Hawaiʻi"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide specific information about the location of the image. The image appears to be of a coastal landscape with a rocky shore, green vegetation, and a body of water. This type of environment is often found in tropical or subtropical regions. To determine the specific city or region, we need more specific information such as the location of the image or any landmarks visible in the picture.\n</Thought>\n<Sub-Question>\nWhat is the location of this image?\n</Sub-Question>\n<Search>\nText Retrieval: location of the image\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.024691358024691357,
+                "acc": 0.0,
+                "precision": 0.01282051282051282,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00036826",
+        "image_id": "oven_05026576",
+        "question": "Who designed this building?",
+        "answer": [
+            "Thomas Telford"
+        ],
+        "answer_eval": [
+            "Thomas Telford"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Thomas Telford designed the Menai Suspension Bridge.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 1.0,
+                "precision": 0.3333333333333333,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00003790",
+        "image_id": "oven_04953315",
+        "question": "Which body of water is this city located in or next to?",
+        "answer": [
+            "Kazanka",
+            "Volga"
+        ],
+        "answer_eval": [
+            "Kazanka River",
+            "Volga River",
+            "Volga",
+            "River Volga",
+            "Kazanka"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide specific information about the city or the body of water near it. However, the image shows a large, modern structure with a circular design, which is likely a landmark in a city. To identify the city, I need to search for landmarks with similar designs.\n</Thought>\n<Sub-Question>\nWhat is the name of the city where this landmark is located?\n</Sub-Question>\n<Search>\nText Retrieval: landmark with a circular design and modern architecture.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00023887",
+        "image_id": "oven_05056502",
+        "question": "What kind of effect does this item have?",
+        "answer": [
+            "electric power conversion"
+        ],
+        "answer_eval": [
+            "electric power conversion",
+            "power conversion"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The primary effect of this item is to convert DC power to AC power.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.13333333333333336,
+                "acc": 0.0,
+                "precision": 0.07692307692307693,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00008058",
+        "image_id": "oven_04952031",
+        "question": "Which protected area is this mountain usually located in?",
+        "answer": [
+            "Snowdonia National Park"
+        ],
+        "answer_eval": [
+            "Snowdonia National Park"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide a clear match for the mountain in the image. The mountain in the image appears to be a different one from the ones described in the documents. I need to refine the search to find the specific mountain in the image.\n</Thought>\n<Sub-Question>\nWhat is the name of the mountain in the image?\n</Sub-Question>\n<Search>\nText Retrieval: Identify the mountain in the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00013605",
+        "image_id": "oven_04959451",
+        "question": "Which country does this food come from?",
+        "answer": [
+            "Portugal",
+            "France"
+        ],
+        "answer_eval": [
+            "PRT",
+            "FRA",
+            "Portugal",
+            "🇵🇹",
+            "FR",
+            "República Portuguesa",
+            "fr",
+            "French Republic",
+            "PT",
+            "the Hexagon",
+            "La France",
+            "Portuguese Republic",
+            "République française",
+            "France",
+            "Republic of France"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe food in the image appears to be a type of bread or pastry, possibly a churro or a similar snack. Based on the retrieved documents, churros are a type of fried pastry that originated in Spain. They are a popular snack in Spain and are also enjoyed in other countries, including the United States, where they are often served as a dessert or snack.\n</Thought>\n<Sub-Question>\nWhat is the origin of churros?\n</Sub-Question>\n<Search>\nText Retrieval: \"origin of churros\"\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.027027027027027032,
+                "acc": 1.0,
+                "precision": 0.014084507042253521,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00027547",
+        "image_id": "oven_05023005",
+        "question": "Who designed this building?",
+        "answer": [
+            "Pere Balaguer"
+        ],
+        "answer_eval": [
+            "Pere Balaguer"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide information about the designer of the building in the image. The documents are about the Monastery of the Corpus Christi, the Palacio de los Capitanes Generales, and the Torres de Serranos. Since the image does not match any of these, I need to refine the search to find the specific building in the image.\n</Thought>\n<Search>\nImage Retrieval: Building in the image\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00027244",
+        "image_id": "oven_05034986",
+        "question": "What is the closest upper taxonomy of this insect?",
+        "answer": [
+            "Anisota"
+        ],
+        "answer_eval": [
+            "Anisota",
+            "oakworms"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The closest upper taxonomy of the insect in the image is the class Insecta.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00024916",
+        "image_id": "oven_05044812",
+        "question": "What is the length of the wingspan in metre of this bird?",
+        "answer": [
+            "0.98"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 0.98,
+                "range": [
+                    0.882,
+                    1.078
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The wingspan of the mallard is 0.81 to 0.98 meters.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.2222222222222222,
+                "acc": 1.0,
+                "precision": 0.125,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00060420",
+        "image_id": "oven_05026480",
+        "question": "What is this building named after?",
+        "answer": [
+            "Dormition of the Mother of God"
+        ],
+        "answer_eval": [
+            "Feast of the Dormition of Mary",
+            "Dormition of the Mother of God Day",
+            "Dormition of the Theotokos",
+            "Dormition of the Mother of God"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The building is named after Curtea de Argeș Cathedral.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00024400",
+        "image_id": "oven_05036439",
+        "question": "What is the basionym of this plant?",
+        "answer": [
+            "Lycopodium digitatum"
+        ],
+        "answer_eval": [
+            "Lycopodium digitatum"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Lycopodium clavatum",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0,
+                "precision": 0.5,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00061994",
+        "image_id": "oven_05043092",
+        "question": "What is the length of the wingspan in metre of this bird?",
+        "answer": [
+            "1.04"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 1.04,
+                "range": [
+                    0.936,
+                    1.1440000000000001
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide specific information about the bird in the image. I need to identify the bird first to find its wingspan measurement.\n</Thought>\n<Sub-Question>\nWhat is the name of the bird in the image?\n</Sub-Question>\n<Search>\nText Retrieval: bird identification from the image\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00041112",
+        "image_id": "oven_05015180",
+        "question": "What place inflows lake?",
+        "answer": [
+            "Chulyshman"
+        ],
+        "answer_eval": [
+            "Chulyshman"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents provide information about geographical features and natural phenomena. From Doc1, we can see that Blackwood Creek is an inflow for Lake Tahoe. From Doc3, we can see that the Snake River flows into Jackson Lake, which is a lake in Grand Teton National Park. Therefore, we can conclude that Blackwood Creek and the Snake River are geographical features that are known to be inflows for lakes.\n</Thought>\n<Sub-Question>\nWhat geographical feature is known to be an inflow for Lake Tahoe?\n</Sub-Question>\n<Search>\nText Retrieval: geographical features that are known to be inflows for Lake Tahoe\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00035744",
+        "image_id": "oven_05020375",
+        "question": "What place inflows lake?",
+        "answer": [
+            "River Derwent"
+        ],
+        "answer_eval": [
+            "River Derwent, Cumbria",
+            "Derwent",
+            "River Derwent"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The lake in the image is likely Lake Kawaguchi.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00059491",
+        "image_id": "oven_05043112",
+        "question": "What is the weight of a male of this bird in kilogram?",
+        "answer": [
+            "1.729"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 1.729,
+                "range": [
+                    1.5561,
+                    1.9019000000000001
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The weight of a male mallard is 0.7–1.6 kg.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00057556",
+        "image_id": "oven_05011298",
+        "question": "Who is the architect of this building?",
+        "answer": [
+            "Hiroshi Hara"
+        ],
+        "answer_eval": [
+            "Hiroshi Hara"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Hiroshi Hara",
+            "metric_score": {
+                "em": 1.0,
+                "f1": 1.0,
+                "acc": 1.0,
+                "precision": 1.0,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00028479",
+        "image_id": "oven_05010177",
+        "question": "What is the immediately prior item that this vehicle follows in a series?",
+        "answer": [
+            "Chevrolet Van"
+        ],
+        "answer_eval": [
+            "Chevrolet Van"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents provide information about various types of vehicles, but they do not specify the context or series in which the vehicle is being discussed. To determine the immediately prior item in a series, we need to know the specific context or series in which the vehicle is being discussed. The retrieved documents do not provide this information, so we need to search for more specific information.\n</Thought>\n<Sub-Question>\nWhat is the specific context or series in which the vehicle is being discussed?\n</Sub-Question>\n<Search>\nText Retrieval: specific context or series in which the vehicle is being discussed.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00052455",
+        "image_id": "oven_05012677",
+        "question": "Who is the owner of this place?",
+        "answer": [
+            "Jefferson Monroe Levy",
+            "Thomas Jefferson Foundation",
+            "Uriah P. Levy",
+            "Thomas Jefferson"
+        ],
+        "answer_eval": [
+            "Uriah Phillips Levy",
+            "Uriah P. Levy",
+            "Jefferson Monroe Levy",
+            "Thomas Jefferson Foundation",
+            "T. Jefferson",
+            "Thomas Jefferson Foundation, Inc.",
+            "Thomas Jefferson",
+            "President Jefferson"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Intesa Sanpaolo",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00058816",
+        "image_id": "oven_05016374",
+        "question": "Which building or structure has been replaced by the building in the image?",
+        "answer": [
+            "Königliches Nationaltheater"
+        ],
+        "answer_eval": [
+            "Schauspielhaus",
+            "Königliches Nationaltheater"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe previous building at the site of the Berliner Staatsoper Unter den Linden was the Neues Königliches Opernhaus Berlin, which was replaced by the current building, the Berliner Staatsoper Unter den Linden.\n</Thought>\n<Sub-Question>\nWhat was the previous building or structure at the site of the Berliner Staatsoper Unter den Linden?\n</Sub-Question>\n<Search>\nText Retrieval: history of Neues Königliches Opernhaus Berlin\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.03571428571428571,
+                "acc": 0.0,
+                "precision": 0.018518518518518517,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00054843",
+        "image_id": "oven_05011423",
+        "question": "What country does this building belong to?",
+        "answer": [
+            "Israel"
+        ],
+        "answer_eval": [
+            "Holy Land",
+            "🇮🇱",
+            "State of Israel",
+            "il",
+            "Israel",
+            "ISR",
+            "the Jewish state"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide a clear match for the building in the image. However, the golden dome and cross are common features in many Christian churches around the world. To determine the specific country, we need more information about the building's location or historical context. Since the image does not provide enough context, we cannot determine the country of the building with certainty.\n</Thought>\n<Sub-Question>\nWhat is the name of the building in the image?\n</Sub-Question>\n<Search>\nText Retrieval: building with golden dome and cross in [country]\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.025,
+                "acc": 1.0,
+                "precision": 0.012987012987012988,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00017534",
+        "image_id": "oven_04965065",
+        "question": "What is the minimum frequency of sound that you can hear of this fish?",
+        "answer": [
+            "20"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 20.0,
+                "range": [
+                    18.0,
+                    22.0
+                ]
+            }
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide specific information about the hearing range of goldfish. However, the documents do provide information about the hearing range of other animals, such as cattle and cats. The hearing range of cattle is from 23 Hz to 35 kHz, and the hearing range of cats is from 500 Hz to 32 kHz. Since goldfish are fish, it is reasonable to assume that their hearing range is similar to that of other fish. However, the exact range is not provided in the retrieved documents.\n</Thought>\n<Sub-Question>\nWhat is the hearing range of goldfish?\n</Sub-Question>\n<Search>\nText Retrieval: hearing range of goldfish\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00027456",
+        "image_id": "oven_05035567",
+        "question": "What is the closest upper taxonomy of this insect?",
+        "answer": [
+            "Limenitis"
+        ],
+        "answer_eval": [
+            "Limenitis"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents provide information about various butterfly species and their families, but not specifically about the family of the butterfly in the image. The butterfly in the image appears to be a member of the family Nymphalidae, as mentioned in Doc1. The family Nymphalidae is part of the order Lepidoptera. Therefore, the closest upper taxonomy of the butterfly in the image is the order Lepidoptera.\n</Thought>\n<Sub-Question>\nWhat is the order of the butterfly in the image?\n</Sub-Question>\n<Search>\nText Retrieval: butterfly order identification\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00021020",
+        "image_id": "oven_05014370",
+        "question": "What is the architectural style of this building?",
+        "answer": [
+            "Moorish Revival architecture"
+        ],
+        "answer_eval": [
+            "Moorish Revival architecture",
+            "Orientalist architecture"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The architectural style of the building in the image is Renaissance Revival.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.16666666666666666,
+                "acc": 0.0,
+                "precision": 0.1111111111111111,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00040848",
+        "image_id": "oven_05038353",
+        "question": "how many metre is the wingspan of this bird?",
+        "answer": [
+            "1.06"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 1.06,
+                "range": [
+                    0.9540000000000001,
+                    1.1660000000000001
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The wingspan of the Yellow-legged gull is 120 to 155 cm (47 to 61 inches).",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00052153",
+        "image_id": "oven_05016582",
+        "question": "Which historic period or era did this mountain occur?",
+        "answer": [
+            "Paleozoic"
+        ],
+        "answer_eval": [
+            "Palaeozoic",
+            "Palaeozoic era",
+            "Paleozoic"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The mountain range in the background of the image is the Alps, and their historic period or era is the Alpine orogeny.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.10526315789473684,
+                "acc": 0.0,
+                "precision": 0.058823529411764705,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00025812",
+        "image_id": "oven_05037487",
+        "question": "What is the closest upper taxonomy of this insect?",
+        "answer": [
+            "Dryas"
+        ],
+        "answer_eval": [
+            "Dryas"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe closest upper taxonomy of a butterfly is the family Papilionidae. This can be inferred from the information provided in the retrieved documents, which discuss the higher classification of butterflies and their relationships within the Lepidoptera order.\n</Thought>\n<Sub-Question>\nWhat is the closest upper taxonomy of a butterfly?\n</Sub-Question>\n<Search>\nText Retrieval: closest upper taxonomy of a butterfly\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00023517",
+        "image_id": "oven_05009839",
+        "question": "who/what operates this aircraft?",
+        "answer": [
+            "Air Koryo"
+        ],
+        "answer_eval": [
+            "Air Koryo",
+            "Chosŏn Minhang"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide direct information about the airline associated with the aircraft in the image. The image shows the tail of the aircraft with a logo and text that likely indicates the airline. The text on the tail of the aircraft is not clear enough to identify the airline. We need to focus on the logo and text on the tail of the aircraft to determine the airline.\n</Thought>\n<Sub-Question>\nWhat is the airline associated with the aircraft in the image?\n</Sub-Question>\n<Search>\nText Retrieval: Information about the airline associated with the aircraft in the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00046750",
+        "image_id": "oven_05026891",
+        "question": "Who designed this bridge?",
+        "answer": [
+            "Santiago Calatrava"
+        ],
+        "answer_eval": [
+            "Santiago Calatrava",
+            "Santiago Calatrava Valls"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Santiago Calatrava designed the Puente de la Mujer.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4444444444444445,
+                "acc": 1.0,
+                "precision": 0.2857142857142857,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00059680",
+        "image_id": "oven_05017380",
+        "question": "Which city or region does this building locate in?",
+        "answer": [
+            "Valparaiso"
+        ],
+        "answer_eval": [
+            "Valparaiso",
+            "Valparaiso, IN",
+            "Valparaiso, Indiana"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide specific information about the building in the image. The image shows a modern building with a unique architectural design, which is not mentioned in the retrieved documents. To identify the building in the image, I need to search for more specific information about the building's name and location.\n</Thought>\n<Search>\nText Retrieval: Information about the building in the image, including its name and location.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.03225806451612903,
+                "acc": 0.0,
+                "precision": 0.016666666666666666,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00001951",
+        "image_id": "oven_04961513",
+        "question": "What is the closest parent taxonomy of this bird?",
+        "answer": [
+            "Sitta"
+        ],
+        "answer_eval": [
+            "nuthatches",
+            "Sitta"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The closest parent taxonomy of the bird is Order: Passeriformes and Family: Sittidae.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00015630",
+        "image_id": "oven_04963193",
+        "question": "What is the oldest age of this animal?",
+        "answer": [
+            "27"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 27.0,
+                "range": [
+                    24.3,
+                    29.700000000000003
+                ]
+            }
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The maximum lifespan of a wild boar in the wild is 10–14 years.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00043954",
+        "image_id": "oven_05014527",
+        "question": "In which year did this building officially open?",
+        "answer": [
+            "1859"
+        ],
+        "answer_eval": [
+            "1860",
+            "1858",
+            "1859"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "1852",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00000383",
+        "image_id": "oven_04956856",
+        "question": "what has this bridge crossed over?",
+        "answer": [
+            "Paranoá Lake"
+        ],
+        "answer_eval": [
+            "Paranoa Lake",
+            "Paranoá Lake"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The Juscelino Kubitschek Bridge crosses over the Paranoá Lake.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.4444444444444445,
+                "acc": 1.0,
+                "precision": 0.2857142857142857,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00029221",
+        "image_id": "oven_05018994",
+        "question": "Who occupies this building?",
+        "answer": [
+            "Local Court Nuremberg"
+        ],
+        "answer_eval": [
+            "Nuremberg District Court",
+            "Local Court Nuremberg",
+            "Local Court Nuremberg (Bavaria)",
+            "District Court Nuremberg",
+            "Nuremberg Local Court"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The Palace of Justice in Nuremberg is occupied by the Memorium Nuremberg Trials.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.14285714285714288,
+                "acc": 0.0,
+                "precision": 0.09090909090909091,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00066438",
+        "image_id": "oven_05030990",
+        "question": "Where is this plant native to?",
+        "answer": [
+            "New Zealand"
+        ],
+        "answer_eval": [
+            "nz",
+            "Dominion of New Zealand",
+            "🇳🇿",
+            "New Zealand",
+            "Aotearoa",
+            "NZ",
+            "Aotearoa New Zealand",
+            "NZL"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The plant in the image is native to the Mediterranean region.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00054948",
+        "image_id": "oven_00003943",
+        "question": "Who is the developer of this aircraft?",
+        "answer": [
+            "de Havilland Canada"
+        ],
+        "answer_eval": [
+            "de Havilland Aircraft of Canada Ltd.",
+            "de Havilland Canada",
+            "DHC"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The developer of the Dornier Do 228 is Dornier Flugzeugwerke, founded by Claude Dornier.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.1111111111111111,
+                "acc": 0.0,
+                "precision": 0.08333333333333333,
+                "recall": 0.16666666666666666
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00004927",
+        "image_id": "oven_04957812",
+        "question": "What is the architectural style of this building?",
+        "answer": [
+            "baroque architecture",
+            "Renaissance architecture"
+        ],
+        "answer_eval": [
+            "Renaissance architecture",
+            "baroque architecture"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The architectural style of the building is likely Renaissance Revival or Baroque Revival.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.15384615384615385,
+                "acc": 0.0,
+                "precision": 0.09090909090909091,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00028073",
+        "image_id": "oven_05018847",
+        "question": "What is this building named after?",
+        "answer": [
+            "Lahore"
+        ],
+        "answer_eval": [
+            "Lahore",
+            "LHR"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe building in the image is a ziggurat-style structure. Based on the retrieved documents, the Al Zaqura Building in Baghdad is a government building that is known for its ziggurat design. This building is named after the ziggurat, which is a type of ancient Mesopotamian temple tower.\n</Thought>\n<Sub-Question>\nWhat is the name of the building in the image?\n</Sub-Question>\n<Search>\nText Retrieval: name of the building in the image\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00060898",
+        "image_id": "oven_05018975",
+        "question": "How many spans does this bridge have?",
+        "answer": [
+            "63"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 63.0,
+                "range": [
+                    56.7,
+                    69.30000000000001
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The bridge has one span.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00072686",
+        "image_id": "oven_05029545",
+        "question": "What is the closest parent taxonomy of this bird?",
+        "answer": [
+            "Galerida"
+        ],
+        "answer_eval": [
+            "Galerida"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe closest parent taxonomy of the Crested Lark is the family Alaudidae, which includes larks and their allies. The Alaudidae family is part of the order Passeriformes, which includes songbirds.\n</Thought>\n<Sub-Question>\nWhat is the order of the Crested Lark?\n</Sub-Question>\n<Search>\nText Retrieval: order of Crested Lark\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00065065",
+        "image_id": "oven_04945074",
+        "question": "What is the main food source of this animal?",
+        "answer": [
+            "Bison",
+            "European hare",
+            "fish",
+            "mule deer",
+            "dog",
+            "Sus scrofa",
+            "food waste",
+            "house cat",
+            "roe deer",
+            "red fox",
+            "carrion",
+            "grass",
+            "apple"
+        ],
+        "answer_eval": [
+            "cat",
+            "grass",
+            "🐕",
+            "carrion",
+            "food wastage",
+            "Vulpes vulpes",
+            "European hare",
+            "European wild pig",
+            "Capreolus capreolus",
+            "house cat",
+            "wild swine",
+            "🐈",
+            "Brown hare",
+            "cats",
+            "🐱",
+            "V.Vulpes",
+            "Sus scrofa",
+            "domestic cat",
+            "Eurasian wild pig",
+            "food waste",
+            "Eurasian wild boar",
+            "Canis lupus familiaris",
+            "red fox",
+            "housecat",
+            "wild boar",
+            "apple",
+            "western roe deer",
+            "dog",
+            "Lepus europaeus",
+            "fishes",
+            "boar",
+            "Odocoileus hemionus",
+            "domestic dog",
+            "puss",
+            "roe deer",
+            "European wild boar",
+            "pig",
+            "buffalo",
+            "🐶",
+            "Bison",
+            "food loss",
+            "wastage of food",
+            "Canis familiaris",
+            "Pisces",
+            "mule deer",
+            "dogs",
+            "fish",
+            "wild pig"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The main food source of the animal in the image is large mammals such as deer, elk, and moose.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.21052631578947367,
+                "acc": 0.0,
+                "precision": 0.125,
+                "recall": 0.6666666666666666
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00071724",
+        "image_id": "oven_05026677",
+        "question": "In which year did this building officially open?",
+        "answer": [
+            "1902"
+        ],
+        "answer_eval": [
+            "1901",
+            "1903",
+            "1902"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide the specific building name or its opening year. To answer the original question, we need to know the name of the building in question and its location. Without this information, it's impossible to determine the year of its opening.\n</Thought>\n<Sub-Question>\nWhat is the name of the building in question?\n</Sub-Question>\n<Search>\nText Retrieval: name of the building in question\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00006547",
+        "image_id": "oven_04952706",
+        "question": "What is the location of this building?",
+        "answer": [
+            "Friedrichshain"
+        ],
+        "answer_eval": [
+            "Friedrichshain"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe East Side Gallery is a significant part of the Berlin Wall, located in Berlin-Friedrichshain, near the center of Berlin, on Mühlenstraße between the Berlin Ostbahnhof and the Oberbaumbrücke along the Spree. The mural in the image is part of the East Side Gallery.\n</Thought>\n<Sub-Question>\nWhat is the location of the East Side Gallery?\n</Sub-Question>\n<Search>\nNo Retrieval.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 1.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00056566",
+        "image_id": "oven_05009565",
+        "question": "What is the height of this aircraft in metre?",
+        "answer": [
+            "15.8"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 15.8,
+                "range": [
+                    14.22,
+                    17.380000000000003
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide specific information about the height of the aircraft in the image. We need to identify the model of the aircraft to find its standard height.\n</Thought>\n<Sub-Question>\nWhat is the model of the aircraft in the image?\n</Sub-Question>\n<Search>\nText Retrieval: Aircraft model identification from the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00043521",
+        "image_id": "oven_05045433",
+        "question": "What is the weight of a female of this bird in gram?",
+        "answer": [
+            "116"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 116.0,
+                "range": [
+                    104.4,
+                    127.60000000000001
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The weight of a female black-necked grebe is approximately 692–925 grams.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00001396",
+        "image_id": "oven_04953933",
+        "question": "What is this building named after?",
+        "answer": [
+            "François, Prince of Soubise"
+        ],
+        "answer_eval": [
+            "François, Prince of Soubise"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The building in the image is named after Pablo Picasso.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00066821",
+        "image_id": "oven_05018425",
+        "question": "What is this lake named after?",
+        "answer": [
+            "Pfäffikon"
+        ],
+        "answer_eval": [
+            "Pfaeffikon",
+            "Pfaffikon",
+            "Pfäffikon",
+            "Pfäffikon ZH"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe lake in the image is not named \"The Vordense Beek\" as mentioned in the retrieved documents. The lake appears to be a large body of water in a rural setting with cows grazing in the foreground. However, the name of the lake is not explicitly mentioned in the retrieved documents. I need to search for more specific information about the lake in the image.\n</Thought>\n<Sub-Question>\nWhat is the name of the lake in the image?\n</Sub-Question>\n<Search>\nText Retrieval: name of the lake in the image with cows grazing in the foreground and a town in the background.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00044562",
+        "image_id": "oven_05025618",
+        "question": "Which body of water is this island located in or next to?",
+        "answer": [
+            "Nakashima River"
+        ],
+        "answer_eval": [
+            "Nakashima River"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Insufficient information to determine the body of water.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00072488",
+        "image_id": "oven_05019918",
+        "question": "What is the height of this building in metre?",
+        "answer": [
+            "10"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 10.0,
+                "range": [
+                    9.0,
+                    11.0
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The image does not show a building, so the height of the building cannot be determined from this image.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00033512",
+        "image_id": "oven_05020855",
+        "question": "Who is the architect of this building?",
+        "answer": [
+            "Fernando H. Ocampo"
+        ],
+        "answer_eval": [
+            "Fernando Hizon Ocampo",
+            "Fernando H. Ocampo"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide the name of the building in the image. I need to identify the building in the image to find out who the architect was.\n</Thought>\n<Sub-Question>\nWhat is the name of the building in the image?\n</Sub-Question>\n<Search>\nImage Retrieval\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00020663",
+        "image_id": "oven_05016370",
+        "question": "Which building or structure has been replaced by the building in the image?",
+        "answer": [
+            "Königliches Nationaltheater"
+        ],
+        "answer_eval": [
+            "Schauspielhaus",
+            "Königliches Nationaltheater"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The building that was replaced by the Konzerthaus Berlin was the Theater am Gendarmenmarkt.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00029504",
+        "image_id": "oven_05046596",
+        "question": "What is the maximum number of players of this game?",
+        "answer": [
+            "22"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 22.0,
+                "range": [
+                    19.8,
+                    24.200000000000003
+                ]
+            }
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "11",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00014088",
+        "image_id": "oven_04976943",
+        "question": "How many offspring can this animal produce at the same time?",
+        "answer": [
+            "18.0-25.0"
+        ],
+        "answer_eval": [
+            {
+                "wikidata": 21.5,
+                "range": [
+                    18.0,
+                    25.0
+                ]
+            }
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents provide information about the reproductive capabilities of opossums and kangaroos, which are both marsupials. Opossums can give birth to up to 20 young at a time, but only a few survive due to high mortality rates. Kangaroos typically give birth to one young at a time, but can have embryonic diapause to delay the development of a second embryo if conditions are not favorable. The number of offspring a marsupial can produce at the same time is generally limited by the number of pouches available for the young.\n</Thought>\n<Sub-Question>\nHow many offspring can a marsupial typically produce at the same time?\n</Sub-Question>\n<Search>\nText Retrieval: Information on the typical number of offspring a marsupial can produce at the same time.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00056491",
+        "image_id": "oven_05024581",
+        "question": "Which city or region does this bridge locate in?",
+        "answer": [
+            "Edmonton"
+        ],
+        "answer_eval": [
+            "Edmonton, Alberta",
+            "Edmonton",
+            "Edmonton, AB",
+            "City of Edmonton"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The Tyne Bridge is located in Newcastle upon Tyne, which is in the North East of England.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.1111111111111111,
+                "acc": 0.0,
+                "precision": 0.06666666666666667,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00008848",
+        "image_id": "oven_05007794",
+        "question": "What is the conservation status of this plant? (The status is assigned by the international union for conservation of nature. Choose one among Endangered,Least Concern,Critically Endangered,extinct species,extinct in the wild,Vulnerable,Near Threatened,Data Deficient)",
+        "answer": [
+            "Near Threatened"
+        ],
+        "answer_eval": [
+            "NT",
+            "Near Threatened",
+            "LR/nt"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The conservation status of Dimocarpus longan is Data Deficient.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 1.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00017462",
+        "image_id": "oven_04951307",
+        "question": "where is the highest point of this mountain?",
+        "answer": [
+            "Dent de Barme"
+        ],
+        "answer_eval": [
+            "Dent de Barme"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "The highest point of the mountain is towards the upper right part of the image.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00022931",
+        "image_id": "oven_05011456",
+        "question": "What is this building dedicated to?",
+        "answer": [
+            "Our Lady, Star of the Sea"
+        ],
+        "answer_eval": [
+            "Stella Maris",
+            "St Mary Star of the Sea",
+            "Our Lady Star of the Sea",
+            "Saint Mary Star of the Sea",
+            "Our Lady, Star of the Sea",
+            "St. Mary, Star of the Sea",
+            "St Mary, Star of the Sea",
+            "St. Mary Star of the Sea",
+            "Saint Mary, Star of the Sea"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe building in the image is the Cathedral Church of the Holy Cross, located on Akdamar Island. It is dedicated to the Holy Cross, as indicated by its name and the architectural features typical of a cathedral.\n</Thought>\n<Sub-Question>\nWhat is the name of the building in the image?\n</Sub-Question>\n<Search>\nText Retrieval: name of the building with a dome and a cross on top in the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.03278688524590164,
+                "acc": 0.0,
+                "precision": 0.017857142857142856,
+                "recall": 0.2
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00003314",
+        "image_id": "oven_05002488",
+        "question": "What is this food named after?",
+        "answer": [
+            "Mahon"
+        ],
+        "answer_eval": [
+            "Maó",
+            "Mahon",
+            "Port Mahon"
+        ],
+        "data_split": "val_unseen_question",
+        "output": {
+            "pred": "Mayonnaise",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00044319",
+        "image_id": "oven_04944596",
+        "question": "Who or what maintains this place?",
+        "answer": [
+            "Greater London Authority"
+        ],
+        "answer_eval": [
+            "Greater London Authority"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents do not provide direct information about the maintenance of the National Gallery in London. However, the documents mention the National Gallery of Scotland, which is a similar institution. The National Gallery of Scotland is maintained by the National Galleries of Scotland. It is reasonable to infer that the National Gallery in London, which is part of the same organization, is also maintained by the National Galleries of Scotland.\n</Thought>\n<Sub-Question>\nWho maintains the National Gallery in London?\n</Sub-Question>\n<Search>\nText Retrieval: National Gallery London maintenance\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.024691358024691357,
+                "acc": 0.0,
+                "precision": 0.01282051282051282,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00040297",
+        "image_id": "oven_05025061",
+        "question": "What country does this lake belong to?",
+        "answer": [
+            "Ecuador"
+        ],
+        "answer_eval": [
+            "🇪🇨",
+            "ECU",
+            "The Ecuadorian State",
+            "EC",
+            "Republic of Ecuador",
+            "Republic of the Equator",
+            "ec",
+            "Ecuador",
+            "ecu"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe retrieved documents provide information about the Pangong Tso lake, which is a trans-border lake extending from the Ali prefecture of China's Tibet autonomous region to India. Therefore, the lake in the image likely belongs to both China and India.\n</Thought>\n<Sub-Question>\nWhat is the name of the lake in the image?\n</Sub-Question>\n<Search>\nText Retrieval: Identify the lake in the image and its name.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.03389830508474576,
+                "acc": 1.0,
+                "precision": 0.017857142857142856,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00033085",
+        "image_id": "oven_05024380",
+        "question": "Which significant event was held in this place?",
+        "answer": [
+            "parturition"
+        ],
+        "answer_eval": [
+            "giving birth",
+            "birth",
+            "delivery",
+            "labour",
+            "childbirth",
+            "GO:0007567",
+            "parturition",
+            "partus",
+            "labor and delivery",
+            "child birth"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The significant events held at the Palace of Mafra include its completion in 1755, declaration as a National Monument in 1910, and inscription as a UNESCO World Heritage Site in 2019.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.06666666666666667,
+                "acc": 0.0,
+                "precision": 0.037037037037037035,
+                "recall": 0.3333333333333333
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00064882",
+        "image_id": "oven_05059286",
+        "question": "Which maintenance method is used for this place?",
+        "answer": [
+            "road maintenance"
+        ],
+        "answer_eval": [
+            "street repair",
+            "street maintenance",
+            "road repair",
+            "highway repair",
+            "highway maintenance",
+            "road maintenance"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "Headlamp maintenance.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.5,
+                "acc": 0.0,
+                "precision": 0.5,
+                "recall": 0.5
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00021154",
+        "image_id": "oven_05038004",
+        "question": "What is the closest upper taxonomy of this insect?",
+        "answer": [
+            "Clepsis"
+        ],
+        "answer_eval": [
+            "Clepsis"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "<Thought>\nThe insect in the image is a moth, which belongs to the class Insecta. The closest upper taxonomy of this insect is the class Insecta.\n</Thought>\n<Sub-Question>\nWhat is the taxonomic classification of the insect in the image?\n</Sub-Question>\n<Search>\nText Retrieval: insect identification of the insect in the image.\n</Search>",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00047565",
+        "image_id": "oven_05025866",
+        "question": "What is this bridge named after?",
+        "answer": [
+            "Charles IV"
+        ],
+        "answer_eval": [
+            "Charles IV",
+            "Karl IV.",
+            "Holy Roman Emperor Charles IV",
+            "Karl von Luxemburg",
+            "Charles of Luxembourg",
+            "Holy Roman Emperor Karl IV"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The bridge is named after King Charles IV of Bohemia.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0.3636363636363636,
+                "acc": 1.0,
+                "precision": 0.2222222222222222,
+                "recall": 1.0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00061114",
+        "image_id": "oven_05013754",
+        "question": "What is the location of this facility?",
+        "answer": [
+            "Shiraz"
+        ],
+        "answer_eval": [
+            "Shiraz"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The location of the facility where the stained glass window with a geometric pattern and the text \"ZAVEEL\" is located cannot be determined from the given information.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    },
+    {
+        "data_id": "infoseek_val_00056866",
+        "image_id": "oven_05019054",
+        "question": "Which significant event was held in this building?",
+        "answer": [
+            "renovation"
+        ],
+        "answer_eval": [
+            "renewal",
+            "renovation",
+            "refurbishment",
+            "renovation building (activity)",
+            "remodeling"
+        ],
+        "data_split": "val_unseen_entity",
+        "output": {
+            "pred": "The Palau Güell was used in Antonioni's film \"The Passenger\" as a backdrop for the first meeting between Jack Nicholson and Maria Schneider.",
+            "metric_score": {
+                "em": 0.0,
+                "f1": 0,
+                "acc": 0.0,
+                "precision": 0,
+                "recall": 0
+            }
+        }
+    }
+]

@@ -1,0 +1,271 @@
+{
+  "categories": [
+    "Explicit Deictics",
+    "Attribute-as-Name",
+    "Spatial Dependency",
+    "Category-level Vagueness",
+    "Visual Recognition Task Offloading"
+  ],
+  "annotations": [
+    {
+      "question": "how much does this car cost new compared to a tesla 3?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "what is the curb weight of this suv?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "when did people start making these?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "where did the artist of this work study?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "how long has the car model been around?",
+      "category": "Visual Recognition Task Offloading",
+      "note": null
+    },
+    {
+      "question": "what kind of foods can i find here?",
+      "category": "Visual Recognition Task Offloading",
+      "note": null
+    },
+    {
+      "question": "when was the process to make this by machine developed?",
+      "category": "Visual Recognition Task Offloading",
+      "note": "Attempted coreference resolution failed: more abstract semantics are diluted"
+    },
+    {
+      "question": "when was the first year this car was released in the usa?",
+      "category": "Visual Recognition Task Offloading",
+      "note": null
+    },
+    {
+      "question": "in what place by population is the city where this car was first introduced?",
+      "category": "Visual Recognition Task Offloading",
+      "note": null
+    },
+    {
+      "question": "what's the difference between this model and the 450h?",
+      "category": "Visual Recognition Task Offloading",
+      "note": null
+    },
+    {
+      "question": "where did the first one of those appear?",
+      "category": "Visual Recognition Task Offloading",
+      "note": "Attempted coreference resolution failed: more abstract semantics are diluted"
+    },
+    {
+      "question": "when was the artist who made this born?",
+      "category": "Explicit Deictics",
+      "note": null
+    },
+    {
+      "question": "what is the ideal soil ph range for growing this plant?",
+      "category": "Visual Recognition Task Offloading",
+      "note": null
+    },
+    {
+      "question": "how many locations do they have?",
+      "category": "Explicit Deictics",
+      "note": null
+    },
+    {
+      "question": "when was the author of this book born?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "how many people are credited with writing this book?",
+      "category": "Explicit Deictics",
+      "note": null
+    },
+    {
+      "question": "what was the nickname of the person this statue depicts?",
+      "category": "Explicit Deictics",
+      "note": null
+    },
+    {
+      "question": "has the author written about other sports?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "what was the name of the first of this to be kept in a modern zoo?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "when was this completed?",
+      "category": "Attribute-as-Name",
+      "note": null
+    },
+    {
+      "question": "what are the four basic barre shapes according to this page?",
+      "category": "Explicit Deictics",
+      "note": null
+    },
+    {
+      "question": "what's the difference between the fruit of this plant and that of ophiopogon planiscapus?",
+      "category": "Explicit Deictics",
+      "note": null
+    },
+    {
+      "question": "how long has this station operated?",
+      "category": "Explicit Deictics",
+      "note": null
+    },
+    {
+      "question": "what language is this page written in?",
+      "category": "Explicit Deictics",
+      "note": null
+    },
+    {
+      "question": "who created the first known modern one of these?",
+      "category": "Explicit Deictics",
+      "note": null
+    },
+    {
+      "question": "how many cars did the parent company of this auto maker sell in 2017?",
+      "category": "Explicit Deictics",
+      "note": null
+    },
+    {
+      "question": "how long are the leaves of this plant, usually?",
+      "category": "Explicit Deictics",
+      "note": "当第一轮检索失败时，模型会知道他应该先确定实体是什么"
+    },
+    {
+      "question": "where is this university that publishes this journal located?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "what is its price on amazon?",
+      "category": "Category-level Vagueness",
+      "note": "混合指代偏差 (Mixed Deictic Bias)，视觉上下文暴露"
+    },
+    {
+      "question": "what is the cost of this scooter?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "what's the name of this plant?",
+      "category": "Visual Recognition Task Offloading",
+      "note": null
+    },
+    {
+      "question": "which quarter had the greatest revenue?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "what are the uses for the oil from this nut?",
+      "category": "Visual Recognition Task Offloading",
+      "note": null
+    },
+    {
+      "question": "how many years ago did this character with the red stripe on their face first appear in a video game?",
+      "category": "Visual Recognition Task Offloading",
+      "note": null
+    },
+    {
+      "question": "is this cheaper at wal-mart or walgreens?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "in which city and country did this candy origin story take place?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "who is the founder of the company that produces this?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "did this book get published before the fall of the ottomans?",
+      "category": "Explicit Deictics",
+      "note": null
+    },
+    {
+      "question": "in what year did production for this first start?",
+      "category": "Explicit Deictics",
+      "note": null
+    },
+    {
+      "question": "what did the company that first developed this character do before they were a game studio?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "what book did they write before this one?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "is this muscle longer in a horse or human?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "what is the average lifespan of this animal?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "is this made with recycled materials?",
+      "category": "Visual Recognition Task Offloading",
+      "note": null
+    },
+    {
+      "question": "what type of battery does the 2022 model of this car have?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "what city claims to be the capital of the world for these berries?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "how long did this cathedral take to build?",
+      "category": "Attribute-as-Name",
+      "note": null
+    },
+    {
+      "question": "how fast does that animal dive?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "what are the concerns associated with this fruit production?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "what is the lifespan of that lizard?",
+      "category": "Category-level Vagueness",
+      "note": null
+    },
+    {
+      "question": "what plant is this?",
+      "category": "Visual Recognition Task Offloading",
+      "note": null
+    },
+    {
+      "question": "what is the genus of the tree that this is made from?",
+      "category": "Explicit Deictics",
+      "note": null
+    }
+  ]
+}

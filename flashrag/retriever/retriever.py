@@ -1274,12 +1274,19 @@ class CRAGRetriever(BaseRetriever):
         super().__init__(config)
         # _patch_crag_web_loader()
         # _patch_crag_image_loader()
-        self.search_pipeline = UnifiedSearchPipeline(
-            image_model_name="openai/clip-vit-large-patch14-336",
-            image_hf_dataset_id="crag-mm-2025/image-search-index-validation",
-            text_model_name="BAAI/bge-large-en-v1.5",
-            web_hf_dataset_id="crag-mm-2025/web-search-index-validation",
-        )
+        crag_search_device = str(config["crag_search_device"]).lower()
+        original_cuda_available = torch.cuda.is_available
+        if crag_search_device == "cpu":
+            torch.cuda.is_available = lambda: False
+        try:
+            self.search_pipeline = UnifiedSearchPipeline(
+                image_model_name="openai/clip-vit-large-patch14-336",
+                image_hf_dataset_id="crag-mm-2025/image-search-index-validation",
+                text_model_name="BAAI/bge-large-en-v1.5",
+                web_hf_dataset_id="crag-mm-2025/web-search-index-validation",
+            )
+        finally:
+            torch.cuda.is_available = original_cuda_available
         self.topk = config["retrieval_topk"]
 
     def build_entity_evidence(self, retrieval_results):
@@ -1345,27 +1352,12 @@ class CRAGRetriever(BaseRetriever):
 
 def main():
 # Example configuration
-    config = {
-        # Base retriever config
-        "retrieval_method": "serper",
-        "retrieval_topk": 10,
-        "index_path": None,  # Not used for Serper
-        "corpus_path": None,  # Not used for Serper
-        "save_dir": "./output",
-        
-        # Serper specific config
-        "serper_api_key": "your-api-key",
-        "serper_search_type": "search",
-        "serper_location": "United States",
-        "serper_gl": "us",
-        "serper_hl": "en"
-    }
     from flashrag.config import Config
-    config = Config("basic_config.yaml",config)
-    retriever = SerperRetriever(config)
+    config = Config("/home/you/FlashRAG/exps/idea10/configs/config.yaml")
+    retriever = DenseRetriever(config)
 
     # Batch search
-    queries = ["Python programming", "Machine learning"]
+    queries = ["Caldwell House"]
     batch_results = retriever.batch_search(queries)
     print(batch_results)
 

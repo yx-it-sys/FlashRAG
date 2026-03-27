@@ -1,0 +1,100 @@
+<View>
+  <Header value="Question" />
+  <Text name="question_text" value="$question" />
+  <Header value="Image" />
+  <Text name="image_id_text" value="Image ID: $image_id" />
+  <Text name="image_title_text" value="Image Title: $image_title" />
+  <Image name="source_image" value="$image" maxWidth="640px" zoom="true" />
+  <Text name="trajectory_total_text" value="Trajectory count: $trajectory_total" />
+
+  <Header value="Trajectory 1" />
+  <Text name="mode_text_1" value="Mode: $mode_1" />
+  <Text name="query_text_1" value="$query_1" />
+  <Choices name="entity_ambiguous_1" toName="query_text_1" choice="single" showInline="true">
+    <Choice value="No" />
+    <Choice value="Yes" />
+  </Choices>
+  <Choices name="ambiguity_type_1" toName="query_text_1" choice="single" showInline="true">
+    <Choice value="Level 0: Description of the entity" />
+    <Choice value="Level 1: Macro classification" />
+    <Choice value="Level 3: Original Query" />
+    <Choice value="Level 4: Entity Absence" />
+  </Choices>
+  <TextArea name="remark_1" toName="query_text_1" placeholder="Remark for trajectory 1" editable="true" maxSubmissions="1" />
+
+  <Header value="Trajectory 2" />
+  <Text name="mode_text_2" value="Mode: $mode_2" />
+  <Text name="query_text_2" value="$query_2" />
+  <Choices name="entity_ambiguous_2" toName="query_text_2" choice="single" showInline="true">
+    <Choice value="No" />
+    <Choice value="Yes" />
+  </Choices>
+  <Choices name="ambiguity_type_2" toName="query_text_2" choice="single" showInline="true">
+    <Choice value="Level 0: Description of the entity" />
+    <Choice value="Level 1: Macro classification" />
+    <Choice value="Level 3: Original Query" />
+    <Choice value="Level 4: Entity Absence" />
+  </Choices>
+  <TextArea name="remark_2" toName="query_text_2" placeholder="Remark for trajectory 2" editable="true" maxSubmissions="1" />
+
+  <Header value="Trajectory 3" />
+  <Text name="mode_text_3" value="Mode: $mode_3" />
+  <Text name="query_text_3" value="$query_3" />
+  <Choices name="entity_ambiguous_3" toName="query_text_3" choice="single" showInline="true">
+    <Choice value="No" />
+    <Choice value="Yes" />
+  </Choices>
+  <Choices name="ambiguity_type_3" toName="query_text_3" choice="single" showInline="true">
+    <Choice value="Level 0: Description of the entity" />
+    <Choice value="Level 1: Macro classification" />
+    <Choice value="Level 3: Original Query" />
+    <Choice value="Level 4: Entity Absence" />
+  </Choices>
+  <TextArea name="remark_3" toName="query_text_3" placeholder="Remark for trajectory 3" editable="true" maxSubmissions="1" />
+
+  <Header value="Trajectory 4" />
+  <Text name="mode_text_4" value="Mode: $mode_4" />
+  <Text name="query_text_4" value="$query_4" />
+  <Choices name="entity_ambiguous_4" toName="query_text_4" choice="single" showInline="true">
+    <Choice value="No" />
+    <Choice value="Yes" />
+  </Choices>
+  <Choices name="ambiguity_type_4" toName="query_text_4" choice="single" showInline="true">
+    <Choice value="Level 0: Description of the entity" />
+    <Choice value="Level 1: Macro classification" />
+    <Choice value="Level 3: Original Query" />
+    <Choice value="Level 4: Entity Absence" />
+  </Choices>
+  <TextArea name="remark_4" toName="query_text_4" placeholder="Remark for trajectory 4" editable="true" maxSubmissions="1" />
+
+  <Header value="Trajectory 5" />
+  <Text name="mode_text_5" value="Mode: $mode_5" />
+  <Text name="query_text_5" value="$query_5" />
+  <Choices name="entity_ambiguous_5" toName="query_text_5" choice="single" showInline="true">
+    <Choice value="No" />
+    <Choice value="Yes" />
+  </Choices>
+  <Choices name="ambiguity_type_5" toName="query_text_5" choice="single" showInline="true">
+    <Choice value="Level 0: Description of the entity" />
+    <Choice value="Level 1: Macro classification" />
+    <Choice value="Level 3: Original Query" />
+    <Choice value="Level 4: Entity Absence" />
+  </Choices>
+  <TextArea name="remark_5" toName="query_text_5" placeholder="Remark for trajectory 5" editable="true" maxSubmissions="1" />
+
+  <Header value="Trajectory 6" />
+  <Text name="mode_text_6" value="Mode: $mode_6" />
+  <Text name="query_text_6" value="$query_6" />
+  <Choices name="entity_ambiguous_6" toName="query_text_6" choice="single" showInline="true">
+    <Choice value="No" />
+    <Choice value="Yes" />
+  </Choices>
+  <Choices name="ambiguity_type_6" toName="query_text_6" choice="single" showInline="true">
+    <Choice value="Level 0: Description of the entity" />
+    <Choice value="Level 1: Macro classification" />
+    <Choice value="Level 3: Original Query" />
+    <Choice value="Level 4: Entity Absence" />
+  </Choices>
+  <TextArea name="remark_6" toName="query_text_6" placeholder="Remark for trajectory 6" editable="true" maxSubmissions="1" />
+
+</View>

@@ -1,81 +1,176 @@
-# ---- Environment Settings ----
-gpu_id: ["0","1"]
-dataset_name: "crag_mm"
-split: ["validation"]
-
-# Sampling configs
-test_sample_num: 100
-random_sample: True
-save_intermediate_data: True
-save_note: "experiment"
+model2path:
+    e5: intfloat/e5-base-v2
+    bge: BAAI/bge-base-en-v1.5
+    contriever: facebook/contriever
+    llama2-7B-chat: meta-llama/Llama-2-7b-chat-hf
+    llama2-7B: meta-llama/Llama-2-7b-hf
+    llama2-13B: meta-llama/Llama-2-13b-hf
+    llama2-13B-chat: meta-llama/Llama-2-13b-chat-hf
+model2pooling:
+    e5: mean
+    bge: cls
+    contriever: mean
+    jina: mean
+    dpr: pooler
+method2index:
+    e5: null
+    bm25: null
+    contriever: null
+    clip:
+        text: path/to/text_index
+        image: path/to/image_index
+data_dir: data/datasets/
+save_dir: data/result/crag_mm_2026_03_20_17_29_experiment
+gpu_id:
+- '1'
+dataset_name: crag_mm
+split:
+- validation
+test_sample_num: 200
+random_sample: true
 seed: 2024
-
-# Data/output paths
-data_dir: "data/datasets/"
-save_new_dir: True
-save_dir: "data/result/"
-
-# ---- Retrieval Settings ----
+save_intermediate_data: true
+save_note: experiment
 retrieval_method: crag
-save_retrieval_cache: True
-use_retrieval_cache: False
-retrieval_cache_path: "./output/retrieval_cache.json"
-silent_retrieval: False
-corpus_path: "/mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl"
+retrieval_model_path: /mnt/data/you/modelscope/clip-vit-large-patch14
+index_path: null
 multimodal_index_path_dict:
-  text: "/mnt/data/you/datasets/infoseek_val/indexes/clip_Flat_text.index"
-  image: ~
+    text: /mnt/data/you/datasets/infoseek_val/indexes/clip_Flat_text.index
+    image: null
+faiss_gpu: false
+corpus_path: /mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl
+instruction: null
 retrieval_topk: 3
-retrieval_query_max_length: 64
-retrieval_pooling_method: "cls"
-retrieval_use_fp16: True
 retrieval_batch_size: 16
-instruction: ~
-retrieval_model_path: "/mnt/data/you/modelscope/clip-vit-large-patch14"
-crag_text_model_name: "/mnt/data/you/modelscope/bge-large-en-v1.5"
-crag_hf_home: "/mnt/data/you/huggingface"
-crag_offline: True
-use_sentence_transformer: False
-faiss_gpu: False
-
-use_reranker: False
+retrieval_use_fp16: true
+retrieval_query_max_length: 64
+save_retrieval_cache: true
+use_retrieval_cache: false
+retrieval_cache_path: ./output/retrieval_cache.json
+retrieval_pooling_method: cls
+bm25_backend: bm25s
+use_sentence_transformer: false
+silent_retrieval: false
+seismic_query_cut: 10
+seismic_heap_factor: 0.8
+use_reranker: false
 rerank_model_name: e5
-
-# ---- Generator Settings ----
+rerank_model_path: intfloat/e5-base-v2
+rerank_pooling_method: mean
+rerank_topk: 5
+rerank_max_length: 512
+rerank_batch_size: 256
+rerank_use_fp16: true
+use_multi_retriever: false
+multi_retriever_setting:
+    merge_method: concat
+    topk: 5
+    rerank_model_name: null
+    rerank_model_path: null
+    retriever_list:
+    -   retrieval_method: e5
+        retrieval_topk: 5
+        index_path: null
+        retrieval_model_path: intfloat/e5-base-v2
+        instruction: null
+        bm25_backend: bm25s
+        use_reranker: false
+        corpus_path: null
+        use_sentence_transformer: false
+        retrieval_pooling_method: mean
+        retrieval_use_fp16: true
+        retrieval_query_max_length: 64
+        faiss_gpu: false
+        retrieval_batch_size: 16
+        rerank_model_name: e5
+        rerank_model_path: intfloat/e5-base-v2
+        retrieval_cache_path: ./output/retrieval_cache.json
+        save_retrieval_cache: false
+        use_retrieval_cache: false
+    -   retrieval_method: bm25
+        retrieval_topk: 5
+        index_path: null
+        retrieval_model_path: bm25
+        instruction: null
+        bm25_backend: bm25s
+        use_reranker: false
+        corpus_path: null
+        use_sentence_transformer: false
+        retrieval_pooling_method: mean
+        retrieval_use_fp16: true
+        retrieval_query_max_length: 64
+        faiss_gpu: false
+        retrieval_batch_size: 16
+        rerank_model_name: e5
+        rerank_model_path: intfloat/e5-base-v2
+        retrieval_cache_path: ./output/retrieval_cache.json
+        save_retrieval_cache: false
+        use_retrieval_cache: false
 framework: vllm
-
-## API Settings
-api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
-generator_model: "Qwen/Qwen2.5-VL-72B-Instruct"
-max_tokens: 2048
-temperature: 0.0
-top_p: 0.0
-
-## vllm Settings
-generator_model: "Qwen2.5-VL-7B-Instruct"
-generator_model_path: "/mnt/data/you/modelscope/Qwen2.5-VL-7B-Instruct"
+generator_model: Qwen2.5-VL-7B-Instruct
+openai_setting:
+    api_key: null
+    base_url: null
+generator_model_path: /mnt/data/you/modelscope/Qwen2.5-VL-7B-Instruct
 generator_max_input_len: 2048
 generator_batch_size: 4
 generation_params:
-  do_sample: False
-  max_tokens: 2048
-  temperature: 0.1
-  top_p: 1.0
-
-vllm_gpu_memory_utilization: 0.88  # Reduced from 0.88 to be more conservative
+    max_tokens: 2048
+    do_sample: false
+    temperature: 0.1
+    top_p: 1.0
+use_fid: false
+gpu_memory_utilization: 0.85
+metrics:
+- em
+- f1
+- acc
+- precision
+- recall
+- input_tokens
+metric_setting:
+    retrieval_recall_topk: 5
+    tokenizer_name: gpt-4
+save_metric_score: true
+save_new_dir: true
+retrieval_device: cpu
+text_retriever_config:
+    retrieval_method: bge
+    retrieval_device: cpu
+    retrieval_model_path: /mnt/data/you/modelscope/bge-large-en-v1.5
+    corpus_path: /mnt/data/you/datasets/mcsearch/corpus/all_docs.jsonl
+    index_path: /mnt/data/you/datasets/mcsearch/indexes/bge_Flat.index
+    retrieval_topk: 5
+    retrieval_pooling_method: cls
+image_retriever_config:
+    retrieval_method: clip
+    retrieval_device: cpu
+    retrieval_model_path: /mnt/data/you/modelscope/clip-vit-large-patch14
+    corpus_path: /home/you/FlashRAG/exps/idea10/data/datasets/mcsearch/corpus/image_corpus.parquet
+    retrieval_topk: 5
+    multimodal_index_path_dict:
+        text: null
+        image: /home/you/FlashRAG/exps/idea10/data/datasets/mcsearch/indexes/clip_Flat_image.index
+    image_retrieval_target_modal: image
+    image_retrieval_return_field: title
+crag_search_device: cpu
+omni_retrieval_char_limit: 12000
+crag_text_model_name: /mnt/data/you/modelscope/bge-large-en-v1.5
+crag_hf_home: /mnt/data/you/huggingface
+crag_offline: true
+api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
+max_tokens: 2048
+temperature: 0.0
+top_p: 0.0
+vllm_gpu_memory_utilization: 0.88
 tensor_parallel_size: 1
 max_model_len: 20000
 vllm_enforce_eager: true
 vllm_max_num_batched_tokens: 4096
 vllm_max_num_seqs: 256
 vllm_max_num_seqs_kv: 256
-
-# ---- Evaluation Settings ----
-metrics: ["em", "f1", "acc", "precision", "recall", "input_tokens"]
-metric_setting:
-  retrieval_recall_topk: 5
-  tokenizer_name: "gpt-4"
-save_metric_score: True
-
-# ---- Prompt Settings ----
-omni_prompt_path: /home/you/FlashRAG/exps/idea10/baseline/prompts/omni_prompt.toml
+omni_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/omni_prompt.toml
+dataset_path: data/datasets/crag_mm
+gpu_num: 1
+device: cuda
+dataset_image_dir: data/datasets/crag_mm/images

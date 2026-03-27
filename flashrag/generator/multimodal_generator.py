@@ -742,7 +742,6 @@ class VLLMMMGenerator(BaseMultiModalGenerator):
                 except:
                     scores.append([])
             return generated_texts, scores
-        
         return generated_texts
     
 from openai import OpenAI  
