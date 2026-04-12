@@ -137,8 +137,8 @@ class BaseRetriever:
 
     def update_base_setting(self):
         self.retrieval_method = self._config["retrieval_method"]
-        self.topk = self._config["retrieval_topk"]
-
+        self.text_retrieval_topk = self._config["text_retrieval_topk"]
+        self.image_retrieval_topk = self._config["image_retrieval_topk"]
         self.index_path = self._config["index_path"]
         self.corpus_path = self._config["corpus_path"]
 
@@ -435,7 +435,7 @@ class DenseRetriever(BaseTextRetriever):
 
     def _search(self, query: str, num: int = None, return_score=False):
         if num is None:
-            num = self.topk
+            num = self.text_retrieval_topk
         query_emb = self.encoder.encode(query)
         scores, idxs = self.index.search(query_emb, k=num)
         scores = scores.tolist()
@@ -452,7 +452,7 @@ class DenseRetriever(BaseTextRetriever):
         if isinstance(query, str):
             query = [query]
         if num is None:
-            num = self.topk
+            num = self.text_retrieval_topk
         batch_size = self.batch_size
 
         results = []
@@ -494,7 +494,8 @@ class MultiModalRetriever(BaseRetriever):
             self.corpus = load_corpus(self.corpus_path)
         else:
             self.corpus = corpus
-        self.topk = config["retrieval_topk"]
+        self.text_retrieval_topk = config["text_retrieval_topk"]
+        self.image_retrieval_topk = config["image_retrieval_topk"]
         self.batch_size = config["retrieval_batch_size"]
 
         self.encoder = ClipEncoder(
@@ -512,7 +513,7 @@ class MultiModalRetriever(BaseRetriever):
 
     def _search(self, query, target_modal: str = "text", num: int = None, return_score=False):
         if num is None:
-            num = self.topk
+            num = self.text_retrieval_topk if target_modal == "text" else self.image_retrieval_topk
         assert target_modal in ["image", "text"]
 
         query_modal = (
@@ -545,7 +546,7 @@ class MultiModalRetriever(BaseRetriever):
         if isinstance(query, str):
             query = [query]
         if num is None:
-            num = self.topk
+            num = self.text_retrieval_topk if target_modal == "text" else self.image_retrieval_topk
         batch_size = self.batch_size
         assert target_modal in ["image", "text"]
 
@@ -1272,24 +1273,127 @@ class CRAGRetriever(BaseRetriever):
     from cragmm_search.search import UnifiedSearchPipeline
     def __init__(self, config):
         super().__init__(config)
-        # _patch_crag_web_loader()
-        # _patch_crag_image_loader()
+        hf_home = config["crag_hf_home"] if "crag_hf_home" in config else None
+        if hf_home:
+            os.environ["HF_HOME"] = hf_home
+            os.environ.setdefault("HUGGINGFACE_HUB_CACHE", os.path.join(hf_home, "hub"))
+            os.environ.setdefault("HF_DATASETS_CACHE", os.path.join(hf_home, "datasets"))
+            os.environ.setdefault("TRANSFORMERS_CACHE", os.path.join(hf_home, "hub"))
+
+        if "crag_offline" in config and config["crag_offline"]:
+            os.environ["HF_HUB_OFFLINE"] = "1"
+            os.environ["HF_DATASETS_OFFLINE"] = "1"
+            os.environ["TRANSFORMERS_OFFLINE"] = "1"
+
         crag_search_device = str(config["crag_search_device"]).lower()
         original_cuda_available = torch.cuda.is_available
         if crag_search_device == "cpu":
             torch.cuda.is_available = lambda: False
         try:
+            # The upstream CragMockWeb eagerly scans metadata for ~900k rows during init,
+            # which makes every startup look hung. Patch it to fetch metadata lazily per result.
+            import cragmm_search.search as crag_search_module
+            from huggingface_hub import snapshot_download
+            import chromadb
+            from cragmm_search.web_search_mock_api.api.web_search import index_web_data
+
+            class LazyCragMockWeb:
+                def __init__(self, emb_model, tokenizer, text_index_path, web_hf_dataset_tag=None):
+                    self.vector_db = index_web_data(hf_path=text_index_path, revision=web_hf_dataset_tag)
+                    self.emb_model = emb_model
+                    self.tokenizer = tokenizer
+                    self._metadata_cache = {}
+
+                def _get_metadata(self, idx):
+                    idx = str(idx)
+                    if idx not in self._metadata_cache:
+                        chunk = self.vector_db.get(ids=[idx], include=["metadatas"])
+                        metadata = chunk["metadatas"][0] if chunk["metadatas"] else {}
+                        self._metadata_cache[idx] = metadata
+                    return self._metadata_cache[idx]
+
+                def get_page_name(self, idx):
+                    return self._get_metadata(idx).get("page_name")
+
+                def get_page_snippet(self, idx):
+                    return self._get_metadata(idx).get("page_snippet")
+
+                def get_page_url(self, idx):
+                    return self._get_metadata(idx).get("page_url")
+
+            class LazyCragImageKG:
+                def __init__(self, emb_model, processor, hf_dataset_id, image_hf_dataset_tag=None):
+                    print(f"Loading image index from huggingface {hf_dataset_id}")
+                    dataset_local_path = snapshot_download(
+                        repo_id=hf_dataset_id,
+                        repo_type="dataset",
+                        revision=image_hf_dataset_tag,
+                    )
+
+                    n_threads = os.cpu_count() or 1
+                    client = chromadb.PersistentClient(path=dataset_local_path)
+                    self.vector_db = client.get_collection(name="image_embeddings")
+                    self.vector_db.modify(metadata={"hnsw:num_threads": n_threads})
+                    self.emb_model = emb_model
+                    self.processor = processor
+                    self._metadata_cache = {}
+                    self._entity_cache = {}
+
+                def _get_metadata(self, image_id):
+                    image_id = int(image_id)
+                    if image_id not in self._metadata_cache:
+                        chunk = self.vector_db.get(ids=[str(image_id)], include=["metadatas"])
+                        metadata = chunk["metadatas"][0] if chunk["metadatas"] else {}
+                        self._metadata_cache[image_id] = metadata
+                    return self._metadata_cache[image_id]
+
+                def get_image_url(self, image_id):
+                    return self._get_metadata(image_id).get("image_url")
+
+                def get_entity_name(self, image_id):
+                    metadata = self._get_metadata(image_id)
+                    entities = metadata.get("entities", "[]")
+                    return json.loads(entities)
+
+                def get_entity(self, entity_name):
+                    if entity_name not in self._entity_cache:
+                        for metadata in self._metadata_cache.values():
+                            info = metadata.get("info")
+                            if not info:
+                                continue
+                            for name, entity in json.loads(info).items():
+                                if name not in self._entity_cache:
+                                    self._entity_cache[name] = entity
+                        self._entity_cache.setdefault(entity_name, {})
+                    return self._entity_cache[entity_name]
+
+            crag_search_module.CragMockWeb = LazyCragMockWeb
+            crag_search_module.CragImageKG = LazyCragImageKG
+
+            image_model_name = (
+                config["crag_image_model_name"]
+                if "crag_image_model_name" in config and config["crag_image_model_name"] is not None
+                else config["retrieval_model_path"]
+                if "retrieval_model_path" in config and config["retrieval_model_path"] is not None
+                else "openai/clip-vit-large-patch14-336"
+            )
+            text_model_name = (
+                config["crag_text_model_name"]
+                if "crag_text_model_name" in config and config["crag_text_model_name"] is not None
+                else "BAAI/bge-large-en-v1.5"
+            )
             self.search_pipeline = UnifiedSearchPipeline(
-                image_model_name="openai/clip-vit-large-patch14-336",
+                image_model_name=image_model_name,
                 image_hf_dataset_id="crag-mm-2025/image-search-index-validation",
-                text_model_name="BAAI/bge-large-en-v1.5",
+                text_model_name=text_model_name,
                 web_hf_dataset_id="crag-mm-2025/web-search-index-validation",
             )
         finally:
             torch.cuda.is_available = original_cuda_available
-        self.topk = config["retrieval_topk"]
-
+        self.text_retrieval_topk = config["text_retrieval_topk"]
+        self.image_retrieval_topk = config["image_retrieval_topk"]
     def build_entity_evidence(self, retrieval_results):
+        print(f"Raw retrieval results: {retrieval_results}")
         entity_map = {}
 
         for item in retrieval_results:
@@ -1305,7 +1409,7 @@ class CRAGRetriever(BaseRetriever):
                         "score_max": score,
                         "match_count": 0,
                         "urls": [],
-                        "attributes": attrs.copy(),
+                        "attributes": attrs.copy() if attrs else {},
                     }
 
                 entity_map[name]["score_max"] = max(entity_map[name]["score_max"], score)
@@ -1332,33 +1436,66 @@ class CRAGRetriever(BaseRetriever):
             chunks.append("\n".join(lines))
         return "\n\n".join(chunks)
 
-    def search(self, query, num: int = None, query_type: str = None) -> List[Dict[str, str]]:
+    @staticmethod
+    def _truncate_text(value, max_chars):
+        text = str(value)
+        if len(text) <= max_chars:
+            return text
+        return text[:max_chars].rstrip() + " ..."
+
+    def image_results_to_text(self, retrieval_results):
+        max_attr_chars = int(self.config["crag_image_attr_max_chars"])
+        max_entity_chars = int(self.config["crag_image_entity_max_chars"])
+        chunks = []
+        for i, item in enumerate(retrieval_results, 1):
+            lines = [f"{i}."]
+
+            entities = item.get("entities", [])
+            if not entities:
+                lines.append("- entities: []")
+            else:
+                for entity_idx, ent in enumerate(entities, 1):
+                    lines.append(f"- entity_{entity_idx}_name: {ent.get('entity_name', 'Unknown')}")
+                    attrs = ent.get("entity_attributes", {}) or {}
+                    for key in sorted(attrs.keys()):
+                        value = attrs[key]
+                        if value is None or value == "":
+                            continue
+                        lines.append(f"  {key}: {self._truncate_text(value, max_attr_chars)}")
+
+            entity_text = "\n".join(lines)
+            chunks.append(self._truncate_text(entity_text, max_entity_chars))
+
+        return "\n\n".join(chunks)
+
+    def search(self, query, num: int = None, query_type: str = "text") -> List[Dict[str, str]]:
         if num is None:
-            num = self.topk
+            num = self.text_retrieval_topk if query_type == "text" else self.image_retrieval_topk
         if query_type is None:
             query_type = "image" if not isinstance(query, str) else "text"
         if query_type == 'text':
-            results = self.search_pipeline(query, num)
+            results = self.search_pipeline(query, k=num)
             final_results = [f"{result.get('page_name')}\n{result.get('page_snippet')}" for result in results]
             return final_results
         elif query_type == 'image':
             results = self.search_pipeline(query, k=num)
-            entities_list = self.build_entity_evidence(results)
-            flatten_texts = self.entity_evidence_to_text(entities_list)
-            return flatten_texts
+            return self.image_results_to_text(results)
         else:
             raise NotImplementedError("CRAGRetriever currently only supports text query and image query.")
 
 
 def main():
-# Example configuration
+    # Example configuration
     from flashrag.config import Config
     config = Config("/home/you/FlashRAG/exps/idea10/configs/config.yaml")
-    retriever = DenseRetriever(config)
+    config['gpu_id']="0"
+    img_path = "/home/you/GroundingDINO/tests/crop_01_red_scooter_make_0.86.jpg"
+    image = Image.open(img_path).convert("RGB")
+    retriever = CRAGRetriever(config)
 
     # Batch search
-    queries = ["Caldwell House"]
-    batch_results = retriever.batch_search(queries)
+    queries = "subaru wrx"
+    batch_results = retriever.search(queries, query_type="text")
     print(batch_results)
 
 if __name__ == "__main__":

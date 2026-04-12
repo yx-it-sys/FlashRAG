@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{7pt}
+\caption{Effect of replacing only the first retrieval query with an oracle entity-grounded rewrite on the subset of 369 validation items whose first labeled retrieval step is entity-ambiguous. Values are reported in percentage points. Even this single-step intervention substantially improves both judge-based correctness and lexical-overlap metrics, with GPTAcc increasing from 5.15 to 11.65. The rewrite is successfully executed for 366 of the 369 selected items, indicating that first-query entity grounding is a real upstream bottleneck but not the only source of failure.}
+\label{tab:first-round-oracle-rewrite}
+\begin{tabular}{lccc}
+\toprule
+Metric & Baseline (\%) & Oracle Rewrite (\%) & $\Delta$ \\
+\midrule
+GPTAcc & 5.15 & \textbf{11.65} & +6.50 \\
+F1 & 16.17 & \textbf{21.58} & +5.41 \\
+Recall & 30.14 & \textbf{36.84} & +6.70 \\
+Precision & 13.84 & \textbf{18.78} & +4.94 \\
+Acc & 0.27 & \textbf{0.81} & +0.54 \\
+EM & 0.00 & \textbf{0.27} & +0.27 \\
+\midrule
+Subset size & \multicolumn{3}{c}{369} \\
+Rewrite applied & \multicolumn{3}{c}{366} \\
+\bottomrule
+\end{tabular}
+\end{table}

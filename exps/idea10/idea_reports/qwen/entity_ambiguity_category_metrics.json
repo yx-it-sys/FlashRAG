@@ -1,0 +1,148 @@
+{
+  "meta": {
+    "num_samples": 1199,
+    "num_retained_samples": 1131,
+    "missing_category_ids": [],
+    "missing_iteration_ids": [],
+    "filtered_multi_category_sample_count": 68,
+    "filtered_multi_category_sample_ids": [
+      "e0967c91-77aa-4c6a-8dcb-197d6718174e",
+      "b58a53ef-fd49-40c2-b9b6-f353539749ae",
+      "1d9ab7e3-3599-464c-971c-123ac94a5e91",
+      "0a33f53f-719b-48a4-8b76-5e0f78c528ff",
+      "38374032-9e4c-4594-8e6b-74d6e07a780a",
+      "2be02caa-d5d1-48ff-a29c-2e2e67dbdcdc",
+      "f57b9082-a2de-47fd-90b0-1b203c6b1d62",
+      "08029d66-61cb-4c23-b762-1ee7648608f2",
+      "2f81e89c-d011-4957-b925-73d8c4bf0ac8",
+      "c5ec19f2-800c-444d-9284-529dbe0baf8a",
+      "9a39e0e6-3625-47f9-b1c7-c213f7eda2e8",
+      "f70df806-a32d-4807-8522-59870fc1a073",
+      "a9b3ce90-e15e-4161-ad6b-2b189df009e6",
+      "132f522d-5cac-4c39-813c-70d2b6ffa6ee",
+      "eda47d0d-50c8-4a57-9b9c-818527e842a1",
+      "eb4c4ad6-3733-4c3d-82d4-43f06b64b64a",
+      "cccf641a-285a-4d6f-91ce-f4cd34cd8a5a",
+      "c050265c-8428-4dee-8cfd-7706a8066e64",
+      "fd82b099-a54f-4580-b7eb-44d1d6a9c837",
+      "b997879c-0cd2-49c1-8a43-6e50456f9fe2",
+      "f15910f1-2c1b-45a1-8dd8-0472e04562ee",
+      "b0790de5-87fd-4233-8103-dc2f17f0a2e6",
+      "f73ab93c-bd01-42ef-b49d-8117080c2500",
+      "c6881e9a-aeea-4b2d-bfad-5913930d7184",
+      "22dfc8ef-a51f-458a-9ed5-1d948c122fdb",
+      "53b1d8e8-32ae-4027-ba7e-d2d865ef231c",
+      "3bf4803d-808a-4a55-95b8-d40d51c1d775",
+      "ea6a8cb3-f336-461c-a1f7-98d8735e686d",
+      "51972f6d-69fc-435b-8eff-d980502af1bf",
+      "f19b369e-ce93-4d1e-9401-746b22706b76",
+      "e28d7053-45ef-42ce-adc7-db03ad79b5e2",
+      "c5b56c49-ccd6-4565-b004-e8e409579e11",
+      "bd6d8701-03d0-4751-9a80-c1353c778060",
+      "53f98721-bbf1-4dd0-b763-f4140a55f9e5",
+      "1ae1b9ee-4b81-4b24-9057-324039027cab",
+      "db7d27e5-44d8-48a5-b176-ead2d580afe6",
+      "8c56271f-3820-4c63-89b7-f81ee38b3ac3",
+      "db02b8a2-7525-48ef-bab7-c4ddee14f9e2",
+      "6ade12eb-28b3-4574-b04e-7e9597f2d824",
+      "4087c255-4345-40bc-b6e2-9261d85b53a5",
+      "5f04a91e-6ae8-44de-95be-6c5248d98453",
+      "98f45972-6551-43de-9c0e-5fdae119270e",
+      "7c5e707f-0441-46f6-9c11-c9fedaf592cf",
+      "39602be6-7701-4165-9982-436796641e17",
+      "57147f41-23f4-4e0e-8ed3-f173dcc258f1",
+      "f7fe68db-ee7b-4d48-bfb3-a036767097f1",
+      "cfaa0bff-3afa-463f-856b-f7ef8015784b",
+      "2081fee8-3cd0-49cf-b8c4-610680b6ac24",
+      "e46f1f84-714e-4750-930e-09aa7433d5ee",
+      "4fa0e6a1-4acc-4011-ae7f-ceac3be7cbf3",
+      "2797c001-9b8e-4650-8a7a-7347d027eb35",
+      "b063646d-b682-4f1a-9d9a-d006229bec0f",
+      "48240937-8e74-4e0d-b7b5-46ea4f1f5574",
+      "9d7ef178-6d93-4817-aa81-d7cd21fd346d",
+      "c2a09613-9952-4e86-8fcc-039b1f9fc9e5",
+      "beb4964b-0494-4c03-b184-d4c3f44796c5",
+      "f217dc08-58eb-4b15-adb2-6bd790ec78dd",
+      "a4adb109-0feb-40de-b9ac-97ecb81568a2",
+      "03d3c498-f874-4948-b85a-5e16cae52211",
+      "d253fc27-09e5-4831-98ac-3bc4c5de5257",
+      "49bc0b71-16cf-4e27-9512-0ddde2255c90",
+      "4e657bcb-4158-4d42-9179-e7b3c145be53",
+      "fd93d7e6-9cdf-4334-a5be-c2ad13880d0b",
+      "e491a1d9-d970-4faf-819c-b5caaff9c3ae",
+      "8b8daf42-6b9a-42a0-9f5d-5c6634257c56",
+      "26351ceb-e42c-4c18-9851-a79299886ebf",
+      "4e3b7b72-dbcf-4828-acf2-7823b571d0f4",
+      "60b0edf7-e36f-47fb-af13-50eb72263938"
+    ],
+    "category_rule": "Exclude samples containing more than one non-No entity ambiguity category across labeled query steps; otherwise, use the first LLM-labeled text-retrieval query category in the sample. If no labeled text query exists, assign No.",
+    "iteration_rule": "Count retrieval-result turns in omnisearch_trajectories.jsonl, i.e. the number of text_retrieval_result, image_retrieval_result, and no_retrieval_result nodes."
+  },
+  "categories": [
+    {
+      "category": "No",
+      "count": 824,
+      "avg_iterations": 3.0109223300970873,
+      "avg_query_count": 2.4611650485436893,
+      "metrics": {
+        "gpt_acc": 0.2766990291262136,
+        "f1": 0.28394750976078453,
+        "recall": 0.4384500079603271,
+        "precision": 0.25868480322586845,
+        "rouge-l": 0.21303755417995368
+      }
+    },
+    {
+      "category": "Object Identification",
+      "count": 183,
+      "avg_iterations": 4.114754098360656,
+      "avg_query_count": 2.7759562841530054,
+      "metrics": {
+        "gpt_acc": 0.04918032786885246,
+        "f1": 0.15005490109377753,
+        "recall": 0.27006914149934613,
+        "precision": 0.12683540207933644,
+        "rouge-l": 0.14736031397495525
+      }
+    },
+    {
+      "category": "Indirect Entity Ambiguity",
+      "count": 56,
+      "avg_iterations": 3.6607142857142856,
+      "avg_query_count": 3.482142857142857,
+      "metrics": {
+        "gpt_acc": 0.03571428571428571,
+        "f1": 0.18603318672331898,
+        "recall": 0.34364681692301613,
+        "precision": 0.15776583771579833,
+        "rouge-l": 0.1656369070863114
+      }
+    },
+    {
+      "category": "Description",
+      "count": 64,
+      "avg_iterations": 3.265625,
+      "avg_query_count": 2.625,
+      "metrics": {
+        "gpt_acc": 0.09375,
+        "f1": 0.2113675794310756,
+        "recall": 0.32766276932346977,
+        "precision": 0.2072500494789845,
+        "rouge-l": 0.1832875761453036
+      }
+    },
+    {
+      "category": "No Object Involved",
+      "count": 4,
+      "avg_iterations": 2.75,
+      "avg_query_count": 2,
+      "metrics": {
+        "gpt_acc": 0.25,
+        "f1": 0.3158244727515177,
+        "recall": 0.5189102564102565,
+        "precision": 0.25518578643578643,
+        "rouge-l": 0.12516534028163648
+      }
+    }
+  ]
+}

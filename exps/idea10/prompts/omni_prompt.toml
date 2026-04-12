@@ -8,7 +8,7 @@ Use the following XML template strictly:
 </Sub-Question>
 <Search>
 Here is One of the following three retrieval methods: 
-Image Retrieval. 
+Image Retrieval: Your description of the entity in the image for which you want more information.
 Text Retrieval: your generated query.  
 No Retrieval.
 </Search>

@@ -1,6 +1,8 @@
 <View>
   <Header value="Question" />
   <Text name="sample_id_text" value="Sample ID: $sample_id" />
+  <Text name="image_url_text" value="Image URL: $image_url" />
+  <Image name="sample_image" value="$image_url" maxWidth="720px" zoom="true" />
   <Text name="question_text" value="$question" />
   <Text name="trajectory_total_text" value="Annotated retrieval actions: $trajectory_total" />
 
@@ -13,10 +15,11 @@
     <Choice value="Yes" />
   </Choices>
   <Choices name="ambiguity_level_1" toName="query_text_1" choice="single" showInline="true">
-    <Choice value="A" />
-    <Choice value="B" />
-    <Choice value="C" />
-    <Choice value="D" />
+    <Choice value="Detailed Description" />
+    <Choice value="highly generalized categorization" />
+    <Choice value="Object Identificattion" />
+    <Choice value="Similar to Text Query" />
+    <Choice value="No Object Involved" />
   </Choices>
   <TextArea name="remark_1" toName="query_text_1" placeholder="Remark for trajectory 1" editable="true" maxSubmissions="1" />
 
@@ -29,10 +32,11 @@
     <Choice value="Yes" />
   </Choices>
   <Choices name="ambiguity_level_2" toName="query_text_2" choice="single" showInline="true">
-    <Choice value="A" />
-    <Choice value="B" />
-    <Choice value="C" />
-    <Choice value="D" />
+    <Choice value="Detailed Description" />
+    <Choice value="highly generalized categorization" />
+    <Choice value="Object Identificattion" />
+    <Choice value="Similar to Text Query" />
+    <Choice value="No Object Involved" />
   </Choices>
   <TextArea name="remark_2" toName="query_text_2" placeholder="Remark for trajectory 2" editable="true" maxSubmissions="1" />
 
@@ -45,10 +49,11 @@
     <Choice value="Yes" />
   </Choices>
   <Choices name="ambiguity_level_3" toName="query_text_3" choice="single" showInline="true">
-    <Choice value="A" />
-    <Choice value="B" />
-    <Choice value="C" />
-    <Choice value="D" />
+    <Choice value="Detailed Description" />
+    <Choice value="highly generalized categorization" />
+    <Choice value="Object Identificattion" />
+    <Choice value="Similar to Text Query" />
+    <Choice value="No Object Involved" />
   </Choices>
   <TextArea name="remark_3" toName="query_text_3" placeholder="Remark for trajectory 3" editable="true" maxSubmissions="1" />
 
@@ -61,10 +66,11 @@
     <Choice value="Yes" />
   </Choices>
   <Choices name="ambiguity_level_4" toName="query_text_4" choice="single" showInline="true">
-    <Choice value="A" />
-    <Choice value="B" />
-    <Choice value="C" />
-    <Choice value="D" />
+    <Choice value="Detailed description" />
+    <Choice value="Highly generalized categorization" />
+    <Choice value="Object Identificattion" />
+    <Choice value="Similar to Text Query" />
+    <Choice value="No Object Involved" />
   </Choices>
   <TextArea name="remark_4" toName="query_text_4" placeholder="Remark for trajectory 4" editable="true" maxSubmissions="1" />
 
@@ -77,10 +83,11 @@
     <Choice value="Yes" />
   </Choices>
   <Choices name="ambiguity_level_5" toName="query_text_5" choice="single" showInline="true">
-    <Choice value="A" />
-    <Choice value="B" />
-    <Choice value="C" />
-    <Choice value="D" />
+    <Choice value="Detailed Description" />
+    <Choice value="highly generalized categorization" />
+    <Choice value="Object Identificattion" />
+    <Choice value="Similar to Text Query" />
+    <Choice value="No Object Involved" />
   </Choices>
   <TextArea name="remark_5" toName="query_text_5" placeholder="Remark for trajectory 5" editable="true" maxSubmissions="1" />
 

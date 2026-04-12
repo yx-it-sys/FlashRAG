@@ -1,0 +1,3 @@
+[Logging] Appending stdout/stderr to /home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment/trajectory_quality_eval/evaluate_trajectory_quality.log
+Evaluating 1199 samples from /home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment/omnisearch_trajectories.jsonl
+[--------------------------------] 0/1199

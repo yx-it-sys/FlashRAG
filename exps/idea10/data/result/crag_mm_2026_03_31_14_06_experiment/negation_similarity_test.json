@@ -1,0 +1,43 @@
+{
+  "config": "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment/config.yaml",
+  "num_pairs": 6,
+  "mean_cosine_similarity": 0.9134473159403385,
+  "results": [
+    {
+      "id": "capital_france",
+      "sentence": "Paris is the capital of France.",
+      "negated": "Paris is not the capital of France.",
+      "cosine_similarity": 0.8977807037068785
+    },
+    {
+      "id": "cat_mat",
+      "sentence": "The cat is sitting on the mat.",
+      "negated": "The cat is not sitting on the mat.",
+      "cosine_similarity": 0.9090611365100201
+    },
+    {
+      "id": "water_boils",
+      "sentence": "Water boils at 100 degrees Celsius.",
+      "negated": "Water does not boil at 100 degrees Celsius.",
+      "cosine_similarity": 0.9065728311633089
+    },
+    {
+      "id": "owns_brand",
+      "sentence": "General Motors owns Chevrolet.",
+      "negated": "General Motors does not own Chevrolet.",
+      "cosine_similarity": 0.9153115209020161
+    },
+    {
+      "id": "building_style",
+      "sentence": "The New York Stock Exchange building is in the Beaux-Arts style.",
+      "negated": "The New York Stock Exchange building is not in the Beaux-Arts style.",
+      "cosine_similarity": 0.9157186367630948
+    },
+    {
+      "id": "plant_blooming",
+      "sentence": "Magnolia grandiflora typically blooms from late spring to summer.",
+      "negated": "Magnolia grandiflora does not typically bloom from late spring to summer.",
+      "cosine_similarity": 0.9362390665967113
+    }
+  ]
+}

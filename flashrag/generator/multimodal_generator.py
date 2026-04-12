@@ -510,7 +510,6 @@ class VLLMMMGenerator(BaseMultiModalGenerator):
         self.limit_mm_per_prompt = config['limit_mm_per_prompt'] if 'limit_mm_per_prompt' in config else {"image": 5}
         self.mm_processor_kwargs = config['mm_processor_kwargs'] if 'mm_processor_kwargs' in config else {"min_pixels": 3136, "max_pixels": 12845056}
         self.enforce_eager = config['vllm_enforce_eager'] if 'vllm_enforce_eager' in config else True
-
         try:
             from transformers.configuration_utils import PretrainedConfig
             if not hasattr(PretrainedConfig, "standardize_rope_params"):
@@ -649,7 +648,6 @@ class VLLMMMGenerator(BaseMultiModalGenerator):
                 tokenize=False,
                 add_generation_prompt=True
             )
-
             # 3. 构造 vLLM 多模态输入字典
             mm_data = {}
             if images:

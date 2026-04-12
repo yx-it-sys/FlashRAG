@@ -20,13 +20,13 @@ method2index:
         text: path/to/text_index
         image: path/to/image_index
 data_dir: data/datasets/
-save_dir: data/result/
+save_dir: /home/you/FlashRAG/exps/idea10/data/result/2026_04_10_12_53_48_first_round_oracle_rewrite_experiment
 gpu_id:
 - '1'
 dataset_name: crag_mm
 split:
 - validation
-test_sample_num: ~
+test_sample_num: null
 random_sample: true
 seed: 2024
 save_intermediate_data: true
@@ -40,8 +40,7 @@ multimodal_index_path_dict:
 faiss_gpu: false
 corpus_path: /mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl
 instruction: null
-text_retrieval_topk: 5
-image_retrieval_topk: 2
+retrieval_topk: 10
 retrieval_batch_size: 16
 retrieval_use_fp16: true
 retrieval_query_max_length: 64
@@ -63,6 +62,50 @@ rerank_max_length: 512
 rerank_batch_size: 256
 rerank_use_fp16: true
 use_multi_retriever: false
+multi_retriever_setting:
+    merge_method: concat
+    topk: 5
+    rerank_model_name: null
+    rerank_model_path: null
+    retriever_list:
+    -   retrieval_method: e5
+        retrieval_topk: 5
+        index_path: null
+        retrieval_model_path: intfloat/e5-base-v2
+        instruction: null
+        bm25_backend: bm25s
+        use_reranker: false
+        corpus_path: null
+        use_sentence_transformer: false
+        retrieval_pooling_method: mean
+        retrieval_use_fp16: true
+        retrieval_query_max_length: 64
+        faiss_gpu: false
+        retrieval_batch_size: 16
+        rerank_model_name: e5
+        rerank_model_path: intfloat/e5-base-v2
+        retrieval_cache_path: ./output/retrieval_cache.json
+        save_retrieval_cache: false
+        use_retrieval_cache: false
+    -   retrieval_method: bm25
+        retrieval_topk: 5
+        index_path: null
+        retrieval_model_path: bm25
+        instruction: null
+        bm25_backend: bm25s
+        use_reranker: false
+        corpus_path: null
+        use_sentence_transformer: false
+        retrieval_pooling_method: mean
+        retrieval_use_fp16: true
+        retrieval_query_max_length: 64
+        faiss_gpu: false
+        retrieval_batch_size: 16
+        rerank_model_name: e5
+        rerank_model_path: intfloat/e5-base-v2
+        retrieval_cache_path: ./output/retrieval_cache.json
+        save_retrieval_cache: false
+        use_retrieval_cache: false
 framework: vllm
 generator_model: Qwen2.5-VL-7B-Instruct
 openai_setting:
@@ -84,14 +127,19 @@ metrics:
 - acc
 - precision
 - recall
-# - gpt
-gpt_acc_setting:
-    model_name: "Pro/deepseek-ai/DeepSeek-R1"
-    api_key: "sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli"
-    base_url: "https://api.siliconflow.cn/v1"
-
+metric_setting:
+    retrieval_recall_topk: 5
+    tokenizer_name: gpt-4
 save_metric_score: true
-save_new_dir: true
+text_retrieval_topk: 5
+image_retrieval_topk: 2
+crag_image_attr_max_chars: 300
+crag_image_entity_max_chars: 1200
+gpt_acc_setting:
+    model_name: Qwen/Qwen3.5-397B-A17B
+    api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
+    base_url: https://api.siliconflow.cn/v1
+save_new_dir: false
 retrieval_device: cpu
 text_retriever_config:
     retrieval_method: bge
@@ -141,5 +189,7 @@ vllm_max_num_seqs: 256
 vllm_max_num_seqs_kv: 256
 omni_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/omni_prompt.toml
 dataset_path: data/datasets/crag_mm
-device: cpu
+device: cuda
 dataset_image_dir: data/datasets/crag_mm/images
+output_dir: /home/you/FlashRAG/exps/idea10/data/result/2026_04_10_12_53_48_first_round_oracle_rewrite_experiment
+gpu_num: 1

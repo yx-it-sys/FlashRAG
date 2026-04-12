@@ -1,0 +1,5382 @@
+[
+  {
+    "task_id": 1244,
+    "sample_id": "a8ae1886-5ad7-40b7-9507-8e80bfb00ec0",
+    "question": "how much does this car cost new compared to a tesla 3?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "current price of the car in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 2,
+        "query": "current price of the car in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 3,
+        "query": "current price of the car in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 4,
+        "query": "current price of the car in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Highly generalized categorization"
+      },
+      {
+        "index": 5,
+        "query": "current price of the car in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      }
+    ]
+  },
+  {
+    "task_id": 1245,
+    "sample_id": "9928baff-4589-493c-bc38-7ab17393d98f",
+    "question": "what do the first four words say in english?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Von Weilheim nach Hamburg: Die folgenden vier Bands kommen von dort, aber nur eine hatte mit 'Verstärker' einen großen Hit. Welche?\" translation to English",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1246,
+    "sample_id": "60b0edf7-e36f-47fb-af13-50eb72263938",
+    "question": "what is the curb weight of this suv?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "curb weight of silver SUV",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      },
+      {
+        "index": 2,
+        "query": "model and year of the silver SUV",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      },
+      {
+        "index": 3,
+        "query": "model and year of the silver SUV",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      },
+      {
+        "index": 4,
+        "query": "model and year of the silver SUV",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed description"
+      },
+      {
+        "index": 5,
+        "query": "model and year of the silver SUV",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      }
+    ]
+  },
+  {
+    "task_id": 1247,
+    "sample_id": "ab189d34-4c0a-4832-a4de-7df117deb556",
+    "question": "where are these plants native to?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "native region of red onions",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1248,
+    "sample_id": "678d137f-240f-49a8-ad30-4655939dbf72",
+    "question": "when did people start making these?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "history of Christmas wreaths",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1249,
+    "sample_id": "fa30288b-c20d-40fb-9b03-db4376855790",
+    "question": "how much is the cheapest package option they offer for puppies?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "cheapest package option for puppies in pet grooming services",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "cheapest package option for puppies in pet grooming services",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "cheapest package option for puppies in pet grooming services",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "cheapest package option for puppies in pet grooming services",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "cheapest package option for puppies in pet grooming services",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1250,
+    "sample_id": "7854d269-37cf-4db1-8ff3-66ddfda379ce",
+    "question": "what is that cab?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1251,
+    "sample_id": "828ba075-761d-4da8-8b24-7def86d639f2",
+    "question": "what exhibition did the designer of this statue visited in 1893?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Exhibition attended by Frédéric Auguste Bartholdi in 1893",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Exhibition attended by Frédéric Auguste Bartholdi in 1893",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Exhibition attended by Frédéric Auguste Bartholdi in 1893",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Exhibition attended by Frédéric Auguste Bartholdi in 1893",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Exhibition attended by Frédéric Auguste Bartholdi in 1893",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1252,
+    "sample_id": "4fa2a85d-d6d8-40ad-8204-da8579a5c307",
+    "question": "where is this plant most commonly grown?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "amaryllis plant indoor growing conditions",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1253,
+    "sample_id": "7a3091e0-1ed5-4db4-b225-758ec98e6a04",
+    "question": "where did the artist of this work study?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "artist name of the sculpture in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 2,
+        "query": "artist name of the sculpture in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 3,
+        "query": "artist name of the sculpture in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 4,
+        "query": "artist name of the sculpture in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Highly generalized categorization"
+      },
+      {
+        "index": 5,
+        "query": "artist name of the sculpture in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      }
+    ]
+  },
+  {
+    "task_id": 1254,
+    "sample_id": "db8aa0c9-b1aa-4ce0-aa63-8d6fd4ad40b4",
+    "question": "did this movie or star wars phantom menace make more money at the box office?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "box office earnings of \"The Phantom Menace\" and \"Interstellar\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "box office earnings of \"The Phantom Menace\" and \"Interstellar\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "box office earnings of \"The Phantom Menace\" and \"Interstellar\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "box office earnings of \"The Phantom Menace\" and \"Interstellar\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "box office earnings of \"The Phantom Menace\" and \"Interstellar\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1255,
+    "sample_id": "fb82e625-a4a3-4c5f-8dec-db64d079d6c6",
+    "question": "which process in here serves to lift the arm away from the body?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "muscles responsible for lifting the arm away from the body",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1256,
+    "sample_id": "dd9ec803-b42d-4b46-a416-0a7de4b397d4",
+    "question": "what did the company that first developed this character do before they were a game studio?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Game Freak history",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1257,
+    "sample_id": "5e9a9e21-8938-4da6-a0ef-f7a990de65a0",
+    "question": "what does the spanish on this mean?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Translate \"PALILLO PARA CHOCOBANANO\" to English.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Translate \"PALILLO PARA CHOCOBANANO\" to English.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Translate \"PALILLO PARA CHOCOBANANO\" to English.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Translate \"PALILLO PARA CHOCOBANANO\" to English.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Translate \"PALILLO PARA CHOCOBANANO\" to English.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1258,
+    "sample_id": "ff1b94fe-22da-47d6-b5b3-2164f5741d70",
+    "question": "how tall is that building?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "height of the building in the image\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      }
+    ]
+  },
+  {
+    "task_id": 1259,
+    "sample_id": "4e657bcb-4158-4d42-9179-e7b3c145be53",
+    "question": "what's the difference between the 2024 sport and 2024 sport s?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "2024 Sport vs 2024 Sport S differences",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "2024 Sport vs 2024 Sport S differences",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "2024 Sport vs 2024 Sport S differences",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "2024 Sport vs 2024 Sport S differences",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "2024 Sport vs 2024 Sport S differences",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1260,
+    "sample_id": "fa6e015a-c99d-4672-a1e2-011139d866ac",
+    "question": "how long has the car model been around?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Ford Escape production history",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1261,
+    "sample_id": "f217dc08-58eb-4b15-adb2-6bd790ec78dd",
+    "question": "when did manifacturing for the predecessor of this car stop?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "car in the image with white color and compact size\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      },
+      {
+        "index": 2,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1262,
+    "sample_id": "755984a5-04f7-43f6-af8f-282ff759a1bc",
+    "question": "is this bpa free?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1263,
+    "sample_id": "30c968de-1dce-4d29-97c4-ca6804102fbc",
+    "question": "what happens when spotted hyena littermates are the same sex?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "spotted hyena littermates same sex behavior",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1264,
+    "sample_id": "4050e8b1-4e42-44b1-a930-cb0771cc4c1a",
+    "question": "which pie is least expensive on this menu?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1265,
+    "sample_id": "6911c214-c4e9-4448-a2da-1812f7705ad0",
+    "question": "what's the name of the character who is the archdeacon's wife in this novel?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Barchester Towers\" by Anthony Trollope archdeacon's wife",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Barchester Towers\" by Anthony Trollope archdeacon's wife",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Barchester Towers\" by Anthony Trollope archdeacon's wife",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Barchester Towers\" by Anthony Trollope archdeacon's wife",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Barchester Towers\" by Anthony Trollope archdeacon's wife",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1266,
+    "sample_id": "717f2afe-5de8-4515-8cc8-53fc2ce7e84a",
+    "question": "does this animal weigh more than a grey wolf?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "weight comparison between maned wolf and grey wolf",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1267,
+    "sample_id": "df94d0b6-63a1-45f1-9186-1c0fa5c30a0d",
+    "question": "what company makes the blue bottles on the top shelf?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "company that makes Windex",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      },
+      {
+        "index": 2,
+        "query": "company that makes Windex",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      },
+      {
+        "index": 3,
+        "query": "company that makes Windex",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      },
+      {
+        "index": 4,
+        "query": "company that makes Windex",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed description"
+      },
+      {
+        "index": 5,
+        "query": "company that makes Windex",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      }
+    ]
+  },
+  {
+    "task_id": 1268,
+    "sample_id": "cfc7dce8-f89a-4e08-9957-40956f7598d7",
+    "question": "what kind of foods can i find here?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "grocery store foods based on the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      }
+    ]
+  },
+  {
+    "task_id": 1269,
+    "sample_id": "4f7076cd-c2e7-4ca9-a5d0-1821a2bbe679",
+    "question": "which borough of new york is the owner on this sign from?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1270,
+    "sample_id": "f05f609e-0d2d-4add-87fd-ba6137990c17",
+    "question": "are these cheaper than nilla wafers per ounce on amazon?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Nilla wafers price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Nilla wafers price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Nilla wafers price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Nilla wafers price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Nilla wafers price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1271,
+    "sample_id": "bb08a592-88d1-4278-9aab-f0322b621509",
+    "question": "how many tracks are on this artist's first studio album?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Caskey first studio album tracks",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Caskey first studio album tracks",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Caskey first studio album tracks",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Caskey first studio album tracks",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Caskey first studio album tracks",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1272,
+    "sample_id": "3c87e21b-cfff-48be-b683-16d32d63d6e1",
+    "question": "help me solve this",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1273,
+    "sample_id": "60b998eb-f54d-4427-86f5-009e60d959d9",
+    "question": "translate this.",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1274,
+    "sample_id": "66eafdda-0437-431a-90a4-91d33fa3fd93",
+    "question": "translate this into english.",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Translate \"Wann waren die Olympischen Spiele in München?\" to English.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Translate \"Wann waren die Olympischen Spiele in München?\" to English.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Translate \"Wann waren die Olympischen Spiele in München?\" to English.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Translate \"Wann waren die Olympischen Spiele in München?\" to English.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Translate \"Wann waren die Olympischen Spiele in München?\" to English.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1275,
+    "sample_id": "3e87645d-4bab-455a-b10c-8edc5344c4df",
+    "question": "when was the process to make this by machine developed?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "history of chain-link fence manufacturing",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "history of chain-link fence manufacturing by machine",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "history of chain-link fence manufacturing by machine",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "history of chain-link fence manufacturing by machine",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "history of chain-link fence manufacturing by machine",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1276,
+    "sample_id": "930ddcb0-d9b3-4c50-a08b-7873693ec4b8",
+    "question": "what book did they write before this one?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Scott Moore previous book",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 2,
+        "query": "Scott Moore previous book",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 3,
+        "query": "Scott Moore previous book",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 4,
+        "query": "Scott Moore previous book",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 5,
+        "query": "Scott Moore previous book",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      }
+    ]
+  },
+  {
+    "task_id": 1277,
+    "sample_id": "18588499-1971-4073-97a1-6532aeee0548",
+    "question": "is this cheaper on the product website?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "MIGUELITO CHAMOY POLVO 500G price on the product website\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "MIGUELITO CHAMOY POLVO 500G price on the product website\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "MIGUELITO CHAMOY POLVO 500G price on the product website\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "MIGUELITO CHAMOY POLVO 500G price on the product website\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "MIGUELITO CHAMOY POLVO 500G price on the product website\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1278,
+    "sample_id": "c25b1b90-de5f-400b-bd14-c1eedac4c186",
+    "question": "why did the brand make the clothes roomier instead of their standard tailored cuts in the 1990s?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "fashion trends in the 1990s and brand strategies for clothing.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "fashion trends and brand strategies in the 1990s that led to making clothes roomier.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "specific fashion trends and brand strategies in the 1990s that led to making clothes roomier.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "specific fashion trends and brand strategies in the 1990s that led to making clothes roomier.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "specific fashion trends and brand strategies in the 1990s that led to making clothes roomier.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1279,
+    "sample_id": "f9d03f1a-06b6-4648-bef8-676c44d1804d",
+    "question": "how many steps are there to this diagram?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1280,
+    "sample_id": "0c8d8222-aee6-46f9-bdbe-d7baec4ad2b6",
+    "question": "when was the first year this car was released in the usa?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Subaru Outback USA release year",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1281,
+    "sample_id": "9493acde-d6b9-4582-a388-84612a5f4b23",
+    "question": "does bank of america hold more assets than these guys?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Bank of America assets compared to other financial institutions",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Bank of America assets compared to other financial institutions",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Bank of America assets compared to other financial institutions",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Bank of America assets compared to other financial institutions",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Bank of America assets compared to other financial institutions",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1282,
+    "sample_id": "d41ac253-2f72-456e-92f3-e74a14828f6f",
+    "question": "what does this code mean?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1283,
+    "sample_id": "505a79f1-98c6-42b0-8a3a-d3d87367bd22",
+    "question": "when did the us atomic energy commission adopted this icon?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "US Atomic Energy Commission icon adoption date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1284,
+    "sample_id": "a6137f78-1aa8-42f3-8017-95f6e1be6578",
+    "question": "in what place by population is the city where this car was first introduced?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "car model identification from image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "2018 Mercedes-Benz A200 AMG Line Premium+ first introduction city",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "2018 Mercedes-Benz A200 AMG Line Premium+ first introduction city",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "2018 Mercedes-Benz A200 AMG Line Premium+ first introduction city",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1285,
+    "sample_id": "72a43a97-455b-4c94-ab6d-70151c165815",
+    "question": "what is the answer to this?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1286,
+    "sample_id": "5a5d4f6c-2648-4c55-8e71-61256a952362",
+    "question": "is this muscle longer in a horse or human?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Comparison of muscle lengths in horses and humans.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Comparison of muscle lengths in horses and humans.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Comparison of muscle lengths in horses and humans.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Comparison of muscle lengths in horses and humans.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Comparison of muscle lengths in horses and humans.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1287,
+    "sample_id": "ab804067-2028-426c-86e3-744f6327a423",
+    "question": "is this company public or privately owned?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Citi Bike ownership status",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Citi Bike ownership status",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Citi Bike ownership status",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Citi Bike ownership status",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Citi Bike ownership status",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1288,
+    "sample_id": "4709c819-6cb9-41ef-9827-7b406096fc24",
+    "question": "are these good for dog's dental hygiene?",
+    "trajectory_total": 2,
+    "queries": [
+      {
+        "index": 1,
+        "query": "dog chew toy materials and design features",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1289,
+    "sample_id": "abe10902-dcc3-49dc-9db6-2990ed9507d1",
+    "question": "how do you traditionally sit while playing this instrument?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "sitar playing posture",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1290,
+    "sample_id": "0bb96f7f-1382-4abc-acca-09e71b79d636",
+    "question": "who voiced this snowman in the first frozen movie?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "voice actor of Olaf in the first Frozen movie",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "voice actor of Olaf in the first Frozen movie",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "voice actor of Olaf in the first Frozen movie",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "voice actor of Olaf in the first Frozen movie",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "voice actor of Olaf in the first Frozen movie",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1291,
+    "sample_id": "fb7eeff9-08a0-4787-a07c-d9f3faea2068",
+    "question": "when does this separate from the lung in human development?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "When does the lung separate from the rest of the body during human development?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "When does the lung begin to develop as an outpouching of the foregut during human development?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "When does the lung separate from the rest of the body during human development?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "When does the lung separate from the rest of the body during human development?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "When does the lung separate from the rest of the body during human development?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1292,
+    "sample_id": "c8fbae7d-d6c6-4cb9-97f5-b6582e353611",
+    "question": "what does the gr mean?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "GR abbreviation in post offices\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "GR abbreviation in post offices\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "GR abbreviation in post offices\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "GR abbreviation in post offices\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "GR abbreviation in post offices\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1293,
+    "sample_id": "c2a09613-9952-4e86-8fcc-039b1f9fc9e5",
+    "question": "do these turn off later on tuesdays or on saturdays in coventry, united kingdom?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "traffic light schedule in Coventry, United Kingdom",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "traffic light schedule in Coventry, United Kingdom",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "traffic light schedule in Coventry, United Kingdom",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "traffic light schedule in Coventry, United Kingdom",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "traffic light schedule in Coventry, United Kingdom",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1294,
+    "sample_id": "a2ecf15b-1ebd-45c8-8815-a3038c980f14",
+    "question": "who made the first version of this?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "first version of a drink",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 2,
+        "query": "first version of a cocktail",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 3,
+        "query": "first version of a Manhattan cocktail",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "first version of a Manhattan cocktail",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "first version of a Manhattan cocktail",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1295,
+    "sample_id": "1026c9d0-78e4-407e-ada4-db21cc7a4733",
+    "question": "what is the average lifespan of this animal?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "types of fish in aquariums\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 2,
+        "query": "average lifespan of a Clownfish\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "average lifespan of Ocellaris clownfish\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "average lifespan of Ocellaris clownfish\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "average lifespan of Ocellaris clownfish\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1296,
+    "sample_id": "4e6f2daa-2932-4e51-aa00-c47921e263dd",
+    "question": "what is the name of the street where the former phillips saleroom of that company is located?",
+    "trajectory_total": 4,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Phillips Saleroom location.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Phillips Saleroom location in London.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Phillips Saleroom location in London.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Phillips Saleroom location in London.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1297,
+    "sample_id": "9f9e3b63-3787-4df6-adcd-0288df026bec",
+    "question": "are they open on christmas?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1298,
+    "sample_id": "ee5738aa-401e-4345-8f2a-760884ddc827",
+    "question": "can i put a pizza box into the left bin?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Can a pizza box be recycled?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Is a pizza box recyclable?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Can a pizza box be put into the left bin?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Can a pizza box be put into the left bin?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Can a pizza box be put into the left bin?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1299,
+    "sample_id": "eb4c4ad6-3733-4c3d-82d4-43f06b64b64a",
+    "question": "who founded this company?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "company name\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "company name\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 3,
+        "query": "company name\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 4,
+        "query": "company name\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 5,
+        "query": "company name\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      }
+    ]
+  },
+  {
+    "task_id": 1300,
+    "sample_id": "269d2b47-e2ea-471b-8193-805f06750969",
+    "question": "is the process of making this aerobic or anaerobic?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "composting process aerobic or anaerobic",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1301,
+    "sample_id": "502adffb-88aa-4618-bf8d-7c829dab374b",
+    "question": "what's the difference in price between this t-shirt and a m men's black t-shirt on amazon?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "men's black t-shirt price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "men's black t-shirt price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "men's black t-shirt price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "men's black t-shirt price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "men's black t-shirt price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1302,
+    "sample_id": "d3186100-792a-49ec-9a54-6c4970a8505b",
+    "question": "how many cities have locations for this business?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "business name in the image\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      }
+    ]
+  },
+  {
+    "task_id": 1303,
+    "sample_id": "d61f9487-e538-44a8-87ef-9950267d5128",
+    "question": "what is the population of this county?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Population of Lyon County, KS",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Population of Lyon County, KS",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Population of Lyon County, KS",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Population of Lyon County, KS",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Population of Lyon County, KS",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1304,
+    "sample_id": "8956ac17-aef8-41b5-a5eb-209ef37af8f3",
+    "question": "is this made with recycled materials?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1305,
+    "sample_id": "4dc0c977-8003-4eb0-9083-1f44c6301d74",
+    "question": "what is the ideal temp for these fish?",
+    "trajectory_total": 2,
+    "queries": [
+      {
+        "index": 1,
+        "query": "identification of fish in the image\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "ideal temperature for Neon tetras\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1306,
+    "sample_id": "bc8a4b69-be0e-4533-a8dc-0ae776e18a14",
+    "question": "what's the difference between this model and the 450h?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "difference between model and 450h",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 2,
+        "query": "specific model compared to 450h",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 3,
+        "query": "specific model compared to 450h",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 4,
+        "query": "specific model compared to 450h",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 5,
+        "query": "specific model compared to 450h",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      }
+    ]
+  },
+  {
+    "task_id": 1307,
+    "sample_id": "da357de5-d8c0-4b99-97e4-0744ed4b1eef",
+    "question": "where should i put this?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1308,
+    "sample_id": "534dbd97-d09b-4187-a16a-60993c96a885",
+    "question": "where did the first one of those appear?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "first appearance of a specific item\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 2,
+        "query": "specific item in the question\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 3,
+        "query": "specific item in the question\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 4,
+        "query": "specific item in the question\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 5,
+        "query": "specific item in the question\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      }
+    ]
+  },
+  {
+    "task_id": 1309,
+    "sample_id": "4bd96d7e-95aa-40d4-b1a3-e399a0af073b",
+    "question": "is this book available at powell's?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Britannica All New Kids' Encyclopedia: What We Know & What We Don't availability at Powell's\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Britannica All New Kids' Encyclopedia: What We Know & What We Don't availability at Powell's\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Britannica All New Kids' Encyclopedia: What We Know & What We Don't availability at Powell's\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Britannica All New Kids' Encyclopedia: What We Know & What We Don't availability at Powell's\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Britannica All New Kids' Encyclopedia: What We Know & What We Don't availability at Powell's\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1310,
+    "sample_id": "c712732d-16e2-4f39-8a68-5cc82671ba6c",
+    "question": "how does this organ digest food?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "stomach digestion process",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1311,
+    "sample_id": "f246eacd-c435-428f-a77e-079c43e4206c",
+    "question": "when was the artist who made this born?",
+    "trajectory_total": 2,
+    "queries": [
+      {
+        "index": 1,
+        "query": "artist name for the sculpture in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 2,
+        "query": "birth year of Gian Lorenzo Bernini",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1312,
+    "sample_id": "d718b6f4-13e8-4baa-ba45-490c66aee6c1",
+    "question": "what is t in this eqation?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Solve the equation \\(-3 + 8t = -1 + 5t\\) for 't'.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1313,
+    "sample_id": "9c6d42a9-89a2-4db9-8b5a-63c9d180b5e6",
+    "question": "what president did this author write books about the most?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Craig Shirley books about presidents",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Craig Shirley books about presidents",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Craig Shirley books about presidents",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Craig Shirley books about presidents",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Craig Shirley books about presidents",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1314,
+    "sample_id": "a24c1367-fa67-42c4-a3c4-b848f559c1d6",
+    "question": "why is this place called that?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "restaurant name of the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 2,
+        "query": "name of the restaurant in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 3,
+        "query": "name of the restaurant in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 4,
+        "query": "name of the restaurant in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Highly generalized categorization"
+      },
+      {
+        "index": 5,
+        "query": "name of the restaurant in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      }
+    ]
+  },
+  {
+    "task_id": 1315,
+    "sample_id": "1e6cd1f6-28e1-4465-a8e7-78b5dc22fdde",
+    "question": "tell me the answer to this question.",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "25 x 67",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1316,
+    "sample_id": "a878926b-26f2-4abd-a3d7-bbd003f6be8a",
+    "question": "what type of battery does the 2022 model of this car have?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "car model identification from the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1317,
+    "sample_id": "a26b875a-ca7b-467c-8229-763882fa6996",
+    "question": "what is the ideal soil ph range for growing this plant?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "plant identification from the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1318,
+    "sample_id": "9f12fc1f-4c11-479e-9026-f103d3d82959",
+    "question": "how many locations do they have?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "StorageMart locations",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "StorageMart locations",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "StorageMart locations",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "StorageMart locations",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "StorageMart locations",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1319,
+    "sample_id": "1bd0b1a4-78d2-4d06-a4a6-defe7a3f45a8",
+    "question": "to what family does this animal belong to?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "duck family",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1320,
+    "sample_id": "1106e44d-5687-4c34-a9d9-6b7fbb28b6e8",
+    "question": "has the amount of 19-25 year olds without health insurance been declining?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1321,
+    "sample_id": "2309b213-6ea7-4894-aa2a-f03f56126d91",
+    "question": "how much sugar does this have?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Simply Lemonade sugar content",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1322,
+    "sample_id": "546f1df6-56e5-48af-ace8-bb3a64dbbbeb",
+    "question": "where is the u.s. headquarters of this bank?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "U.S. headquarters of TD Bank",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "U.S. headquarters of TD Bank",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "U.S. headquarters of TD Bank",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "U.S. headquarters of TD Bank",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "U.S. headquarters of TD Bank",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1323,
+    "sample_id": "3c9f4700-4ab4-4aa6-bbe6-cb21a5503cb3",
+    "question": "when was the author of this book born?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Stephen Hawking birth date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Stephen Hawking birth date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Stephen Hawking birth date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Stephen Hawking birth date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Stephen Hawking birth date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1324,
+    "sample_id": "534cf768-a506-4c8f-808e-f7fd042ee9fe",
+    "question": "is this a protestant or catholic denomination?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Presbyterianism Protestant or Catholic",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1325,
+    "sample_id": "8f6c8389-fb36-4528-b522-8099308f162c",
+    "question": "what is the stock price of this company?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Ace Hardware stock price",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Ace Hardware stock price",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Ace Hardware stock price",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Ace Hardware stock price",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Ace Hardware stock price",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1326,
+    "sample_id": "2575c73c-b13a-4994-aa52-f259c4e663e5",
+    "question": "where is this museum located?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Leslie Lohman Museum of Art location",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Leslie Lohman Museum of Art location",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Leslie Lohman Museum of Art location",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Leslie Lohman Museum of Art location",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Leslie Lohman Museum of Art location",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1327,
+    "sample_id": "1de7eb85-3734-4eff-93aa-fdda1b58ffc4",
+    "question": "what is the name of the show?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "ellentube show name\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1328,
+    "sample_id": "6f526d55-f949-4ec1-9172-80a3c7fa4d1d",
+    "question": "how many people are credited with writing this book?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "book title in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1329,
+    "sample_id": "c6881e9a-aeea-4b2d-bfad-5913930d7184",
+    "question": "how tall is this hotel?",
+    "trajectory_total": 2,
+    "queries": [
+      {
+        "index": 1,
+        "query": "hotel name in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "height of Hotel Arts in Barcelona",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1330,
+    "sample_id": "2faf5949-07d2-4d9b-9e3a-e748af053230",
+    "question": "what is this material?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1331,
+    "sample_id": "a9647010-205f-4f16-9926-ea42498eee0b",
+    "question": "what was the nickname of the person this statue depicts?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "statue in a park with a person in formal attire.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      }
+    ]
+  },
+  {
+    "task_id": 1332,
+    "sample_id": "3a8d4904-7f6f-4ef5-9f17-689564a1c2ba",
+    "question": "what are the active ingredients in this?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Aleve active ingredient",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1333,
+    "sample_id": "47b3cb1e-bbfd-4e25-8dde-18f9e0bc51d3",
+    "question": "of the two winners in the competition to design this building, who was the only one that supervised the construction and design changes?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "names of the two winners in the competition to design the New York City Hall",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "names of the two winners in the competition to design the New York City Hall",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "names of the two winners in the competition to design the New York City Hall",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "names of the two winners in the competition to design the New York City Hall",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "names of the two winners in the competition to design the New York City Hall",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1334,
+    "sample_id": "a6d2363d-c098-4b35-8a23-4c15c3bba8c0",
+    "question": "is there any dangers in maintaining these?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "dangers in maintaining sidewalks",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1335,
+    "sample_id": "df9e49ad-be76-43d5-8642-99f3e6ad389b",
+    "question": "has the author written about other sports?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Joe Posnanski other sports works",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      }
+    ]
+  },
+  {
+    "task_id": 1336,
+    "sample_id": "9fcb5090-3e1c-452a-96ed-7dba7c9ee26d",
+    "question": "does this model suggest that having few suppliers is good for business?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Five Competitive Forces model and suppliers",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Five Competitive Forces model and suppliers",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Five Competitive Forces model and suppliers",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Five Competitive Forces model and suppliers",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Five Competitive Forces model and suppliers",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1337,
+    "sample_id": "6e228fd0-fe73-4fa4-9162-9e9b79b60324",
+    "question": "is this vegan?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Is the Turkey Bacon Avocado sandwich vegan?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1338,
+    "sample_id": "c7036b42-975e-49ba-a378-6fd6eae22692",
+    "question": "what city claims to be the capital of the world for these berries?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "city that claims to be the capital of the world for berries",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "city that claims to be the capital of the world for berries in general",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "city that claims to be the capital of the world for berries in general",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "city that claims to be the capital of the world for berries in general",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "city that claims to be the capital of the world for berries in general",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1339,
+    "sample_id": "b83e26ab-f631-4841-8552-6c683b4b2a76",
+    "question": "how long did this cathedral take to build?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "cathedral in the image with a golden dome and columns\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      }
+    ]
+  },
+  {
+    "task_id": 1340,
+    "sample_id": "b0790de5-87fd-4233-8103-dc2f17f0a2e6",
+    "question": "what was the name of the first of this to be kept in a modern zoo?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "the first animal kept in a modern zoo",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      }
+    ]
+  },
+  {
+    "task_id": 1341,
+    "sample_id": "22cab127-2c4e-4b8e-9590-76d8d7ada2cd",
+    "question": "which ones are better for acrylic painting: synthetic or natural?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "brushes for acrylic painting, synthetic vs natural",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "pros and cons of synthetic versus natural brushes for acrylic painting",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "pros and cons of synthetic versus natural brushes for acrylic painting",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "pros and cons of synthetic versus natural brushes for acrylic painting",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "pros and cons of synthetic versus natural brushes for acrylic painting",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1342,
+    "sample_id": "b2aaa21f-aa27-4951-ae60-35c2a26b0501",
+    "question": "what are the hours of that restaurant?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "hours of BILL'S BAR & BURGER",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "hours of BILL'S BAR & BURGER",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "hours of BILL'S BAR & BURGER",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "hours of BILL'S BAR & BURGER",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "hours of BILL'S BAR & BURGER",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1343,
+    "sample_id": "43b7c341-2446-448f-9a10-4c7d59461d58",
+    "question": "grill temperature?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Stonefire Mini Naan grill temperature",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Stonefire Mini Naan grill temperature",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Stonefire Mini Naan grill temperature",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Stonefire Mini Naan grill temperature",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Stonefire Mini Naan grill temperature",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1344,
+    "sample_id": "b4c8e7d5-b06f-4f8e-b53f-c077c0f507d2",
+    "question": "how old was koson ohara when he painted this picture with a bird?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "artworks with a bird by Koson Ohara",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      },
+      {
+        "index": 2,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1345,
+    "sample_id": "6a777103-7405-4d93-a2cf-1cf30d0b81d1",
+    "question": "where is smiltene?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Smiltene location in Latvia",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Smiltene location in Latvia",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Smiltene location in Latvia",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Smiltene location in Latvia",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Smiltene location in Latvia",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1346,
+    "sample_id": "f4906210-ba2f-4b11-8a2f-95ad354f2e86",
+    "question": "what is the next book in this series?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Old Man's War series next book\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 2,
+        "query": "Old Man's War series next book\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 3,
+        "query": "Old Man's War series next book\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 4,
+        "query": "Old Man's War series next book\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 5,
+        "query": "Old Man's War series next book\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      }
+    ]
+  },
+  {
+    "task_id": 1347,
+    "sample_id": "4d8230a3-e6a1-4755-bbe1-03945fa72a54",
+    "question": "is a prescription needed for this product?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "OTC medication definition and examples\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1348,
+    "sample_id": "7024afe6-940c-4383-bc4d-0ff9d64b525c",
+    "question": "when did the creator make their first comic?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "When did the creator of Deadpool make their first comic?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Who is the creator of Deadpool and when did they make their first comic?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Who is the creator of Deadpool and when did they make their first comic?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Who is the creator of Deadpool and when did they make their first comic?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Who is the creator of Deadpool and when did they make their first comic?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1349,
+    "sample_id": "83650d06-b391-47a4-943e-bc2fe9c6dd33",
+    "question": "how fast does that animal dive?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "bald eagle diving speed",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1350,
+    "sample_id": "51972f6d-69fc-435b-8eff-d980502af1bf",
+    "question": "when was this completed?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "title of the book in the image\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "title of the book in the image\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 3,
+        "query": "title of the book in the image\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 4,
+        "query": "title of the book in the image\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 5,
+        "query": "title of the book in the image\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      }
+    ]
+  },
+  {
+    "task_id": 1351,
+    "sample_id": "442bafb3-b620-409c-a043-51fed9a76f54",
+    "question": "who is the founder of company that makes this?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "SHOC Accelerator founder",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "founder of SHOC Accelerator",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "founder of SHOC Accelerator",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "founder of SHOC Accelerator",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "founder of SHOC Accelerator",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1352,
+    "sample_id": "41f6ac6d-c6dd-4366-80a5-ccee021b4979",
+    "question": "what are the four basic barre shapes according to this page?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "four basic barre shapes according to the page",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "four basic barre shapes according to the page",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 3,
+        "query": "four basic barre shapes according to the page",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 4,
+        "query": "four basic barre shapes according to the page",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 5,
+        "query": "four basic barre shapes according to the page",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      }
+    ]
+  },
+  {
+    "task_id": 1353,
+    "sample_id": "bb7f88b4-1403-4b02-bc00-ad529889e43a",
+    "question": "what is the drive layout of this car?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "make and model of the car in the image\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 2,
+        "query": "make and model of the car in the image\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 3,
+        "query": "make and model of the car in the image\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 4,
+        "query": "make and model of the car in the image\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Highly generalized categorization"
+      },
+      {
+        "index": 5,
+        "query": "make and model of the car in the image\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      }
+    ]
+  },
+  {
+    "task_id": 1354,
+    "sample_id": "84c61eee-da04-482d-9e1b-1a73813678de",
+    "question": "what's the difference between the fruit of this plant and that of ophiopogon planiscapus?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1355,
+    "sample_id": "6853bee1-eed5-4859-a256-e11672c8a38c",
+    "question": "how long has this station operated?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "history of the train station in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 2,
+        "query": "history of the train station in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 3,
+        "query": "history of the train station in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 4,
+        "query": "history of the train station in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Highly generalized categorization"
+      },
+      {
+        "index": 5,
+        "query": "history of the train station in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      }
+    ]
+  },
+  {
+    "task_id": 1356,
+    "sample_id": "b294684b-447c-4c12-8d24-a764de7e37ca",
+    "question": "do they have vegan options?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Dunkin' Donuts menu options",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Dunkin' Donuts vegan menu options",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Dunkin' Donuts vegan menu options",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Dunkin' Donuts vegan menu options",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Dunkin' Donuts vegan menu options",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1357,
+    "sample_id": "31aec0a1-c000-4dd9-9992-e0091dffde94",
+    "question": "what language is this page written in?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1358,
+    "sample_id": "2a4cefe8-4777-43fc-b3ea-5e1834e36923",
+    "question": "what ford series is this a part of?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Ford truck model identification\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      }
+    ]
+  },
+  {
+    "task_id": 1359,
+    "sample_id": "49bec032-5140-4871-baaf-269a5772174e",
+    "question": "how many sheep are standing?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1360,
+    "sample_id": "6a0d63a0-1910-4de3-8686-a6189f176b3d",
+    "question": "what is the name of the person who applied for the world's first patent for this?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "the name of the person who applied for the world's first patent",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "the name of the person who applied for the world's first patent",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "the name of the person who applied for the world's first patent",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "the name of the person who applied for the world's first patent",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "the name of the person who applied for the world's first patent",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1361,
+    "sample_id": "4ffe0a9a-f4fa-4775-a8f4-f634574570b2",
+    "question": "is lucid a chinese company?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Is Lucid a Chinese company?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Is Lucid a Chinese company?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Is Lucid a Chinese company?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Is Lucid a Chinese company?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Is Lucid a Chinese company?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1362,
+    "sample_id": "64a78eb6-634f-4bda-83ec-358427940d78",
+    "question": "what will the temperature be at 5 pm?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1363,
+    "sample_id": "771e20fb-3fe6-4136-a439-48b245b7c5ad",
+    "question": "who created the first known modern one of these?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "first known modern one of these\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 2,
+        "query": "first known modern one of these\" context",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 3,
+        "query": "first known modern one of these\" context",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 4,
+        "query": "first known modern one of these\" context",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 5,
+        "query": "first known modern one of these\" context",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      }
+    ]
+  },
+  {
+    "task_id": 1364,
+    "sample_id": "569a3617-a7cf-477a-8aa3-f64372443d40",
+    "question": "which station has more tracks, this one or penn station?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Grand Central Terminal tracks vs Penn Station tracks",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1365,
+    "sample_id": "44850371-5d7d-4482-9c0c-43c8b104bdf7",
+    "question": "how many cars did the parent company of this auto maker sell in 2017?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "auto maker name in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "Daimler AG sales data in 2017",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Daimler AG sales data in 2017",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Daimler AG sales data in 2017",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Daimler AG sales data in 2017",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1366,
+    "sample_id": "04ceb762-12f7-4de8-8e1f-a13907b4265e",
+    "question": "how long are the leaves of this plant, usually?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "plant identification based on leaf shape, size, and arrangement.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "plant identification based on leaf shape, size, and arrangement, with specific mention of the plant in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 3,
+        "query": "plant identification based on leaf shape, size, and arrangement, with specific mention of the plant in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 4,
+        "query": "plant identification based on leaf shape, size, and arrangement, with specific mention of the plant in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 5,
+        "query": "plant identification based on leaf shape, size, and arrangement, with specific mention of the plant in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      }
+    ]
+  },
+  {
+    "task_id": 1367,
+    "sample_id": "7db3563f-5e2c-4f8b-b458-a2b7d303333d",
+    "question": "where is this university that publishes this journal located?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Bingham University location",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Bingham University location",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Bingham University location",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Bingham University location",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Bingham University location",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1368,
+    "sample_id": "d27bdc2f-4e50-4d7b-9601-d0489609a782",
+    "question": "what's on tv today?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "TV schedule for the next 30 minutes.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "TV schedule for the next 30 minutes.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "TV schedule for the next 30 minutes.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "TV schedule for the next 30 minutes.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "TV schedule for the next 30 minutes.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1369,
+    "sample_id": "05a10b9f-66ad-44b1-846d-148fa7e94a94",
+    "question": "does this company also make pizza ovens?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "company name of the grill in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 2,
+        "query": "Weber Brothers Metal Works pizza ovens",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Weber Brothers Metal Works product range",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Weber Brothers Metal Works pizza ovens",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Weber Brothers Metal Works pizza ovens",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1370,
+    "sample_id": "28b3a829-9bdb-4ea3-91eb-c8f1e49bc232",
+    "question": "how big is each pouch of these snacks?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1371,
+    "sample_id": "4f69e90f-73eb-4ebc-a596-48dfa0c905cc",
+    "question": "what are the concerns associated with this fruit production?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "concerns associated with orange production",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "specific concerns associated with orange production",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "specific concerns associated with orange production",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "specific concerns associated with orange production",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "specific concerns associated with orange production",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1372,
+    "sample_id": "6059c998-0ae7-41de-9da4-a035980b76a4",
+    "question": "read me the sign.",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1373,
+    "sample_id": "fbbb7dd3-d06d-4f1f-ad51-9742db803c65",
+    "question": "what is its price on amazon?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Graco 4Ever Extend2Fit DLX car seat price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Graco 4Ever Extend2Fit DLX car seat price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Graco 4Ever Extend2Fit DLX car seat price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Graco 4Ever Extend2Fit DLX car seat price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Graco 4Ever Extend2Fit DLX car seat price on Amazon",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1374,
+    "sample_id": "94d0455d-044d-4f52-937b-528797e9a6c6",
+    "question": "for the 2016 hybrid version of this car, which trim has better mileage, the ex-l or touring?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "2016 hybrid Honda model\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "2016 Honda CR-V hybrid model\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "2016 Honda CR-V hybrid model\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "2016 Honda CR-V hybrid model\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "2016 Honda CR-V hybrid model\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1375,
+    "sample_id": "56d15488-767f-474f-b5be-211126f9187f",
+    "question": "what is this disease?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "DIC and von Willebrand disease in the context of blood clotting.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1376,
+    "sample_id": "2f8848d5-39db-4a9c-834e-9dce387cd3b9",
+    "question": "how often should this be cleaned?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "cleaning frequency for decorative hairpins",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1377,
+    "sample_id": "3a2b69dc-7833-4c79-96a5-1d74650e2057",
+    "question": "what is the cost of this scooter?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "red scooter make and model identification\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "scooter make and model identification\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 3,
+        "query": "scooter make and model identification\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 4,
+        "query": "scooter make and model identification\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 5,
+        "query": "scooter make and model identification\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      }
+    ]
+  },
+  {
+    "task_id": 1378,
+    "sample_id": "f0175dd8-250b-4257-8b50-e39630cc95c5",
+    "question": "when was the company that owns this brand founded?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Worx brand parent company founding date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Worx brand parent company founding date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Worx brand parent company founding date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Worx brand parent company founding date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Worx brand parent company founding date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1379,
+    "sample_id": "fd60d044-4298-4e2f-88ed-fb436f8afdae",
+    "question": "where is this from?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Terra Delyssa olive oil origin",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1380,
+    "sample_id": "83c5d2b2-2c1d-41b7-b284-bf9f0a9f00c0",
+    "question": "what's the name of this plant?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "plant identification with broad, oval-shaped leaves",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      },
+      {
+        "index": 2,
+        "query": "plant identification with broad, oval-shaped leaves and image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      },
+      {
+        "index": 3,
+        "query": "plant identification with broad, oval-shaped leaves and image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      },
+      {
+        "index": 4,
+        "query": "plant identification with broad, oval-shaped leaves and image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed description"
+      },
+      {
+        "index": 5,
+        "query": "plant identification with broad, oval-shaped leaves and image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      }
+    ]
+  },
+  {
+    "task_id": 1381,
+    "sample_id": "2aff1964-f675-4727-a9a4-423a74d76e9d",
+    "question": "what is the lifespan of that lizard?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Gargoyle Gecko lifespan",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Gargoyle Gecko lifespan",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Gargoyle Gecko lifespan",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Gargoyle Gecko lifespan",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Gargoyle Gecko lifespan",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1382,
+    "sample_id": "06957ad4-f069-4388-8a86-c3cb9f965f6b",
+    "question": "how many grams are in this bag?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Welch's Fruit Snacks weight\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1383,
+    "sample_id": "b15f8fb2-b417-4342-a1b2-93d287d827e7",
+    "question": "what kind of engine is there in this kind of truck?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Ford F-150 model and year identification",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Ford F-150 model and year identification",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Ford F-150 model and year identification",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Ford F-150 model and year identification",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Ford F-150 model and year identification",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1384,
+    "sample_id": "67aab871-12ce-4d2e-8241-6e06b66f9d9a",
+    "question": "what's the ideal temperature for this plant?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "ideal temperature range for aloe vera plants",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1385,
+    "sample_id": "728ce3eb-fc32-4a7d-88b1-d4a130b9b222",
+    "question": "what do the letters stand for?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "SWOT analysis meaning",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1386,
+    "sample_id": "2fcdd141-f919-4430-8143-63a5931b4488",
+    "question": "what does a graph of this look like?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "graph of y = (x^2 - 1)(x + 3)^3\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "function or polynomial that the graph is supposed to represent\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 3,
+        "query": "function or polynomial that the graph is supposed to represent\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 4,
+        "query": "function or polynomial that the graph is supposed to represent\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 5,
+        "query": "function or polynomial that the graph is supposed to represent\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      }
+    ]
+  },
+  {
+    "task_id": 1387,
+    "sample_id": "1f6bbe3b-c1f4-4999-8730-01d5c48cbc96",
+    "question": "how can this company be contacted?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "contact information for Millennium HVAC NY Inc.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1388,
+    "sample_id": "e725f388-e9d6-4fde-a85e-78c9d87c10f3",
+    "question": "who owns the company?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Lance brand ownership",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Lance brand ownership",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Lance brand ownership",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Lance brand ownership",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Lance brand ownership",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1389,
+    "sample_id": "44e87922-641e-4a17-aac7-49fdeeed13ec",
+    "question": "what does it mean if it's painted white?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "white paint on fire hydrant meaning",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "meaning of a fire hydrant painted white",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "meaning of a fire hydrant painted white",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "meaning of a fire hydrant painted white",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "meaning of a fire hydrant painted white",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1390,
+    "sample_id": "8151619c-0d75-438b-b5ca-6e02b4080dfd",
+    "question": "what is the percentage of water in these?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "water content of common fruits and vegetables",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      }
+    ]
+  },
+  {
+    "task_id": 1391,
+    "sample_id": "a8296891-0251-47eb-96f8-10c9e42fa509",
+    "question": "how can i move this once it's set up?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Marcy Deluxe Utility Bench moving instructions",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1392,
+    "sample_id": "89704bd8-b97a-45b1-997f-336bc16334cb",
+    "question": "which version of this book is more expensive, the kindle or the hardcover version?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Kindle price of the book \"The Great Journeys in History\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "hardcover price of the book \"The Great Journeys in History\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Kindle price of the book \"The Great Journeys in History\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "hardcover price of the book \"The Great Journeys in History\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Kindle price of the book \"The Great Journeys in History\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1393,
+    "sample_id": "3688297a-62fb-421a-abb2-3681280c5830",
+    "question": "which of these is the strongest muscle?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "strongest muscle in the thigh",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1394,
+    "sample_id": "1bcbcb47-8894-4866-9ad6-687f01a0cab7",
+    "question": "when did this car brand stop producing new vehicles?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Saturn brand production timeline",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1395,
+    "sample_id": "2c215746-1a17-41d5-bcd7-bac34a7a34d1",
+    "question": "which is cheaper, the hardcover version of this book or the audiobook?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "price of hardcover version of Assyria: A Graphic Biography",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "price of hardcover version of Assyria: A Graphic Biography",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "price of hardcover version of Assyria: A Graphic Biography",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "price of hardcover version of Assyria: A Graphic Biography",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "price of hardcover version of Assyria: A Graphic Biography",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1396,
+    "sample_id": "5c06f025-c67d-418c-8f75-fba27c2d6e0e",
+    "question": "what is the main subject of the museum in rochester ny that hosts competitions for these things every christmas?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "museums in Rochester, NY that host gingerbread house competitions\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Rochester, NY gingerbread house competition\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Rochester, NY gingerbread house competition\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Rochester, NY gingerbread house competition\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Rochester, NY gingerbread house competition\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1397,
+    "sample_id": "d81fcd72-7f6a-4bd7-a993-90b3932ede1e",
+    "question": "what does the text at the top mean in english?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Translate \"Seleccionar una opción\" to English.",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1398,
+    "sample_id": "eb0faf6e-a03c-499b-91ef-4c76ff1e8f72",
+    "question": "which sugar substitute did this brand use to replace its original one?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Russell Stover milk chocolate sugar substitute",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Russell Stover milk chocolate sugar substitute",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Russell Stover milk chocolate sugar substitute",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Russell Stover milk chocolate sugar substitute",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Russell Stover milk chocolate sugar substitute",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1399,
+    "sample_id": "f8291531-823e-4598-9609-1b9a92700ca4",
+    "question": "which quarter had the greatest revenue?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "quarterly revenue data table\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1400,
+    "sample_id": "f5f212e7-b973-415f-9502-97bb84c4173a",
+    "question": "how long have people eating these?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "cattail identification and culinary history",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1401,
+    "sample_id": "4b3591e1-62ba-48d8-b0a5-fa2b87e5d5ed",
+    "question": "why is this plant named that?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "plant identification from the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1402,
+    "sample_id": "4a235b50-b824-438d-bcba-a5834522bb78",
+    "question": "where does this company source their maple syrup from?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1403,
+    "sample_id": "8d54411e-ce62-4407-ac99-5b44a4a25124",
+    "question": "what is the relationship shown by this graph?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1404,
+    "sample_id": "712eef13-e4a0-40f9-b931-8bf4f8eb9dc8",
+    "question": "what are the atomic numbers of the elements in this chemical equation?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "elements in the chemical equation \"_C + _O2 --> _CO2\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1405,
+    "sample_id": "d9583463-11e6-4321-a4c8-e5cc1f53786f",
+    "question": "what are the main pigments used to make this color of paint?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1406,
+    "sample_id": "2bf66e9b-a547-4f7e-bd7f-63569c83cb74",
+    "question": "what teeth are missing?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1407,
+    "sample_id": "f51c759e-7d68-4304-a730-e15a24d58604",
+    "question": "what's the plant called right here?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Haworthia plant identification\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      }
+    ]
+  },
+  {
+    "task_id": 1408,
+    "sample_id": "935d0431-badd-43f3-a96c-9cb125abeb12",
+    "question": "what is the price per ounce?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1409,
+    "sample_id": "98e45741-0d6d-42e8-88dc-18dc5a8a92df",
+    "question": "how many calories does this item have?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Bahlsen Choco Leibniz biscuits nutritional information",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Bahlsen Choco Leibniz biscuits nutritional information",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Bahlsen Choco Leibniz biscuits nutritional information",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Bahlsen Choco Leibniz biscuits nutritional information",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Bahlsen Choco Leibniz biscuits nutritional information",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1410,
+    "sample_id": "37e292e3-7992-4bd9-92fc-f5367e23071f",
+    "question": "what plant is this?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "plants with small oval-shaped leaves and needle-like structures",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      },
+      {
+        "index": 2,
+        "query": "plant with needle-like leaves and small oval-shaped leaves",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      },
+      {
+        "index": 3,
+        "query": "plant with needle-like leaves and small oval-shaped leaves",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      },
+      {
+        "index": 4,
+        "query": "plant with needle-like leaves and small oval-shaped leaves",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed description"
+      },
+      {
+        "index": 5,
+        "query": "plant with needle-like leaves and small oval-shaped leaves",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Detailed Description"
+      }
+    ]
+  },
+  {
+    "task_id": 1411,
+    "sample_id": "364308cb-e29d-4895-8d1e-b004364ec6b2",
+    "question": "what other libraries did the architect of this building design?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Identify the name of the building in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "Identify the name of the building in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 3,
+        "query": "Identify the name of the building in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 4,
+        "query": "Identify the name of the building in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 5,
+        "query": "Identify the name of the building in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      }
+    ]
+  },
+  {
+    "task_id": 1412,
+    "sample_id": "5ec406c4-fe58-4a21-b7d6-cbb972ce19fc",
+    "question": "has this brand been around longer than kirkland signature?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "history of Simple Truth brand and Kirkland Signature",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "history of Simple Truth brand and Kirkland Signature",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "history of Simple Truth brand and Kirkland Signature",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "history of Simple Truth brand and Kirkland Signature",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "history of Simple Truth brand and Kirkland Signature",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1413,
+    "sample_id": "c6bd27ec-049b-4f03-a3da-a14739c371ba",
+    "question": "when was this sculpture created?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Chamunda, the Horrific Destroyer of Evil creation date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Chamunda, the Horrific Destroyer of Evil creation date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Chamunda, the Horrific Destroyer of Evil creation date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Chamunda, the Horrific Destroyer of Evil creation date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Chamunda, the Horrific Destroyer of Evil creation date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1414,
+    "sample_id": "7f8d4b54-58cc-4775-95a3-6b4888f09e09",
+    "question": "where is this car model's parent company from?",
+    "trajectory_total": 2,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Hyundai parent company",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "parent company of Hyundai Motor Company",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1415,
+    "sample_id": "3a96150b-2217-4c1c-b429-bf96b4ae72e9",
+    "question": "did this car model sell more units than the honda civic in 2012?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "sales data for GMC model and Honda Civic in 2012",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "sales data for GMC model and Honda Civic in 2012",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "sales data for GMC model and Honda Civic in 2012",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "sales data for GMC model and Honda Civic in 2012",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "sales data for GMC model and Honda Civic in 2012",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1416,
+    "sample_id": "313300f0-d4fe-4c7c-955a-1e76764ded93",
+    "question": "what are the uses for the oil from this nut?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "types of nuts in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "uses of hazelnut oil",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "uses of hazelnut oil",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "uses of hazelnut oil",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "uses of hazelnut oil",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1417,
+    "sample_id": "e045e65d-b9e0-4d86-bdc0-1c144532d086",
+    "question": "why would betsy ross be chosen to make the first one of the us?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Betsy Ross and the creation of the first American flag",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "pattern of the Betsy Ross flag",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "why was Betsy Ross chosen to make the first American flag",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "why was Betsy Ross chosen to make the first American flag",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "why was Betsy Ross chosen to make the first American flag",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1418,
+    "sample_id": "54923716-2632-4f4d-b279-e811ea3c746e",
+    "question": "what types of nut does this have?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "types of nuts mentioned on the label of the container in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      }
+    ]
+  },
+  {
+    "task_id": 1419,
+    "sample_id": "a30e8504-bba9-4477-947a-c0d32b8df27d",
+    "question": "when was the order this author belongs to established?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Ezra F. Vogel and Harvard University Press",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Ezra F. Vogel and Harvard University Press establishment",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Ezra F. Vogel and Harvard University Press establishment",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Ezra F. Vogel and Harvard University Press establishment",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Ezra F. Vogel and Harvard University Press establishment",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1420,
+    "sample_id": "07d0aad3-1e54-4efb-935e-2542e36ad16f",
+    "question": "between these two species of elephants, which is bigger?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "African elephant vs Asian elephant size comparison\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1421,
+    "sample_id": "258fe09c-3799-4cc4-bb96-c44fa6051027",
+    "question": "can i get this hand sanitizer at walmart?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "hand sanitizer name",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 2,
+        "query": "hand sanitizer name",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 3,
+        "query": "hand sanitizer name",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 4,
+        "query": "hand sanitizer name",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Highly generalized categorization"
+      },
+      {
+        "index": 5,
+        "query": "hand sanitizer name",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      }
+    ]
+  },
+  {
+    "task_id": 1422,
+    "sample_id": "e51259a0-565f-45c4-b9d1-98d161d4b6e6",
+    "question": "how many years ago did this character with the red stripe on their face first appear in a video game?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Mario first appearance in video game",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1423,
+    "sample_id": "c5b56c49-ccd6-4565-b004-e8e409579e11",
+    "question": "is this cheaper at wal-mart or walgreens?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "compare prices of Wal-Mart and Walgreens for the item mentioned in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 2,
+        "query": "compare prices of Wal-Mart and Walgreens for the item mentioned in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 3,
+        "query": "compare prices of Wal-Mart and Walgreens for the item mentioned in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 4,
+        "query": "compare prices of Wal-Mart and Walgreens for the item mentioned in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 5,
+        "query": "compare prices of Wal-Mart and Walgreens for the item mentioned in the image.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      }
+    ]
+  },
+  {
+    "task_id": 1424,
+    "sample_id": "208af5de-ea9f-4c1f-8f95-61a369fdf7cb",
+    "question": "did this car model sell more units than the honda civic in 2012?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Ford F-150 vs Honda Civic sales in 2012",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Ford F-150 vs Honda Civic sales in 2012",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Ford F-150 vs Honda Civic sales in 2012",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Ford F-150 vs Honda Civic sales in 2012",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Ford F-150 vs Honda Civic sales in 2012",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1425,
+    "sample_id": "15f658c7-4bee-4569-ac24-ae5cc7ad74f4",
+    "question": "what kind of equipment is this?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1426,
+    "sample_id": "3b21d306-44bf-4666-b818-0632ab035ff9",
+    "question": "is this gluten-free?",
+    "trajectory_total": 0,
+    "queries": []
+  },
+  {
+    "task_id": 1427,
+    "sample_id": "de328715-5006-4c48-a508-d45cb58b0ff0",
+    "question": "why are the chocolate boxes heart-shaped?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "reasons for heart-shaped chocolate boxes",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1428,
+    "sample_id": "feb5409b-00ea-4129-af1d-049b2b85850f",
+    "question": "are there more locations of this chain in ohio or new jersey?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "number of Raising Cane's locations in Ohio and New Jersey",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "number of Raising Cane's locations in Ohio and New Jersey",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "number of Raising Cane's locations in Ohio and New Jersey",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "number of Raising Cane's locations in Ohio and New Jersey",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "number of Raising Cane's locations in Ohio and New Jersey",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1429,
+    "sample_id": "7cd15678-d602-4b2d-b331-1ec84c673aea",
+    "question": "what does this law say?",
+    "trajectory_total": 2,
+    "queries": [
+      {
+        "index": 1,
+        "query": "parking sign with D.M.V. disabled permit",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Oregon Revised Statutes 811.620 and 811.615",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1430,
+    "sample_id": "2f81e89c-d011-4957-b925-73d8c4bf0ac8",
+    "question": "what is this chapter about in english?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Translate the text in the image to English.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 2,
+        "query": "Translate the text in the image to English.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 3,
+        "query": "Translate the text in the image to English.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 4,
+        "query": "Translate the text in the image to English.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      },
+      {
+        "index": 5,
+        "query": "Translate the text in the image to English.",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "No Object Involved"
+      }
+    ]
+  },
+  {
+    "task_id": 1431,
+    "sample_id": "30231e16-a458-41c0-913e-2d2539a33357",
+    "question": "how many distinct enzyme exist of this?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "distinct enzymes mentioned in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      }
+    ]
+  },
+  {
+    "task_id": 1432,
+    "sample_id": "cd7f2fd5-8b65-4486-82c0-cdbc14186351",
+    "question": "when was this brand founded?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "When was Birkenstock founded?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "When was Birkenstock founded?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "When was Birkenstock founded?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "When was Birkenstock founded?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "When was Birkenstock founded?",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1433,
+    "sample_id": "3a61db88-7123-4f64-beda-efdd605435e4",
+    "question": "what is the genus of the tree that this is made from?",
+    "trajectory_total": 2,
+    "queries": [
+      {
+        "index": 1,
+        "query": "type of wood used in the instrument in the image\"",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 2,
+        "query": "genus of spruce\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1434,
+    "sample_id": "40c54b88-ac6f-463d-a70f-1b88fe859e7b",
+    "question": "what influences the population of this animal?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "factors influencing the population of Pygmy Hippo",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "factors influencing the population of Pygmy Hippo",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "factors influencing the population of Pygmy Hippo",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "factors influencing the population of Pygmy Hippo",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "factors influencing the population of Pygmy Hippo",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1435,
+    "sample_id": "b7588fe6-6471-4ad5-a047-db2ab4da1362",
+    "question": "how many grams of sugar is in this per serving?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "product identification from the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1436,
+    "sample_id": "80f2fe60-b8e1-4b5f-80cd-f86c43cb5d6a",
+    "question": "in which city and country did this candy origin story take place?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "candy name in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "name of the candy in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 3,
+        "query": "name of the candy in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 4,
+        "query": "name of the candy in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 5,
+        "query": "name of the candy in the image",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      }
+    ]
+  },
+  {
+    "task_id": 1437,
+    "sample_id": "2c612718-fbb6-47da-86e7-29599ca46e5d",
+    "question": "what are the extrasegmental mechanisms this uses?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "extrasegmental mechanisms of an infusion pump",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1438,
+    "sample_id": "64f788ec-d00a-4261-a14a-bfcce23250b1",
+    "question": "who is the founder of the company that produces this?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "founder of Young Living",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "founder of Young Living company",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "founder of Young Living company",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "founder of Young Living company",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "founder of Young Living company",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1439,
+    "sample_id": "c69129bf-6f03-4490-8794-0df74a692579",
+    "question": "did this book get published before the fall of the ottomans?",
+    "trajectory_total": 1,
+    "queries": [
+      {
+        "index": 1,
+        "query": "The Damascus Events\" publication date",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1440,
+    "sample_id": "6a8f95dc-0c55-4bdb-83da-c61b129c2f57",
+    "question": "are more art pieces by the artist displayed in the united kingdom or france?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "artist name from the image of the altarpiece",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 2,
+        "query": "artist name from the image of the altarpiece",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 3,
+        "query": "artist name from the image of the altarpiece",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      },
+      {
+        "index": 4,
+        "query": "artist name from the image of the altarpiece",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Highly generalized categorization"
+      },
+      {
+        "index": 5,
+        "query": "artist name from the image of the altarpiece",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "highly generalized categorization"
+      }
+    ]
+  },
+  {
+    "task_id": 1441,
+    "sample_id": "a3fe0e8a-ebf5-451b-bff7-c2d179177850",
+    "question": "in what year did production for this first start?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Hyundai car model identification",
+        "entity_ambiguous": "Yes",
+        "ambiguity_level": "Object Identificattion"
+      },
+      {
+        "index": 2,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1442,
+    "sample_id": "99d4d068-6071-435d-b11a-4293a7e0c2a3",
+    "question": "does coach ship internationally?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Coach shipping policies",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Coach international shipping policies",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Coach international shipping policies",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Coach international shipping policies",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Coach international shipping policies",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  },
+  {
+    "task_id": 1443,
+    "sample_id": "df084975-1781-4be6-9177-d5434e1ce28d",
+    "question": "how fast does this vehicle need to go to travel in time?",
+    "trajectory_total": 5,
+    "queries": [
+      {
+        "index": 1,
+        "query": "Back to the Future time travel speed\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 2,
+        "query": "Back to the Future DeLorean speed\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 3,
+        "query": "Back to the Future DeLorean time travel speed\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 4,
+        "query": "Back to the Future DeLorean time travel speed\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      },
+      {
+        "index": 5,
+        "query": "Back to the Future DeLorean time travel speed\"",
+        "entity_ambiguous": "No",
+        "ambiguity_level": null
+      }
+    ]
+  }
+]

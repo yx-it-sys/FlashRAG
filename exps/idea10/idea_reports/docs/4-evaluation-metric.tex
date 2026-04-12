@@ -1,0 +1,51 @@
+\section{Evaluation on ReAct Trajectories}
+
+Traditional evaluation protocols for RAG systems primarily focus on generation quality (e.g., EM, Accuracy, F1) and retrieval effectiveness (e.g., Recall, MRR, NDCG). However, these metrics overlook the \textbf{trajectory-level dynamics} of agentic pipelines, where multi-iteration query generation and retrieval decisions critically determine final outcomes. In particular, the quality of intermediate trajectories—i.e., whether each iteration contributes meaningful and relevant information—remains underexplored, despite being a key source of failure in Agentic RAG systems.
+
+To better characterize this aspect, we introduce a trajectory-level evaluation framework that explicitly measures the impact of entity ambiguity on the iterative reasoning process. Our metric decomposes trajectory quality into two complementary components: 
+\textbf{(1) Information Increment}, which quantifies the additional information gained at each iteration, and 
+\textbf{(2) Iteration Utility}, which evaluates the contribution of each step toward the final answer.
+
+% \paragraph{Infomation Increment.} Evaluation on this can be designed as two layers, the top layers is coarse-grained cosline similarity between the current generated search query $q_t$ and $q_{t-1},t\geq 1$. If the similarity is high, we consider the VLMs has generated a repeated search query which cannot bring any information gains. The fined-grained evaluation if fact-level differences. Specifically, we consider the current iteration $i_t$ increase infomation if cumulated retrieval results from iteration $i_{\leq t}$ have more infomation than that from iteration $i_{< t}$. Specifically,
+\paragraph{Information Increment.}
+We quantify the information increment introduced at each iteration using a two-level criterion. \textbf{Coarse-grained redundancy.} We measure the cosine similarity between consecutive VLM-generated queries, $\mathrm{sim}(q_t, q_{t-1})$ for $t \geq 1$. A high similarity indicates that the agent issues near-duplicate queries, implying negligible information gain due to the static and definite retrieval system.
+\textbf{Fine-grained factual gain.} Beyond surface similarity, we assess whether the current iteration contributes \textbf{new facts}. Let $\mathcal{F}_{\leq t}$ denote the set of atomic facts extracted from all retrieved evidence up to step $t$, and $\mathcal{F}_{< t}$ the corresponding set up to step $t-1$, where $\mathcal{F}=\left\{f_1,f_2, \dots, f_n\right\}$. We define iteration $t$ as \textbf{informative} if $\mathcal{F}_{\leq t}$ introduces additional non-redundant facts beyond $\mathcal{F}_{< t}$. Formally, the information increment at step $t$ is defined as
+\begin{equation}
+    \Delta F_t = \dfrac{\left| \mathcal{F}_{\leq t} \setminus \mathcal{F}_{< t} \right|}{\left|\mathcal{F}_{\leq t}\right|}=\dfrac{\left|\mathcal{F}_t\cup\mathcal{F}_{<t}\right|-\left|\mathcal{F}_{<t}\right|}{\left|\mathcal{F}_{\leq t}\right|}
+\end{equation}
+By construction, $\Delta F_t \geq 0$. 
+If $\Delta F_t = 0$, the current iteration $t$ fails to retrieve any novel information.
+
+Furthermore, a high similarity between consecutive queries indicates that the current iteration is unlikely to yield new information. 
+In such cases, the retrieval process tends to return highly overlapping results, leading to redundant iterations without meaningful progress. 
+Therefore, when the similarity exceeds a predefined threshold, the information increment can be safely approximated as zero, eliminating the need for explicit computation. Formally, this process can be express as
+\begin{equation}
+\Delta F_t
+=
+\mathbb{I}\!\left[\operatorname{sim}(q_t, q_{t-1}) \le \tau\right]
+\cdot
+\dfrac{\left| \mathcal{F}_{\leq t} \setminus \mathcal{F}_{< t} \right|}{\left|\mathcal{F}_{\leq t}\right|},
+\end{equation}
+% \begin{equation}
+% \Delta F_t^{*} = \left(1 - \mathrm{sim}(q_t, q_{t-1})\right) \cdot 
+% \left| \mathcal{F}_{\leq t} \setminus \mathcal{F}_{< t} \right|
+% \end{equation}
+
+While this metric captures whether the retrieval process makes progress in terms of factual novelty, 
+it does not account for the \textbf{utility} of the acquired information with respect to resolving the query. Therefore, we introduce an additional metric to quantify the contribution of each iteration to the final answer. 
+\paragraph{Iteration Utility.} To further assess whether an iteration contributes to the final answer, we introduce a metric termed \textit{Iteration Utility}. This metric leverages the intrinsic structure of the ReAct pipeline: 
+the \texttt{<Thought>} at iteration $t_j$ ($j \geq 1$) is conditioned on the retrieval results obtained at step $t_{j-1}$. Therefore, the content of the \texttt{<Thought>} provides a direct signal of how the retrieved evidence is interpreted and utilized by the model. Compared to relying on external annotators or expert judgments, this approach evaluates utility from the model’s own reasoning perspective, ensuring consistency with the underlying execution dynamics of the ReAct pipeline. 
+Consequently, it offers a more faithful characterization of how intermediate retrieval results influence the final answer generation.
+
+Through comprehensive analysis of trajectory-level reasoning, we identify three types of model reactions: \textbf{(I) No Contribution.} 
+The VLM explicitly indicates that the retrieved evidence is irrelevant or uninformative with respect to the query (e.g., ``The retrieved documents do not provide relevant information for the query''). \textbf{(II) Partial Contribution.} The VLM acknowledges that the retrieved evidence supports part of the query while leaving certain aspects unresolved (e.g., ``The document provides evidence for A, but B remains unsupported''). \textbf{(III) Full Contribution.} The retrieved evidence fully resolves the query, no additional external information is required for subsequent reasoning.
+
+We assign each reaction type a utility value $u \in \{0, 0.5, 1\}$, corresponding to no contribution, partial contribution, and full contribution, respectively. The step-level trajectory score is then defined as the product of utility and information increment:
+\begin{equation}
+    S_t = u_t \cdot \Delta \mathcal{F}_t
+\end{equation}
+The overall Trajectory Quality Score (abbreviated as TQS) is computed as the average step-level score over the entire trajectory:
+\begin{equation}
+    \mathrm{TQS} = \frac{1}{|T|}\sum_{t=1}^{|T|} S_t
+\end{equation}
+A higher TQS indicates that the trajectory is more informative, more useful, and overall better aligned with successful task completion.

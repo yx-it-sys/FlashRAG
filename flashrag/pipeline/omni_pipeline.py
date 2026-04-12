@@ -4,11 +4,14 @@ from flashrag.pipeline import BasicMultiModalPipeline
 import re
 import os
 import json
+import subprocess
+import tempfile
 from PIL import Image
 import tomllib
 from tqdm import tqdm
 import time
 import openai
+import inspect
 
 class OmniSearchPipeline(BasicMultiModalPipeline):
     def __init__(self, config, prompt_template=None, retriever=None, generator=None):
@@ -17,12 +20,7 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         self.data_dir = self.config['data_dir']
         self.dataset_name = self.config['dataset_name']
         self.generator = get_generator(config) if generator is None else generator
-        if retriever is not None:
-            self.retriever = retriever
-        elif "text_retriever_config" in self.config or "image_retriever_config" in self.config:
-            self.retriever = None
-        else:
-            self.retriever = get_retriever(config)
+        self.retriever = retriever if retriever is not None else get_retriever(config)
         prompt_path = self.config['omni_prompt_path']
         with open(prompt_path, 'rb') as f:
             self.prompt = tomllib.load(f)['system_prompt']
@@ -30,6 +28,7 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         os.makedirs(self.output_dir, exist_ok=True)
         self.trajectory_path = os.path.join(self.output_dir, "omnisearch_trajectories.jsonl")
         self.retrieval_char_limit = int(self.config["omni_retrieval_char_limit"])
+        self.roi_preprocess_config = self.config["roi_preprocess_config"]
 
     def _retriever_device_context(self, device):
         if device != "cpu":
@@ -101,7 +100,7 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         clipped = text[:limit]
         return clipped + "\n\n[Truncated due to prompt length limit]"
 
-    def _build_followup_message(self, retrieval_mode, retrieval_content):
+    def  _build_followup_message(self, retrieval_mode, retrieval_content):
         if retrieval_mode == "no_retrieval":
             return (
                 "You chose `No Retrieval`, which means external retrieval is unnecessary for this sub-question. "
@@ -209,28 +208,117 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         print(f"Retrieval result:\n{preview}")
 
     def _search_text_docs(self, query_txt):
-        from copy import deepcopy
+        return self._search_with_main_retriever(query_txt, query_kind="text")
 
-        text_cfg = deepcopy(self.config.final_config)
-        text_cfg.update(deepcopy(self.config["text_retriever_config"]))
-        text_device = text_cfg.get("retrieval_device", "cuda")
-        with self._retriever_device_context(text_device):
-            if not hasattr(self, "_text_retriever"):
-                self._text_retriever = get_retriever(text_cfg)
-            return self._text_retriever.search(query_txt)
+    def _search_with_main_retriever(self, query, query_kind):
+        search_signature = inspect.signature(self.retriever.search)
+        search_params = search_signature.parameters
+        kwargs = {}
 
-    def _search_image_docs(self, img):
-        from copy import deepcopy
-        from flashrag.retriever.retriever import MultiModalRetriever
+        if query_kind == "image":
+            topk = self.config["image_retrieval_topk"]
+        else:
+            topk = self.config["text_retrieval_topk"]
 
-        image_cfg = deepcopy(self.config.final_config)
-        image_cfg.update(deepcopy(self.config["image_retriever_config"]))
-        target_modal = image_cfg.get("image_retrieval_target_modal", "image")
-        image_device = image_cfg.get("retrieval_device", "cuda")
-        with self._retriever_device_context(image_device):
-            if not hasattr(self, "_image_retriever"):
-                self._image_retriever = MultiModalRetriever(image_cfg)
-            return self._image_retriever.search(img, target_modal=target_modal)
+        if "num" in search_params and topk is not None:
+            kwargs["num"] = topk
+        if "query_type" in search_params:
+            kwargs["query_type"] = query_kind
+        if query_kind == "image" and "target_modal" in search_params:
+            kwargs["target_modal"] = self.config["image_retrieval_target_modal"]
+
+        return self.retriever.search(query, **kwargs)
+
+    def _extract_retrieval_query(self, response, retrieval_label):
+        pattern = rf'{re.escape(retrieval_label)}[:\s"]*(.*?)(?=<|$)'
+        match = re.search(pattern, response, re.DOTALL)
+        if not match:
+            return ""
+        return match.group(1).strip()
+
+    def _run_roi_preprocess(self, img, image_query):
+        roi_cfg = self.roi_preprocess_config
+        if not roi_cfg or not roi_cfg.get("enabled", False):
+            return img
+        if not image_query:
+            return img
+
+        python_bin = roi_cfg.get("python_bin")
+        script_path = roi_cfg.get("script_path")
+        if not python_bin or not script_path:
+            print("ROI preprocessing skipped: missing python_bin or script_path.")
+            return img
+
+        output_dir = roi_cfg.get("output_dir", os.path.join(self.output_dir, "roi_cache"))
+        os.makedirs(output_dir, exist_ok=True)
+
+        with tempfile.NamedTemporaryFile(dir=output_dir, suffix=".png", delete=False) as src_file:
+            src_path = src_file.name
+        with tempfile.NamedTemporaryFile(dir=output_dir, suffix=".png", delete=False) as crop_file:
+            crop_path = crop_file.name
+        with tempfile.NamedTemporaryFile(dir=output_dir, suffix=".json", delete=False) as meta_file:
+            meta_path = meta_file.name
+
+        img.save(src_path)
+
+        command = [
+            python_bin,
+            script_path,
+            "--image-path", src_path,
+            "--phrase", image_query,
+            "--output-path", crop_path,
+            "--json-output", meta_path,
+        ]
+
+        optional_args = {
+            "--groundingdino-root": roi_cfg.get("groundingdino_root"),
+            "--config-file": roi_cfg.get("config_file"),
+            "--checkpoint-path": roi_cfg.get("checkpoint_path"),
+            "--device": roi_cfg.get("device"),
+            "--box-threshold": roi_cfg.get("box_threshold"),
+            "--text-threshold": roi_cfg.get("text_threshold"),
+            "--expand-ratio": roi_cfg.get("expand_ratio"),
+        }
+        for flag, value in optional_args.items():
+            if value is not None:
+                command.extend([flag, str(value)])
+
+        env = os.environ.copy()
+        env.pop("PYTHONPATH", None)
+        env.pop("VIRTUAL_ENV", None)
+        env.pop("ALL_PROXY", None)
+        env.pop("all_proxy", None)
+
+        try:
+            completed = subprocess.run(
+                command,
+                check=True,
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+            if completed.stdout.strip():
+                print(f"ROI preprocess stdout:\n{completed.stdout.strip()}")
+            if completed.stderr.strip():
+                print(f"ROI preprocess stderr:\n{completed.stderr.strip()}")
+            with Image.open(crop_path) as cropped:
+                return cropped.convert("RGB")
+        except subprocess.CalledProcessError as exc:
+            stdout = exc.stdout.strip() if exc.stdout else ""
+            stderr = exc.stderr.strip() if exc.stderr else ""
+            if stdout:
+                print(f"ROI preprocess stdout before failure:\n{stdout}")
+            if stderr:
+                print(f"ROI preprocess stderr before failure:\n{stderr}")
+            print(f"ROI preprocessing failed, fallback to original image: {exc}")
+            return img
+        except Exception as exc:
+            print(f"ROI preprocessing failed, fallback to original image: {exc}")
+            return img
+
+    def _search_image_docs(self, img, image_query=""):
+        retrieval_img = self._run_roi_preprocess(img, image_query)
+        return self._search_with_main_retriever(retrieval_img, query_kind="image")
 
     def _serialize_for_log(self, value):
         if isinstance(value, (str, int, float, bool)) or value is None:
@@ -347,11 +435,8 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
                 if need_txt_ret:
                     retrieval_mode = "text_retrieval"
                     print("Start Text Retrieval...")
-                    pattern = r'Text Retrieval[:\s"]*(.*?)(?=<|$)'
-                    match = re.search(pattern, response, re.DOTALL)
-                    if match:
-                        query_txt = match.group(1).strip()
-                        print(f"Query Text: {query_txt}")
+                    query_txt = self._extract_retrieval_query(response, "Text Retrieval")
+                    print(f"Query Text: {query_txt}")
                     if query_txt == "":
                         print(f"ERROR!!Query_txt is None")
                         retrieved_docs = self._search_text_docs(query_txt)
@@ -366,12 +451,10 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
                 elif need_img_ret:
                     retrieval_mode = "image_retrieval"
                     print("Start Image Retrieval...")
-                    retrieved_docs = self._search_image_docs(img)
-                    image_return_field = self.config["image_retriever_config"].get("image_retrieval_return_field", "title")
-                    retrieval_content = self._format_retrieval_content(
-                        retrieved_docs,
-                        preferred_field=image_return_field,
-                    )
+                    query_txt = self._extract_retrieval_query(response, "Image Retrieval")
+                    print(f"Image Query: {query_txt}")
+                    retrieved_docs = self._search_image_docs(img, query_txt)
+                    retrieval_content = self._format_retrieval_content(retrieved_docs)
                     retrieval_content = self._clip_text(retrieval_content, self.retrieval_char_limit)
                     self._log_retrieval_preview(retrieval_content)
                 elif need_no_ret:

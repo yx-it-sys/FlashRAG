@@ -1,10 +1,11 @@
 import re
 import json
+import time
 import numpy as np
 import warnings
 from collections import Counter
 from flashrag.evaluator.utils import normalize_answer
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from tqdm import tqdm
 
 class BaseMetric:
     """`BaseMetric` serves as the base object of all metrics. Implemented metric should
@@ -51,7 +52,7 @@ class BaseMetric:
 
     def get_dataset_answer(self, data):
         if any(choice == [] for choice in data.choices):
-            golden_answers_list = data.golden_answers
+            golden_answers_list = data.answer_eval if hasattr(data, "answer_eval") else data.answer
             if any(not answers for answers in golden_answers_list):
                 answer_eval_list = getattr(data, "answer_eval", None)
                 if answer_eval_list is not None:
@@ -254,56 +255,99 @@ class GPTAcc(BaseMetric):
 
     def __init__(self, config):
         super().__init__(config)
-        model_name = "Qwen/Qwen2.5-7B-Instruct"
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            torch_dtype="auto",
-            device_map="auto"
+        from openai import OpenAI
+
+        self.sys_prompt = (
+            "You are a strict answer judge.\n"
+            "Task: compare the Candidate's Answer against the Reference Answers and decide whether the candidate answer is semantically correct.\n"
+            "Rules:\n"
+            "1. Return 'yes' if the candidate answer matches the reference meaning, even if wording differs.\n"
+            "2. Return 'no' if the answer is wrong, unsupported, incomplete for the asked target, or irrelevant.\n"
+            "3. If the candidate answer is empty, a reasoning trace, a search plan, or does not directly answer the question, return 'no'.\n"
+            "4. Output exactly one token: yes or no.\n"
+            "5. Do not output any explanation, punctuation, or extra words."
         )
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.sys_prompt = f"You are an experienced examiner. Based on the provided Reference Answers, determine whether the Candidate's Answer is correct. The candidate's answer does not need to be completely identical to the standard answer; it is sufficient if the meaning is the same. Your response should ONLY be yes or no."
+        gpt_acc_setting = config["gpt_acc_setting"]
+        self.api_model = gpt_acc_setting["model_name"]
+        api_key = gpt_acc_setting["api_key"]
+        base_url = gpt_acc_setting["base_url"]
+        self.max_retries = 5
+        self.retry_sleep_seconds = 5
+
+        assert api_key, "GPTAcc requires gpt_acc_setting.api_key for API judge."
+        assert base_url, "GPTAcc requires gpt_acc_setting.base_url for API judge."
+
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url=base_url,
+        )
+
+    def _parse_judge_text(self, judge_text: str):
+        judge_text = (judge_text or "").strip().lower()
+        if judge_text == "yes":
+            return 1.0
+        if judge_text == "no":
+            return 0.0
+
+        tokens = re.findall(r"\b(?:yes|no)\b", judge_text)
+        if len(tokens) == 1:
+            return 1.0 if tokens[0] == "yes" else 0.0
+        return None
 
     def calculate_acc(self, prediction: str, golden_answers: list) -> float:
         if isinstance(golden_answers, str):
             golden_answers = [golden_answers]
         normalized_prediction = normalize_answer(prediction)
-        score = 0.0
         reference_answers_list = "\n".join(golden_answers)
         messages = [
             {"role": "system", "content": self.sys_prompt},
-            {"role": "user", "content": f"Reference Answers:\n{reference_answers_list}\n\nCandidate's Answer:{normalized_prediction}\n\nYour judge response:"}
+            {
+                "role": "user",
+                "content": (
+                    f"Reference Answers:\n{reference_answers_list}\n\n"
+                    f"Candidate's Answer:{normalized_prediction}\n\n"
+                    "Your judge response:"
+                ),
+            },
         ]
-        text = self.tokenizer.apply_chat_template(
-            messages,
-            tokenize=False,
-            add_generation_prompt=True
-        )
-        model_inputs = self.tokenizer([text], return_tensors="pt").to(self.model.device)
+        last_error = None
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                response = self.client.chat.completions.create(
+                    model=self.api_model,
+                    messages=messages,
+                    stream=False,
+                    temperature=0,
+                    max_tokens=4,
+                )
+                judge_text = (response.choices[0].message.content or "").strip()
+                parsed_score = self._parse_judge_text(judge_text)
+                if parsed_score is not None:
+                    return parsed_score
 
-        generated_ids = self.model.generate(
-            **model_inputs,
-            max_new_tokens=512
-        )
-        generated_ids = [
-            output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
-        ]
+                last_error = ValueError(f"Response cannot be parsed: {judge_text}")
+                print(
+                    f"ERROR judge with GPT API! Response cannot be parsed "
+                    f"(attempt {attempt}/{self.max_retries}): {judge_text}"
+                )
+            except Exception as exc:
+                last_error = exc
+                print(
+                    f"ERROR judge with GPT API! Request failed "
+                    f"(attempt {attempt}/{self.max_retries}): {type(exc).__name__}: {exc}"
+                )
 
-        response = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
-        if "yes" == response.lower():
-            score = 1.0
-        elif "no" == response.lower():
-            score = 0.0
-        else:
-            print(f"ERROR judge with GPT! Response cannot be parsed: {response}")
-            score = 0.0
-        return score
+            if attempt < self.max_retries:
+                time.sleep(self.retry_sleep_seconds * attempt)
+
+        raise last_error
     
     def calculate_metric(self, data):
         golden_answers_list = self.get_dataset_answer(data)
         pred_list = data.pred
 
         metric_score_list = [
-            self.calculate_acc(pred, golden_answers) for pred, golden_answers in zip(pred_list, golden_answers_list)
+            self.calculate_acc(pred, golden_answers) for pred, golden_answers in tqdm(zip(pred_list, golden_answers_list), total=len(pred_list), desc="Calculating GPTAcc")
         ]
         gpt_acc_score = sum(metric_score_list) / len(metric_score_list)
 

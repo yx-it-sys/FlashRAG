@@ -1,0 +1,2642 @@
+[
+  {
+    "id": 1,
+    "data": {
+      "sample_id": "c4b65412-e87f-45c2-8878-44c69e91b120",
+      "question": "what's depicted in this diagram?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/c4b65412-e87f-45c2-8878-44c69e91b120.jpg",
+      "sub_question_1": "What is the title of the diagram in the image?",
+      "query_1": "Figure 16.12 Proposed phylogeny of the Cetacea",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "figure 16.12 depicts the proposed phylogeny of the cetacea, according to the text."
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "data": {
+      "sample_id": "eefaede9-e411-4953-9b33-a72099004add",
+      "question": "is it currently colder in tillmook or troutdale, according to the graphic?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/eefaede9-e411-4953-9b33-a72099004add.jpg",
+      "sub_question_1": "Is the temperature in Tillamook 50 degrees?",
+      "query_1": "temperature in Tillamook",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "it is 5 degrees colder in troutdale now than it is in tillamook."
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "data": {
+      "sample_id": "611ff0e8-8209-47a3-b04c-2e525563a8ac",
+      "question": "read to me step 1.",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/611ff0e8-8209-47a3-b04c-2e525563a8ac.jpg",
+      "sub_question_1": "Read the first step of the game setup instructions for \"Century: Golem Edition.",
+      "query_1": "Century: Golem Edition game setup instructions step 1",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "shuffle the point cards (golem back) to form a deck, then draw 5 cards and place them face up in a row to the left of that deck."
+      ]
+    }
+  },
+  {
+    "id": 4,
+    "data": {
+      "sample_id": "5392cf50-1994-4bca-8783-97634f9fe78c",
+      "question": "do they sell smart watches?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/5392cf50-1994-4bca-8783-97634f9fe78c.jpg",
+      "sub_question_1": "Do they sell smart watches?",
+      "query_1": "Citizen watch store selling smart watches",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "yes, citizen sells smart watches."
+      ]
+    }
+  },
+  {
+    "id": 5,
+    "data": {
+      "sample_id": "b58a53ef-fd49-40c2-b9b6-f353539749ae",
+      "question": "how much is this at walgreens?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/b58a53ef-fd49-40c2-b9b6-f353539749ae.jpg",
+      "sub_question_1": "What is the specific item being referred to in the question?",
+      "query_1": "specific item being referred to in the question about Walgreens price",
+      "sub_question_2": "What is the specific item being referred to in the question about Walgreens price?",
+      "query_2": "specific item being referred to in the question about Walgreens price",
+      "sub_question_3": "What is the specific item being referred to in the question about Walgreens price?",
+      "query_3": "specific item being referred to in the question about Walgreens price",
+      "sub_question_4": "What is the specific item being referred to in the question about Walgreens price?",
+      "query_4": "specific item being referred to in the question about Walgreens price",
+      "sub_question_5": "What is the specific item being referred to in the question about Walgreens price?",
+      "query_5": "specific item being referred to in the question about Walgreens price",
+      "Golden Answers": [
+        "walgreens temple touch mini digital thermometer is $29.99 at walgreens."
+      ]
+    }
+  },
+  {
+    "id": 6,
+    "data": {
+      "sample_id": "cd7f2fd5-8b65-4486-82c0-cdbc14186351",
+      "question": "when was this brand founded?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/cd7f2fd5-8b65-4486-82c0-cdbc14186351.jpg",
+      "sub_question_1": "When was Birkenstock founded?",
+      "query_1": "When was Birkenstock founded?",
+      "sub_question_2": "When was Birkenstock founded?",
+      "query_2": "When was Birkenstock founded?",
+      "sub_question_3": "When was Birkenstock founded?",
+      "query_3": "When was Birkenstock founded?",
+      "sub_question_4": "When was Birkenstock founded?",
+      "query_4": "When was Birkenstock founded?",
+      "sub_question_5": "When was Birkenstock founded?",
+      "query_5": "When was Birkenstock founded?",
+      "Golden Answers": [
+        "birkenstock was founded in 1774 by johann adam birkenstock in germany."
+      ]
+    }
+  },
+  {
+    "id": 7,
+    "data": {
+      "sample_id": "1d9ab7e3-3599-464c-971c-123ac94a5e91",
+      "question": "where is this originally from?",
+      "query_total": 3,
+      "image_url": "http://127.0.0.1:8008/1d9ab7e3-3599-464c-971c-123ac94a5e91.jpg",
+      "sub_question_1": "What is the name of the museum where this statue is located?",
+      "query_1": "museum where the statue is located",
+      "sub_question_2": "What is the name of the statue in the Louvre Museum?",
+      "query_2": "name of the statue in the Louvre Museum",
+      "sub_question_3": "What is the origin of the Mona Lisa?",
+      "query_3": "origin of the Mona Lisa",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the patravahaka yaksha is originally from india, madha pradesh."
+      ]
+    }
+  },
+  {
+    "id": 8,
+    "data": {
+      "sample_id": "2769edad-d79c-4d12-acc8-c72ca7808049",
+      "question": "how many triads are there?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/2769edad-d79c-4d12-acc8-c72ca7808049.jpg",
+      "sub_question_1": "How many different types of triads are mentioned in the book?",
+      "query_1": "four different triads\" in the context of musical theory.",
+      "sub_question_2": "How many different types of triads are mentioned in the book?",
+      "query_2": "four different triads\" in the context of musical theory.",
+      "sub_question_3": "How many different types of triads are mentioned in the book?",
+      "query_3": "four different triads\" in the context of musical theory.",
+      "sub_question_4": "How many different types of triads are mentioned in the book?",
+      "query_4": "four different triads\" in the context of musical theory.",
+      "sub_question_5": "How many different types of triads are mentioned in the book?",
+      "query_5": "four different triads\" in the context of musical theory.",
+      "Golden Answers": [
+        "there are four triads: major, minor, augmented, and diminished."
+      ]
+    }
+  },
+  {
+    "id": 9,
+    "data": {
+      "sample_id": "3b70f5bd-935d-4402-91a6-21bf621b43e5",
+      "question": "what material is this horn made of?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/3b70f5bd-935d-4402-91a6-21bf621b43e5.jpg",
+      "sub_question_1": "What material is the cornet-trompe made of?",
+      "query_1": "cornet-trompe material",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the cornet-trompe is made from brass."
+      ]
+    }
+  },
+  {
+    "id": 10,
+    "data": {
+      "sample_id": "608df94c-b306-4cc0-b859-b9477635562b",
+      "question": "can these contain microplastics?",
+      "query_total": 3,
+      "image_url": "http://127.0.0.1:8008/608df94c-b306-4cc0-b859-b9477635562b.jpg",
+      "sub_question_1": "Can the bed in the image contain microplastics?",
+      "query_1": "microplastics in bedding",
+      "sub_question_2": "Can the fan in the image contain microplastics?",
+      "query_2": "microplastics in fans",
+      "sub_question_3": "Can the table in the image contain microplastics?",
+      "query_3": "microplastics in tables",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "yes, plastic water bottles have been found to have microplastics in them."
+      ]
+    }
+  },
+  {
+    "id": 11,
+    "data": {
+      "sample_id": "0be95923-7d0c-4c4e-af7b-73b47613366f",
+      "question": "what type of olives is this made from?",
+      "query_total": 2,
+      "image_url": "http://127.0.0.1:8008/0be95923-7d0c-4c4e-af7b-73b47613366f.jpg",
+      "sub_question_1": "What type of olives is the Kirkland Signature Extra Virgin Olive Oil made from?",
+      "query_1": "Kirkland Signature Extra Virgin Olive Oil ingredients",
+      "sub_question_2": "What is the most prevalent olive variety in Skopelos?",
+      "query_2": "most prevalent olive variety in Skopelos",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "kirkland signature 100% spanish extra virgin olive oil is a blend of three varieties of olives: picual, hojiblanca and arbequina, sourced from the andalusia region of spain."
+      ]
+    }
+  },
+  {
+    "id": 12,
+    "data": {
+      "sample_id": "9cf9e363-7fe2-44a1-b44d-fc460a643dd7",
+      "question": "translate the banners to english.",
+      "query_total": 3,
+      "image_url": "http://127.0.0.1:8008/9cf9e363-7fe2-44a1-b44d-fc460a643dd7.jpg",
+      "sub_question_1": "Translate the text \"VINOS\" to English.",
+      "query_1": "Translate \"VINOS\" to English.",
+      "sub_question_2": "Translate the text \"AL FONDO A LA IZQUIERDA\" to English.",
+      "query_2": "Translate \"AL FONDO A LA IZQUIERDA\" to English.",
+      "sub_question_3": "Translate the text \"Baños WC\" to English.",
+      "query_3": "Translate \"Baños WC\" to English.",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the banners say, \"wines in the back to the left.\""
+      ]
+    }
+  },
+  {
+    "id": 13,
+    "data": {
+      "sample_id": "58b1bc9a-1662-4cf7-a9e2-fb76c4b90481",
+      "question": "who makes this za'atar seasoning blend?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/58b1bc9a-1662-4cf7-a9e2-fb76c4b90481.jpg",
+      "sub_question_1": "Who is the brand name on the za'atar seasoning blend in the image?",
+      "query_1": "za'atar seasoning blend trader joe's",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "trader joe's makes this za'atar seasoning blend."
+      ]
+    }
+  },
+  {
+    "id": 14,
+    "data": {
+      "sample_id": "d8d60e2b-ee01-43b4-9cc2-9b19ccc8bed8",
+      "question": "what company is located in this building?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/d8d60e2b-ee01-43b4-9cc2-9b19ccc8bed8.jpg",
+      "sub_question_1": "What company is located in the building at 10305 West Colfax?",
+      "query_1": "10305 West Colfax company",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the golden music, a family-owned music company is located in the building."
+      ]
+    }
+  },
+  {
+    "id": 15,
+    "data": {
+      "sample_id": "a91d8c35-b1c7-47ee-aeac-0a6e6c3186e6",
+      "question": "how many different storage sizes were released for this item?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/a91d8c35-b1c7-47ee-aeac-0a6e6c3186e6.jpg",
+      "sub_question_1": "How many different storage sizes were released for the Crucial external hard drive?",
+      "query_1": "Crucial external hard drive storage sizes",
+      "sub_question_2": "How many different storage sizes were released for the Crucial external hard drive?",
+      "query_2": "Crucial external hard drive storage sizes",
+      "sub_question_3": "How many different storage sizes were released for the Crucial external hard drive?",
+      "query_3": "Crucial external hard drive storage sizes",
+      "sub_question_4": "How many different storage sizes were released for the Crucial external hard drive?",
+      "query_4": "Crucial external hard drive storage sizes",
+      "sub_question_5": "How many different storage sizes were released for the Crucial external hard drive?",
+      "query_5": "Crucial external hard drive storage sizes",
+      "Golden Answers": [
+        "the crucial x8 portable ssd was released in three different storage sizes, with capacities of 1tb, 2tb, and 4tb."
+      ]
+    }
+  },
+  {
+    "id": 16,
+    "data": {
+      "sample_id": "f727012d-812b-4da1-bc3b-c8578b89df93",
+      "question": "what region is this area code from?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/f727012d-812b-4da1-bc3b-c8578b89df93.jpg",
+      "sub_question_1": "What region is the area code 503 from?",
+      "query_1": "area code 503 region",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "area code 503 is from northwestern region of the u.s. state of oregon."
+      ]
+    }
+  },
+  {
+    "id": 17,
+    "data": {
+      "sample_id": "d8b85c1a-47f7-4546-9ba7-84727bc93913",
+      "question": "how to prepare this?",
+      "query_total": 4,
+      "image_url": "http://127.0.0.1:8008/d8b85c1a-47f7-4546-9ba7-84727bc93913.jpg",
+      "sub_question_1": "How to prepare Orgain Organic Protein powder?",
+      "query_1": "Orgain Organic Protein powder preparation instructions",
+      "sub_question_2": "What is the general method for preparing protein powder?",
+      "query_2": "general method for preparing protein powder",
+      "sub_question_3": "What is the general method for preparing protein powder?",
+      "query_3": "general method for preparing protein powder",
+      "sub_question_4": "What is the general method for preparing protein powder?",
+      "query_4": "general method for preparing protein powder",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "this protein powder can be mixed with milk or water."
+      ]
+    }
+  },
+  {
+    "id": 18,
+    "data": {
+      "sample_id": "0243cd11-aebe-4316-b4f5-b9f7e9362390",
+      "question": "what is the river in front of the building across from me?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/0243cd11-aebe-4316-b4f5-b9f7e9362390.jpg",
+      "sub_question_1": "What is the name of the river in the image?",
+      "query_1": "river in the image with a building across from it",
+      "sub_question_2": "What is the name of the river in the image?",
+      "query_2": "river in the image with a building across from it",
+      "sub_question_3": "What is the name of the river in the image?",
+      "query_3": "river in the image with a building across from it",
+      "sub_question_4": "What is the name of the river in the image?",
+      "query_4": "river in the image with a building across from it",
+      "sub_question_5": "What is the name of the river in the image?",
+      "query_5": "river in the image with a building across from it",
+      "Golden Answers": [
+        "the river in front of exploration place is the arkansas river."
+      ]
+    }
+  },
+  {
+    "id": 19,
+    "data": {
+      "sample_id": "6847b040-68b9-4e6f-8b38-f5935adc1385",
+      "question": "can you keep one of these as a pet?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/6847b040-68b9-4e6f-8b38-f5935adc1385.jpg",
+      "sub_question_1": "Can the red-sided garter snake be kept as a pet?",
+      "query_1": "red-sided garter snake pet care",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "yes, you can keep a red-sided garter snake as a pet, as long as their environmental requirements are met."
+      ]
+    }
+  },
+  {
+    "id": 20,
+    "data": {
+      "sample_id": "bf93a424-7ba8-4a99-839c-02d03533067c",
+      "question": "what ph should this plant be kept at?",
+      "query_total": 2,
+      "image_url": "http://127.0.0.1:8008/bf93a424-7ba8-4a99-839c-02d03533067c.jpg",
+      "sub_question_1": "What type of plant is this?",
+      "query_1": "Identify the plant in the image.",
+      "sub_question_2": "What is the optimal pH level for a Mosaic plant?",
+      "query_2": "Optimal pH level for a Mosaic plant.",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "calathea lancifolia rattlesnake plant should be kept between 6.1 and 7.3 ph level."
+      ]
+    }
+  },
+  {
+    "id": 21,
+    "data": {
+      "sample_id": "58e229eb-1be4-4562-8859-5c79c6408130",
+      "question": "what country are these the national aquatic animal of?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/58e229eb-1be4-4562-8859-5c79c6408130.jpg",
+      "sub_question_1": "What are the species of the fish in the image?",
+      "query_1": "fish species identification from image",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "betta fish are the national aquatic animal of thailand."
+      ]
+    }
+  },
+  {
+    "id": 22,
+    "data": {
+      "sample_id": "75326b7b-d2b1-4af6-be88-a6b376aaffc3",
+      "question": "what is the history behind this train?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/75326b7b-d2b1-4af6-be88-a6b376aaffc3.jpg",
+      "sub_question_1": "What is the history of the steam locomotive with the number 641 and the letters \"C&S\"?",
+      "query_1": "history of steam locomotive with number 641 and letters C&S",
+      "sub_question_2": "What is the specific history of the steam locomotive with the number 641 and the letters \"C&S\"?",
+      "query_2": "specific history of steam locomotive with number 641 and letters C&S",
+      "sub_question_3": "What is the specific history of the steam locomotive with the number 641 and the letters \"C&S\"?",
+      "query_3": "specific history of steam locomotive with number 641 and letters C&S",
+      "sub_question_4": "What is the specific history of the steam locomotive with the number 641 and the letters \"C&S\"?",
+      "query_4": "specific history of steam locomotive with number 641 and letters C&S",
+      "sub_question_5": "What is the specific history of the steam locomotive with the number 641 and the letters \"C&S\"?",
+      "query_5": "specific history of steam locomotive with number 641 and letters C&S",
+      "Golden Answers": [
+        "the c&s engine 641 is the line's last operating standard-gauge steam locomotive, it was used on the climax-leadville run until 1962."
+      ]
+    }
+  },
+  {
+    "id": 23,
+    "data": {
+      "sample_id": "1bd0b1a4-78d2-4d06-a4a6-defe7a3f45a8",
+      "question": "to what family does this animal belong to?",
+      "query_total": 2,
+      "image_url": "http://127.0.0.1:8008/1bd0b1a4-78d2-4d06-a4a6-defe7a3f45a8.jpg",
+      "sub_question_1": "What family do ducks belong to?",
+      "query_1": "duck family",
+      "sub_question_2": "What family do real ducks belong to?",
+      "query_2": "family of ducks",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "ducks are in the anatidae family."
+      ]
+    }
+  },
+  {
+    "id": 24,
+    "data": {
+      "sample_id": "e0d261dc-1423-4bb0-81ae-70f4af1e316d",
+      "question": "how much would this be at total wine?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/e0d261dc-1423-4bb0-81ae-70f4af1e316d.jpg",
+      "sub_question_1": "What is the price of Fords Gin at Total Wine?",
+      "query_1": "Fords Gin price at Total Wine",
+      "sub_question_2": "What is the price of Fords Gin at Total Wine?",
+      "query_2": "Fords Gin price at Total Wine",
+      "sub_question_3": "What is the price of Fords Gin at Total Wine?",
+      "query_3": "Fords Gin price at Total Wine",
+      "sub_question_4": "What is the price of Fords Gin at Total Wine?",
+      "query_4": "Fords Gin price at Total Wine",
+      "sub_question_5": "What is the price of Fords Gin at Total Wine?",
+      "query_5": "Fords Gin price at Total Wine",
+      "Golden Answers": [
+        "a bottle of fords gin is $23.49 at total wine & more."
+      ]
+    }
+  },
+  {
+    "id": 25,
+    "data": {
+      "sample_id": "52fd69fa-fa2f-499b-b44e-08c04b47633f",
+      "question": "how much does this macaroni salad cost per pound?",
+      "query_total": 3,
+      "image_url": "http://127.0.0.1:8008/52fd69fa-fa2f-499b-b44e-08c04b47633f.jpg",
+      "sub_question_1": "What is the net weight of the macaroni salad in pounds?",
+      "query_1": "macaroni salad net weight in pounds",
+      "sub_question_2": "What is the net weight of the macaroni salad in pounds?",
+      "query_2": "15 ounces to pounds",
+      "sub_question_3": "What is the cost per pound of the macaroni salad?",
+      "query_3": "4.99 to pounds",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "this macaroni salad costs $5.32 per pound."
+      ]
+    }
+  },
+  {
+    "id": 26,
+    "data": {
+      "sample_id": "be01bd8d-c90b-4c69-b576-a7ac2ce84a07",
+      "question": "who's the author of the book?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/be01bd8d-c90b-4c69-b576-a7ac2ce84a07.jpg",
+      "sub_question_1": "What is the author's name of the book?",
+      "query_1": "author of the book shown in the image",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "hans g. hockerts, a german historian is the author of the book."
+      ]
+    }
+  },
+  {
+    "id": 27,
+    "data": {
+      "sample_id": "5a3a5ec1-f231-4c4f-a833-c42af35ec177",
+      "question": "how much does one of these weigh?",
+      "query_total": 4,
+      "image_url": "http://127.0.0.1:8008/5a3a5ec1-f231-4c4f-a833-c42af35ec177.jpg",
+      "sub_question_1": "How much does the gas patio heater weigh?",
+      "query_1": "gas patio heater weight",
+      "sub_question_2": "What is the weight of the gas patio heater shown in the image?",
+      "query_2": "gas patio heater weight",
+      "sub_question_3": "What is the weight of the gas patio heater shown in the image?",
+      "query_3": "gas patio heater weight",
+      "sub_question_4": "What is the weight of the gas patio heater shown in the image?",
+      "query_4": "gas patio heater weight",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "member's mark gas patio heater's assembled weight is 55 pounds."
+      ]
+    }
+  },
+  {
+    "id": 28,
+    "data": {
+      "sample_id": "99d4d068-6071-435d-b11a-4293a7e0c2a3",
+      "question": "does coach ship internationally?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/99d4d068-6071-435d-b11a-4293a7e0c2a3.jpg",
+      "sub_question_1": "Does Coach ship internationally?",
+      "query_1": "Coach shipping policies",
+      "sub_question_2": "Does Coach ship internationally?",
+      "query_2": "Coach shipping policies official website",
+      "sub_question_3": "Does Coach ship internationally?",
+      "query_3": "Coach shipping policies official website",
+      "sub_question_4": "Does Coach ship internationally?",
+      "query_4": "Coach shipping policies official website",
+      "sub_question_5": "Does Coach ship internationally?",
+      "query_5": "Coach shipping policies official website",
+      "Golden Answers": [
+        "coach.com does not accept orders with billing or shipping addresses outside of the united states, puerto rico and canada, but you can place an international order by calling customer service at 1.888.262.6224."
+      ]
+    }
+  },
+  {
+    "id": 29,
+    "data": {
+      "sample_id": "46d9192f-c908-4248-9d5b-effef8294910",
+      "question": "what does the protein that this table is about do?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/46d9192f-c908-4248-9d5b-effef8294910.jpg",
+      "sub_question_1": "What is the function of hemoglobin?",
+      "query_1": "function of hemoglobin",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "hemoglobin facilitates the transportation of oxygen in red blood cells."
+      ]
+    }
+  },
+  {
+    "id": 30,
+    "data": {
+      "sample_id": "7db3563f-5e2c-4f8b-b458-a2b7d303333d",
+      "question": "where is this university that publishes this journal located?",
+      "query_total": 3,
+      "image_url": "http://127.0.0.1:8008/7db3563f-5e2c-4f8b-b458-a2b7d303333d.jpg",
+      "sub_question_1": "Where is Bingham University located?",
+      "query_1": "Bingham University location",
+      "sub_question_2": "Where is Binghamton University located?",
+      "query_2": "Binghamton University location",
+      "sub_question_3": "Where is Binghamton, New York located?",
+      "query_3": "Binghamton, New York location",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "bingham university is located in nigeria."
+      ]
+    }
+  },
+  {
+    "id": 31,
+    "data": {
+      "sample_id": "2dfa614b-e810-400d-b668-1bc41e8ca52b",
+      "question": "which age and sex had the least amount of injury-related unintentional falls reported?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/2dfa614b-e810-400d-b668-1bc41e8ca52b.jpg",
+      "sub_question_1": "Which age group and sex had the lowest number of injury-related unintentional falls reported?",
+      "query_1": "injury-related unintentional falls by age and sex",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "males aged 18-24 had the leaset amount of injury-related unintentional falls reported."
+      ]
+    }
+  },
+  {
+    "id": 32,
+    "data": {
+      "sample_id": "deae940a-a3a7-4f1e-99d7-f4bde2085c9c",
+      "question": "where does the author do his work for road scholar?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/deae940a-a3a7-4f1e-99d7-f4bde2085c9c.jpg",
+      "sub_question_1": "Where does the author of \"Road Scholar\" work?",
+      "query_1": "author of Road Scholar work location",
+      "sub_question_2": "What is the author of \"Road Scholar\"?",
+      "query_2": "author of Road Scholar",
+      "sub_question_3": "What is the author of \"Road Scholar\"?",
+      "query_3": "author of Road Scholar",
+      "sub_question_4": "What is the author of \"Road Scholar\"?",
+      "query_4": "author of Road Scholar",
+      "sub_question_5": "What is the author of \"Road Scholar\"?",
+      "query_5": "author of Road Scholar",
+      "Golden Answers": [
+        "john haywood leads tours for road scholar in iceland, scandinavia, and the baltic."
+      ]
+    }
+  },
+  {
+    "id": 33,
+    "data": {
+      "sample_id": "6f526d55-f949-4ec1-9172-80a3c7fa4d1d",
+      "question": "how many people are credited with writing this book?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/6f526d55-f949-4ec1-9172-80a3c7fa4d1d.jpg",
+      "sub_question_1": "What is the title of the book shown in the image?",
+      "query_1": "book title in the image",
+      "sub_question_2": "What is the title of the book shown in the image?",
+      "query_2": "title of the book in the image",
+      "sub_question_3": "What is the title of the book shown in the image?",
+      "query_3": "title of the book in the image",
+      "sub_question_4": "What is the title of the book shown in the image?",
+      "query_4": "title of the book in the image",
+      "sub_question_5": "What is the title of the book shown in the image?",
+      "query_5": "title of the book in the image",
+      "Golden Answers": [
+        "3 people, keith l. moore, t. v. n. persaud, and mark g. torchia, are credited with writing before we are born: essentials of embryology and birth defects."
+      ]
+    }
+  },
+  {
+    "id": 34,
+    "data": {
+      "sample_id": "41c37d2b-f009-41e1-aaa2-50f76d5b877a",
+      "question": "what is the price of this on instacart?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/41c37d2b-f009-41e1-aaa2-50f76d5b877a.jpg",
+      "sub_question_1": "What is the price of Lifeway Organic Kefir on Instacart?",
+      "query_1": "Lifeway Organic Kefir price on Instacart",
+      "sub_question_2": "What is the price of Lifeway Organic Kefir on Instacart?",
+      "query_2": "Lifeway Organic Kefir price on Instacart",
+      "sub_question_3": "What is the price of Lifeway Organic Kefir on Instacart?",
+      "query_3": "Lifeway Organic Kefir price on Instacart",
+      "sub_question_4": "What is the price of Lifeway Organic Kefir on Instacart?",
+      "query_4": "Lifeway Organic Kefir price on Instacart",
+      "sub_question_5": "What is the price of Lifeway Organic Kefir on Instacart?",
+      "query_5": "Lifeway Organic Kefir price on Instacart",
+      "Golden Answers": [
+        "lifeway organic keifir is $6.29 on instacart."
+      ]
+    }
+  },
+  {
+    "id": 35,
+    "data": {
+      "sample_id": "feca1694-bec1-4693-b3f6-14bcb2c0dc0d",
+      "question": "where is this buisiness located?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/feca1694-bec1-4693-b3f6-14bcb2c0dc0d.jpg",
+      "sub_question_1": "What is the name of the business associated with this image?",
+      "query_1": "business name associated with the image of makeup brushes and beauty products.",
+      "sub_question_2": "Can you provide more context about the image or the business associated with it?",
+      "query_2": "more context about the image of makeup brushes and beauty products.",
+      "sub_question_3": "Can you provide more context about the image or the business associated with it?",
+      "query_3": "more context about the image of makeup brushes and beauty products.",
+      "sub_question_4": "Can you provide more context about the image or the business associated with it?",
+      "query_4": "more context about the image of makeup brushes and beauty products.",
+      "sub_question_5": "Can you provide more context about the image or the business associated with it?",
+      "query_5": "more context about the image of makeup brushes and beauty products.",
+      "Golden Answers": [
+        "reecho hair is located in changsha, hunan, china."
+      ]
+    }
+  },
+  {
+    "id": 36,
+    "data": {
+      "sample_id": "35c56df7-29f7-495f-b0c4-8ee108c2fe7a",
+      "question": "when was that company founded?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/35c56df7-29f7-495f-b0c4-8ee108c2fe7a.jpg",
+      "sub_question_1": "When was AT&T founded?",
+      "query_1": "AT&T founding date",
+      "sub_question_2": "When was AT&T founded?",
+      "query_2": "AT&T founding date",
+      "sub_question_3": "When was AT&T founded?",
+      "query_3": "AT&T founding date",
+      "sub_question_4": "When was AT&T founded?",
+      "query_4": "AT&T founding date",
+      "sub_question_5": "When was AT&T founded?",
+      "query_5": "AT&T founding date",
+      "Golden Answers": [
+        "the company that would eventually become at&t was founded in 1878 as american district telegraph company."
+      ]
+    }
+  },
+  {
+    "id": 37,
+    "data": {
+      "sample_id": "37e292e3-7992-4bd9-92fc-f5367e23071f",
+      "question": "what plant is this?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/37e292e3-7992-4bd9-92fc-f5367e23071f.jpg",
+      "sub_question_1": "What plant has small, oval-shaped leaves and needle-like structures?",
+      "query_1": "plants with small oval-shaped leaves and needle-like structures",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "it is a boxwood plant, also known as the common boxwood."
+      ]
+    }
+  },
+  {
+    "id": 38,
+    "data": {
+      "sample_id": "b383fc61-a0fc-4784-9387-2f6da611a975",
+      "question": "when were these first patented?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/b383fc61-a0fc-4784-9387-2f6da611a975.jpg",
+      "sub_question_1": "When were fire extinguishers first patented?",
+      "query_1": "When were fire extinguishers first patented?",
+      "sub_question_2": "When was the first fire extinguisher patent issued?",
+      "query_2": "When was the first fire extinguisher patent issued?",
+      "sub_question_3": "When was the first fire extinguisher patent issued?",
+      "query_3": "When was the first fire extinguisher patent issued?",
+      "sub_question_4": "When was the first fire extinguisher patent issued?",
+      "query_4": "When was the first fire extinguisher patent issued?",
+      "sub_question_5": "When was the first fire extinguisher patent issued?",
+      "query_5": "When was the first fire extinguisher patent issued?",
+      "Golden Answers": [
+        "rubber traffic cones were patented in 1943."
+      ]
+    }
+  },
+  {
+    "id": 39,
+    "data": {
+      "sample_id": "d9f56093-4299-4689-84c7-5df0abb49ba5",
+      "question": "when was it created?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/d9f56093-4299-4689-84c7-5df0abb49ba5.jpg",
+      "sub_question_1": "When was the stop sign in the image created?",
+      "query_1": "When was the stop sign in the image created?",
+      "sub_question_2": "When was the stop sign in the image created?",
+      "query_2": "When was the stop sign in the image created?",
+      "sub_question_3": "When was the stop sign in the image created?",
+      "query_3": "When was the stop sign in the image created?",
+      "sub_question_4": "When was the stop sign in the image created?",
+      "query_4": "When was the stop sign in the image created?",
+      "sub_question_5": "When was the stop sign in the image created?",
+      "query_5": "When was the stop sign in the image created?",
+      "Golden Answers": [
+        "the first stop sign was created in 1914 by detroit police sergeant harold \"harry\" jackson, who was working as a traffic guard at a busy city intersection."
+      ]
+    }
+  },
+  {
+    "id": 40,
+    "data": {
+      "sample_id": "b817271b-ec34-4b0e-8875-250277503ad3",
+      "question": "what are the allergen in this product?",
+      "query_total": 4,
+      "image_url": "http://127.0.0.1:8008/b817271b-ec34-4b0e-8875-250277503ad3.jpg",
+      "sub_question_1": "What are the allergens in the Similac Advance infant formula?",
+      "query_1": "Similac Advance infant formula allergens",
+      "sub_question_2": "What are the allergens in the Similac Advance infant formula?",
+      "query_2": "Similac Advance infant formula allergens",
+      "sub_question_3": "What are the allergens in the Similac Advance infant formula?",
+      "query_3": "Similac Advance infant formula allergens",
+      "sub_question_4": "What are the allergens in the Similac Advance infant formula?",
+      "query_4": "Similac Advance infant formula allergens",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "similac advance contains milk and soy."
+      ]
+    }
+  },
+  {
+    "id": 41,
+    "data": {
+      "sample_id": "0605a33b-5a2a-4455-aaac-c8a4050c463f",
+      "question": "what vitamins are contained in this vegetable?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/0605a33b-5a2a-4455-aaac-c8a4050c463f.jpg",
+      "sub_question_1": "What vitamins are contained in potatoes?",
+      "query_1": "vitamins in potatoes",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "potatoes are a good source of several important vitamins, including vitamin c, vitamin b6, folate, thiamin, niacin, pantothenic acid, and vitamin k."
+      ]
+    }
+  },
+  {
+    "id": 42,
+    "data": {
+      "sample_id": "1c00ecb2-fdb6-4d07-95b4-e98e4ab74718",
+      "question": "what is the milk in the carton made of?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/1c00ecb2-fdb6-4d07-95b4-e98e4ab74718.jpg",
+      "sub_question_1": "What is the composition of Almond Breeze milk?",
+      "query_1": "Almond Breeze milk composition",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "almond breeze milk is made of  almondmilk (filtered water, almonds), calcium carbonate, sea salt, potassium citrate, sunflower lecithin, gellan gum, natural flavors, vitamin a palmitate, vitamin d2, d-alpha-tocopherol (natural vitamin e)."
+      ]
+    }
+  },
+  {
+    "id": 43,
+    "data": {
+      "sample_id": "4e0e0c47-aec0-420a-8072-153e7e81d8ee",
+      "question": "how many grams of carbs does a can of this have?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/4e0e0c47-aec0-420a-8072-153e7e81d8ee.jpg",
+      "sub_question_1": "What is the carbohydrate content in a can of V8 Energy Strawberry Banana?",
+      "query_1": "V8 Energy Strawberry Banana nutrition facts",
+      "sub_question_2": "What is the carbohydrate content in a can of V8 Energy Strawberry Banana?",
+      "query_2": "V8 Energy Strawberry Banana carbohydrate content",
+      "sub_question_3": "What is the carbohydrate content in a can of V8 Energy Strawberry Banana?",
+      "query_3": "V8 Energy Strawberry Banana carbohydrate content",
+      "sub_question_4": "What is the carbohydrate content in a can of V8 Energy Strawberry Banana?",
+      "query_4": "V8 Energy Strawberry Banana carbohydrate content",
+      "sub_question_5": "What is the carbohydrate content in a can of V8 Energy Strawberry Banana?",
+      "query_5": "V8 Energy Strawberry Banana carbohydrate content",
+      "Golden Answers": [
+        "the v8 +energy strawberry banana has 50 calories and 12 grams of carbs per can."
+      ]
+    }
+  },
+  {
+    "id": 44,
+    "data": {
+      "sample_id": "b9ce3501-e628-4149-ac2a-c018b5c59bc9",
+      "question": "who designed that flag?",
+      "query_total": 3,
+      "image_url": "http://127.0.0.1:8008/b9ce3501-e628-4149-ac2a-c018b5c59bc9.jpg",
+      "sub_question_1": "Who designed the flag on the road sign in the image?",
+      "query_1": "flag design on road sign",
+      "sub_question_2": "What is the flag on the road sign in the image?",
+      "query_2": "flag on road sign in image",
+      "sub_question_3": "What is the flag on the road sign in the image?",
+      "query_3": "flag on road sign in image",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the flag of colorado was designed by andrew carlisle carson."
+      ]
+    }
+  },
+  {
+    "id": 45,
+    "data": {
+      "sample_id": "cf24b51e-6e2b-4e1d-85a3-b9106d9d836b",
+      "question": "what body styles is this car available in?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/cf24b51e-6e2b-4e1d-85a3-b9106d9d836b.jpg",
+      "sub_question_1": "What is the make and model of the car in the image?",
+      "query_1": "car identification from image",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the mazda 3 is available in 4-door sedan and 5-door hatchback body styles."
+      ]
+    }
+  },
+  {
+    "id": 46,
+    "data": {
+      "sample_id": "3f51fe59-b2f0-4792-aceb-5ea8f2963d03",
+      "question": "how do you make potato cake out of this?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/3f51fe59-b2f0-4792-aceb-5ea8f2963d03.jpg",
+      "sub_question_1": "What is the recipe for making potato cake?",
+      "query_1": "potato cake recipe",
+      "sub_question_2": "What is the recipe for potato kugel?",
+      "query_2": "potato kugel recipe",
+      "sub_question_3": "What is the recipe for potato kugel?",
+      "query_3": "potato kugel recipe",
+      "sub_question_4": "What is the recipe for potato kugel?",
+      "query_4": "potato kugel recipe",
+      "sub_question_5": "What is the recipe for potato kugel?",
+      "query_5": "potato kugel recipe",
+      "Golden Answers": [
+        "cold mashed potato can be mixed with fresh eggs and then fried until crisp to produce a potato cake."
+      ]
+    }
+  },
+  {
+    "id": 47,
+    "data": {
+      "sample_id": "56677e8f-e296-4f74-9474-082fd6d60a9f",
+      "question": "where is this plant native to?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/56677e8f-e296-4f74-9474-082fd6d60a9f.jpg",
+      "sub_question_1": "What is the species of the plant in the image?",
+      "query_1": "Identify the plant species in the image.",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "majestic palm is native to madagascar"
+      ]
+    }
+  },
+  {
+    "id": 48,
+    "data": {
+      "sample_id": "fd60d044-4298-4e2f-88ed-fb436f8afdae",
+      "question": "where is this from?",
+      "query_total": 2,
+      "image_url": "http://127.0.0.1:8008/fd60d044-4298-4e2f-88ed-fb436f8afdae.jpg",
+      "sub_question_1": "Where is the olive oil brand \"Terra Delyssa\" from?",
+      "query_1": "Terra Delyssa olive oil origin",
+      "sub_question_2": "What is the origin of olive oil?",
+      "query_2": "origin of olive oil",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "terra delyssa olive oil is from tunisia."
+      ]
+    }
+  },
+  {
+    "id": 49,
+    "data": {
+      "sample_id": "9dc8f548-4b92-4b65-92e4-f328baca30bc",
+      "question": "what is this car named after?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/9dc8f548-4b92-4b65-92e4-f328baca30bc.jpg",
+      "sub_question_1": "What is the make and model of the car in the image?",
+      "query_1": "car identification from image",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the chevy impala was named after the graceful african antelope, which was used as the car's logo."
+      ]
+    }
+  },
+  {
+    "id": 50,
+    "data": {
+      "sample_id": "d876a110-6543-4e0c-b11f-b6fbf5d85758",
+      "question": "are these the same as amaryllis?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/d876a110-6543-4e0c-b11f-b6fbf5d85758.jpg",
+      "sub_question_1": "Are the flowers in the image amaryllis?",
+      "query_1": "amaryllis flower characteristics",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "\"amaryllis\" is both the name of a south african genus separate from hippeastrum, but also a common name for plants in the hippeastrum genus."
+      ]
+    }
+  },
+  {
+    "id": 51,
+    "data": {
+      "sample_id": "ff1b94fe-22da-47d6-b5b3-2164f5741d70",
+      "question": "how tall is that building?",
+      "query_total": 4,
+      "image_url": "http://127.0.0.1:8008/ff1b94fe-22da-47d6-b5b3-2164f5741d70.jpg",
+      "sub_question_1": "What is the height of the building in the image?",
+      "query_1": "height of the building in the image",
+      "sub_question_2": "What is the height of the building in the image?",
+      "query_2": "height of the building in the image",
+      "sub_question_3": "What is the height of the building in the image?",
+      "query_3": "height of the building in the image",
+      "sub_question_4": "What is the height of the building in the image?",
+      "query_4": "height of the building in the image",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "sutton 58 is 847 feet (258 m) tall."
+      ]
+    }
+  },
+  {
+    "id": 52,
+    "data": {
+      "sample_id": "83e9ea66-1ab3-4da9-8171-56ddb5101623",
+      "question": "what is the primary benefit of using embossing in production of these towels?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/83e9ea66-1ab3-4da9-8171-56ddb5101623.jpg",
+      "sub_question_1": "What is the primary benefit of using embossing in the production of towels?",
+      "query_1": "primary benefit of using embossing in towel production",
+      "sub_question_2": "What is the primary benefit of using embossing in the production of towels?",
+      "query_2": "primary benefit of embossing in towel production",
+      "sub_question_3": "What is the primary benefit of using embossing in the production of towels?",
+      "query_3": "primary benefit of embossing in towel production",
+      "sub_question_4": "What is the primary benefit of using embossing in the production of towels?",
+      "query_4": "primary benefit of embossing in towel production",
+      "sub_question_5": "What is the primary benefit of using embossing in the production of towels?",
+      "query_5": "primary benefit of embossing in towel production",
+      "Golden Answers": [
+        "embossing creates the effect of having multiple sheets of soft tissue paper with spaces in between the layers. the top of the towel is modified using a shaped surface as opposed to a flat working surface. this process creates raised areas, and these open spaces can absorb and hold water."
+      ]
+    }
+  },
+  {
+    "id": 53,
+    "data": {
+      "sample_id": "934c8d8c-fa71-4009-acc8-4aede2856898",
+      "question": "what's the tallest building on that island?",
+      "query_total": 3,
+      "image_url": "http://127.0.0.1:8008/934c8d8c-fa71-4009-acc8-4aede2856898.jpg",
+      "sub_question_1": "What is the name of the island in the image?",
+      "query_1": "Identify the name of the island in the image.",
+      "sub_question_2": "What is the name of the city in the image?",
+      "query_2": "Identify the name of the city in the image.",
+      "sub_question_3": "What is the name of the tallest building in New York City?",
+      "query_3": "Identify the name of the tallest building in New York City.",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "one world trade center is the tallest building in manhattan, as well as in the whole of new york city."
+      ]
+    }
+  },
+  {
+    "id": 54,
+    "data": {
+      "sample_id": "add5df65-6523-4538-acf0-5dbe3a08b5e8",
+      "question": "do the leaves on this plant fall in autumn?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/add5df65-6523-4538-acf0-5dbe3a08b5e8.jpg",
+      "sub_question_1": "Is the plant in the image a deciduous plant?",
+      "query_1": "deciduous plant identification",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "no, viburnum rhytidophyllum has evergreen foliage."
+      ]
+    }
+  },
+  {
+    "id": 55,
+    "data": {
+      "sample_id": "b034be62-cd9f-4b21-9cb7-ae5c86ef5485",
+      "question": "how many species in this plant's genus?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/b034be62-cd9f-4b21-9cb7-ae5c86ef5485.jpg",
+      "sub_question_1": "How many species are there in the Sansevieria genus?",
+      "query_1": "number of species in the Sansevieria genus",
+      "sub_question_2": "How many species are there in the Sansevieria genus?",
+      "query_2": "number of species in the Sansevieria genus",
+      "sub_question_3": "How many species are there in the Sansevieria genus?",
+      "query_3": "number of species in the Sansevieria genus",
+      "sub_question_4": "How many species are there in the Sansevieria genus?",
+      "query_4": "number of species in the Sansevieria genus",
+      "sub_question_5": "How many species are there in the Sansevieria genus?",
+      "query_5": "number of species in the Sansevieria genus",
+      "Golden Answers": [
+        "there are roughly 70 species in the snake plant's genus."
+      ]
+    }
+  },
+  {
+    "id": 56,
+    "data": {
+      "sample_id": "4cd79b63-6e4b-400f-aee0-f917dc1443c5",
+      "question": "how many calories are in wendy's equivalent of this dish?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/4cd79b63-6e4b-400f-aee0-f917dc1443c5.jpg",
+      "sub_question_1": "What is the calorie count of Wendy's loaded fries?",
+      "query_1": "Wendy's loaded fries calorie count",
+      "sub_question_2": "What is the calorie count of Wendy's loaded fries?",
+      "query_2": "Wendy's loaded fries calorie count",
+      "sub_question_3": "What is the calorie count of Wendy's loaded fries?",
+      "query_3": "Wendy's loaded fries calorie count",
+      "sub_question_4": "What is the calorie count of Wendy's loaded fries?",
+      "query_4": "Wendy's loaded fries calorie count",
+      "sub_question_5": "What is the calorie count of Wendy's loaded fries?",
+      "query_5": "Wendy's loaded fries calorie count",
+      "Golden Answers": [
+        "there are 460 calories in wendy's baconator fries, the equivalent of this dish on their menu."
+      ]
+    }
+  },
+  {
+    "id": 57,
+    "data": {
+      "sample_id": "26a387dd-e953-4b3e-9687-04d7ad2da5ea",
+      "question": "what is the highway mpg of the 2018 laramie longhorn model of this truck?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/26a387dd-e953-4b3e-9687-04d7ad2da5ea.jpg",
+      "sub_question_1": "What is the highway mpg of the 2018 Ram 3500 Laramie Longhorn?",
+      "query_1": "2018 Ram 3500 Laramie Longhorn highway mpg",
+      "sub_question_2": "What is the highway mpg of the 2018 Ram 3500 Laramie Longhorn?",
+      "query_2": "2018 Ram 3500 Laramie Longhorn highway mpg",
+      "sub_question_3": "What is the highway mpg of the 2018 Ram 3500 Laramie Longhorn?",
+      "query_3": "2018 Ram 3500 Laramie Longhorn highway mpg",
+      "sub_question_4": "What is the highway mpg of the 2018 Ram 3500 Laramie Longhorn?",
+      "query_4": "2018 Ram 3500 Laramie Longhorn highway mpg",
+      "sub_question_5": "What is the highway mpg of the 2018 Ram 3500 Laramie Longhorn?",
+      "query_5": "2018 Ram 3500 Laramie Longhorn highway mpg",
+      "Golden Answers": [
+        "the 2018 ram 3500 laramie longhorn gets 21 mpg highway on average."
+      ]
+    }
+  },
+  {
+    "id": 58,
+    "data": {
+      "sample_id": "133081a5-3fe8-47e7-91dc-f002d19d4b8e",
+      "question": "how old do you have to be to drive this in the u.s.?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/133081a5-3fe8-47e7-91dc-f002d19d4b8e.jpg",
+      "sub_question_1": "how old do you have to be to drive a forklift in the U.S.?",
+      "query_1": "driving age for forklift in the U.S.",
+      "sub_question_2": "what is the age requirement for a commercial driver's license (CDL) in the U.S.?",
+      "query_2": "age requirement for commercial driver's license (CDL) in the U.S.",
+      "sub_question_3": "what is the age requirement for forklift driving in the U.S.?",
+      "query_3": "age requirement for forklift driving in the U.S.",
+      "sub_question_4": "what is the age requirement for forklift driving in the U.S.?",
+      "query_4": "age requirement for forklift driving in the U.S.",
+      "sub_question_5": "what is the age requirement for forklift driving in the U.S.?",
+      "query_5": "age requirement for forklift driving in the U.S.",
+      "Golden Answers": [
+        "it is illegal for anyone under 18 to drive a forklift in the united states."
+      ]
+    }
+  },
+  {
+    "id": 59,
+    "data": {
+      "sample_id": "40ff9d99-2f6b-466d-b6d0-ad814183cd88",
+      "question": "where did the first gen of this car get its debut?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/40ff9d99-2f6b-466d-b6d0-ad814183cd88.jpg",
+      "sub_question_1": "Where did the first generation of the Kia Soul get its debut?",
+      "query_1": "first generation Kia Soul debut location",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the kia soul got its debut at the 2008 paris motor show."
+      ]
+    }
+  },
+  {
+    "id": 60,
+    "data": {
+      "sample_id": "b67964ec-f37f-4e4e-8393-bfefd8c4e70e",
+      "question": "who served as the mayor when this building opened?",
+      "query_total": 3,
+      "image_url": "http://127.0.0.1:8008/b67964ec-f37f-4e4e-8393-bfefd8c4e70e.jpg",
+      "sub_question_1": "What is the name of the building in the image?",
+      "query_1": "building resembling a city hall or government building in the image",
+      "sub_question_2": "When did the Manhattan Municipal Building open?",
+      "query_2": "Manhattan Municipal Building opening date",
+      "sub_question_3": "Who was the mayor of New York City in 1914?",
+      "query_3": "mayor of New York City in 1914",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "dewitt clinton served as mayor of new york from 1803 to 1815 and was mayor when the new york city hall building opened."
+      ]
+    }
+  },
+  {
+    "id": 61,
+    "data": {
+      "sample_id": "fa6e015a-c99d-4672-a1e2-011139d866ac",
+      "question": "how long has the car model been around?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/fa6e015a-c99d-4672-a1e2-011139d866ac.jpg",
+      "sub_question_1": "How long has the Ford Escape been in production?",
+      "query_1": "Ford Escape production history",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the ford escape was introduced in 2001, so it has been around 24 years."
+      ]
+    }
+  },
+  {
+    "id": 62,
+    "data": {
+      "sample_id": "59c47bf4-e373-4681-8543-799b5fd48200",
+      "question": "where has this been installed?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/59c47bf4-e373-4681-8543-799b5fd48200.jpg",
+      "sub_question_1": "Where is the famous sculpture in the image located?",
+      "query_1": "famous sculptures in urban settings",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the sphere was originally installed in the world trade center, then battery park after the september 11 attacks, and then liberty park, where it currently resides."
+      ]
+    }
+  },
+  {
+    "id": 63,
+    "data": {
+      "sample_id": "f246eacd-c435-428f-a77e-079c43e4206c",
+      "question": "when was the artist who made this born?",
+      "query_total": 2,
+      "image_url": "http://127.0.0.1:8008/f246eacd-c435-428f-a77e-079c43e4206c.jpg",
+      "sub_question_1": "What is the name of the artist who created this sculpture?",
+      "query_1": "artist name for the sculpture in the image",
+      "sub_question_2": "When was Michelangelo born?",
+      "query_2": "birth year of Michelangelo",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "saint michael the archangel was made by the italian renaissance sculptor, andrea della robbia, whow as born on october 20th,1435"
+      ]
+    }
+  },
+  {
+    "id": 64,
+    "data": {
+      "sample_id": "c712732d-16e2-4f39-8a68-5cc82671ba6c",
+      "question": "how does this organ digest food?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/c712732d-16e2-4f39-8a68-5cc82671ba6c.jpg",
+      "sub_question_1": "How does the stomach digest food?",
+      "query_1": "stomach digestion process",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the stomach digests food by producing enzymes and acids"
+      ]
+    }
+  },
+  {
+    "id": 65,
+    "data": {
+      "sample_id": "bd6d8701-03d0-4751-9a80-c1353c778060",
+      "question": "how many pounds of the most commonly consumed plant that produces the molecule at the top are consumed each year in the us?",
+      "query_total": 2,
+      "image_url": "http://127.0.0.1:8008/bd6d8701-03d0-4751-9a80-c1353c778060.jpg",
+      "sub_question_1": "What is the most commonly consumed plant that produces the molecule at the top in the US?",
+      "query_1": "most commonly consumed plant that produces the molecule at the top in the US",
+      "sub_question_2": "What is the molecule at the top in the image?",
+      "query_2": "molecule at the top in the image",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the us consumes 1.62 billion pounds of coffee a year."
+      ]
+    }
+  },
+  {
+    "id": 66,
+    "data": {
+      "sample_id": "fa3c8d05-d3e0-4f94-8c80-b750fa487995",
+      "question": "how tall is this building compared to the tallest building in the united states?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/fa3c8d05-d3e0-4f94-8c80-b750fa487995.jpg",
+      "sub_question_1": "What is the height of the building in the image?",
+      "query_1": "height of the building in the image",
+      "sub_question_2": "What is the height of the building in the image?",
+      "query_2": "height of the building in the image",
+      "sub_question_3": "What is the height of the building in the image?",
+      "query_3": "height of the building in the image",
+      "sub_question_4": "What is the height of the building in the image?",
+      "query_4": "height of the building in the image",
+      "sub_question_5": "What is the height of the building in the image?",
+      "query_5": "height of the building in the image",
+      "Golden Answers": [
+        "one kansas city place, at 624 feet tall, is less than half the height of one world trade center in new york, which is 1,776 feet tall."
+      ]
+    }
+  },
+  {
+    "id": 67,
+    "data": {
+      "sample_id": "b22b9fe9-d283-4639-b017-5f0b6255c843",
+      "question": "what are the ingredients in this?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/b22b9fe9-d283-4639-b017-5f0b6255c843.jpg",
+      "sub_question_1": "What are the ingredients in the IAMS Proactive Health Large Breed Chicken & Whole Grain Recipe dog food?",
+      "query_1": "IAMS Proactive Health Large Breed Chicken & Whole Grain Recipe ingredients",
+      "sub_question_2": "What are the ingredients in the IAMS Proactive Health Large Breed Chicken & Whole Grain Recipe dog food?",
+      "query_2": "IAMS Proactive Health Large Breed Chicken & Whole Grain Recipe ingredients",
+      "sub_question_3": "What are the ingredients in the IAMS Proactive Health Large Breed Chicken & Whole Grain Recipe dog food?",
+      "query_3": "IAMS Proactive Health Large Breed Chicken & Whole Grain Recipe ingredients",
+      "sub_question_4": "What are the ingredients in the IAMS Proactive Health Large Breed Chicken & Whole Grain Recipe dog food?",
+      "query_4": "IAMS Proactive Health Large Breed Chicken & Whole Grain Recipe ingredients",
+      "sub_question_5": "What are the ingredients in the IAMS Proactive Health Large Breed Chicken & Whole Grain Recipe dog food?",
+      "query_5": "IAMS Proactive Health Large Breed Chicken & Whole Grain Recipe ingredients",
+      "Golden Answers": [
+        "the ingredients in iams proactive health large breed chicken & whole grain recipe are; chicken, ground barley, ground whole grain corn, ground whole grain sorghum, chicken by-product meal, dried plain beet pulp, natural flavor, chicken fat, brewers yeast, dried egg product, flaxseed, caramel color, calcium carbonate, potassium chloride, carrots, fructooligosaccharides, choline chloride, dicalcium phosphate, vitamins, minerals, mixed tocopherol, citric acid, rosemary extract.the i"
+      ]
+    }
+  },
+  {
+    "id": 68,
+    "data": {
+      "sample_id": "b0c3b05d-56e7-4fde-b309-6b05aa643f30",
+      "question": "was this the first product by pepperidge farm?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/b0c3b05d-56e7-4fde-b309-6b05aa643f30.jpg",
+      "sub_question_1": "Was this the first product by Pepperidge Farm?",
+      "query_1": "history of Pepperidge Farm products",
+      "sub_question_2": "Was this the first product by Pepperidge Farm?",
+      "query_2": "first product by Pepperidge Farm",
+      "sub_question_3": "Was this the first product by Pepperidge Farm?",
+      "query_3": "first product by Pepperidge Farm",
+      "sub_question_4": "Was this the first product by Pepperidge Farm?",
+      "query_4": "first product by Pepperidge Farm",
+      "sub_question_5": "Was this the first product by Pepperidge Farm?",
+      "query_5": "first product by Pepperidge Farm",
+      "Golden Answers": [
+        "no, the first product by pepperidge farm was bread."
+      ]
+    }
+  },
+  {
+    "id": 69,
+    "data": {
+      "sample_id": "c96e9a96-9545-431f-98d9-9ba095c65ad3",
+      "question": "what are their hours?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/c96e9a96-9545-431f-98d9-9ba095c65ad3.jpg",
+      "sub_question_1": "What are the hours of operation for the MONEY AUTOMOTIVE CENTER?",
+      "query_1": "hours of operation for MONEY AUTOMOTIVE CENTER",
+      "sub_question_2": "What are the hours of operation for the MONEY AUTOMOTIVE CENTER?",
+      "query_2": "hours of operation for MONEY AUTOMOTIVE CENTER",
+      "sub_question_3": "What are the hours of operation for the MONEY AUTOMOTIVE CENTER?",
+      "query_3": "hours of operation for MONEY AUTOMOTIVE CENTER",
+      "sub_question_4": "What are the hours of operation for the MONEY AUTOMOTIVE CENTER?",
+      "query_4": "hours of operation for MONEY AUTOMOTIVE CENTER",
+      "sub_question_5": "What are the hours of operation for the MONEY AUTOMOTIVE CENTER?",
+      "query_5": "hours of operation for MONEY AUTOMOTIVE CENTER",
+      "Golden Answers": [
+        "money automotive center in salina kansas is open monday through friday from 8am to 6pm, saturday from 8am to 5pm, and they are closed on sundays."
+      ]
+    }
+  },
+  {
+    "id": 70,
+    "data": {
+      "sample_id": "1e6302d7-6eb5-4266-9ec8-fa9cbac4ec3c",
+      "question": "when was this on display in the cityarts boardroom gallery?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/1e6302d7-6eb5-4266-9ec8-fa9cbac4ec3c.jpg",
+      "sub_question_1": "What are the titles of the paintings in the image?",
+      "query_1": "paintings in the image",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "comfortably uncomfortable by shelby r. was on display in the cityarts boardroom gallery from december 17, 2024 to december 22, 2024."
+      ]
+    }
+  },
+  {
+    "id": 71,
+    "data": {
+      "sample_id": "d3186100-792a-49ec-9a54-6c4970a8505b",
+      "question": "how many cities have locations for this business?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/d3186100-792a-49ec-9a54-6c4970a8505b.jpg",
+      "sub_question_1": "What is the name of the business in the image?",
+      "query_1": "business name in the image",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "there are eight cities with locations for the up down arcade bar."
+      ]
+    }
+  },
+  {
+    "id": 72,
+    "data": {
+      "sample_id": "84f5acc3-5e94-4e03-9707-fc25fda9ebbc",
+      "question": "when was the founder born?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/84f5acc3-5e94-4e03-9707-fc25fda9ebbc.jpg",
+      "sub_question_1": "When was Colonel Harland Sanders born?",
+      "query_1": "Colonel Harland Sanders birth date",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "colonel harland sanders was born on 9/9/1890."
+      ]
+    }
+  },
+  {
+    "id": 73,
+    "data": {
+      "sample_id": "0209f4a7-dd09-4d47-8106-09fff97004d5",
+      "question": "is there anywhere to buy discount broadway tickets near this statue?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/0209f4a7-dd09-4d47-8106-09fff97004d5.jpg",
+      "sub_question_1": "Is there a specific location or area near the George M. Cohan statue in Times Square where discount Broadway tickets can be purchased?",
+      "query_1": "discount Broadway tickets near George M. Cohan statue Times Square",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "yes, this statue is located in duffy square, home to the famous tkts reduced price ticket booth."
+      ]
+    }
+  },
+  {
+    "id": 74,
+    "data": {
+      "sample_id": "0eb67624-e986-48c2-bd23-b46232087bcd",
+      "question": "do decongestant tablets have more side effects than decongestant spray?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/0eb67624-e986-48c2-bd23-b46232087bcd.jpg",
+      "sub_question_1": "Do decongestant tablets have more side effects than decongestant sprays?",
+      "query_1": "decongestant tablets vs decongestant sprays side effects comparison",
+      "sub_question_2": "Do decongestant tablets have more side effects than decongestant sprays?",
+      "query_2": "decongestant tablets vs decongestant sprays side effects comparison",
+      "sub_question_3": "Do decongestant tablets have more side effects than decongestant sprays?",
+      "query_3": "decongestant tablets vs decongestant sprays side effects comparison",
+      "sub_question_4": "Do decongestant tablets have more side effects than decongestant sprays?",
+      "query_4": "decongestant tablets vs decongestant sprays side effects comparison",
+      "sub_question_5": "Do decongestant tablets have more side effects than decongestant sprays?",
+      "query_5": "decongestant tablets vs decongestant sprays side effects comparison",
+      "Golden Answers": [
+        "walgreen's non drowsy decongestant tablets have more side effects than a decongestant spray."
+      ]
+    }
+  },
+  {
+    "id": 75,
+    "data": {
+      "sample_id": "4a14ca1f-56b4-41dd-bfc6-cba4a87dec8e",
+      "question": "is a 6-inch one of these safe for a young dwarf hamster?",
+      "query_total": 4,
+      "image_url": "http://127.0.0.1:8008/4a14ca1f-56b4-41dd-bfc6-cba4a87dec8e.jpg",
+      "sub_question_1": "Is a 6-inch hamster wheel appropriate for a young dwarf hamster?",
+      "query_1": "6-inch hamster wheel size for young dwarf hamster",
+      "sub_question_2": "Is a 6-inch hamster wheel appropriate for a young dwarf hamster?",
+      "query_2": "6-inch hamster wheel size for young dwarf hamster",
+      "sub_question_3": "Is a 6-inch hamster wheel appropriate for a young dwarf hamster?",
+      "query_3": "6-inch hamster wheel size for young dwarf hamster",
+      "sub_question_4": "Is a 6-inch hamster wheel appropriate for a young dwarf hamster?",
+      "query_4": "6-inch hamster wheel size for young dwarf hamster",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "no, hamster wheels under 8 inches can lead to permanent spinal curvatures in young dwarf hamsters."
+      ]
+    }
+  },
+  {
+    "id": 76,
+    "data": {
+      "sample_id": "7d7daff6-a18b-4a67-9c70-91c4b963fb9e",
+      "question": "when was the person who first described these animals born?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/7d7daff6-a18b-4a67-9c70-91c4b963fb9e.jpg",
+      "sub_question_1": "When was Carl Linnaeus born?",
+      "query_1": "Carl Linnaeus birth year",
+      "sub_question_2": "When was Carl Linnaeus born?",
+      "query_2": "Carl Linnaeus birth year",
+      "sub_question_3": "When was Carl Linnaeus born?",
+      "query_3": "Carl Linnaeus birth year",
+      "sub_question_4": "When was Carl Linnaeus born?",
+      "query_4": "Carl Linnaeus birth year",
+      "sub_question_5": "When was Carl Linnaeus born?",
+      "query_5": "Carl Linnaeus birth year",
+      "Golden Answers": [
+        "carl linnaeus, who first described the green iguana, was born in 1707."
+      ]
+    }
+  },
+  {
+    "id": 77,
+    "data": {
+      "sample_id": "4d829990-c40c-4dc2-ad5f-233ff97ac436",
+      "question": "what's the latest book from the author of this book?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/4d829990-c40c-4dc2-ad5f-233ff97ac436.jpg",
+      "sub_question_1": "What is the latest book by Guy Gavriel Kay?",
+      "query_1": "latest book by Guy Gavriel Kay",
+      "sub_question_2": "What is the latest book by Guy Gavriel Kay?",
+      "query_2": "latest book by Guy Gavriel Kay",
+      "sub_question_3": "What is the latest book by Guy Gavriel Kay?",
+      "query_3": "latest book by Guy Gavriel Kay",
+      "sub_question_4": "What is the latest book by Guy Gavriel Kay?",
+      "query_4": "latest book by Guy Gavriel Kay",
+      "sub_question_5": "What is the latest book by Guy Gavriel Kay?",
+      "query_5": "latest book by Guy Gavriel Kay",
+      "Golden Answers": [
+        "guy gavriel kay's latest book is all the seas of the world."
+      ]
+    }
+  },
+  {
+    "id": 78,
+    "data": {
+      "sample_id": "a4f3f35f-38bf-463f-b1ba-c96bbdf7d1c5",
+      "question": "what's special about these spiders?",
+      "query_total": 2,
+      "image_url": "http://127.0.0.1:8008/a4f3f35f-38bf-463f-b1ba-c96bbdf7d1c5.jpg",
+      "sub_question_1": "What species of spider is shown in the image?",
+      "query_1": "spider species identification from the image",
+      "sub_question_2": "What are the special features of jumping spiders?",
+      "query_2": "special features of jumping spiders",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "nephila inaurata spiders are known for their large size and enormous webs. females can grow to be 1.9–2.0 inches (4.8–5.1 cm) in size, not including their legspan. nephila inaurata spiders can produce large asymmetric orb webs up to 1.5 m (5 ft) in diameter."
+      ]
+    }
+  },
+  {
+    "id": 79,
+    "data": {
+      "sample_id": "a5ce091e-699f-4ffa-827c-80cf18aefe50",
+      "question": "when was his alma mater established?",
+      "query_total": 2,
+      "image_url": "http://127.0.0.1:8008/a5ce091e-699f-4ffa-827c-80cf18aefe50.jpg",
+      "sub_question_1": "What is Henry David Thoreau's alma mater?",
+      "query_1": "Henry David Thoreau's alma mater",
+      "sub_question_2": "When was Harvard University established?",
+      "query_2": "When was Harvard University established",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "harvard university, henry david thoreau's alma mater, was established in 1636."
+      ]
+    }
+  },
+  {
+    "id": 80,
+    "data": {
+      "sample_id": "cfc7dce8-f89a-4e08-9957-40956f7598d7",
+      "question": "what kind of foods can i find here?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/cfc7dce8-f89a-4e08-9957-40956f7598d7.jpg",
+      "sub_question_1": "What kind of foods can be found in the grocery store based on the image?",
+      "query_1": "grocery store foods based on the image",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "apna bazar farmers market specializes in indian and ethnic foods."
+      ]
+    }
+  },
+  {
+    "id": 81,
+    "data": {
+      "sample_id": "9fcb5090-3e1c-452a-96ed-7dba7c9ee26d",
+      "question": "does this model suggest that having few suppliers is good for business?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/9fcb5090-3e1c-452a-96ed-7dba7c9ee26d.jpg",
+      "sub_question_1": "Does the \"Five Competitive Forces\" model suggest that having few suppliers is good for business?",
+      "query_1": "Five Competitive Forces model and suppliers",
+      "sub_question_2": "Does the \"Five Competitive Forces\" model suggest that having few suppliers is good for business?",
+      "query_2": "Five Competitive Forces model and suppliers",
+      "sub_question_3": "Does the \"Five Competitive Forces\" model suggest that having few suppliers is good for business?",
+      "query_3": "Five Competitive Forces model and suppliers",
+      "sub_question_4": "Does the \"Five Competitive Forces\" model suggest that having few suppliers is good for business?",
+      "query_4": "Five Competitive Forces model and suppliers",
+      "sub_question_5": "Does the \"Five Competitive Forces\" model suggest that having few suppliers is good for business?",
+      "query_5": "Five Competitive Forces model and suppliers",
+      "Golden Answers": [
+        "no, porter's five forces model suggests that having fewer suppliers increases their ability to charge you more, and thus can impact your profitability."
+      ]
+    }
+  },
+  {
+    "id": 82,
+    "data": {
+      "sample_id": "4e6f2daa-2932-4e51-aa00-c47921e263dd",
+      "question": "what is the name of the street where the former phillips saleroom of that company is located?",
+      "query_total": 4,
+      "image_url": "http://127.0.0.1:8008/4e6f2daa-2932-4e51-aa00-c47921e263dd.jpg",
+      "sub_question_1": "What is the name of the street where the former Phillips Saleroom is located?",
+      "query_1": "Phillips Saleroom location.",
+      "sub_question_2": "What is the name of the street where the former Phillips Saleroom is located?",
+      "query_2": "Phillips Saleroom location.",
+      "sub_question_3": "What is the name of the street where the former Phillips Saleroom is located?",
+      "query_3": "Phillips Saleroom location.",
+      "sub_question_4": "What is the name of the street where the former Phillips Saleroom is located?",
+      "query_4": "Phillips Saleroom location.",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the former phillips saleroom of bonhams is located on new bond street in london."
+      ]
+    }
+  },
+  {
+    "id": 83,
+    "data": {
+      "sample_id": "e0c7c0b8-b70d-4d58-a98a-ba22d511588f",
+      "question": "what is the difference between this and a articulating boom lift?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/e0c7c0b8-b70d-4d58-a98a-ba22d511588f.jpg",
+      "sub_question_1": "What is the difference between a boom lift and an articulating boom lift?",
+      "query_1": "difference between boom lift and articulating boom lift",
+      "sub_question_2": "What is the difference between a boom lift and an articulating boom lift?",
+      "query_2": "difference between boom lift and articulating boom lift",
+      "sub_question_3": "What is the difference between a boom lift and an articulating boom lift?",
+      "query_3": "difference between boom lift and articulating boom lift",
+      "sub_question_4": "What is the difference between a boom lift and an articulating boom lift?",
+      "query_4": "difference between boom lift and articulating boom lift",
+      "sub_question_5": "What is the difference between a boom lift and an articulating boom lift?",
+      "query_5": "difference between boom lift and articulating boom lift",
+      "Golden Answers": [
+        "for maximum height and reach, telescopic booms offer more horizontal outreach. however, if obstacles are present, consider an articulated boom lift, which can navigate \"up and over\" with its multiple pivot points."
+      ]
+    }
+  },
+  {
+    "id": 84,
+    "data": {
+      "sample_id": "9493acde-d6b9-4582-a388-84612a5f4b23",
+      "question": "does bank of america hold more assets than these guys?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/9493acde-d6b9-4582-a388-84612a5f4b23.jpg",
+      "sub_question_1": "Does Bank of America hold more assets than other financial institutions?",
+      "query_1": "Bank of America assets compared to other financial institutions",
+      "sub_question_2": "Does Bank of America hold more assets than other financial institutions?",
+      "query_2": "Bank of America assets compared to other financial institutions",
+      "sub_question_3": "Does Bank of America hold more assets than other financial institutions?",
+      "query_3": "Bank of America assets compared to other financial institutions",
+      "sub_question_4": "Does Bank of America hold more assets than other financial institutions?",
+      "query_4": "Bank of America assets compared to other financial institutions",
+      "sub_question_5": "Does Bank of America hold more assets than other financial institutions?",
+      "query_5": "Bank of America assets compared to other financial institutions",
+      "Golden Answers": [
+        "no, j.p. morgan holds more assets at $4.2 trillion than bank of america at $3.3 trillion."
+      ]
+    }
+  },
+  {
+    "id": 85,
+    "data": {
+      "sample_id": "ed449a69-130e-4ab6-b26e-397f42d5f411",
+      "question": "what's the difference between citrate and carnitine in relation to fatty acids according to this page?",
+      "query_total": 3,
+      "image_url": "http://127.0.0.1:8008/ed449a69-130e-4ab6-b26e-397f42d5f411.jpg",
+      "sub_question_1": "What is the role of citrate in fatty acid synthesis according to the page?",
+      "query_1": "role of citrate in fatty acid synthesis",
+      "sub_question_2": "What is the role of carnitine in fatty acid transport into the mitochondria according to the page?",
+      "query_2": "role of carnitine in fatty acid transport into the mitochondria",
+      "sub_question_3": "What is the difference between citrate and carnitine in relation to fatty acids according to the page?",
+      "query_3": "difference between citrate and carnitine in relation to fatty acids",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "fatty acid synthesis requires transport of citrate from mitochondria to cytosol, whereas degradation requires carnitine-dependent transport into the mitochondrial matrix."
+      ]
+    }
+  },
+  {
+    "id": 86,
+    "data": {
+      "sample_id": "cfaa0bff-3afa-463f-856b-f7ef8015784b",
+      "question": "does this university have more undergraduate or graduate students?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/cfaa0bff-3afa-463f-856b-f7ef8015784b.jpg",
+      "sub_question_1": "Does the book provide information about the number of undergraduate or graduate students at a specific university?",
+      "query_1": "number of undergraduate and graduate students at a specific university",
+      "sub_question_2": "What is the name of the university in question?",
+      "query_2": "name of the university in question",
+      "sub_question_3": "What is the name of the university in question?",
+      "query_3": "name of the university in question",
+      "sub_question_4": "What is the name of the university in question?",
+      "query_4": "name of the university in question",
+      "sub_question_5": "What is the name of the university in question?",
+      "query_5": "name of the university in question",
+      "Golden Answers": [
+        "bingham university has more undergraduate students than graduate students."
+      ]
+    }
+  },
+  {
+    "id": 87,
+    "data": {
+      "sample_id": "b75eeffe-dd00-497c-af73-9cb9d4b1b884",
+      "question": "is the address for the rectory the same as the main structure?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/b75eeffe-dd00-497c-af73-9cb9d4b1b884.jpg",
+      "sub_question_1": "Is the address for the rectory the same as the main structure?",
+      "query_1": "rectory address of the building in the image",
+      "sub_question_2": "What is the address of the rectory and the main structure in the image?",
+      "query_2": "address of the rectory and the main structure in the image",
+      "sub_question_3": "What is the address of the rectory and the main structure in the image?",
+      "query_3": "address of the rectory and the main structure in the image",
+      "sub_question_4": "What is the address of the rectory and the main structure in the image?",
+      "query_4": "address of the rectory and the main structure in the image",
+      "sub_question_5": "What is the address of the rectory and the main structure in the image?",
+      "query_5": "address of the rectory and the main structure in the image",
+      "Golden Answers": [
+        "no, the address for the st. patrick's cathedral (midtown manhattan) - rectory is 460 madison avenue, while the address for the main structure is 631 fifth avenue."
+      ]
+    }
+  },
+  {
+    "id": 88,
+    "data": {
+      "sample_id": "091b9302-2c55-438d-b104-251daf1b8a7a",
+      "question": "what is the answer to this?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/091b9302-2c55-438d-b104-251daf1b8a7a.jpg",
+      "sub_question_1": "What is the result of multiplying 93 by 65?",
+      "query_1": "93 x 65",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "93 times 65 is 6,045."
+      ]
+    }
+  },
+  {
+    "id": 89,
+    "data": {
+      "sample_id": "502adffb-88aa-4618-bf8d-7c829dab374b",
+      "question": "what's the difference in price between this t-shirt and a m men's black t-shirt on amazon?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/502adffb-88aa-4618-bf8d-7c829dab374b.jpg",
+      "sub_question_1": "What is the price of a men's black t-shirt on Amazon?",
+      "query_1": "men's black t-shirt price on Amazon",
+      "sub_question_2": "What is the price of a men's black t-shirt on Amazon?",
+      "query_2": "men's black t-shirt price on Amazon",
+      "sub_question_3": "What is the price of a men's black t-shirt on Amazon?",
+      "query_3": "men's black t-shirt price on Amazon",
+      "sub_question_4": "What is the price of a men's black t-shirt on Amazon?",
+      "query_4": "men's black t-shirt price on Amazon",
+      "sub_question_5": "What is the price of a men's black t-shirt on Amazon?",
+      "query_5": "men's black t-shirt price on Amazon",
+      "Golden Answers": [
+        "a m men's black t-shirt on amazon is $5 more than one at ross, though other similar options at both stores may be compared."
+      ]
+    }
+  },
+  {
+    "id": 90,
+    "data": {
+      "sample_id": "108067c3-54b3-412b-8c4f-75bc679f98f5",
+      "question": "when was the founder of that restaurant born?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/108067c3-54b3-412b-8c4f-75bc679f98f5.jpg",
+      "sub_question_1": "When was Colonel Sanders, the founder of KFC, born?",
+      "query_1": "when was colonel sanders born",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "colonel harland sanders was born september 9th, 1890."
+      ]
+    }
+  },
+  {
+    "id": 91,
+    "data": {
+      "sample_id": "5d9dd4df-f633-4c9d-89a6-755e3c70c833",
+      "question": "which sex of this breed tends to be taller males or females?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/5d9dd4df-f633-4c9d-89a6-755e3c70c833.jpg",
+      "sub_question_1": "What breed is the dog in the image?",
+      "query_1": "dog breed identification from image",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "male siberian huskies tend to reach a height of 23.5 inches. females tend to reach 22 inches."
+      ]
+    }
+  },
+  {
+    "id": 92,
+    "data": {
+      "sample_id": "a3731fef-0f46-45d1-840f-a0f562fcd17e",
+      "question": "how does the size of this breed compare to the english staffordshire bull terrier?",
+      "query_total": 4,
+      "image_url": "http://127.0.0.1:8008/a3731fef-0f46-45d1-840f-a0f562fcd17e.jpg",
+      "sub_question_1": "What is the average size of the English Staffordshire Bull Terrier?",
+      "query_1": "average size of English Staffordshire Bull Terrier",
+      "sub_question_2": "What is the average size of the English Staffordshire Bull Terrier?",
+      "query_2": "average size of English Staffordshire Bull Terrier",
+      "sub_question_3": "What is the average size of the English Staffordshire Bull Terrier?",
+      "query_3": "average size of English Staffordshire Bull Terrier",
+      "sub_question_4": "What is the average size of the English Staffordshire Bull Terrier?",
+      "query_4": "average size of English Staffordshire Bull Terrier",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "when compared with the english staffordshire bull terrier, the american pit bull terrier is larger by margins of 6–8 inches (15–20 cm) in height and 25–35 pounds (11–16 kg) in weight."
+      ]
+    }
+  },
+  {
+    "id": 93,
+    "data": {
+      "sample_id": "0d3f0c7b-59b9-4902-a39f-105a2b53e453",
+      "question": "what did the family that owns the vineyard where this is from first plant when they originally arrived in the region?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/0d3f0c7b-59b9-4902-a39f-105a2b53e453.jpg",
+      "sub_question_1": "What is the name of the vineyard mentioned in the image?",
+      "query_1": "vineyard name in the image",
+      "sub_question_2": "What is the name of the vineyard mentioned in the image?",
+      "query_2": "name of the vineyard in the image",
+      "sub_question_3": "What is the name of the vineyard mentioned in the image?",
+      "query_3": "name of the vineyard in the image",
+      "sub_question_4": "What is the name of the vineyard mentioned in the image?",
+      "query_4": "name of the vineyard in the image",
+      "sub_question_5": "What is the name of the vineyard mentioned in the image?",
+      "query_5": "name of the vineyard in the image",
+      "Golden Answers": [
+        "the hope family, who owns hope family wines who makes liberty school wine, first planted apples and grapes when they arrived in paso robles."
+      ]
+    }
+  },
+  {
+    "id": 94,
+    "data": {
+      "sample_id": "fb70742c-be21-4665-9383-e1f98dae15f6",
+      "question": "can i get a relocatable 30a ac version of one of these in the usa legally?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/fb70742c-be21-4665-9383-e1f98dae15f6.jpg",
+      "sub_question_1": "Can a relocatable 30A AC version of a device be legally obtained in the USA?",
+      "query_1": "relocatable 30A AC device legality in the USA",
+      "sub_question_2": "Can a relocatable 30A AC version of a device be legally obtained in the USA?",
+      "query_2": "relocatable 30A AC device legality in the USA",
+      "sub_question_3": "Can a relocatable 30A AC version of a device be legally obtained in the USA?",
+      "query_3": "relocatable 30A AC device legality in the USA",
+      "sub_question_4": "Can a relocatable 30A AC version of a device be legally obtained in the USA?",
+      "query_4": "relocatable 30A AC device legality in the USA",
+      "sub_question_5": "Can a relocatable 30A AC version of a device be legally obtained in the USA?",
+      "query_5": "relocatable 30A AC device legality in the USA",
+      "Golden Answers": [
+        "no, underwriters laboratories standard 1363 states that relocatable power taps must be rated 20a ac or less."
+      ]
+    }
+  },
+  {
+    "id": 95,
+    "data": {
+      "sample_id": "b44bd25d-6418-47a5-9705-e5c98412c54c",
+      "question": "what is the city this sauce is named after best known for?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/b44bd25d-6418-47a5-9705-e5c98412c54c.jpg",
+      "sub_question_1": "What city is Cholula named after?",
+      "query_1": "Cholula hot sauce city",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "cholula, puebla, mexico, is best known for its great pyramid."
+      ]
+    }
+  },
+  {
+    "id": 96,
+    "data": {
+      "sample_id": "4445ed52-cf69-4f50-8e81-193c4e5d9521",
+      "question": "who created this character?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/4445ed52-cf69-4f50-8e81-193c4e5d9521.jpg",
+      "sub_question_1": "Who created the character in the background of the image?",
+      "query_1": "character in the background of the image created by",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "stan lee, larry lieber, don heck, jack kirby created iron man."
+      ]
+    }
+  },
+  {
+    "id": 97,
+    "data": {
+      "sample_id": "87d6fe32-5e15-4e60-bfa8-311fa32f93b1",
+      "question": "in what year was the museum where this statue is exhibited founded?",
+      "query_total": 2,
+      "image_url": "http://127.0.0.1:8008/87d6fe32-5e15-4e60-bfa8-311fa32f93b1.jpg",
+      "sub_question_1": "What is the name of the museum where this statue is exhibited?",
+      "query_1": "museum where the statue in the image is exhibited",
+      "sub_question_2": "In what year was the Louvre Museum founded?",
+      "query_2": "year the Louvre Museum was founded",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the metropolitan museum of art was founded in 1870"
+      ]
+    }
+  },
+  {
+    "id": 98,
+    "data": {
+      "sample_id": "92a215f8-8836-4ccc-a140-fe044b560bce",
+      "question": "how many people lived in the city where the inventor of this was born in 2022?",
+      "query_total": 4,
+      "image_url": "http://127.0.0.1:8008/92a215f8-8836-4ccc-a140-fe044b560bce.jpg",
+      "sub_question_1": "Who is the inventor of the glass jars shown in the image?",
+      "query_1": "inventor of glass jars",
+      "sub_question_2": "Who is the inventor of the glass jars shown in the image?",
+      "query_2": "inventor of glass jars",
+      "sub_question_3": "Who is the inventor of the glass jars shown in the image?",
+      "query_3": "inventor of glass jars",
+      "sub_question_4": "Who is the inventor of the glass jars shown in the image?",
+      "query_4": "inventor of glass jars",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the population of the vineland, new jersey where john landis mason, inventor of mason jar, was 60,491 in 2022."
+      ]
+    }
+  },
+  {
+    "id": 99,
+    "data": {
+      "sample_id": "d723514e-14a7-4459-9901-5f59f9529500",
+      "question": "when was the football club based in the same city as this sculpture founded?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/d723514e-14a7-4459-9901-5f59f9529500.jpg",
+      "sub_question_1": "What city is the building in the image located in?",
+      "query_1": "building in the image located in",
+      "sub_question_2": "What city is the Mutual Building located in?",
+      "query_2": "Mutual Building city",
+      "sub_question_3": "When was the football club based in Cape Town founded?",
+      "query_3": "football club based in Cape Town founded",
+      "sub_question_4": "When were the football clubs based in Cape Town founded?",
+      "query_4": "football clubs based in Cape Town founded",
+      "sub_question_5": "When were the football clubs based in Cape Town founded?",
+      "query_5": "football clubs based in Cape Town founded",
+      "Golden Answers": [
+        "fortuna düsseldorf is a german football club from düsseldorf, the city where max ernst's sculpture of habakuk is located, founded in 1895."
+      ]
+    }
+  },
+  {
+    "id": 100,
+    "data": {
+      "sample_id": "9daf023f-f5c0-47b5-a841-e6d864b1fb6b",
+      "question": "who manages the museum that has the original of this stone?",
+      "query_total": 2,
+      "image_url": "http://127.0.0.1:8008/9daf023f-f5c0-47b5-a841-e6d864b1fb6b.jpg",
+      "sub_question_1": "What is the name of the museum that houses the original Aztec calendar stone?",
+      "query_1": "Aztec calendar stone museum",
+      "sub_question_2": "Who manages the National Anthropology Museum in Mexico City?",
+      "query_2": "National Anthropology Museum Mexico City management",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the national institute of anthropology and history (inah) manages the national museum of anthropology in mexico city, which houses the aztec sun stone."
+      ]
+    }
+  },
+  {
+    "id": 101,
+    "data": {
+      "sample_id": "ac5a7695-8074-48ee-bd3d-e2ac8739a51a",
+      "question": "why do these have different colors?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/ac5a7695-8074-48ee-bd3d-e2ac8739a51a.jpg",
+      "sub_question_1": "Why is the fire hydrant green?",
+      "query_1": "fire hydrant color meaning",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the colors indicate the rated water-flow capacity of that particular hydrant. red fire hydrants have the lowest water pressure and green the highest."
+      ]
+    }
+  },
+  {
+    "id": 102,
+    "data": {
+      "sample_id": "8dab7a6d-13e5-4081-884e-eced5b4cf615",
+      "question": "what was the most recent movie with the superhero on that poster?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/8dab7a6d-13e5-4081-884e-eced5b4cf615.jpg",
+      "sub_question_1": "What is the most recent Iron Man movie?",
+      "query_1": "most recent Iron Man movie",
+      "sub_question_2": "What is the most recent Iron Man movie?",
+      "query_2": "most recent Iron Man movie",
+      "sub_question_3": "What is the most recent Iron Man movie?",
+      "query_3": "most recent Iron Man movie",
+      "sub_question_4": "What is the most recent Iron Man movie?",
+      "query_4": "most recent Iron Man movie",
+      "sub_question_5": "What is the most recent Iron Man movie?",
+      "query_5": "most recent Iron Man movie",
+      "Golden Answers": [
+        "the most recent movie appearance of iron man was in avengers: endgame in 2019."
+      ]
+    }
+  },
+  {
+    "id": 103,
+    "data": {
+      "sample_id": "7686d1da-1ceb-4105-897a-39db2e9867fc",
+      "question": "do these live longer than box turtles?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/7686d1da-1ceb-4105-897a-39db2e9867fc.jpg",
+      "sub_question_1": "What is the typical lifespan of a box turtle?",
+      "query_1": "typical lifespan of a box turtle",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "no, both russian tortoises and box turtles can live up to 50 years."
+      ]
+    }
+  },
+  {
+    "id": 104,
+    "data": {
+      "sample_id": "6c82e133-2506-4619-ad16-435ba7a9cbe7",
+      "question": "do these have more protien than black beans?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/6c82e133-2506-4619-ad16-435ba7a9cbe7.jpg",
+      "sub_question_1": "Do lentils have more protein than black beans?",
+      "query_1": "protein content of lentils vs black beans",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "a one cup serving of red lentils has 18 grams of protien, which is more than black beans, which have 15 grams of protien per one cup serving."
+      ]
+    }
+  },
+  {
+    "id": 105,
+    "data": {
+      "sample_id": "5af2343e-64bd-4cbc-9365-7d2cf3fc4409",
+      "question": "are these fowers larger in height than roses?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/5af2343e-64bd-4cbc-9365-7d2cf3fc4409.jpg",
+      "sub_question_1": "Are the flowers in the image roses?",
+      "query_1": "Are the flowers in the image roses?",
+      "sub_question_2": "Are the flowers in the image roses?",
+      "query_2": "Are the flowers in the image roses?",
+      "sub_question_3": "Are the flowers in the image roses?",
+      "query_3": "Are the flowers in the image roses?",
+      "sub_question_4": "Are the flowers in the image roses?",
+      "query_4": "Are the flowers in the image roses?",
+      "sub_question_5": "Are the flowers in the image roses?",
+      "query_5": "Are the flowers in the image roses?",
+      "Golden Answers": [
+        "no, lilies reach a height of 1-6 feet but some species of roses climb much higher."
+      ]
+    }
+  },
+  {
+    "id": 106,
+    "data": {
+      "sample_id": "32c8474c-defe-495e-b278-cc538d6f9517",
+      "question": "does this have less calories than red wine?",
+      "query_total": 4,
+      "image_url": "http://127.0.0.1:8008/32c8474c-defe-495e-b278-cc538d6f9517.jpg",
+      "sub_question_1": "What is the calorie content of white wine and red wine?",
+      "query_1": "calorie content of white wine and red wine.",
+      "sub_question_2": "What is the calorie content of white wine and red wine?",
+      "query_2": "calorie content of white wine and red wine.",
+      "sub_question_3": "What is the calorie content of white wine and red wine?",
+      "query_3": "calorie content of white wine and red wine.",
+      "sub_question_4": "What is the calorie content of white wine and red wine?",
+      "query_4": "calorie content of white wine and red wine.",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "yes, on average white wine has slightly less calories than red wine."
+      ]
+    }
+  },
+  {
+    "id": 107,
+    "data": {
+      "sample_id": "800ceb96-c986-4068-8335-ed822867f0df",
+      "question": "is this wall cheaper than concrete wall?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/800ceb96-c986-4068-8335-ed822867f0df.jpg",
+      "sub_question_1": "Is the cost of brick walls typically lower than concrete walls?",
+      "query_1": "cost comparison between brick walls and concrete walls",
+      "sub_question_2": "Is the cost of materials and labor for brick walls typically higher than for concrete walls?",
+      "query_2": "cost comparison between brick walls and concrete walls",
+      "sub_question_3": "Is the cost of materials and labor for brick walls typically higher than for concrete walls?",
+      "query_3": "cost comparison between brick walls and concrete walls",
+      "sub_question_4": "Is the cost of materials and labor for brick walls typically higher than for concrete walls?",
+      "query_4": "cost comparison between brick walls and concrete walls",
+      "sub_question_5": "Is the cost of materials and labor for brick walls typically higher than for concrete walls?",
+      "query_5": "cost comparison between brick walls and concrete walls",
+      "Golden Answers": [
+        "no, brick walls are typically more expensive than concrete walls due to higher material and labor costs. brick wall costs can range from $10 to $45 per square foot, plus $70 to $110 per hour for labor. meanwhile, concrete block walls usually cost $10 to $20 per square foot, depending on the material type. labor for concrete is less costly."
+      ]
+    }
+  },
+  {
+    "id": 108,
+    "data": {
+      "sample_id": "a6178eb7-9857-4ed2-8466-31baad8ceae4",
+      "question": "what does the name of this car mean?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/a6178eb7-9857-4ed2-8466-31baad8ceae4.jpg",
+      "sub_question_1": "What is the name of the car in the image?",
+      "query_1": "car name in image with \"QUICK\" on it",
+      "sub_question_2": "What is the name of the car in the image?",
+      "query_2": "car name in image with \"QUICK\" on it",
+      "sub_question_3": "What is the name of the car in the image?",
+      "query_3": "car name in image with \"QUICK\" on it",
+      "sub_question_4": "What is the name of the car in the image?",
+      "query_4": "car name in image with \"QUICK\" on it",
+      "sub_question_5": "What is the name of the car in the image?",
+      "query_5": "car name in image with \"QUICK\" on it",
+      "Golden Answers": [
+        "sonata literally means a piece played."
+      ]
+    }
+  },
+  {
+    "id": 109,
+    "data": {
+      "sample_id": "3b6bce95-4d9c-4bee-8256-32468d048b5f",
+      "question": "what years was the painter of this active?",
+      "query_total": 2,
+      "image_url": "http://127.0.0.1:8008/3b6bce95-4d9c-4bee-8256-32468d048b5f.jpg",
+      "sub_question_1": "What is the name of the painter whose work is mentioned in the text \"The Gare Saint-Lazare: Arrival of a Train, 1877\"?",
+      "query_1": "painter name in \"The Gare Saint-Lazare: Arrival of a Train, 1877",
+      "sub_question_2": "What were the specific years of Claude Monet's activity as a painter?",
+      "query_2": "specific years of Claude Monet's activity",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "claude monet, who painted arrival of the normandy train, gare saint-lazare, was active from 1865 to 1926."
+      ]
+    }
+  },
+  {
+    "id": 110,
+    "data": {
+      "sample_id": "647be4d7-b3c9-4612-9ac1-b0c5a10b7d67",
+      "question": "did this car model sell more units than the honda civic in 2012?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/647be4d7-b3c9-4612-9ac1-b0c5a10b7d67.jpg",
+      "sub_question_1": "What is the car model shown in the image?",
+      "query_1": "car model identification from the image",
+      "sub_question_2": "What is the car model shown in the image?",
+      "query_2": "car model identification from the image",
+      "sub_question_3": "What is the car model shown in the image?",
+      "query_3": "car model identification from the image",
+      "sub_question_4": "What is the car model shown in the image?",
+      "query_4": "car model identification from the image",
+      "sub_question_5": "What is the car model shown in the image?",
+      "query_5": "car model identification from the image",
+      "Golden Answers": [
+        "yes, the honda accord sold 331,872 models in 2012, 13,963 less than the honda civic at 317,909."
+      ]
+    }
+  },
+  {
+    "id": 111,
+    "data": {
+      "sample_id": "6e0490b3-42b4-4462-9c37-6dc280690b50",
+      "question": "which car is more expensive: toyota rav4 or that grey one?",
+      "query_total": 2,
+      "image_url": "http://127.0.0.1:8008/6e0490b3-42b4-4462-9c37-6dc280690b50.jpg",
+      "sub_question_1": "Which car in the image is the Toyota RAV4?",
+      "query_1": "Identify the Toyota RAV4 in the image.",
+      "sub_question_2": "Which car in the image is the grey one?",
+      "query_2": "Identify the grey car in the image.",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "for a new model, the bmw x5's price is between $70,019 and $97,316, with the toyota rav4 priced between $30,673 and $41,221."
+      ]
+    }
+  },
+  {
+    "id": 112,
+    "data": {
+      "sample_id": "52928b1a-8e82-4fec-acfe-1bc5cb800331",
+      "question": "how are this flag and the flag of the netherlands different?",
+      "query_total": 2,
+      "image_url": "http://127.0.0.1:8008/52928b1a-8e82-4fec-acfe-1bc5cb800331.jpg",
+      "sub_question_1": "How are the flag and the flag of the Netherlands different?",
+      "query_1": "flag of the Netherlands",
+      "sub_question_2": "How is the flag of the Netherlands different from the flag of another country?",
+      "query_2": "flag of another country",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the flag of france features three vertical bands coloured blue, white, and red, from right to left, while the flag of the netherlands is a horizontal tricolor of red, white, and blue, from top to bottom."
+      ]
+    }
+  },
+  {
+    "id": 113,
+    "data": {
+      "sample_id": "1cfc574c-31b2-4925-9065-b9333f85cac7",
+      "question": "in what year was the first recorded case of the disease for which starbucks annually runs a campaign using these cups to support research?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/1cfc574c-31b2-4925-9065-b9333f85cac7.jpg",
+      "sub_question_1": "What is the disease that Starbucks supports through their holiday campaign using red cups?",
+      "query_1": "Starbucks holiday campaign red cups breast cancer research",
+      "sub_question_2": "In what year was the first recorded case of a breast cancer awareness campaign?",
+      "query_2": "first recorded case breast cancer awareness campaign",
+      "sub_question_3": "What is the first recorded case of a breast cancer awareness campaign?",
+      "query_3": "first recorded case breast cancer awareness campaign",
+      "sub_question_4": "What is the first recorded case of a breast cancer awareness campaign?",
+      "query_4": "first recorded case breast cancer awareness campaign",
+      "sub_question_5": "What is the first recorded case of a breast cancer awareness campaign?",
+      "query_5": "first recorded case breast cancer awareness campaign",
+      "Golden Answers": [
+        "starbucks used the campaign to support hiv/aids research, which was first clinically reported on june 5, 1981."
+      ]
+    }
+  },
+  {
+    "id": 114,
+    "data": {
+      "sample_id": "20fa680c-7c30-4ff5-82d2-fab2f1986386",
+      "question": "what pasta sauce also originates from the same region in italy this pasta is from?",
+      "query_total": 4,
+      "image_url": "http://127.0.0.1:8008/20fa680c-7c30-4ff5-82d2-fab2f1986386.jpg",
+      "sub_question_1": "What is the pasta sauce that originates from the same region as penne pasta?",
+      "query_1": "pasta sauce from Puglia",
+      "sub_question_2": "What is the pasta sauce that originates from the same region as penne pasta?",
+      "query_2": "pasta sauce from Puglia",
+      "sub_question_3": "What is the pasta sauce that originates from the same region as penne pasta?",
+      "query_3": "pasta sauce from Puglia",
+      "sub_question_4": "What is the pasta sauce that originates from the same region as penne pasta?",
+      "query_4": "pasta sauce from Puglia",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "both penne pasta and pesto sauce originate in the region of liguria in italy."
+      ]
+    }
+  },
+  {
+    "id": 115,
+    "data": {
+      "sample_id": "a2b3cb7e-0b83-4beb-955c-0ea7724b0300",
+      "question": "what is the population of this animal in the world?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/a2b3cb7e-0b83-4beb-955c-0ea7724b0300.jpg",
+      "sub_question_1": "What is the species of the cat in the image?",
+      "query_1": "species of the cat in the image",
+      "sub_question_2": "What is the population of the domestic cat (Felis catus) in the world?",
+      "query_2": "population of the domestic cat (Felis catus) in the world",
+      "sub_question_3": "What is the most recent and specific population data for the domestic cat (Felis catus) in the world?",
+      "query_3": "most recent and specific population data for the domestic cat (Felis catus) in the world",
+      "sub_question_4": "What is the most recent and specific population data for the domestic cat (Felis catus) in the world?",
+      "query_4": "most recent and specific population data for the domestic cat (Felis catus) in the world",
+      "sub_question_5": "What is the most recent and specific population data for the domestic cat (Felis catus) in the world?",
+      "query_5": "most recent and specific population data for the domestic cat (Felis catus) in the world",
+      "Golden Answers": [
+        "there are around 600 million cats in the world."
+      ]
+    }
+  },
+  {
+    "id": 116,
+    "data": {
+      "sample_id": "8b35eaba-f0ba-409a-bd92-980d15ff7e71",
+      "question": "what is the base price of the premium trim?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/8b35eaba-f0ba-409a-bd92-980d15ff7e71.jpg",
+      "sub_question_1": "What is the base price of the premium trim for the car model shown in the image?",
+      "query_1": "base price of the premium trim for the car model shown in the image",
+      "sub_question_2": "What is the base price of the premium trim for the car model shown in the image?",
+      "query_2": "base price of the premium trim for the car model shown in the image",
+      "sub_question_3": "What is the base price of the premium trim for the car model shown in the image?",
+      "query_3": "base price of the premium trim for the car model shown in the image",
+      "sub_question_4": "What is the base price of the premium trim for the car model shown in the image?",
+      "query_4": "base price of the premium trim for the car model shown in the image",
+      "sub_question_5": "What is the base price of the premium trim for the car model shown in the image?",
+      "query_5": "base price of the premium trim for the car model shown in the image",
+      "Golden Answers": [
+        "it is listed at $34000."
+      ]
+    }
+  },
+  {
+    "id": 117,
+    "data": {
+      "sample_id": "e74e976f-9281-42d2-b176-b06f4437d727",
+      "question": "what is the msrp of the base model of this suv?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/e74e976f-9281-42d2-b176-b06f4437d727.jpg",
+      "sub_question_1": "What is the MSRP of the base model of the Tesla Model Y?",
+      "query_1": "MSRP of the base model of the Tesla Model Y",
+      "sub_question_2": "What is the MSRP of the base model of the Tesla Model Y?",
+      "query_2": "MSRP of the base model of the Tesla Model Y",
+      "sub_question_3": "What is the MSRP of the base model of the Tesla Model Y?",
+      "query_3": "MSRP of the base model of the Tesla Model Y",
+      "sub_question_4": "What is the MSRP of the base model of the Tesla Model Y?",
+      "query_4": "MSRP of the base model of the Tesla Model Y",
+      "sub_question_5": "What is the MSRP of the base model of the Tesla Model Y?",
+      "query_5": "MSRP of the base model of the Tesla Model Y",
+      "Golden Answers": [
+        "it is listed at  $48,990."
+      ]
+    }
+  },
+  {
+    "id": 118,
+    "data": {
+      "sample_id": "a26b875a-ca7b-467c-8229-763882fa6996",
+      "question": "what is the ideal soil ph range for growing this plant?",
+      "query_total": 1,
+      "image_url": "http://127.0.0.1:8008/a26b875a-ca7b-467c-8229-763882fa6996.jpg",
+      "sub_question_1": "What is the specific plant species shown in the image?",
+      "query_1": "plant identification from the image",
+      "sub_question_2": "",
+      "query_2": "",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the ideal soil ph range for growing aspidistra elatior is from 5.5 to 7.0 ph."
+      ]
+    }
+  },
+  {
+    "id": 119,
+    "data": {
+      "sample_id": "0f31ff6c-56b1-4496-b25b-71ce940d0a03",
+      "question": "what is the ideal soil ph range for growing this plant?",
+      "query_total": 5,
+      "image_url": "http://127.0.0.1:8008/0f31ff6c-56b1-4496-b25b-71ce940d0a03.jpg",
+      "sub_question_1": "What type of plant is in the bouquet?",
+      "query_1": "identify the plant in the bouquet",
+      "sub_question_2": "What is the type of plant in the bouquet?",
+      "query_2": "identify the plant in the bouquet",
+      "sub_question_3": "What is the type of plant in the bouquet?",
+      "query_3": "identify the plant in the bouquet",
+      "sub_question_4": "What is the type of plant in the bouquet?",
+      "query_4": "identify the plant in the bouquet",
+      "sub_question_5": "What is the type of plant in the bouquet?",
+      "query_5": "identify the plant in the bouquet",
+      "Golden Answers": [
+        "the ideal soil ph range for growing lilium ×pseudograyi is from 5.5 to 7.0 ph."
+      ]
+    }
+  },
+  {
+    "id": 120,
+    "data": {
+      "sample_id": "04ceb762-12f7-4de8-8e1f-a13907b4265e",
+      "question": "how long are the leaves of this plant, usually?",
+      "query_total": 2,
+      "image_url": "http://127.0.0.1:8008/04ceb762-12f7-4de8-8e1f-a13907b4265e.jpg",
+      "sub_question_1": "What is the species of the plant in the image?",
+      "query_1": "plant identification based on leaf shape, size, and arrangement.",
+      "sub_question_2": "What is the typical length of the leaves of a plant in the Boraginaceae family?",
+      "query_2": "typical leaf length of plants in the Boraginaceae family.",
+      "sub_question_3": "",
+      "query_3": "",
+      "sub_question_4": "",
+      "query_4": "",
+      "sub_question_5": "",
+      "query_5": "",
+      "Golden Answers": [
+        "the leaves of cordyline australis are typically 40 to 100 cm (16 to 39 in) long."
+      ]
+    }
+  }
+]

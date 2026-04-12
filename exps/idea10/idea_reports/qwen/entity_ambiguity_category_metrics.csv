@@ -1,0 +1,6 @@
+category,count,avg_iterations,avg_query_count,gpt_acc,f1,recall,precision,rouge-l
+No,824,3.0109,2.4612,0.2767,0.2839,0.4385,0.2587,0.2130
+Object Identification,183,4.1148,2.7760,0.0492,0.1501,0.2701,0.1268,0.1474
+Indirect Entity Ambiguity,56,3.6607,3.4821,0.0357,0.1860,0.3436,0.1578,0.1656
+Description,64,3.2656,2.6250,0.0938,0.2114,0.3277,0.2073,0.1833
+No Object Involved,4,2.7500,2.0000,0.2500,0.3158,0.5189,0.2552,0.1252
