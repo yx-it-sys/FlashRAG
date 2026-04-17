@@ -1,0 +1,387 @@
+[Logging] Appending stdout/stderr to /home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_04_16_10_21_api_experiment/label/deepseek/trajectory_annotation.llm_labeled.rewrite.jsonl.rewrite.log
+Starting new rewrite run from: /home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_04_16_10_21_api_experiment/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl
+Pending queries: 76
+Skipped by existing rewrite cache: 0; deduplicated in current run: 223
+[--------------------------------] 0/76
+
+[LLM RAW] annotation_id=7fcfa480-a0aa-49ab-bddd-89701cd0c888 step_index=6
+{
+  "rewritten_query": "pencil drawing painting style"
+}
+
+[LLM RAW] annotation_id=cf195e6a-c144-4095-acce-570159daf1a6 step_index=6
+{
+  "rewritten_query": "different angle names of views of the skull"
+}
+[--------------------------------] 1/76[--------------------------------] 2/76
+[LLM RAW] annotation_id=9bee56af-8970-4e78-947e-d2cfb8eb1ad5 step_index=6
+{
+  "rewritten_query": "ultrasonic transducer"
+}
+[#-------------------------------] 3/76
+[LLM RAW] annotation_id=1d9ab7e3-3599-464c-971c-123ac94a5e91 step_index=6
+{
+  "rewritten_query": "origin of Patravahaka Yaksha"
+}
+[#-------------------------------] 4/76
+[LLM RAW] annotation_id=1d9ab7e3-3599-464c-971c-123ac94a5e91 step_index=14
+{
+  "rewritten_query": "origin of Patravahaka Yaksha"
+}
+[##------------------------------] 5/76
+[LLM RAW] annotation_id=329e197d-5eff-45de-a361-19f048deb27f step_index=10
+{
+  "rewritten_query": "longleaf pine trees"
+}
+[##------------------------------] 6/76
+[LLM RAW] annotation_id=9cf9e363-7fe2-44a1-b44d-fc460a643dd7 step_index=6
+{
+  "rewritten_query": "AL FONDO A LA IZQUIERDA translation to English"
+}
+[##------------------------------] 7/76
+[LLM RAW] annotation_id=f57b9082-a2de-47fd-90b0-1b203c6b1d62 step_index=5
+{
+  "rewritten_query": "QWERTY keyboard"
+}
+[###-----------------------------] 8/76
+[LLM RAW] annotation_id=1e7dcf21-35da-4c4f-b481-a6cd7bded777 step_index=6
+{
+  "rewritten_query": "Ford F-250"
+}
+[###-----------------------------] 9/76
+[LLM RAW] annotation_id=fe6512e1-6e5d-47d5-8535-949404643173 step_index=6
+{
+  "rewritten_query": "The Bright Ages by Matthew Gabriele and David M. Perry"
+}
+[####----------------------------] 10/76
+[LLM RAW] annotation_id=6c592731-fe3b-46b0-802f-b0570820828b step_index=2
+{
+  "rewritten_query": "Hotel Colorado architectural style"
+}
+[####----------------------------] 11/76
+[LLM RAW] annotation_id=b2aaa21f-aa27-4951-ae60-35c2a26b0501 step_index=6
+{
+  "rewritten_query": "hours of restaurant"
+}
+[#####---------------------------] 12/76
+[LLM RAW] annotation_id=8cc45d9a-8d38-4e43-bfb5-17158385ed20 step_index=6
+{
+  "rewritten_query": "Honda CR-V 6th Generation"
+}
+[#####---------------------------] 13/76
+[LLM RAW] annotation_id=f5384e55-3078-44c6-9e11-401b38d9e41c step_index=2
+{
+  "rewritten_query": "Why was Lehi rejected in Jerusalem?"
+}
+[#####---------------------------] 14/76
+[LLM RAW] annotation_id=50b299eb-bcf1-4871-8518-ac090651bbc5 step_index=2
+{
+  "rewritten_query": "unit of measurement for kilowatt-hours on electrical equipment"
+}
+[######--------------------------] 15/76
+[LLM RAW] annotation_id=07cc87f8-1b3b-462b-8e76-44475f91a3ea step_index=14
+{
+  "rewritten_query": "cultural significance of Winter Wind on the Mesa statue"
+}
+[######--------------------------] 16/76
+[LLM RAW] annotation_id=07cc87f8-1b3b-462b-8e76-44475f91a3ea step_index=10
+{
+  "rewritten_query": "historical significance of Winter Wind on the Mesa"
+}
+[#######-------------------------] 17/76
+[LLM RAW] annotation_id=3a61db88-7123-4f64-beda-efdd605435e4 step_index=2
+{
+  "rewritten_query": "genus of wood used for stringed musical instruments"
+}
+[#######-------------------------] 18/76
+[LLM RAW] annotation_id=3a61db88-7123-4f64-beda-efdd605435e4 step_index=6
+{
+  "rewritten_query": "genus of wood used for stringed musical instruments in India mulberry"
+}
+[########------------------------] 19/76
+[LLM RAW] annotation_id=db02b8a2-7525-48ef-bab7-c4ddee14f9e2 step_index=2
+{
+  "rewritten_query": "range of Mercedes-Benz EQE SUV compared to Honda Prologue"
+}
+[########------------------------] 20/76
+[LLM RAW] annotation_id=db02b8a2-7525-48ef-bab7-c4ddee14f9e2 step_index=6
+{
+  "rewritten_query": "Mercedes-Benz EQE SUV comparison range with Honda Prologue"
+}
+[########------------------------] 21/76
+[LLM RAW] annotation_id=655695f1-dbbc-4ea5-99f9-14774153b3f3 step_index=6
+{
+  "rewritten_query": "birth date of American Senator Anthony Trollope"
+}
+[#########-----------------------] 22/76
+[LLM RAW] annotation_id=fc59077e-db06-487a-ad96-ac5ff1c51c15 step_index=2
+{
+  "rewritten_query": "BioAdvanced 12 Month Tree & Shrub Protect & Feed Concentrate usage instructions seasons"
+}
+[#########-----------------------] 23/76
+[LLM RAW] annotation_id=a30e8504-bba9-4477-947a-c0d32b8df27d step_index=6
+{
+  "rewritten_query": "Order of the British Empire established date"
+}
+[##########----------------------] 24/76
+[LLM RAW] annotation_id=e46f1f84-714e-4750-930e-09aa7433d5ee step_index=2
+{
+  "rewritten_query": "Flonase Sensimist non-drowsy 24hr allergy relief spray only comes in 120 spray sizes"
+}
+[##########----------------------] 25/76
+[LLM RAW] annotation_id=f6ab627d-edf9-4c20-bf42-a9c1356f9eea step_index=6
+{
+  "rewritten_query": "A Brief History of Time chapters count"
+}
+[##########----------------------] 26/76
+[LLM RAW] annotation_id=4445ed52-cf69-4f50-8e81-193c4e5d9521 step_index=2
+{
+  "rewritten_query": "Iron Man"
+}
+[###########---------------------] 27/76
+[LLM RAW] annotation_id=87d6fe32-5e15-4e60-bfa8-311fa32f93b1 step_index=6
+{
+  "rewritten_query": "Metropolitan Museum of Art founded year"
+}
+[###########---------------------] 28/76
+[LLM RAW] annotation_id=392a93b2-97fa-4dde-8c2d-6a6cb91f5f28 step_index=2
+{
+  "rewritten_query": "original use of Airedale Building"
+}
+[############--------------------] 29/76
+[LLM RAW] annotation_id=ce33112c-12bd-4296-ba35-6341ceaa7d34 step_index=6
+{
+  "rewritten_query": "Alicia Schmidt Camacho college who wrote book that received Lora Romero First Book Prize in American Studies published year"
+}
+[############--------------------] 30/76
+[LLM RAW] annotation_id=d253fc27-09e5-4831-98ac-3bc4c5de5257 step_index=6
+{
+  "rewritten_query": "George Washington Bridge"
+}
+[#############-------------------] 31/76
+[LLM RAW] annotation_id=fb3c32ac-2147-4d6c-b0fb-7441c373d692 step_index=5
+{
+  "rewritten_query": "inventions Exposition Universelle of 1878 best known for"
+}
+[#############-------------------] 32/76
+[LLM RAW] annotation_id=4a984b44-6a41-4bff-b0b3-6c71e4076efb step_index=6
+{
+  "rewritten_query": "Hyundai Excel"
+}
+[#############-------------------] 33/76
+[LLM RAW] annotation_id=60b0edf7-e36f-47fb-af13-50eb72263938 step_index=6
+{
+    "rewritten_query": "Jeep Wrangler curb weight"
+}
+[##############------------------] 34/76
+[LLM RAW] annotation_id=a6137f78-1aa8-42f3-8017-95f6e1be6578 step_index=2
+{
+  "rewritten_query": "Hyundai Kona first introduction in Baltimore"
+}
+[##############------------------] 35/76
+[LLM RAW] annotation_id=01312d48-b0fe-4128-aa01-db254703b1be step_index=6
+{
+  "rewritten_query": "artist of the painting Untitled (Paths, Crossing—Blue)"
+}
+[###############-----------------] 36/76
+[LLM RAW] annotation_id=08029d66-61cb-4c23-b762-1ee7648608f2 step_index=2
+{
+  "rewritten_query": "author of the book Brainwashed"
+}
+[###############-----------------] 37/76
+[LLM RAW] annotation_id=25a43b28-d2f0-41bc-b795-ed7982b6a31f step_index=2
+{
+  "rewritten_query": "MTA TrainTime"
+}
+[################----------------] 38/76
+[LLM RAW] annotation_id=2c215746-1a17-41d5-bcd7-bac34a7a34d1 step_index=6
+{
+  "rewritten_query": "price of hardcover version of Assyria: The Rise and Fall of the World's First Empire"
+}
+[################----------------] 39/76
+[LLM RAW] annotation_id=30019e0f-1a75-4611-87d2-4c8ab2fb0c38 step_index=6
+{
+  "rewritten_query": "2018 Honda Accord Touring wheel size"
+}
+[################----------------] 40/76
+[LLM RAW] annotation_id=25a43b28-d2f0-41bc-b795-ed7982b6a31f step_index=6
+{
+  "rewritten_query": "MTA TrainTime app cost on Google Play and Apple App Store"
+}
+[#################---------------] 41/76
+[LLM RAW] annotation_id=340abc34-b915-4f92-820d-8775ff620847 step_index=2
+{
+  "rewritten_query": "function of LTH Meter"
+}
+[#################---------------] 42/76
+[LLM RAW] annotation_id=39b101b4-f7cd-4c79-9aba-d8228547d0ae step_index=2
+{
+  "rewritten_query": "largest stadium in Munich"
+}
+[##################--------------] 43/76
+[LLM RAW] annotation_id=442bafb3-b620-409c-a043-51fed9a76f54 step_index=2
+{
+  "rewritten_query": "A SHOC company founder"
+}
+[##################--------------] 44/76
+[LLM RAW] annotation_id=42ad7243-7e36-4f78-9e3d-2ba5d2951535 step_index=6
+{
+  "rewritten_query": "pineapple maté fizzy tea vs goodthread turmeric radiance sugar content"
+}
+[##################--------------] 45/76
+[LLM RAW] annotation_id=44ea1666-2cd3-440f-9bdd-decf5b9238a7 step_index=6
+{
+  "rewritten_query": "statue of seated bodhisattva maitreya found"
+}
+[###################-------------] 46/76
+[LLM RAW] annotation_id=44ea1666-2cd3-440f-9bdd-decf5b9238a7 step_index=14
+{
+  "rewritten_query": "seated bodhisattva maitreya discovery location"
+}
+[###################-------------] 47/76
+[LLM RAW] annotation_id=4ea0f62d-f2cd-461d-b7bd-1d7b065af2db step_index=6
+{
+  "rewritten_query": "founding date of Syracuse University"
+}
+[####################------------] 48/76
+[LLM RAW] annotation_id=48240937-8e74-4e0d-b7b5-46ea4f1f5574 step_index=2
+{
+  "rewritten_query": "current CEO of AT&T"
+}
+[####################------------] 49/76
+[LLM RAW] annotation_id=57147f41-23f4-4e0e-8ed3-f173dcc258f1 step_index=2
+{
+  "rewritten_query": "Pyotr Bagration"
+}
+[#####################-----------] 50/76
+[LLM RAW] annotation_id=5d9dd4df-f633-4c9d-89a6-755e3c70c833 step_index=6
+{
+  "rewritten_query": "Siberian Husky"
+}
+[#####################-----------] 51/76
+[LLM RAW] annotation_id=534dbd97-d09b-4187-a16a-60993c96a885 step_index=5
+{
+  "rewritten_query": "first appearance of above-ground iron fire hydrant"
+}
+[#####################-----------] 52/76
+[LLM RAW] annotation_id=66659ab8-cfe9-47b1-9ef2-fb74f0dd1c49 step_index=6
+{
+  "rewritten_query": "maximum RPM of Dremel 4000"
+}
+[######################----------] 53/76
+[LLM RAW] annotation_id=728ff37e-1ff0-43b7-bc3a-fc47ec98a1a6 step_index=2
+{
+  "rewritten_query": "E. Remington and Sons founded"
+}
+[######################----------] 54/76
+[LLM RAW] annotation_id=6f526d55-f949-4ec1-9172-80a3c7fa4d1d step_index=2
+{
+  "rewritten_query": "Before We Are Born: Essentials of Embryology and Birth Defects"
+}
+[#######################---------] 55/76
+[LLM RAW] annotation_id=826b37d3-dcf1-4e96-abb9-b8c806a04b4b step_index=2
+{
+  "rewritten_query": "Axis"
+}
+[#######################---------] 56/76
+[LLM RAW] annotation_id=84ad7c0e-952b-459f-915a-cd6f8b59cb32 step_index=2
+{
+  "rewritten_query": "inventor of shoulder-shaped clothes hanger by O. A. North"
+}
+[########################--------] 57/76
+[LLM RAW] annotation_id=87276bdf-9c86-4f36-bb3d-21c42f49d71d step_index=6
+{
+  "rewritten_query": "Spathiphyllum wallisii"
+}
+[########################--------] 58/76
+[LLM RAW] annotation_id=9484bfa0-8780-4aa1-8bee-56558bd6e3e6 step_index=2
+{
+  "rewritten_query": "height of previous iteration of Trinity Church"
+}
+[########################--------] 59/76
+[LLM RAW] annotation_id=91dc79ef-6f2c-4bd6-abd7-b2b1ed84a73d step_index=10
+{
+  "rewritten_query": "sunlight requirements for lemon cypress every day if grown indoors"
+}
+[#########################-------] 60/76
+[LLM RAW] annotation_id=98587562-6b20-426f-80f4-b921c12240d3 step_index=6
+{
+  "rewritten_query": "specifications of through-hole LEDs"
+}
+[#########################-------] 61/76
+[LLM RAW] annotation_id=a22c8bc3-6e0f-4953-9e96-f5343c8de9f9 step_index=6
+{
+  "rewritten_query": "first commercial plant for bacon"
+}
+[##########################------] 62/76
+[LLM RAW] annotation_id=98587562-6b20-426f-80f4-b921c12240d3 step_index=2
+{
+  "rewritten_query": "specifications of through-hole LEDs"
+}
+[##########################------] 63/76
+[LLM RAW] annotation_id=a4adb109-0feb-40de-b9ac-97ecb81568a2 step_index=2
+{
+  "rewritten_query": "Douglas Engelbart"
+}
+[##########################------] 64/76
+[LLM RAW] annotation_id=a91d8c35-b1c7-47ee-aeac-0a6e6c3186e6 step_index=2
+{
+  "rewritten_query": "different storage sizes for Crucial X8 Portable SSD"
+}
+[###########################-----] 65/76
+[LLM RAW] annotation_id=a9647010-205f-4f16-9926-ea42498eee0b step_index=6
+{
+  "rewritten_query": "nickname of Gilbert du Motier statue"
+}
+[###########################-----] 66/76
+[LLM RAW] annotation_id=b0790de5-87fd-4233-8103-dc2f17f0a2e6 step_index=2
+{
+  "rewritten_query": "Hippo"
+}
+[############################----] 67/76
+[LLM RAW] annotation_id=bb7f88b4-1403-4b02-bc00-ad529889e43a step_index=2
+{
+  "rewritten_query": "Chevrolet Bolt EV"
+}
+[############################----] 68/76
+[LLM RAW] annotation_id=cfaa0bff-3afa-463f-856b-f7ef8015784b step_index=2
+{
+  "rewritten_query": "Bingham University"
+}
+[#############################---] 69/76
+[LLM RAW] annotation_id=e28d7053-45ef-42ce-adc7-db03ad79b5e2 step_index=6
+{
+  "rewritten_query": "Mammalogy: Adaptation, Diversity, Ecology"
+}
+[#############################---] 70/76
+[LLM RAW] annotation_id=e3a1d220-57b7-4241-abdd-7aaf61688458 step_index=10
+{
+  "rewritten_query": "Did the Romans come before or after the Phoenicians?"
+}
+[#############################---] 71/76
+[LLM RAW] annotation_id=eb4c4ad6-3733-4c3d-82d4-43f06b64b64a step_index=2
+{
+  "rewritten_query": "Quizlet founder"
+}
+[##############################--] 72/76
+[LLM RAW] annotation_id=f7fe68db-ee7b-4d48-bfb3-a036767097f1 step_index=2
+{
+  "rewritten_query": "vice chancellor of Bingham University"
+}
+[##############################--] 73/76
+[LLM RAW] annotation_id=e7ab713c-3b25-4b3a-92f3-726412fbb554 step_index=6
+{
+  "rewritten_query": "Kroger CEO"
+}
+[###############################-] 74/76
+[LLM RAW] annotation_id=f8291531-823e-4598-9609-1b9a92700ca4 step_index=6
+{
+  "rewritten_query": "fourth quarter revenue figure"
+}
+[###############################-] 75/76
+[LLM RAW] annotation_id=feca1694-bec1-4693-b3f6-14bcb2c0dc0d step_index=10
+{
+  "rewritten_query": "REECHO Hair location in Changsha, Hunan, China"
+}
+[################################] 76/76
+Done. Output: /home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_04_16_10_21_api_experiment/label/deepseek/trajectory_annotation.llm_labeled.rewrite.jsonl; failed rewrites: 0

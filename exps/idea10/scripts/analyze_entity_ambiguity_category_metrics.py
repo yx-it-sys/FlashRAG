@@ -7,8 +7,19 @@ from pathlib import Path
 from statistics import mean
 from zlib import compress
 
+import matplotlib
+import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
 
+matplotlib.rcParams.update(
+    {
+        "font.size": 12,
+        "font.family": "serif",
+        "font.serif": ["Times New Roman", "Times", "DejaVu Serif"],
+        "pdf.fonttype": 42,
+        "ps.fonttype": 42,
+    }
+)
 
 BASE_DIR = Path("/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment")
 REPORT_DIR = Path("/home/you/FlashRAG/exps/idea10/idea_reports")
@@ -24,8 +35,26 @@ HEATMAP_PDF_OUTPUT_PATH = REPORT_DIR / "qwen/entity_ambiguity_accuracy_heatmap.p
 RADAR_ORIGIN_CSV_OUTPUT_PATH = REPORT_DIR / "qwen/entity_ambiguity_accuracy_radar_origin.csv"
 ITERATION_SVG_OUTPUT_PATH = REPORT_DIR / "qwen/entity_ambiguity_iteration_bar.svg"
 ITERATION_PDF_OUTPUT_PATH = REPORT_DIR / "qwen/entity_ambiguity_iteration_bar.pdf"
+FIGS_DIR = REPORT_DIR / "figs"
+CONTROLLED_RADAR_PDF_OUTPUT_PATH = FIGS_DIR / "entity_ambiguity_accuracy_radar_controlled_subset.pdf"
+CONTROLLED_ITERATION_PDF_OUTPUT_PATH = FIGS_DIR / "entity_ambiguity_iteration_bar_controlled_subset.pdf"
+CONTROLLED_CATEGORY_ORDER = [
+    "No",
+    "Object Identification",
+    "Indirect Entity Ambiguity",
+    "Description",
+    "Mixed",
+]
 
 CATEGORY_ORDER = [
+    "No",
+    "Object Identification",
+    "Indirect Entity Ambiguity",
+    "Description",
+    "No Object Involved",
+    "Mixed",
+]
+STEP_LEVEL_CATEGORIES = [
     "No",
     "Object Identification",
     "Indirect Entity Ambiguity",
@@ -79,14 +108,13 @@ def category_from_label(llm_label: dict | None) -> str | None:
     if llm_label.get("entity_ambiguous") == "No":
         return "No"
     category = llm_label.get("ambiguity_level")
-    if category in CATEGORY_ORDER:
+    if category in STEP_LEVEL_CATEGORIES:
         return category
     return None
 
 
 def build_sample_categories() -> dict[str, dict]:
     category_map = {}
-    filtered_multi_category_ids = []
     for item in read_jsonl(LABEL_PATH):
         annotation_id = item["annotation_id"]
         query_steps = item.get("query_steps", [])
@@ -105,18 +133,18 @@ def build_sample_categories() -> dict[str, dict]:
                 unique_non_no.add(category)
 
         if len(unique_non_no) > 1:
-            filtered_multi_category_ids.append(annotation_id)
-            continue
+            sample_category = "Mixed"
+        else:
+            sample_category = first_category or "No"
 
         category_map[annotation_id] = {
-            "category": first_category or "No",
+            "category": sample_category,
             "query_count": item.get("query_count", 0),
             "label_sequence": category_sequence,
         }
 
     return {
         "category_map": category_map,
-        "filtered_multi_category_ids": filtered_multi_category_ids,
     }
 
 
@@ -139,23 +167,18 @@ def build_iteration_counts() -> dict[str, int]:
     return counts
 
 
-def compute_stats() -> dict:
+def collect_grouped_rows() -> tuple[dict, dict]:
     intermediate_items = json.loads(INTERMEDIATE_PATH.read_text(encoding="utf-8"))
     label_info = build_sample_categories()
     category_map = label_info["category_map"]
     iteration_counts = build_iteration_counts()
-    filtered_multi_category_ids = set(label_info["filtered_multi_category_ids"])
 
     grouped = defaultdict(list)
     missing_category_ids = []
     missing_iteration_ids = []
-    filtered_multi_category_samples = []
 
     for item in intermediate_items:
         sample_id = item.get("id") or item.get("data_id")
-        if sample_id in filtered_multi_category_ids:
-            filtered_multi_category_samples.append(sample_id)
-            continue
         category_meta = category_map.get(sample_id)
         if category_meta is None:
             missing_category_ids.append(sample_id)
@@ -175,8 +198,22 @@ def compute_stats() -> dict:
             }
         )
 
+    meta = {
+        "num_samples": len(intermediate_items),
+        "num_retained_samples": sum(len(rows) for rows in grouped.values()),
+        "missing_category_ids": missing_category_ids,
+        "missing_iteration_ids": missing_iteration_ids,
+        "mixed_sample_count": len(grouped.get("Mixed", [])),
+        "category_rule": "If a sample contains more than one non-No entity ambiguity category across labeled query steps, assign Mixed. Otherwise, use the first LLM-labeled text-retrieval query category in the sample. If no labeled text query exists, assign No.",
+        "iteration_rule": "Count retrieval-result turns in omnisearch_trajectories.jsonl, i.e. the number of text_retrieval_result, image_retrieval_result, and no_retrieval_result nodes.",
+    }
+    return grouped, meta
+
+
+
+def build_stats_from_grouped(grouped: dict, meta: dict, category_order: list[str]) -> dict:
     category_rows = []
-    for category in CATEGORY_ORDER:
+    for category in category_order:
         rows = grouped.get(category, [])
         if rows:
             metric_means = {
@@ -201,18 +238,37 @@ def compute_stats() -> dict:
         )
 
     return {
-        "meta": {
-            "num_samples": len(intermediate_items),
-            "num_retained_samples": sum(len(rows) for rows in grouped.values()),
-            "missing_category_ids": missing_category_ids,
-            "missing_iteration_ids": missing_iteration_ids,
-            "filtered_multi_category_sample_count": len(filtered_multi_category_samples),
-            "filtered_multi_category_sample_ids": filtered_multi_category_samples,
-            "category_rule": "Exclude samples containing more than one non-No entity ambiguity category across labeled query steps; otherwise, use the first LLM-labeled text-retrieval query category in the sample. If no labeled text query exists, assign No.",
-            "iteration_rule": "Count retrieval-result turns in omnisearch_trajectories.jsonl, i.e. the number of text_retrieval_result, image_retrieval_result, and no_retrieval_result nodes.",
-        },
+        "meta": meta,
         "categories": category_rows,
     }
+
+
+
+def compute_stats() -> dict:
+    grouped, meta = collect_grouped_rows()
+    return build_stats_from_grouped(grouped, meta, CATEGORY_ORDER)
+
+
+
+def compute_controlled_subset_stats() -> dict:
+    grouped, meta = collect_grouped_rows()
+    subset_size = min(len(grouped[category]) for category in CONTROLLED_CATEGORY_ORDER)
+    controlled_grouped = {}
+    for category in CONTROLLED_CATEGORY_ORDER:
+        controlled_grouped[category] = sorted(grouped[category], key=lambda row: row["id"])[:subset_size]
+
+    controlled_meta = dict(meta)
+    controlled_meta.update(
+        {
+            "controlled_subset": True,
+            "controlled_subset_size_per_category": subset_size,
+            "controlled_category_order": CONTROLLED_CATEGORY_ORDER,
+            "excluded_categories": [category for category in CATEGORY_ORDER if category not in CONTROLLED_CATEGORY_ORDER],
+            "num_retained_samples": subset_size * len(CONTROLLED_CATEGORY_ORDER),
+        }
+    )
+    return build_stats_from_grouped(controlled_grouped, controlled_meta, CONTROLLED_CATEGORY_ORDER)
+
 
 
 def write_outputs(stats: dict) -> None:
@@ -237,7 +293,7 @@ def write_outputs(stats: dict) -> None:
         "",
         f"- Samples: {stats['meta']['num_samples']}",
         f"- Retained samples: {stats['meta']['num_retained_samples']}",
-        f"- Filtered multi-category samples: {stats['meta']['filtered_multi_category_sample_count']}",
+        f"- Mixed samples: {stats['meta'].get('mixed_sample_count', 0)}",
         f"- Category rule: {stats['meta']['category_rule']}",
         f"- Iteration rule: {stats['meta']['iteration_rule']}",
         "",
@@ -314,6 +370,7 @@ def draw_accuracy_heatmap_svg(stats: dict) -> None:
         "Indirect Entity Ambiguity": "#F5C04E",
         "Description": "#B9D9B7",
         "No Object Involved": "#6EA6D7",
+        "Mixed": "#8C6BB1",
     }
     angles = [-pi / 2 + 2 * pi * idx / len(RADAR_METRIC_ORDER) for idx in range(len(RADAR_METRIC_ORDER))]
 
@@ -386,6 +443,7 @@ def draw_accuracy_heatmap_pdf(stats: dict) -> None:
         "Indirect Entity Ambiguity": "#F5C04E",
         "Description": "#B9D9B7",
         "No Object Involved": "#6EA6D7",
+        "Mixed": "#8C6BB1",
     }
     angles = [-pi / 2 + 2 * pi * idx / len(RADAR_METRIC_ORDER) for idx in range(len(RADAR_METRIC_ORDER))]
 
@@ -550,17 +608,6 @@ def draw_iteration_bar_svg(stats: dict) -> None:
         f'<rect x="{left}" y="{top - 28}" width="{plot_width}" height="{len(rows) * (bar_height + gap) - gap + 50}" fill="none" stroke="#444444" stroke-width="1.4"/>',
     ]
 
-    defs = ['<defs>']
-    for idx, color in enumerate(colors):
-        defs.append(
-            f'<pattern id="diag{idx}" patternUnits="userSpaceOnUse" width="14" height="14" patternTransform="rotate(45)">'
-            f'<rect width="14" height="14" fill="{color}"/>'
-            f'<line x1="0" y1="0" x2="0" y2="14" stroke="#666666" stroke-width="3"/>'
-            f'</pattern>'
-        )
-    defs.append('</defs>')
-    parts.extend(defs)
-
     for tick_idx in range(6):
         tick_value = max_value * tick_idx / 5
         x = left + plot_width * tick_idx / 5
@@ -578,7 +625,7 @@ def draw_iteration_bar_svg(stats: dict) -> None:
         parts.append(
             f'<text x="{left - 14}" y="{y + 46}" text-anchor="end" font-size="12" font-family="Arial, Helvetica, sans-serif" fill="#6B7280">n={row["count"]}</text>'
         )
-        parts.append(f'<rect x="{left}" y="{y}" width="{fill_width:.1f}" height="{bar_height}" fill="url(#diag{idx % len(colors)})" stroke="#666666" stroke-width="1"/>')
+        parts.append(f'<rect x="{left}" y="{y}" width="{fill_width:.1f}" height="{bar_height}" fill="{colors[idx % len(colors)]}" stroke="#666666" stroke-width="1"/>')
         parts.append(
             f'<text x="{left + fill_width + 10:.1f}" y="{y + 28}" font-size="16" font-family="Arial, Helvetica, sans-serif" fill="#222222">{row["avg_iterations"]:.2f}</text>'
         )
@@ -629,11 +676,6 @@ def draw_iteration_bar_pdf(stats: dict) -> None:
         n_box = draw.textbbox((0, 0), n_text, font=small_font)
         draw.text((left - 14 - (n_box[2] - n_box[0]), y + 27), n_text, fill=TEXT_MID, font=small_font)
         draw.rectangle((left, y, left + fill_width, y + bar_height), fill=colors[idx % len(colors)], outline="#666666", width=1)
-        step = 12
-        x0 = left - bar_height
-        while x0 < left + fill_width:
-            draw.line((x0, y + bar_height, x0 + bar_height, y), fill="#666666", width=2)
-            x0 += step
         draw.text((left + fill_width + 8, y + 8), f"{row['avg_iterations']:.2f}", fill=TEXT_DARK, font=text_font)
 
     axis_title = "Average Search Rounds"
@@ -643,11 +685,137 @@ def draw_iteration_bar_pdf(stats: dict) -> None:
     image.save(ITERATION_PDF_OUTPUT_PATH, "PDF", resolution=300.0)
 
 
+
+def draw_accuracy_heatmap_pdf_to(stats: dict, output_path: Path) -> None:
+    from math import cos, pi, sin
+
+    width, height = 980, 560
+    cx, cy = 345, 285
+    radius = 190
+    radar_max = 0.5
+    colors = {
+        "No": "#E64B35",
+        "Object Identification": "#F39B45",
+        "Indirect Entity Ambiguity": "#F5C04E",
+        "Description": "#B9D9B7",
+        "No Object Involved": "#6EA6D7",
+        "Mixed": "#8C6BB1",
+    }
+    angles = [-pi / 2 + 2 * pi * idx / len(RADAR_METRIC_ORDER) for idx in range(len(RADAR_METRIC_ORDER))]
+
+    cmds = []
+    for level in range(1, 6):
+        r = radius * level / 5
+        if level == 5:
+            cmds.extend(pdf_circle(cx, cy, r, width, height, "#444444", line_width=1.0))
+        else:
+            cmds.extend(pdf_circle(cx, cy, r, width, height, "#D7DDE5", line_width=0.8, dash=[2, 2]))
+        cmds.extend(pdf_text(cx + 10, cy - r + 5, f"{radar_max * level / 5:.1f}", width, height, RADAR_RING_LABEL_FONT_SIZE, "#6B7280"))
+
+    for angle, metric in zip(angles, RADAR_METRIC_ORDER):
+        x = cx + radius * cos(angle)
+        y = cy + radius * sin(angle)
+        cmds.extend(pdf_line(cx, cy, x, y, width, height, "#D7DDE5", line_width=0.9))
+        label = METRIC_LABELS[metric]
+        extra_offset = 48 if metric == "rouge-l" else 38
+        lx = cx + (radius + extra_offset) * cos(angle)
+        ly = cy + (radius + extra_offset) * sin(angle)
+        cmds.extend(pdf_text(lx - 24, ly + 6, label, width, height, RADAR_AXIS_LABEL_FONT_SIZE, "#222222"))
+
+    for row in stats["categories"]:
+        pts = []
+        for angle, metric in zip(angles, RADAR_METRIC_ORDER):
+            value = min(row["metrics"][metric], radar_max) / radar_max
+            pts.append((cx + radius * value * cos(angle), cy + radius * value * sin(angle)))
+        cmds.extend(pdf_polyline(pts + [pts[0]], width, height, colors[row["category"]], line_width=1.8))
+        for px, py in pts:
+            cmds.extend(pdf_filled_circle(px, py, 2.6, width, height, colors[row["category"]]))
+
+    legend_x = 560
+    legend_y = 58
+    for idx, row in enumerate(stats["categories"]):
+        y = legend_y + idx * RADAR_LEGEND_ROW_GAP
+        color = colors[row["category"]]
+        cmds.extend(pdf_line(legend_x, y, legend_x + 26, y, width, height, color, line_width=1.8))
+        cmds.extend(pdf_filled_circle(legend_x + 13, y, 2.6, width, height, color))
+        cmds.extend(pdf_text(legend_x + 38, y + 5, row["category"], width, height, RADAR_LEGEND_FONT_SIZE, "#222222"))
+
+    write_vector_pdf(output_path, width, height, cmds)
+
+
+
+def draw_iteration_bar_pdf_to(stats: dict, output_path: Path) -> None:
+    rows = sorted(stats["categories"], key=lambda row: row["avg_iterations"], reverse=True)
+    labels = [row["category"] for row in rows]
+    values = [row["avg_iterations"] for row in rows]
+    counts = [row["count"] for row in rows]
+    palette = ["#E88C9A", "#F3B37A", "#F6C98E", "#8DB7E0", "#B9D4EE"]
+    colors = [palette[i % len(palette)] for i in range(len(rows))]
+    xmax = max(max(values), 1.0) * 1.16
+
+    with plt.rc_context(
+        {
+            "font.family": "DejaVu Sans",
+            "font.size": 15,
+            "axes.labelsize": 16,
+            "xtick.labelsize": 13,
+            "ytick.labelsize": 13,
+        }
+    ):
+        fig, ax = plt.subplots(figsize=(8.8, 4.5))
+        y = list(range(len(rows)))
+        bars = ax.barh(y, values, color=colors, edgecolor="#666666", linewidth=0.8, height=0.56)
+
+        for idx, (bar, value, count) in enumerate(zip(bars, values, counts)):
+            y_center = bar.get_y() + bar.get_height() / 2
+            ax.text(
+                value + xmax * 0.015,
+                y_center,
+                f"{value:.2f}",
+                va="center",
+                ha="left",
+                fontsize=13,
+                color="#333333",
+            )
+            ax.text(
+                -xmax * 0.02,
+                y_center,
+                labels[idx],
+                va="center",
+                ha="right",
+                fontsize=13,
+                color="#222222",
+                rotation=25,
+                rotation_mode="anchor",
+            )
+
+        ax.set_yticks(y)
+        ax.set_yticklabels([""] * len(rows))
+        ax.tick_params(axis="y", which="both", left=False, right=False, length=0)
+        ax.minorticks_off()
+        ax.invert_yaxis()
+        ax.set_xlabel("Average Search Rounds")
+        ax.set_xlim(0, xmax)
+        ax.grid(axis="x", linestyle="--", linewidth=0.6, alpha=0.22)
+        ax.spines["top"].set_visible(True)
+        ax.spines["right"].set_visible(True)
+        ax.spines["left"].set_visible(True)
+        ax.spines["bottom"].set_visible(True)
+
+        fig.subplots_adjust(left=0.34, right=0.97, bottom=0.20, top=0.96)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(output_path, format="pdf", bbox_inches="tight", pad_inches=0.03)
+        plt.close(fig)
+
+
 def main() -> None:
     stats = compute_stats()
+    controlled_stats = compute_controlled_subset_stats()
     write_outputs(stats)
     draw_accuracy_heatmap_pdf(stats)
     draw_iteration_bar_pdf(stats)
+    draw_accuracy_heatmap_pdf_to(controlled_stats, CONTROLLED_RADAR_PDF_OUTPUT_PATH)
+    draw_iteration_bar_pdf_to(controlled_stats, CONTROLLED_ITERATION_PDF_OUTPUT_PATH)
     print(f"Saved {JSON_OUTPUT_PATH}")
     print(f"Saved {CSV_OUTPUT_PATH}")
     print(f"Saved {MD_OUTPUT_PATH}")
@@ -656,6 +824,8 @@ def main() -> None:
     print(f"Saved {RADAR_ORIGIN_CSV_OUTPUT_PATH}")
     print(f"Saved {ITERATION_SVG_OUTPUT_PATH}")
     print(f"Saved {ITERATION_PDF_OUTPUT_PATH}")
+    print(f"Saved {CONTROLLED_RADAR_PDF_OUTPUT_PATH}")
+    print(f"Saved {CONTROLLED_ITERATION_PDF_OUTPUT_PATH}")
 
 
 if __name__ == "__main__":

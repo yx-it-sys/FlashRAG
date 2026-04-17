@@ -1,0 +1,8 @@
+{
+  "input_trajectory_file": "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment/omnisearch_trajectories.jsonl",
+  "label_file": "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment/label/qwen/trajectory_annotation.llm_labeled.adjudicated.jsonl",
+  "output_file": "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment/omnisearch_trajectories.entity_ambiguous_items.jsonl",
+  "total_trajectory_items": 1199,
+  "entity_ambiguous_items": 399,
+  "criterion": "Keep an item if any query_step has entity_ambiguous == Yes, preferring human_label over llm_label when human_label exists."
+}

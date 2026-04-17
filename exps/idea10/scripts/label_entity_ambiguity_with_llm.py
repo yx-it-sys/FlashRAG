@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+import argparse
 import json
 import os
+import re
 import sys
 import threading
 import time
@@ -17,11 +19,11 @@ for k in [
 ]:
     os.environ.pop(k, None)
 
-INPUT_PATH = Path(
-    "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment/label/trajectory_annotation.jsonl"
+DEFAULT_INPUT_PATH = Path(
+    "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_04_16_10_21_api_experiment/omnisearch_trajectories.jsonl"
 )
-OUTPUT_PATH = Path(
-    "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment/label/deepseek/trajectory_annotation.llm_labeled.jsonl"
+DEFAULT_OUTPUT_PATH = Path(
+    "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_04_16_10_21_api_experiment/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl"
 )
 PROMPT_PATH = Path("/home/you/FlashRAG/exps/idea10/prompts/label_entitiy_ambiguouty.toml")
 MODEL = "Pro/deepseek-ai/DeepSeek-R1"
@@ -60,6 +62,7 @@ def read_jsonl(path: Path) -> list[dict]:
 
 def write_jsonl(path: Path, items: list[dict]) -> None:
     tmp_path = path.with_suffix(path.suffix + ".tmp")
+    path.parent.mkdir(parents=True, exist_ok=True)
     with tmp_path.open("w", encoding="utf-8") as f:
         for item in items:
             f.write(json.dumps(item, ensure_ascii=False) + "\n")
@@ -92,8 +95,8 @@ def render_prompt(template: str, sample: dict, query_step: dict) -> str:
     return template.format(**values)
 
 
-def is_labeled(query_step: dict) -> bool:
-    llm_label = query_step.get("llm_label")
+def is_labeled(target: dict) -> bool:
+    llm_label = target.get("llm_label")
     if not isinstance(llm_label, dict):
         return False
     entity = llm_label.get("entity_ambiguous")
@@ -143,16 +146,85 @@ def normalize_query_key(query: str) -> str | None:
     return query or None
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Label entity ambiguity for text retrieval queries in trajectory annotations "
+            "or omnisearch trajectories."
+        )
+    )
+    parser.add_argument("--input", type=Path, default=DEFAULT_INPUT_PATH)
+    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT_PATH)
+    parser.add_argument("--prompt", type=Path, default=PROMPT_PATH)
+    parser.add_argument("--model", default=MODEL)
+    parser.add_argument("--base-url", default=BASE_URL)
+    return parser.parse_args()
+
+
+def extract_text_retrieval_query_from_search(content: str) -> str:
+    if not isinstance(content, str):
+        return ""
+    match = re.search(r'Text Retrieval[:\s"]*(.*?)(?=(?:<|$))', content, re.DOTALL)
+    if not match:
+        return ""
+    return match.group(1).strip().strip('"')
+
+
+def iter_label_targets(sample: dict):
+    query_steps = sample.get("query_steps")
+    if isinstance(query_steps, list):
+        for step_idx, query_step in enumerate(query_steps):
+            if not isinstance(query_step, dict):
+                continue
+            yield {
+                "container": "query_steps",
+                "index": step_idx,
+                "target": query_step,
+                "step_id": query_step.get("step_index", step_idx + 1),
+                "query": query_step.get("text_query", ""),
+                "prompt_values": query_step,
+            }
+        return
+
+    trajectory = sample.get("trajectory")
+    if not isinstance(trajectory, list):
+        return
+
+    for step_idx, step in enumerate(trajectory):
+        if not isinstance(step, dict):
+            continue
+        query = ""
+        if step.get("mode") == "text_retrieval":
+            query = step.get("query", "")
+        elif step.get("action") == "search":
+            query = extract_text_retrieval_query_from_search(step.get("content", ""))
+        query = normalize_query_key(query) or ""
+        if not query:
+            continue
+        yield {
+            "container": "trajectory",
+            "index": step_idx,
+            "target": step,
+            "step_id": step_idx + 1,
+            "query": query,
+            "prompt_values": {
+                "sub_question": "",
+                "text_query": query,
+            },
+        }
+
+
 def build_existing_label_cache(items: list[dict]) -> dict[str, dict]:
     cache: dict[str, dict] = {}
     for sample in items:
-        for query_step in sample.get("query_steps", []):
-            if not is_labeled(query_step):
+        for target_info in iter_label_targets(sample):
+            target = target_info["target"]
+            if not is_labeled(target):
                 continue
-            query_key = normalize_query_key(query_step.get("text_query", ""))
+            query_key = normalize_query_key(target_info["query"])
             if query_key is None:
                 continue
-            cache[query_key] = dict(query_step["llm_label"])
+            cache[query_key] = dict(target["llm_label"])
     return cache
 
 
@@ -179,22 +251,27 @@ def annotate_query(client: OpenAI, model: str, system_prompt: str, sample_id: st
 
 
 def main() -> None:
+    args = parse_args()
     api_key = os.environ.get("SILICONFLOW_API_KEY") or os.environ.get("OPENAI_API_KEY")
     if not api_key:
         raise ValueError("Set SILICONFLOW_API_KEY or OPENAI_API_KEY before running.")
 
-    source_items = read_jsonl(INPUT_PATH)
-    if OUTPUT_PATH.exists():
-        items = read_jsonl(OUTPUT_PATH)
+    input_path = args.input
+    output_path = args.output
+    prompt_path = args.prompt
+
+    source_items = read_jsonl(input_path)
+    if output_path.exists():
+        items = read_jsonl(output_path)
         if len(items) != len(source_items):
             raise ValueError(f"Existing output length mismatch: {len(items)} vs {len(source_items)}")
-        print(f"Resuming from existing output: {OUTPUT_PATH}")
+        print(f"Resuming from existing output: {output_path}")
     else:
         items = source_items
-        print(f"Starting new labeling run from: {INPUT_PATH}")
+        print(f"Starting new labeling run from: {input_path}")
 
-    system_template = load_system_prompt(PROMPT_PATH)
-    client = OpenAI(api_key=api_key, base_url=BASE_URL)
+    system_template = load_system_prompt(prompt_path)
+    client = OpenAI(api_key=api_key, base_url=args.base_url)
 
     lock = threading.Lock()
     futures = {}
@@ -207,30 +284,35 @@ def main() -> None:
 
     with ThreadPoolExecutor(max_workers=WORKERS) as executor:
         for sample_idx, sample in enumerate(items):
-            for step_idx, query_step in enumerate(sample.get("query_steps", [])):
-                if is_labeled(query_step):
+            for target_info in iter_label_targets(sample):
+                target = target_info["target"]
+                if is_labeled(target):
                     continue
-                query_key = normalize_query_key(query_step.get("text_query", ""))
+                query_key = normalize_query_key(target_info["query"])
                 if query_key is not None and query_key in label_cache:
-                    query_step["llm_label"] = dict(label_cache[query_key])
+                    target["llm_label"] = dict(label_cache[query_key])
                     cache_hits += 1
                     continue
-                prompt = render_prompt(system_template, sample, query_step)
+                prompt = render_prompt(system_template, sample, target_info["prompt_values"])
                 if query_key is not None and query_key in futures:
-                    future_targets[futures[query_key]].append((sample_idx, step_idx))
+                    future_targets[futures[query_key]].append(
+                        (sample_idx, target_info["container"], target_info["index"])
+                    )
                     dedup_hits += 1
                     continue
                 future = executor.submit(
                     annotate_query,
                     client,
-                    MODEL,
+                    args.model,
                     prompt,
-                    sample.get("annotation_id", ""),
-                    query_step.get("step_index", step_idx + 1),
+                    sample.get("annotation_id") or sample.get("id", ""),
+                    target_info["step_id"],
                 )
                 if query_key is not None:
                     futures[query_key] = future
-                future_targets[future] = [(sample_idx, step_idx)]
+                future_targets[future] = [
+                    (sample_idx, target_info["container"], target_info["index"])
+                ]
                 pending += 1
 
         print(f"Pending queries: {pending}")
@@ -241,27 +323,33 @@ def main() -> None:
         print(render_progress(0, pending), flush=True)
 
         if cache_hits > 0:
-            write_jsonl(OUTPUT_PATH, items)
+            write_jsonl(output_path, items)
 
         for future in as_completed(future_targets):
             result = future.result()
             with lock:
-                for sample_idx, step_idx in future_targets[future]:
-                    query_step = items[sample_idx]["query_steps"][step_idx]
-                    query_step["llm_label"] = dict(result)
-                    query_key = normalize_query_key(query_step.get("text_query", ""))
+                for sample_idx, container, step_idx in future_targets[future]:
+                    target = items[sample_idx][container][step_idx]
+                    target["llm_label"] = dict(result)
+                    if container == "query_steps":
+                        query_key = normalize_query_key(target.get("text_query", ""))
+                    else:
+                        query_key = normalize_query_key(
+                            target.get("query", "") if target.get("mode") == "text_retrieval"
+                            else extract_text_retrieval_query_from_search(target.get("content", ""))
+                        )
                     if query_key is not None:
                         label_cache[query_key] = dict(result)
                 completed += 1
-                write_jsonl(OUTPUT_PATH, items)
+                write_jsonl(output_path, items)
                 sys.stdout.write("\r" + render_progress(completed, pending))
                 sys.stdout.flush()
 
-    if pending == 0 and not OUTPUT_PATH.exists():
-        write_jsonl(OUTPUT_PATH, items)
+    if pending == 0 and not output_path.exists():
+        write_jsonl(output_path, items)
     elif pending > 0:
         print()
-    print(f"Done. Output: {OUTPUT_PATH}")
+    print(f"Done. Output: {output_path}")
 
 
 if __name__ == "__main__":

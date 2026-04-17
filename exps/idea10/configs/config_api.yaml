@@ -1,0 +1,89 @@
+data_dir: data/datasets/
+dataset_name: crag_mm
+split:
+  - validation_sample
+test_sample_num: 
+random_sample: true
+seed: 2024
+
+save_dir: data/result/
+save_note: api_experiment
+save_new_dir: true
+save_intermediate_data: true
+save_metric_score: true
+
+gpu_id: "0"
+
+framework: api
+generator_model: Qwen/Qwen2-VL-72B-Instruct
+openai_setting:
+  api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
+  base_url: https://api.siliconflow.cn/v1
+generator_batch_size: 4
+generator_max_input_len: 2048
+generation_params:
+  max_tokens: 2048
+  temperature: 0.0
+  top_p: 1.0
+api_image_max_side: 1024
+api_image_quality: 85
+
+metrics:
+  - em
+  - f1
+  - acc
+  - precision
+  - recall
+
+# Required by Config even though OmniSearchPipeline lazy-loads modality-specific retrievers.
+retrieval_method: crag
+retrieval_model_path: /mnt/data/you/modelscope/clip-vit-large-patch14
+index_path: null
+retrieval_pooling_method: cls
+
+text_retrieval_topk: 5
+image_retrieval_topk: 2
+omni_retrieval_char_limit: 12000
+omni_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/omni_prompt.toml
+
+text_retriever_config:
+  retrieval_method: bge
+  retrieval_device: cpu
+  retrieval_model_path: /mnt/data/you/modelscope/bge-large-en-v1.5
+  corpus_path: /mnt/data/you/datasets/mcsearch/corpus/all_docs.jsonl
+  index_path: /mnt/data/you/datasets/mcsearch/indexes/bge_Flat.index
+  retrieval_topk: 10
+  retrieval_pooling_method: cls
+
+image_retriever_config:
+  retrieval_method: crag
+  retrieval_device: cpu
+  retrieval_model_path: /mnt/data/you/modelscope/clip-vit-large-patch14
+  corpus_path: /home/you/FlashRAG/exps/idea10/data/datasets/mcsearch/corpus/image_corpus.parquet
+  retrieval_topk: 5
+  multimodal_index_path_dict:
+    text: null
+    image: /home/you/FlashRAG/exps/idea10/data/datasets/mcsearch/indexes/clip_Flat_image.index
+  image_retrieval_target_modal: image
+
+roi_preprocess_config:
+  enabled: false
+  python_bin: /home/you/miniconda3/envs/dino/bin/python3.11
+  script_path: /home/you/FlashRAG/exps/idea10/scripts/groundingdino_roi_worker.py
+  groundingdino_root: /home/you/GroundingDINO
+  config_file: /home/you/GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py
+  checkpoint_path: /home/you/GroundingDINO/weights/groundingdino_swint_ogc.pth
+  device: cpu
+  box_threshold: 0.35
+  text_threshold: 0.25
+  expand_ratio: 0.08
+  output_dir: /tmp/omnisearch_roi_cache
+
+crag_search_device: cpu
+crag_text_model_name: /mnt/data/you/modelscope/bge-large-en-v1.5
+crag_image_attr_max_chars: 200
+crag_image_entity_max_chars: 1200
+crag_hf_home: /mnt/data/you/huggingface
+crag_offline: true
+crag_search_device: cpu
+omni_retrieval_char_limit: 12000

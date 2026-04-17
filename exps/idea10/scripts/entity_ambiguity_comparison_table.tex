@@ -1,0 +1,34 @@
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lrrr}
+\hline
+Metric & Before Oracle Rewrite & After Oracle Rewrite & Reduction \\
+\hline
+Items with $\geq$1 entity-ambiguous step & 366 / 369 (99.19\%) & 60 / 369 (16.26\%) & 82.93 pct \\
+Ambiguous retrieval steps & 938 / 1180 (79.49\%) & 288 / 1794 (16.05\%) & 63.44 pct \\
+\hline
+\end{tabular}
+\caption{Entity ambiguity before and after Oracle rewrite on the same cohort of 369 items. Oracle rewrite reduces the fraction of items that still contain at least one entity-ambiguous retrieval step from 99.19\% to 16.26\%, and reduces the ambiguous-step rate from 79.49\% to 16.05\%.}
+\label{tab:oracle-rewrite-entity-ambiguity}
+\end{table}
+
+\noindent\textbf{Category breakdown of remaining ambiguous steps.}
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{lrr}
+\hline
+Ambiguity Category & Before Oracle Rewrite & After Oracle Rewrite \\
+\hline
+Object Identification & 519 & 110 \\
+Indirect Entity Ambiguity & 220 & 149 \\
+Description & 187 & 29 \\
+No Object Involved & 12 & 0 \\
+\hline
+\end{tabular}
+\caption{Breakdown of entity-ambiguous retrieval steps by category before and after Oracle rewrite.}
+\label{tab:oracle-rewrite-entity-ambiguity-breakdown}
+\end{table}

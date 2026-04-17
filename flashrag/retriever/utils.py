@@ -118,7 +118,7 @@ def parse_query(model_name, query_list, instruction=None, is_query=True):
         if instruction == "":
             warnings.warn('Instruction is not set')
         else:
-            print(f"Use `{instruction}` as retreival instruction")
+            print(f"Use `{instruction}` as retrieval instruction")
         _has_printed_instruction = True
         
     query_list = [instruction + query for query in query_list]

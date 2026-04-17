@@ -25,7 +25,8 @@ gpu_id:
 - '1'
 dataset_name: crag_mm
 split:
-- validation
+# - validation
+- public_test
 test_sample_num: ~
 random_sample: true
 seed: 2024
@@ -84,6 +85,7 @@ metrics:
 - acc
 - precision
 - recall
+- gpt
 # - gpt
 gpt_acc_setting:
     model_name: "Pro/deepseek-ai/DeepSeek-R1"
@@ -112,7 +114,7 @@ image_retriever_config:
         image: /home/you/FlashRAG/exps/idea10/data/datasets/mcsearch/indexes/clip_Flat_image.index
     image_retrieval_target_modal: image
 roi_preprocess_config:
-    enabled: true
+    enabled: false
     python_bin: /home/you/miniconda3/envs/dino/bin/python3.11
     script_path: /home/you/FlashRAG/exps/idea10/scripts/groundingdino_roi_worker.py
     groundingdino_root: /home/you/GroundingDINO
@@ -125,6 +127,8 @@ roi_preprocess_config:
     output_dir: /tmp/omnisearch_roi_cache
 crag_search_device: cpu
 omni_retrieval_char_limit: 12000
+crag_image_attr_max_chars: 500
+crag_image_entity_max_chars: 1200
 crag_text_model_name: /mnt/data/you/modelscope/bge-large-en-v1.5
 crag_hf_home: /mnt/data/you/huggingface
 crag_offline: true

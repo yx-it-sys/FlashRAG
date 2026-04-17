@@ -25,9 +25,9 @@ for k in [
     os.environ.pop(k, None)
 
 DEFAULT_INPUT_PATH = Path(
-    "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment/label/trajectory_annotation.llm_labeled.jsonl"
+    "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_04_16_10_21_api_experiment/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl"
 )
-DEFAULT_OUTPUT_PATH = "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment/label/trajectory_annotation.llm_labeled.rewrite_deepseek.jsonl"
+DEFAULT_OUTPUT_PATH = "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_04_16_10_21_api_experiment/label/deepseek/trajectory_annotation.llm_labeled.rewrite.jsonl"
 DEFAULT_PROMPT_PATH = Path(
     "/home/you/FlashRAG/exps/idea10/prompts/rewrite_entity_ambiguous_query.toml"
 )
@@ -306,8 +306,6 @@ def main() -> None:
             )
             print(render_progress(0, pending), flush=True)
 
-            # Persist cache-hit assignments before waiting on remote calls so they
-            # are not lost if one request later fails.
             write_jsonl(args.output, items)
 
             for future in as_completed(future_targets):

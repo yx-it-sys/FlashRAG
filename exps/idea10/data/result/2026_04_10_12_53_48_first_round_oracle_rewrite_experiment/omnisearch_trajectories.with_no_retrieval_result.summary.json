@@ -1,0 +1,7 @@
+{
+  "input_file": "/home/you/FlashRAG/exps/idea10/data/result/2026_04_10_12_53_48_first_round_oracle_rewrite_experiment/omnisearch_trajectories.jsonl",
+  "output_file": "/home/you/FlashRAG/exps/idea10/data/result/2026_04_10_12_53_48_first_round_oracle_rewrite_experiment/omnisearch_trajectories.with_no_retrieval_result.jsonl",
+  "total_input_items": 369,
+  "items_with_at_least_one_no_retrieval_result": 120,
+  "criterion": "Keep an item if any trajectory step has action == \"no_retrieval_result\"."
+}

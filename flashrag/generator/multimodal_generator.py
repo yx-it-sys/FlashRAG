@@ -16,6 +16,7 @@ import json
 import os
 import importlib
 import base64
+import io
 from io import BytesIO
 from flashrag.generator.utils import convert_image_to_base64, process_image, resolve_max_tokens, process_image_pil
 import time
@@ -742,26 +743,106 @@ class VLLMMMGenerator(BaseMultiModalGenerator):
             return generated_texts, scores
         return generated_texts
     
-from openai import OpenAI  
+from openai import OpenAI
 class APIGenerator():
     def __init__(self, config):
-        api_key = config["api_key"]
-        self.model_name = config["generator_model"]
-        self.max_tokens = config["max_tokens"]
-        self.temperature = config['temperature']
-        self.top_p = config["top_p"]
-        self.client = OpenAI(
-            api_key=api_key,
-            base_url="https://api.siliconflow.cn/v1"
+        self.config = config
+        openai_setting = deepcopy(config["openai_setting"] if "openai_setting" in config else {})
+
+        api_key = (
+            config["api_key"] if "api_key" in config else None
+            or openai_setting.get("api_key")
+            or os.getenv("OPENAI_API_KEY")
+        )
+        if api_key is None:
+            raise ValueError("APIGenerator requires `api_key` or `openai_setting.api_key`.")
+
+        base_url = (
+            config["api_base_url"] if "api_base_url" in config else None
+            or openai_setting.get("base_url")
+            or "https://api.siliconflow.cn/v1"
         )
 
-    def generate(self, input):
+        generation_params = deepcopy(config["generation_params"] if "generation_params" in config else {})
+        self.model_name = config["generator_model"]
+        self.max_tokens = (
+            generation_params.get("max_tokens")
+            or (config["max_tokens"] if "max_tokens" in config else None)
+            or 512
+        )
+        self.temperature = generation_params.get(
+            "temperature",
+            config["temperature"] if "temperature" in config else 0.0,
+        )
+        self.top_p = generation_params.get(
+            "top_p",
+            config["top_p"] if "top_p" in config else 1.0,
+        )
+        self.image_max_side = int(config["api_image_max_side"] if "api_image_max_side" in config else 1024)
+        self.image_quality = int(config["api_image_quality"] if "api_image_quality" in config else 85)
+        self.client = OpenAI(api_key=api_key, base_url=base_url)
+
+    def _image_to_data_url(self, image):
+        from PIL import Image
+
+        image = process_image_pil(image)
+        if not isinstance(image, Image.Image):
+            raise ValueError(f"Unsupported image type for APIGenerator: {type(image).__name__}")
+
+        image = image.convert("RGB")
+        image.thumbnail((self.image_max_side, self.image_max_side))
+        buffer = io.BytesIO()
+        image.save(buffer, format="JPEG", quality=self.image_quality, optimize=True)
+        image_bs64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+        return f"data:image/jpeg;base64,{image_bs64}"
+
+    def _normalize_content_item(self, item):
+        if not isinstance(item, dict):
+            return item
+
+        item_type = item.get("type")
+        if item_type == "image_url":
+            return item
+
+        if item_type == "image":
+            image = item.get("image")
+            image_url = self._image_to_data_url(image)
+            return {
+                "type": "image_url",
+                "image_url": {"url": image_url},
+            }
+
+        return item
+
+    def _normalize_message(self, message):
+        normalized = deepcopy(message)
+        content = normalized.get("content")
+
+        if isinstance(content, list):
+            normalized_content = [self._normalize_content_item(item) for item in content]
+            if all(isinstance(item, dict) and item.get("type") == "text" for item in normalized_content):
+                normalized["content"] = "\n".join(item.get("text", "") for item in normalized_content).strip()
+            else:
+                normalized["content"] = normalized_content
+
+        return normalized
+
+    def _generate_one(self, messages):
+        normalized_messages = [self._normalize_message(message) for message in messages]
         response = self.client.chat.completions.create(
             model=self.model_name,
-            messages=input,
+            messages=normalized_messages,
             max_tokens=self.max_tokens,
             temperature=self.temperature,
-            top_p=self.top_p
+            top_p=self.top_p,
         )
-        response = response.choices[0].message.content
-        return response
+        return response.choices[0].message.content or ""
+
+    def generate(self, input_list):
+        if not input_list:
+            return []
+
+        if isinstance(input_list, list) and input_list and isinstance(input_list[0], dict):
+            return self._generate_one(input_list)
+
+        return [self._generate_one(messages) for messages in input_list]
