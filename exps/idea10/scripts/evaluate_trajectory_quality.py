@@ -39,24 +39,27 @@ DEFAULT_INPUT = Path(
     "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_04_16_10_21_api_experiment/omnisearch_trajectories.jsonl"
 )
 DEFAULT_OUTPUT_DIR = Path(
-    "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_04_16_10_21_api_experiment/trajectory_quality_eval"
+    "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_04_16_10_21_api_experiment/trajectory_quality_eval_whole_delta_F"
 )
 DEFAULT_FACT_PROMPT = Path(
     "/home/you/FlashRAG/exps/idea10/prompts/extract_atomic_fact_set.toml"
 )
 DEFAULT_UTILITY_PROMPT = Path(
-    "/home/you/FlashRAG/exps/idea10/prompts/label_iteration_utility.toml"
+    "/home/you/FlashRAG/exps/idea10/prompts/select_helpful_facts_for_utility.toml"
 )
 DEFAULT_MODEL = os.environ.get("TRAJECTORY_EVAL_MODEL", "Pro/deepseek-ai/DeepSeek-R1")
+DEFAULT_FACT_API_MODEL = os.environ.get(
+    "TRAJECTORY_EVAL_FACT_MODEL", "Qwen/Qwen2.5-7B-Instruct"
+)
 DEFAULT_BASE_URL = os.environ.get("TRAJECTORY_EVAL_BASE_URL", "https://api.siliconflow.cn/v1")
 DEFAULT_API_KEY_ENV = "SILICONFLOW_API_KEY"
-DEFAULT_FACT_EXTRACTOR = "local_qwen" #"api" or "local_qwen"
+DEFAULT_FACT_EXTRACTOR = "api"  # "api" or "local_qwen"
 DEFAULT_LOCAL_FACT_MODEL = "Qwen2.5-7B-Instruct"
 DEFAULT_LOCAL_FACT_MODEL_PATH = Path("/mnt/data/you/modelscope/Qwen2.5-7B-Instruct")
 DEFAULT_WORKERS = 2
 DEFAULT_TIMEOUT = 120.0
 DEFAULT_RETRIES = 2
-DEFAULT_SIM_THRESHOLD = 0.85
+DEFAULT_SIM_THRESHOLD = 2.0
 DEFAULT_FACT_SIM_THRESHOLD = 0.9
 DEFAULT_EMBED_BATCH_SIZE = 64
 DEFAULT_EPSILON = 1e-8
@@ -110,6 +113,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--fact-prompt", type=Path, default=DEFAULT_FACT_PROMPT)
     parser.add_argument("--utility-prompt", type=Path, default=DEFAULT_UTILITY_PROMPT)
     parser.add_argument("--model", type=str, default=DEFAULT_MODEL)
+    parser.add_argument("--fact-api-model", type=str, default=DEFAULT_FACT_API_MODEL)
     parser.add_argument("--base-url", type=str, default=DEFAULT_BASE_URL)
     parser.add_argument("--api-key-env", type=str, default=DEFAULT_API_KEY_ENV)
     parser.add_argument(
@@ -661,6 +665,7 @@ class LLMJudge:
         self,
         client: OpenAI,
         model: str,
+        fact_api_model: str,
         timeout: float,
         retries: int,
         max_docs_per_iteration: int,
@@ -674,6 +679,7 @@ class LLMJudge:
     ) -> None:
         self.client = client
         self.model = model
+        self.fact_api_model = fact_api_model
         self.timeout = timeout
         self.retries = retries
         self.max_docs_per_iteration = max_docs_per_iteration
@@ -719,12 +725,12 @@ class LLMJudge:
         self._maybe_flush_fact_cache(force=True)
         self._maybe_flush_utility_cache(force=True)
 
-    def _chat_json(self, system_prompt: str, user_prompt: str) -> dict:
+    def _chat_json(self, system_prompt: str, user_prompt: str, model: str | None = None) -> dict:
         last_error = None
         for attempt in range(self.retries + 1):
             try:
                 response = self.client.chat.completions.create(
-                    model=self.model,
+                    model=model or self.model,
                     messages=[
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": user_prompt},
@@ -776,6 +782,7 @@ class LLMJudge:
             data = self._chat_json(
                 "You extract atomic fact sets for trajectory-level evaluation.",
                 user_prompt,
+                model=self.fact_api_model,
             )
         raw_facts = data.get("facts", [])
         if not isinstance(raw_facts, list):
@@ -843,7 +850,7 @@ class LLMJudge:
         query: str,
         reasoning: str,
         facts: list[str],
-    ) -> tuple[str, str, list[str]]:
+    ) -> tuple[float, str, list[str]]:
         cache_key = json.dumps(
             {"query": query, "reasoning": reasoning, "facts": facts},
             ensure_ascii=False,
@@ -852,19 +859,19 @@ class LLMJudge:
         with self.utility_cache_lock:
             cached = self.utility_cache.get(cache_key)
         if cached is not None:
-            cached_label = normalize_utility_label(cached.get("label"))
+            cached_utility = cached.get("utility_score")
             cached_reason = cached.get("reason", "")
-            cached_filtered_facts = cached.get("filtered_facts", [])
-            if not isinstance(cached_filtered_facts, list):
-                cached_filtered_facts = []
-            cached_filtered_facts = [
+            cached_helpful_facts = cached.get("helpful_facts", [])
+            if not isinstance(cached_helpful_facts, list):
+                cached_helpful_facts = []
+            cached_helpful_facts = [
                 normalize_whitespace(str(fact))
-                for fact in cached_filtered_facts
+                for fact in cached_helpful_facts
                 if normalize_whitespace(str(fact))
             ]
-            if cached_label:
-                return cached_label, cached_reason, cached_filtered_facts
-            # Drop malformed cached labels and recompute.
+            if isinstance(cached_utility, (int, float)):
+                return float(cached_utility), cached_reason, cached_helpful_facts
+            # Drop malformed cached entries and recompute.
             with self.utility_cache_lock:
                 self.utility_cache.pop(cache_key, None)
                 self.utility_cache_pending_writes += 1
@@ -872,53 +879,45 @@ class LLMJudge:
 
         user_prompt = render_prompt(
             self.utility_prompt,
-            question=query,
-            reasoning=reasoning,
+            sub_question=query,
+            thought=reasoning,
             facts=json.dumps(facts, ensure_ascii=False),
         )
         data = self._chat_json(
-            "You label iteration utility for trajectory-level evaluation.",
+            "You identify which deduplicated facts are helpful for answering the current sub-question.",
             user_prompt,
         )
-        raw_label = data.get("label")
-        label = normalize_utility_label(raw_label)
         reason = data.get("reason", "")
         if not isinstance(reason, str):
             reason = str(reason)
         reason = normalize_whitespace(reason)
-        if not label:
-            raise InvalidUtilityLabelError(
-                f"Unsupported utility label: {raw_label!r}; reason={reason!r}; "
-                f"query={query!r}; reasoning={reasoning!r}"
-            )
-        raw_filtered_facts = data.get("filtered_facts", [])
-        if not isinstance(raw_filtered_facts, list):
-            raw_filtered_facts = []
+        raw_helpful_facts = data.get("helpful_facts", [])
+        if not isinstance(raw_helpful_facts, list):
+            raw_helpful_facts = []
         fact_lookup = {normalize_fact(fact): fact for fact in facts}
-        filtered_facts = []
-        seen_filtered_fact_keys = set()
-        for fact in raw_filtered_facts:
+        helpful_facts = []
+        seen_helpful_fact_keys = set()
+        for fact in raw_helpful_facts:
             fact_text = normalize_whitespace(str(fact))
             fact_key = normalize_fact(fact_text)
-            if not fact_key or fact_key in seen_filtered_fact_keys:
+            if not fact_key or fact_key in seen_helpful_fact_keys:
                 continue
             original_fact = fact_lookup.get(fact_key)
             if original_fact is None:
                 continue
-            filtered_facts.append(original_fact)
-            seen_filtered_fact_keys.add(fact_key)
-        if label == "no_contribution":
-            filtered_facts = []
+            helpful_facts.append(original_fact)
+            seen_helpful_fact_keys.add(fact_key)
+        utility_score = len(helpful_facts) / (len(facts) + 1e-8)
 
         with self.utility_cache_lock:
             self.utility_cache[cache_key] = {
-                "label": label,
+                "utility_score": utility_score,
                 "reason": reason,
-                "filtered_facts": filtered_facts,
+                "helpful_facts": helpful_facts,
             }
             self.utility_cache_pending_writes += 1
         self._maybe_flush_utility_cache()
-        return label, reason, filtered_facts
+        return utility_score, reason, helpful_facts
 
 
 def evaluate_sample(
@@ -968,7 +967,7 @@ def evaluate_sample(
             )
         if use_query_similarity and query_sim is not None and query_sim > sim_threshold:
             facts = []
-            filtered_facts = []
+            helpful_facts = []
             accepted_facts = []
             fact_match_rows = []
             delta_f = 0.0
@@ -994,43 +993,34 @@ def evaluate_sample(
             if progress_tracker is not None:
                 progress_tracker.set_stage(
                     sample_id,
+                    "delta_f",
+                    iteration["iteration_index"],
+                    total_iterations,
+                )
+            accepted_facts, novel_facts, fact_match_rows = classify_facts_by_novelty(
+                facts,
+                cumulative_facts,
+                dense_similarity,
+                fact_sim_threshold,
+            )
+            current_fact_count = len(facts)
+            delta_f = len(novel_facts) / (current_fact_count + epsilon)
+            delta_reason = (
+                "set_difference" if use_query_similarity else "set_difference_no_query_similarity"
+            )
+            cumulative_facts.extend(accepted_facts)
+            if progress_tracker is not None:
+                progress_tracker.set_stage(
+                    sample_id,
                     "utility",
                     iteration["iteration_index"],
                     total_iterations,
                 )
-            label, label_reason, filtered_facts = judge.classify_utility(
+            utility, label_reason, helpful_facts = judge.classify_utility(
                 query=query,
                 reasoning=iteration["reaction_text"],
-                facts=facts,
+                facts=novel_facts,
             )
-            utility = UTILITY_TO_SCORE[label]
-
-            if label == "no_contribution":
-                accepted_facts = []
-                fact_match_rows = []
-                delta_f = 0.0
-                novel_facts = []
-                delta_reason = "no_contribution"
-            else:
-                if progress_tracker is not None:
-                    progress_tracker.set_stage(
-                        sample_id,
-                        "delta_f",
-                        iteration["iteration_index"],
-                        total_iterations,
-                    )
-                accepted_facts, novel_facts, fact_match_rows = classify_facts_by_novelty(
-                    filtered_facts,
-                    cumulative_facts,
-                    dense_similarity,
-                    fact_sim_threshold,
-                )
-                cumulative_fact_count = len(cumulative_facts) + len(accepted_facts)
-                delta_f = len(novel_facts) / (cumulative_fact_count + epsilon)
-                delta_reason = (
-                    "set_difference" if use_query_similarity else "set_difference_no_query_similarity"
-                )
-                cumulative_facts.extend(accepted_facts)
         if progress_tracker is not None:
             progress_tracker.set_metric(
                 sample_id,
@@ -1064,14 +1054,14 @@ def evaluate_sample(
                 "reaction_action": iteration["reaction_action"],
                 "reaction_text": iteration["reaction_text"],
                 "facts_t": facts,
-                "filtered_facts_t": filtered_facts,
+                "helpful_facts_t": helpful_facts,
                 "accepted_facts_t": accepted_facts,
                 "delta_f": delta_f,
                 "novel_facts": novel_facts,
                 "fact_novelty_matches": fact_match_rows,
                 "cumulative_fact_count_after_dedup": len(cumulative_facts),
                 "delta_reason": delta_reason,
-                "utility_label": label,
+                "utility_label": "helpful_novel_fact_ratio",
                 "utility": utility,
                 "utility_reason": label_reason,
                 "step_score": step_score,
@@ -1094,9 +1084,6 @@ def evaluate_sample(
 
 def summarize(results: list[dict], args: argparse.Namespace) -> dict:
     steps = [step for sample in results for step in sample["steps"]]
-    label_counts = {key: 0 for key in UTILITY_TO_SCORE}
-    for step in steps:
-        label_counts[step["utility_label"]] += 1
 
     return {
         "meta": {
@@ -1104,6 +1091,7 @@ def summarize(results: list[dict], args: argparse.Namespace) -> dict:
             "fact_prompt": str(args.fact_prompt),
             "utility_prompt": str(args.utility_prompt),
             "fact_extractor": args.fact_extractor,
+            "fact_api_model": args.fact_api_model,
             "local_fact_model": args.local_fact_model,
             "local_fact_model_path": str(args.local_fact_model_path),
             "model": args.model,
@@ -1114,11 +1102,11 @@ def summarize(results: list[dict], args: argparse.Namespace) -> dict:
             "num_samples": len(results),
             "num_steps": len(steps),
             "definitions": {
-                "delta_f_t": "If cosine_similarity(q_t, q_t-1) > tau, set delta_f_t=0. Otherwise extract facts, use the utility prompt to predict utility and filtered_facts, and compute delta_f_t from the semantically novel filtered facts in F_<=t \\ F_<t divided by (|F_<=t| + epsilon).",
+                "delta_f_t": "If cosine_similarity(q_t, q_t-1) > tau, set delta_f_t=0. Otherwise extract facts, compute semantically novel facts against the history, and compute delta_f_t as the number of semantically novel extracted facts divided by (the number of facts extracted from the current retrieval result + epsilon). helpful_facts are logged for analysis but do not affect Delta F. With tau=2.0, the similarity gate is effectively disabled for cosine similarity values.",
                 "query_similarity": "Cosine similarity between dense query embeddings produced by flashrag.retriever.encoder.Encoder using text_retriever_config.",
                 "fact_similarity": "Atomic facts are treated as duplicates if their normalized strings match exactly or their dense embedding cosine similarity is >= fact_similarity_threshold.",
-                "utility_mapping": UTILITY_TO_SCORE,
-                "utility_filtering": "The utility prompt first predicts utility_label and then filters facts based on the model's Next Reasoning Text. If utility_label is no_contribution, filtered_facts is empty and u_t=0.",
+                "utility_definition": "utility_t is the ratio between the number of LLM-selected helpful facts and the number of novel facts in the current retrieval step.",
+                "utility_filtering": "The utility prompt selects the subset of novel facts that are helpful for answering the current sub-question, based on the post-retrieval Thought. Delta F is computed from extracted facts rather than helpful_facts.",
                 "step_score": "S_t = u_t * delta_f_t",
                 "trajectory_quality_score": "TQS = average_t S_t within each trajectory",
             },
@@ -1127,9 +1115,9 @@ def summarize(results: list[dict], args: argparse.Namespace) -> dict:
             "mean_tqs": mean(item["trajectory_quality_score"] for item in results) if results else 0.0,
             "mean_iterations": mean(item["num_iterations"] for item in results) if results else 0.0,
             "mean_delta_f": mean(step["delta_f"] for step in steps) if steps else 0.0,
+            "mean_utility": mean(step["utility"] for step in steps) if steps else 0.0,
             "mean_step_score": mean(step["step_score"] for step in steps) if steps else 0.0,
             "informative_step_rate": (sum(1 for step in steps if step["delta_f"] > 0) / len(steps)) if steps else 0.0,
-            "utility_label_counts": label_counts,
         },
     }
 
@@ -1190,6 +1178,7 @@ def main() -> None:
         judge = LLMJudge(
             client=client,
             model=args.model,
+            fact_api_model=args.fact_api_model,
             timeout=args.timeout,
             retries=args.retries,
             max_docs_per_iteration=args.max_docs_per_iteration,
