@@ -745,14 +745,24 @@ class VLLMMMGenerator(BaseMultiModalGenerator):
     
 from openai import OpenAI
 class APIGenerator():
+    RETRYABLE_API_ERROR_NAMES = {
+        "RateLimitError",
+        "APIConnectionError",
+        "APITimeoutError",
+        "APIStatusError",
+        "InternalServerError",
+    }
+    RETRYABLE_API_STATUS_CODES = {408, 409, 425, 429, 500, 502, 503, 504}
+
     def __init__(self, config):
         self.config = config
+        self._perf_stats = []
         openai_setting = deepcopy(config["openai_setting"] if "openai_setting" in config else {})
 
         api_key = (
             config["api_key"] if "api_key" in config else None
             or openai_setting.get("api_key")
-            or os.getenv("OPENAI_API_KEY")
+            or os.getenv("SILICONFLOW_API_KEY")
         )
         if api_key is None:
             raise ValueError("APIGenerator requires `api_key` or `openai_setting.api_key`.")
@@ -781,6 +791,27 @@ class APIGenerator():
         self.image_max_side = int(config["api_image_max_side"] if "api_image_max_side" in config else 1024)
         self.image_quality = int(config["api_image_quality"] if "api_image_quality" in config else 85)
         self.client = OpenAI(api_key=api_key, base_url=base_url)
+        try:
+            import tiktoken
+
+            self.tokenizer = tiktoken.encoding_for_model(self.model_name)
+        except Exception:
+            import tiktoken
+
+            self.tokenizer = tiktoken.encoding_for_model("gpt-4")
+
+    def _is_retryable_api_error(self, exc):
+        if not isinstance(exc, Exception):
+            return False
+        if exc.__class__.__name__ in self.RETRYABLE_API_ERROR_NAMES:
+            return True
+        status_code = getattr(exc, "status_code", None)
+        if status_code in self.RETRYABLE_API_STATUS_CODES:
+            return True
+        cause = getattr(exc, "__cause__", None)
+        if cause is not None and self._is_retryable_api_error(cause):
+            return True
+        return False
 
     def _image_to_data_url(self, image):
         from PIL import Image
@@ -829,14 +860,95 @@ class APIGenerator():
 
     def _generate_one(self, messages):
         normalized_messages = [self._normalize_message(message) for message in messages]
-        response = self.client.chat.completions.create(
-            model=self.model_name,
-            messages=normalized_messages,
-            max_tokens=self.max_tokens,
-            temperature=self.temperature,
-            top_p=self.top_p,
+        delay = 2
+        max_retries = 5
+        last_error = None
+        for attempt in range(max_retries):
+            start_time = time.time()
+            try:
+                response = self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=normalized_messages,
+                    max_tokens=self.max_tokens,
+                    temperature=self.temperature,
+                    top_p=self.top_p,
+                )
+                latency_seconds = time.time() - start_time
+                break
+            except Exception as e:
+                last_error = e
+                if not self._is_retryable_api_error(e) or attempt == max_retries - 1:
+                    raise
+                time.sleep(delay)
+                delay *= 2
+        else:
+            raise last_error
+
+        choice = response.choices[0]
+        usage = getattr(response, "usage", None)
+        prompt_tokens = None
+        output_tokens = None
+        if usage is not None:
+            prompt_tokens = getattr(usage, "prompt_tokens", None)
+            output_tokens = getattr(usage, "completion_tokens", None)
+
+        if prompt_tokens is None:
+            prompt_chunks = []
+            for message in normalized_messages:
+                if not isinstance(message, dict):
+                    continue
+                content = message.get("content", "")
+                if isinstance(content, str):
+                    prompt_chunks.append(content)
+                elif isinstance(content, list):
+                    for item in content:
+                        if isinstance(item, dict) and item.get("type") == "text":
+                            prompt_chunks.append(item.get("text", ""))
+            prompt_text = "\n".join(chunk for chunk in prompt_chunks if chunk)
+            prompt_tokens = len(self.tokenizer.encode(prompt_text))
+
+        if output_tokens is None:
+            output_text = choice.message.content or ""
+            output_tokens = len(self.tokenizer.encode(output_text))
+
+        prompt_tokens = int(prompt_tokens)
+        output_tokens = int(output_tokens)
+        total_tokens = prompt_tokens + output_tokens
+        self._perf_stats.append(
+            {
+                "input_tokens": prompt_tokens,
+                "output_tokens": output_tokens,
+                "total_tokens": total_tokens,
+                "latency_seconds": float(latency_seconds),
+            }
         )
-        return response.choices[0].message.content or ""
+        return choice.message.content or ""
+
+    def get_generation_stats(self, reset=False):
+        stats = list(self._perf_stats)
+        total_samples = len(stats)
+        total_input_tokens = sum(item.get("input_tokens", 0) for item in stats)
+        total_output_tokens = sum(item.get("output_tokens", 0) for item in stats)
+        total_tokens = sum(item.get("total_tokens", 0) for item in stats)
+        total_latency = sum(item.get("latency_seconds", 0.0) for item in stats)
+        summary = {
+            "total_samples": total_samples,
+            "total_input_tokens": int(total_input_tokens),
+            "total_output_tokens": int(total_output_tokens),
+            "total_tokens": int(total_tokens),
+            "total_latency_seconds": float(total_latency),
+            "avg_input_tokens_per_sample": (total_input_tokens / total_samples) if total_samples > 0 else 0.0,
+            "avg_output_tokens_per_sample": (total_output_tokens / total_samples) if total_samples > 0 else 0.0,
+            "avg_total_tokens_per_sample": (total_tokens / total_samples) if total_samples > 0 else 0.0,
+            "avg_latency_seconds_per_sample": (total_latency / total_samples) if total_samples > 0 else 0.0,
+            "input_tokens_per_second": (total_input_tokens / total_latency) if total_latency > 0 else 0.0,
+            "output_tokens_per_second": (total_output_tokens / total_latency) if total_latency > 0 else 0.0,
+            "total_tokens_per_second": (total_tokens / total_latency) if total_latency > 0 else 0.0,
+            "history": stats,
+        }
+        if reset:
+            self._perf_stats = []
+        return summary
 
     def generate(self, input_list):
         if not input_list:

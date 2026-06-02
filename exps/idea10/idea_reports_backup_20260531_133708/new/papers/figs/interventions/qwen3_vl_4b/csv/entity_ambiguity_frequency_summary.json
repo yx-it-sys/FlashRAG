@@ -1,0 +1,64 @@
+{
+  "model": "Qwen3-vl-4B",
+  "result_dir": "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-4B",
+  "label_file_count": 4,
+  "source_file_count": 4,
+  "overall": {
+    "model": "Qwen3-vl-4B",
+    "source": "Overall",
+    "label_file": "aggregate",
+    "total_labels": 8638,
+    "ambiguous_labels": 1714,
+    "not_ambiguous_labels": 6924,
+    "other_labels": 0,
+    "ambiguity_rate": 0.1984255614725631,
+    "ambiguity_percent": "19.84%"
+  },
+  "sources": [
+    {
+      "model": "Qwen3-vl-4B",
+      "source": "OVEN",
+      "label_file": "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-4B/RefAmb_2026_05_23_11_46_refamb_oven_qwen3_vl_4b_stage/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl",
+      "total_labels": 713,
+      "ambiguous_labels": 252,
+      "not_ambiguous_labels": 461,
+      "other_labels": 0,
+      "ambiguity_rate": 0.3534361851332398,
+      "ambiguity_percent": "35.34%"
+    },
+    {
+      "model": "Qwen3-vl-4B",
+      "source": "InfoSeek",
+      "label_file": "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-4B/RefAmb_2026_05_23_12_21_refamb_infoseek_qwen3_vl_4b_stage/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl",
+      "total_labels": 1246,
+      "ambiguous_labels": 598,
+      "not_ambiguous_labels": 648,
+      "other_labels": 0,
+      "ambiguity_rate": 0.4799357945425361,
+      "ambiguity_percent": "47.99%"
+    },
+    {
+      "model": "Qwen3-vl-4B",
+      "source": "MCSearch",
+      "label_file": "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-4B/RefAmb_2026_05_23_13_04_refamb_mcsearch_qwen3_vl_4b_stage/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl",
+      "total_labels": 1780,
+      "ambiguous_labels": 32,
+      "not_ambiguous_labels": 1748,
+      "other_labels": 0,
+      "ambiguity_rate": 0.017977528089887642,
+      "ambiguity_percent": "1.80%"
+    },
+    {
+      "model": "Qwen3-vl-4B",
+      "source": "CRAG",
+      "label_file": "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-4B/RefAmb_2026_05_23_14_22_refamb_crag_qwen3_vl_4b_stage/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl",
+      "total_labels": 4899,
+      "ambiguous_labels": 832,
+      "not_ambiguous_labels": 4067,
+      "other_labels": 0,
+      "ambiguity_rate": 0.16983057766891202,
+      "ambiguity_percent": "16.98%"
+    }
+  ],
+  "missing_label_files": false
+}

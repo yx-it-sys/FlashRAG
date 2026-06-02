@@ -1,6 +1,7 @@
 from typing import List
 from copy import deepcopy
 import warnings
+import time
 from tqdm import tqdm
 from tqdm.auto import trange
 import numpy as np
@@ -174,6 +175,7 @@ class VLLMGenerator(BaseGenerator):
 
     def __init__(self, config):
         super().__init__(config)
+        self._perf_stats = []
         
         from vllm import LLM
         if self.use_lora:
@@ -195,6 +197,42 @@ class VLLMGenerator(BaseGenerator):
                 max_model_len = self.max_model_len
             )
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_path, trust_remote_code=True)
+
+    def _record_perf(self, input_tokens, output_tokens, latency_seconds):
+        self._perf_stats.append(
+            {
+                "input_tokens": int(input_tokens),
+                "output_tokens": int(output_tokens),
+                "total_tokens": int(input_tokens + output_tokens),
+                "latency_seconds": float(latency_seconds),
+            }
+        )
+
+    def get_generation_stats(self, reset=False):
+        stats = list(self._perf_stats)
+        total_samples = len(stats)
+        total_input_tokens = sum(item.get("input_tokens", 0) for item in stats)
+        total_output_tokens = sum(item.get("output_tokens", 0) for item in stats)
+        total_tokens = sum(item.get("total_tokens", 0) for item in stats)
+        total_latency = sum(item.get("latency_seconds", 0.0) for item in stats)
+        summary = {
+            "total_samples": total_samples,
+            "total_input_tokens": int(total_input_tokens),
+            "total_output_tokens": int(total_output_tokens),
+            "total_tokens": int(total_tokens),
+            "total_latency_seconds": float(total_latency),
+            "avg_input_tokens_per_sample": (total_input_tokens / total_samples) if total_samples > 0 else 0.0,
+            "avg_output_tokens_per_sample": (total_output_tokens / total_samples) if total_samples > 0 else 0.0,
+            "avg_total_tokens_per_sample": (total_tokens / total_samples) if total_samples > 0 else 0.0,
+            "avg_latency_seconds_per_sample": (total_latency / total_samples) if total_samples > 0 else 0.0,
+            "input_tokens_per_second": (total_input_tokens / total_latency) if total_latency > 0 else 0.0,
+            "output_tokens_per_second": (total_output_tokens / total_latency) if total_latency > 0 else 0.0,
+            "total_tokens_per_second": (total_tokens / total_latency) if total_latency > 0 else 0.0,
+            "history": stats,
+        }
+        if reset:
+            self._perf_stats = []
+        return summary
     def update_additional_setting(self):
         if "gpu_memory_utilization" not in self._config:
             self.gpu_memory_utilization = 0.85
@@ -247,6 +285,7 @@ class VLLMGenerator(BaseGenerator):
 
         sampling_params = SamplingParams(**generation_params)
 
+        start_time = time.time()
         if self.use_lora:
             from vllm.lora.request import LoRARequest
 
@@ -258,6 +297,7 @@ class VLLMGenerator(BaseGenerator):
             )
         else:
             outputs = self.model.generate(input_list, sampling_params, use_tqdm=False)
+        latency_seconds = time.time() - start_time
 
         if return_raw_output:
             base_output = outputs
@@ -267,6 +307,18 @@ class VLLMGenerator(BaseGenerator):
                 for output in outputs
             ]
             base_output = generated_texts
+
+        for prompt, output in zip(input_list, outputs):
+            prompt_tokens = len(self.tokenizer.encode(prompt, add_special_tokens=False))
+            output_tokens = 0
+            output_items = getattr(output, "outputs", [])
+            if len(output_items) > 0:
+                token_ids = getattr(output_items[0], "token_ids", None)
+                if token_ids is not None:
+                    output_tokens = len(token_ids)
+            per_sample_latency = latency_seconds / max(len(outputs), 1)
+            self._record_perf(prompt_tokens, output_tokens, per_sample_latency)
+
         if return_scores:
             scores = []
             for output in outputs:

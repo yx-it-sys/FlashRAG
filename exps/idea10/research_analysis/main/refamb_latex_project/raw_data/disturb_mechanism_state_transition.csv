@@ -1,0 +1,6 @@
+transition,count,delta_total_delta_f,delta_iter,delta_utility,delta_lj
+missing_final_answer_to_ok,7.2%,+0.2442,-2.7397,+0.1088,+0.3699
+generation_error_to_ok,8.2%,+0.1067,-1.4643,+0.0146,+0.3571
+ok_to_missing_final_answer,7.4%,+0.6232,+2.6533,-0.3562,-0.4667
+ok_to_generation_error,4.9%,+0.6677,+2.6800,-0.3233,-0.2800
+ok_to_ok,41.3%,+0.3599,+0.2993,-0.1465,-0.0855

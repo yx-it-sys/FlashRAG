@@ -1,0 +1,6 @@
+task_type,yes_yes,no_yes,no_no
+Entity Recognition,2.00%,64.67%,33.33%
+Single-hop Attribute Query,3.00%,97.00%,0.00%
+Multi-hop,1.33%,98.67%,0.00%
+Comparison,17.00%,83.00%,0.00%
+Subproblem Aggregation,79.67%,20.33%,0.00%

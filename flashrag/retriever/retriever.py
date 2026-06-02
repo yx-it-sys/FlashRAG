@@ -2,6 +2,8 @@ import json
 import os
 import time
 import requests
+from collections import defaultdict
+from io import BytesIO
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import warnings
@@ -16,6 +18,7 @@ from flashrag.utils import get_reranker, get_device
 from flashrag.retriever.utils import load_corpus, load_docs, convert_numpy, judge_image, judge_zh
 from flashrag.retriever.encoder import Encoder, STEncoder, ClipEncoder
 import torch
+from PIL import Image
 
 if get_device() == "cpu":
     faiss.omp_set_num_threads(1)
@@ -163,6 +166,53 @@ class BaseRetriever:
 
     def update_additional_setting(self):
         pass
+
+    @staticmethod
+    def _normalize_dedup_value(value):
+        if value is None:
+            return ""
+        return str(value).strip()
+
+    def _build_result_dedup_key(self, item):
+        if isinstance(item, str):
+            return ("text", self._normalize_dedup_value(item))
+
+        if isinstance(item, dict):
+            content_fields = [
+                "title",
+                "text",
+                "contents",
+                "page_name",
+                "page_snippet",
+                "url",
+                "image_url",
+            ]
+            content_key = tuple(self._normalize_dedup_value(item.get(field, "")) for field in content_fields)
+            if any(content_key):
+                return ("dict", content_key)
+            return ("dict_json", json.dumps(item, sort_keys=True, ensure_ascii=False))
+
+        return ("raw", self._normalize_dedup_value(item))
+
+    def _dedup_topk_results(self, results, scores=None, num=None):
+        deduped_results = []
+        deduped_scores = [] if scores is not None else None
+        seen_keys = set()
+
+        for idx, result in enumerate(results):
+            dedup_key = self._build_result_dedup_key(result)
+            if dedup_key in seen_keys:
+                continue
+            seen_keys.add(dedup_key)
+            deduped_results.append(result)
+            if scores is not None:
+                deduped_scores.append(scores[idx])
+            if num is not None and len(deduped_results) >= num:
+                break
+
+        if scores is not None:
+            return deduped_results, deduped_scores
+        return deduped_results
 
     def _save_cache(self):
         self.cache = convert_numpy(self.cache)
@@ -437,12 +487,14 @@ class DenseRetriever(BaseTextRetriever):
         if num is None:
             num = self.text_retrieval_topk
         query_emb = self.encoder.encode(query)
-        scores, idxs = self.index.search(query_emb, k=num)
+        candidate_k = min(max(num * 5, num), self.index.ntotal)
+        scores, idxs = self.index.search(query_emb, k=candidate_k)
         scores = scores.tolist()
         idxs = idxs[0]
         scores = scores[0]
 
         results = load_docs(self.corpus, idxs)
+        results, scores = self._dedup_topk_results(results, scores, num)
         if return_score:
             return results, scores
         else:
@@ -454,17 +506,26 @@ class DenseRetriever(BaseTextRetriever):
         if num is None:
             num = self.text_retrieval_topk
         batch_size = self.batch_size
+        candidate_k = min(max(num * 5, num), self.index.ntotal)
 
         results = []
         scores = []
         emb = self.encoder.encode(query, batch_size=batch_size, is_query=True)
-        scores, idxs = self.index.search(emb, k=num)
+        scores, idxs = self.index.search(emb, k=candidate_k)
         scores = scores.tolist()
         idxs = idxs.tolist()
 
         flat_idxs = sum(idxs, [])
         results = load_docs(self.corpus, flat_idxs)
-        results = [results[i * num : (i + 1) * num] for i in range(len(idxs))]
+        results = [results[i * candidate_k : (i + 1) * candidate_k] for i in range(len(idxs))]
+        deduped_results = []
+        deduped_scores = []
+        for query_results, query_scores in zip(results, scores):
+            query_results, query_scores = self._dedup_topk_results(query_results, query_scores, num)
+            deduped_results.append(query_results)
+            deduped_scores.append(query_scores)
+        results = deduped_results
+        scores = deduped_scores
 
         if return_score:
             return results, scores
@@ -542,48 +603,6 @@ class MultiModalRetriever(BaseRetriever):
         else:
             return results
 
-    def _batch_search(self, query: List[str], target_modal: str = "text", num: int = None, return_score=False):
-        if isinstance(query, str):
-            query = [query]
-        if num is None:
-            num = self.text_retrieval_topk if target_modal == "text" else self.image_retrieval_topk
-        batch_size = self.batch_size
-        assert target_modal in ["image", "text"]
-
-        query_modal = self._judge_input_modal(query[0])
-        if query_modal == "image" and isinstance(query[0], str):
-            from PIL import Image
-            import requests
-
-            if os.path.exists(query[0]):
-                query = [Image.open(q) for q in query]
-            else:
-                query = [Image.open(requests.get(q, stream=True).raw) for q in query]
-
-        results = []
-        scores = []
-
-        for start_idx in tqdm(range(0, len(query), batch_size), desc="Retrieval process: ", disable=self.silent):
-            query_batch = query[start_idx : start_idx + batch_size]
-            batch_emb = self.encoder.encode(query_batch, modal=query_modal)
-            batch_scores, batch_idxs = self.index_dict[target_modal].search(batch_emb, k=num)
-
-            batch_scores = batch_scores.tolist()
-            batch_idxs = batch_idxs.tolist()
-
-            flat_idxs = sum(batch_idxs, [])
-            batch_results = load_docs(self.corpus, flat_idxs)
-            batch_results = [batch_results[i * num : (i + 1) * num] for i in range(len(batch_idxs))]
-
-            scores.extend(batch_scores)
-            results.extend(batch_results)
-
-        if return_score:
-            return results, scores
-        else:
-            return results
-
-
 class MultiRetrieverRouter:
     def __init__(self, config):
         self.merge_method = config["multi_retriever_setting"].get("merge_method", "concat")  # concat/rrf/rerank
@@ -607,7 +626,9 @@ class MultiRetrieverRouter:
             retrieval_model_path = retriever_config["retrieval_model_path"]
             corpus_path = retriever_config["corpus_path"]
 
-            if retrieval_method == "bm25":
+            if retrieval_method == "mcsearch":
+                retriever = MCSearchRetriever(retriever_config)
+            elif retrieval_method == "bm25":
                 if corpus_path is None:
                     corpus = None
                 else:
@@ -645,7 +666,7 @@ class MultiRetrieverRouter:
     def add_source(self, result: Union[list, tuple], retriever):
         retrieval_method = retriever.retrieval_method
         corpus_path = retriever.corpus_path
-        is_multimodal = isinstance(retriever, MultiModalRetriever)
+        is_multimodal = isinstance(retriever, (MultiModalRetriever, MCSearchRetriever))
         # for naive search, result is a list of dict, each repr a doc
         # for batch search, result is a list of list, each repr a doc list(per query)
         for item in result:
@@ -668,7 +689,7 @@ class MultiRetrieverRouter:
         score_list = []
 
         def process_retriever(retriever):
-            is_multimodal = isinstance(retriever, MultiModalRetriever)
+            is_multimodal = isinstance(retriever, (MultiModalRetriever, MCSearchRetriever))
             params = {"query": query, "return_score": return_score}
 
             if is_multimodal:
@@ -1468,34 +1489,372 @@ class CRAGRetriever(BaseRetriever):
 
         return "\n\n".join(chunks)
 
-    def search(self, query, num: int = None, query_type: str = "text") -> List[Dict[str, str]]:
-        if num is None:
-            num = self.text_retrieval_topk if query_type == "text" else self.image_retrieval_topk
+    def search(self, query, num: int = None, query_type: str = None, target_modal: str = "text") -> List[Dict[str, str]]:
         if query_type is None:
             query_type = "image" if not isinstance(query, str) else "text"
+        if num is None:
+            num = self.text_retrieval_topk if query_type == "text" else self.image_retrieval_topk
+        candidate_k = max(num * 5, num)
         if query_type == 'text':
-            results = self.search_pipeline(query, k=num)
+            results = self.search_pipeline(query, k=candidate_k)
             final_results = [f"{result.get('page_name')}\n{result.get('page_snippet')}" for result in results]
+            final_results = self._dedup_topk_results(final_results, num=num)
             return final_results
         elif query_type == 'image':
-            results = self.search_pipeline(query, k=num)
-            return self.image_results_to_text(results)
+            results = self.search_pipeline(query, k=candidate_k)
+            results = self._dedup_topk_results(results, num=num)
+            return results
         else:
             raise NotImplementedError("CRAGRetriever currently only supports text query and image query.")
+
+class MCSearchRetriever(BaseRetriever):
+    """Retriever for local MC-Search KB embeddings and metadata."""
+
+    def __init__(self, config):
+        super().__init__(config)
+        self._load_mcsearch_assets()
+        self._load_model()
+
+    def update_additional_setting(self):
+        self.batch_size = self._config.get("retrieval_batch_size", 8)
+        self.score_threshold = self._config.get("mcsearch_score_threshold", 0.0)
+        self.image_search_topk = self._config.get("mcsearch_image_search_topk", 5)
+        self.mcsearch_visual_bge_model_name = self._config.get(
+            "mcsearch_visual_bge_model_name",
+            "BAAI/bge-base-en-v1.5",
+        )
+        self.retrieval_model_path = self._config.get(
+            "mcsearch_visual_bge_model_path",
+            self._config.get("retrieval_model_path", None),
+        )
+        self.mcsearch_data_root = self._config.get(
+            "mcsearch_data_root",
+            "/home/you/FlashRAG/exps/idea10/data/datasets/mcsearch/kb",
+        )
+        self.mcsearch_model_weight = self._config.get(
+            "mcsearch_model_weight",
+            "/home/you/FlashRAG/exps/idea10/data/datasets/mcsearch/Visualized_base_en_v1.5.pth",
+        )
+
+    @staticmethod
+    def _l2_normalize(mat: np.ndarray) -> np.ndarray:
+        norms = np.linalg.norm(mat, axis=1, keepdims=True) + 1e-12
+        return mat / norms
+
+    @staticmethod
+    def _load_ordered_id_list(mapping_path: str) -> List[str]:
+        with open(mapping_path, "r", encoding="utf-8") as f:
+            mapping = json.load(f)
+        if isinstance(mapping, list):
+            return mapping
+        return [sid for _, sid in sorted(((int(k), v) for k, v in mapping.items()), key=lambda x: x[0])]
+
+    @classmethod
+    def _build_kb_index(cls, emb_path: str, mapping_path: str) -> tuple[faiss.IndexFlatIP, List[str]]:
+        id_list = cls._load_ordered_id_list(mapping_path)
+        mat = np.load(emb_path, mmap_mode="r").astype("float32")
+        if mat.ndim != 2:
+            raise ValueError(f"Expected 2D embedding matrix in {emb_path}, got shape {mat.shape}")
+        if len(id_list) != mat.shape[0]:
+            raise ValueError(f"Row count mismatch: embeddings {mat.shape[0]} vs mapping {len(id_list)}")
+        mat = cls._l2_normalize(mat)
+        index = faiss.IndexFlatIP(mat.shape[1])
+        index.add(mat)
+        return index, id_list
+
+    @staticmethod
+    def _load_mcsearch_docs(all_docs_path: str) -> Dict[str, Dict[str, str]]:
+        with open(all_docs_path, "r", encoding="utf-8") as f:
+            first = f.read(1)
+            f.seek(0)
+            if first == "[":
+                raw_docs = json.load(f)
+            else:
+                raw_docs = [json.loads(line) for line in f if line.strip()]
+
+        docs = {}
+        for item in raw_docs:
+            snippet_id = str(item.get("snippet_id", "")).strip()
+            if not snippet_id:
+                continue
+            title = str(item.get("title", "")).strip()
+            fact = str(item.get("fact", "")).strip()
+            docs[snippet_id] = {
+                "id": snippet_id,
+                "title": title,
+                "text": fact,
+                "contents": fact,
+                "url": str(item.get("url", "")).strip(),
+            }
+        return docs
+
+    @staticmethod
+    def _load_image_infos(all_image_infos_path: str) -> Dict[int, Dict[str, str]]:
+        with open(all_image_infos_path, "r", encoding="utf-8") as f:
+            infos = json.load(f)
+        return {
+            int(item["image_id"]): {
+                "id": str(item["image_id"]),
+                "title": str(item.get("title", "")).strip(),
+                "text": str(item.get("title", "")).strip(),
+                "contents": str(item.get("title", "")).strip(),
+                "image_url": str(item.get("imgUrl", "")).strip(),
+            }
+            for item in infos
+            if item.get("image_id") is not None
+        }
+
+    def _load_mcsearch_assets(self):
+        emb_dir = os.path.join(self.mcsearch_data_root, "knowledge_base_emb")
+        self.doc_index, self.doc_sid_list = self._build_kb_index(
+            os.path.join(emb_dir, "docs_embeddings.npy"),
+            os.path.join(emb_dir, "doc_index2snippet.json"),
+        )
+        self.doc_sid_lookup = np.array(self.doc_sid_list)
+
+        self.img_index, self.img_id_list = self._build_kb_index(
+            os.path.join(emb_dir, "img_embeddings.npy"),
+            os.path.join(emb_dir, "img_index2imageid.json"),
+        )
+        self.img_id_lookup = np.array(self.img_id_list)
+
+        self.cap_index, self.cap_id_list = self._build_kb_index(
+            os.path.join(emb_dir, "cap_embeddings.npy"),
+            os.path.join(emb_dir, "cap_index2imageid.json"),
+        )
+        self.cap_id_lookup = np.array(self.cap_id_list)
+
+        self.sid2doc = self._load_mcsearch_docs(os.path.join(self.mcsearch_data_root, "all_docs.json"))
+        self.image_info = self._load_image_infos(os.path.join(self.mcsearch_data_root, "all_image_infos.json"))
+
+    def _resolve_mcsearch_device(self):
+        if not torch.cuda.is_available():
+            return "cpu"
+        # GPU selection should be decided once at process startup from config
+        # via CUDA_VISIBLE_DEVICES. Inside the process, always use the default
+        # logical CUDA device instead of reinterpreting gpu_id again.
+        return "cuda"
+
+    def _load_model(self):
+        from visual_bge.modeling import Visualized_BGE
+
+        device = self._resolve_mcsearch_device()
+        from_pretrained = self.retrieval_model_path
+        if from_pretrained is not None and "bge-base-en-v1.5" not in str(from_pretrained):
+            warnings.warn(
+                "MCSearchRetriever expects a BGE base encoder compatible with "
+                "`Visualized_base_en_v1.5.pth`. The configured `mcsearch_visual_bge_model_path` "
+                f"is `{from_pretrained}`, which does not look like a base model path. "
+                "Falling back to loading tokenizer/config by model name only."
+            )
+            from_pretrained = None
+
+        self.encoder = Visualized_BGE(
+            model_name_bge=self.mcsearch_visual_bge_model_name,
+            model_weight=self.mcsearch_model_weight,
+            from_pretrained=from_pretrained,
+        ).to(device)
+        self.encoder.device = torch.device(device)
+        print(f"MCSearchRetriever loads Visualized_BGE on device: {device}")
+        self.encoder.eval()
+        torch.set_grad_enabled(False)
+
+    def _encode_text(self, text: Union[str, List[str]]) -> np.ndarray:
+        with torch.no_grad():
+            emb = self.encoder.encode(text=text)
+        emb = emb.cpu().numpy().astype("float32")
+        if emb.ndim == 1:
+            emb = emb[None, :]
+        return self._l2_normalize(emb)
+
+    def _load_query_image(self, query):
+        if isinstance(query, Image.Image):
+            image_bytes = BytesIO()
+            query.convert("RGB").save(image_bytes, format="JPEG")
+            image_bytes.seek(0)
+            return image_bytes
+        if isinstance(query, str):
+            if os.path.exists(query):
+                return query
+            response = requests.get(query, stream=True, timeout=15)
+            response.raise_for_status()
+            image_bytes = BytesIO(response.content)
+            image_bytes.seek(0)
+            return image_bytes
+        raise TypeError(f"Unsupported image query type: {type(query)}")
+
+    def _encode_image(self, image_query) -> np.ndarray:
+        image = self._load_query_image(image_query)
+        with torch.no_grad():
+            emb = self.encoder.encode(image=image)
+        emb = emb.cpu().numpy().astype("float32")
+        if emb.ndim == 1:
+            emb = emb[None, :]
+        return self._l2_normalize(emb)
+
+    def _format_doc_result(self, snippet_id: str) -> Dict[str, str]:
+        return dict(self.sid2doc.get(str(snippet_id), {"id": str(snippet_id), "title": "", "text": "", "contents": ""}))
+
+    def _format_image_result(self, image_id: Union[str, int]) -> Dict[str, str]:
+        image_id = int(image_id)
+        item = dict(self.image_info.get(image_id, {"id": str(image_id), "title": "", "text": "", "contents": "", "image_url": ""}))
+        item["image_id"] = image_id
+        return item
+
+    def _search_text_index(self, query: str, num: int) -> tuple[List[Dict[str, str]], List[float]]:
+        query_emb = self._encode_text(query)
+        candidate_k = min(max(num * 5, num), self.doc_index.ntotal)
+        scores, idxs = self.doc_index.search(query_emb, k=candidate_k)
+        idxs = idxs[0].tolist()
+        scores = scores[0].tolist()
+
+        deduped_results = []
+        deduped_scores = []
+        seen_doc_keys = set()
+
+        for idx, score in zip(idxs, scores):
+            if idx < 0:
+                continue
+            result = self._format_doc_result(self.doc_sid_lookup[idx])
+            if not any(str(result.get(field, "")).strip() for field in ("title", "text", "contents")):
+                continue
+            doc_key = (
+                str(result.get("title", "")).strip(),
+                str(result.get("text", "")).strip(),
+            )
+            if doc_key in seen_doc_keys:
+                continue
+            seen_doc_keys.add(doc_key)
+            deduped_results.append(result)
+            deduped_scores.append(score)
+            if len(deduped_results) >= num:
+                break
+
+        return deduped_results, deduped_scores
+
+    def _search_image_by_image(self, query, num: int) -> tuple[List[Dict[str, str]], List[float]]:
+        query_emb = self._encode_image(query)
+        candidate_k = min(max(num * 5, num), self.img_index.ntotal)
+        scores, idxs = self.img_index.search(query_emb, k=candidate_k)
+        idxs = idxs[0].tolist()
+        scores = scores[0].tolist()
+        results = [self._format_image_result(self.img_id_lookup[idx]) for idx in idxs if idx >= 0]
+        scores = [score for idx, score in zip(idxs, scores) if idx >= 0]
+        results, scores = self._dedup_topk_results(results, scores, num)
+        return results, scores
+
+    def _search_image_by_text(self, query: str, num: int) -> tuple[List[Dict[str, str]], List[float]]:
+        query_emb = self._encode_text(query)
+        k = max(num, self.image_search_topk)
+        img_scores, img_idxs = self.img_index.search(query_emb, k=k)
+        cap_scores, cap_idxs = self.cap_index.search(query_emb, k=k)
+
+        bucket = defaultdict(list)
+        for idx, score in zip(img_idxs[0].tolist(), img_scores[0].tolist()):
+            if idx >= 0:
+                bucket[int(self.img_id_lookup[idx])].append(float(score))
+        for idx, score in zip(cap_idxs[0].tolist(), cap_scores[0].tolist()):
+            if idx >= 0:
+                bucket[int(self.cap_id_lookup[idx])].append(float(score))
+
+        ranked = sorted(
+            ((image_id, sum(scores) / len(scores)) for image_id, scores in bucket.items()),
+            key=lambda x: x[1],
+            reverse=True,
+        )[:num]
+        results = [self._format_image_result(image_id) for image_id, _ in ranked]
+        scores = [score for _, score in ranked]
+        results, scores = self._dedup_topk_results(results, scores, num)
+        return results, scores
+
+    def _search(self, query, target_modal: str = "text", num: int = None, return_score=False):
+        if target_modal == "text":
+            num = self.text_retrieval_topk if num is None else num
+            if judge_image(query):
+                raise NotImplementedError("MCSearchRetriever does not support image-to-text retrieval.")
+            results, scores = self._search_text_index(query, num)
+        elif target_modal == "image":
+            num = self.image_retrieval_topk if num is None else num
+            if judge_image(query):
+                results, scores = self._search_image_by_image(query, num)
+            else:
+                results, scores = self._search_image_by_text(query, num)
+        else:
+            raise ValueError("target_modal must be `text` or `image`.")
+
+        if self.score_threshold > 0:
+            filtered = [(item, score) for item, score in zip(results, scores) if score >= self.score_threshold]
+            results = [item for item, _ in filtered]
+            scores = [score for _, score in filtered]
+        if return_score:
+            return results, scores
+        return results
+
+    def _batch_search(self, query: List[Union[str, Image.Image]], target_modal: str = "text", num: int = None, return_score=False):
+        if isinstance(query, (str, Image.Image)):
+            query = [query]
+        results = []
+        scores = []
+        for item in tqdm(query, desc="Retrieval process: ", disable=self.silent):
+            item_result, item_score = self._search(item, target_modal=target_modal, num=num, return_score=True)
+            results.append(item_result)
+            scores.append(item_score)
+        if return_score:
+            return results, scores
+        return results
+
+    def _batch_search(self, query: List[str], target_modal: str = "text", num: int = None, return_score=False):
+        if isinstance(query, str):
+            query = [query]
+        if num is None:
+            num = self.text_retrieval_topk if target_modal == "text" else self.image_retrieval_topk
+        batch_size = self.batch_size
+        assert target_modal in ["image", "text"]
+
+        query_modal = self._judge_input_modal(query[0])
+        if query_modal == "image" and isinstance(query[0], str):
+            from PIL import Image
+            import requests
+
+            if os.path.exists(query[0]):
+                query = [Image.open(q) for q in query]
+            else:
+                query = [Image.open(requests.get(q, stream=True).raw) for q in query]
+
+        results = []
+        scores = []
+
+        for start_idx in tqdm(range(0, len(query), batch_size), desc="Retrieval process: ", disable=self.silent):
+            query_batch = query[start_idx : start_idx + batch_size]
+            batch_emb = self.encoder.encode(query_batch, modal=query_modal)
+            batch_scores, batch_idxs = self.index_dict[target_modal].search(batch_emb, k=num)
+
+            batch_scores = batch_scores.tolist()
+            batch_idxs = batch_idxs.tolist()
+
+            flat_idxs = sum(batch_idxs, [])
+            batch_results = load_docs(self.corpus, flat_idxs)
+            batch_results = [batch_results[i * num : (i + 1) * num] for i in range(len(batch_idxs))]
+
+            scores.extend(batch_scores)
+            results.extend(batch_results)
+
+        if return_score:
+            return results, scores
+        else:
+            return results
 
 
 def main():
     # Example configuration
     from flashrag.config import Config
-    config = Config("/home/you/FlashRAG/exps/idea10/configs/config.yaml")
-    config['gpu_id']="0"
-    img_path = "/home/you/GroundingDINO/tests/crop_01_red_scooter_make_0.86.jpg"
-    image = Image.open(img_path).convert("RGB")
+    config = Config("/home/you/FlashRAG/exps/idea10/configs/configs_refamb/qwen2_5_7b/config_stage_crag.yaml")
+    config['gpu_id']="1"
+    text = "playwright"
     retriever = CRAGRetriever(config)
 
-    # Batch search
-    queries = "subaru wrx"
-    batch_results = retriever.search(queries, query_type="text")
+    # Text search
+    batch_results = retriever.search(text, query_type="text")
     print(batch_results)
 
 if __name__ == "__main__":

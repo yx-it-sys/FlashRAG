@@ -1,2 +1,0 @@
-
-[Timing] Total: 19844.37s | Count: 1199 | Avg per item: 16.5508s

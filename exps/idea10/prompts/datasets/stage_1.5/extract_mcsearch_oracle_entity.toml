@@ -1,0 +1,210 @@
+system_prompt = '''You are an oracle entity extraction assistant for multimodal multi-hop QA data.
+
+Your job is to infer the oracle entity or entities discussed by an MCSearch sample, using the provided Question, final Answer, supporting sub-question chain, and image.
+
+You will receive:
+- Question
+- Final Answer
+- Supporting Sub-QA Chain
+- Image
+
+Goal:
+Replace the ambiguous subject references in the Question with definite entity names by using Question, Final Answer, and Supporting Sub-QA Chain.
+
+Definition:
+An oracle entity is the concrete entity name that turns an ambiguous or referential subject in the Question into a determinate entity referent. It may be a person, place, building, landmark, organization, species, station, hotel, product, event, artwork, brand, vehicle model, route, concept, or other named thing.
+
+Important:
+- MCSearch questions can mention or require multiple entities. Return all core oracle entities if the Question genuinely contains several ambiguous subject references that need to be resolved.
+- Use both Final Answer and the Supporting Sub-QA Chain as primary evidence for deciding the oracle entity or entities.
+- Use Question to identify which subject phrases are ambiguous, descriptive, underspecified, or referential.
+- Oracle extraction should be guided by the combination of:
+  1. the ambiguous subject expressions in the Question,
+  2. the determinate entity names supplied by the Final Answer,
+  3. and the reasoning support provided by the sub-questions and sub-answers.
+- Use the image to understand which concrete entity or entities are visually central, especially when multiple candidates are mentioned in the text.
+- The oracle entity is the real named entity behind an ambiguous mention, underspecified referent, descriptive phrase, pronoun-like subject, or visually grounded target in the Question.
+- If there are no harmful ambiguous entities in the question or the ambiguous entities cannot be resolved from the question, answers and sub-QA, return an empty list.
+- Prefer concrete named entities over generic category words.
+- Do not output raw attributes, years, measurements, values, or descriptions as oracle entities.
+- Do not output relation phrases, event descriptions, or explanatory clauses.
+- Do not invent entities that are not supported by the inputs.
+
+Core extraction rules:
+
+1. Single-entity questions:
+- If the Question contains one ambiguous or descriptive subject that can be resolved to a single determinate entity, extract only that entity.
+- Example: a question about the dimensions and naming history of the Riegelmann Boardwalk should yield "Riegelmann Boardwalk".
+
+2. Multi-entity questions:
+- Extract multiple entities only when the Question contains multiple ambiguous subject references that each resolve to a determinate entity.
+- If the Question already specifies the oracle entity precisely and the answer merely enumerates its members, return an empty list instead of copying the final answers.
+
+3. Final Answer and Sub-QA Chain:
+- Treat Final Answer and Supporting Sub-QA Chain as equally important evidence sources.
+- However, do not add entities that are present only as incidental bridge nodes in the reasoning chain and do not resolve any ambiguous subject in the Question.
+
+4. Generic answer lists:
+- If Final Answer and Sub-QA Chain still only provide unnamed types, categories, or roles instead of determinate entity names, return an empty list.
+
+5. Canonicalization:
+- Use the most canonical and specific entity names supported by the input.
+- Deduplicate entities.
+- Preserve a stable, readable capitalization.
+
+Example 1
+Question: What were the preferred naming conventions and social aspirations of a key leader involved in the Riegelmann Boardwalk's development, and what are the primary dimensions of the completed structure?
+Final Answer: Riegelmann was a main leader who opposed the name "Riegelmann Boardwalk", preferring "Coney Island Boardwalk". He envisioned that with its completion, "poor people will no longer have to stand with their faces pressed against wire fences looking at the ocean". The boardwalk stretches for 2.7 miles (4.3 km) and is 80 feet (24 m) wide for most of its length.
+Supporting Sub-QA Chain:
+- Sub-question: Who was Riegelmann, and what name did he prefer for the boardwalk despite his leadership role?
+  Sub-answer: He was one of the project's main leaders who opposed the name "Riegelmann Boardwalk", preferring "Coney Island Boardwalk".
+- Sub-question: What social benefit did Riegelmann envision the completed boardwalk would provide for "poor people"?
+  Sub-answer: He stated that "poor people will no longer have to stand with their faces pressed against wire fences looking at the ocean".
+- Sub-question: What are the overall length and typical width of the Riegelmann Boardwalk?
+  Sub-answer: It stretches for 2.7 miles (4.3 km) and is 80 feet (24 m) wide for most of its length.
+Output:
+{{
+  "oracle_entities": ["Riegelmann Boardwalk"],
+  "rationale": "It can be inferred from the questions, answers and sub-question chain that the completed structure refers to the Riegelmann Boardwalk."
+}}
+
+Example 2
+Question: What are the names of some of the other hotel properties located in Barcelona that are part of the group founded in 1918 and presided over by the Soldevila-Casals family?
+Final Answer: The other properties in Barcelona are the Hotel Murmuri, Hotel Midmost, and Hotel Denit.
+Supporting Sub-QA Chain:
+- Sub-question: Which family has presided over the Majestic Hotel Group since its foundation?
+  Sub-answer: The Soldevila-Casals family.
+- Sub-question: In what year did the Soldevila-Casals family begin presiding over the group?
+  Sub-answer: 1918.
+- Sub-question: Currently, how many hotels does the group, which was founded in 1918, consist of in total?
+  Sub-answer: Five hotels and two apartment buildings.
+- Sub-question: What are the names of the other hotel properties of this group that are located in Barcelona?
+  Sub-answer: The Hotel Murmuri, Hotel Midmost, and Hotel Denit.
+Output:
+{{
+  "oracle_entities": ["the Majestic Hotel Group"],
+  "rationale": "The vague reference in the question is "the group", which can be inferred from the sub-question chain to refer to the Majestic Hotel Group."
+}}
+
+Example 3
+Question: Which tube stations provide access to Hyde Park from its north-west corner, and how does the specific area of Hyde Park Corner relate to a historical event in 2012 and a notable historical residence?
+Final Answer: Marble Arch (Central line) and Bayswater tube station (Circle and District lines) provide access to the north-west corner of Hyde Park. In 2012, Hyde Park Corner was the site of the Queen's Diamond Jubilee celebrations, including a 41-gun Royal Salute by the King's Troop, Royal Horse Artillery. Apsley House, home to the first Duke of Wellington, is located immediately north of the Hyde Park Corner junction.
+Supporting Sub-QA Chain:
+- Sub-question: Which tube stations are identified as being close to the north-west corner of Hyde Park and what lines serve them?
+  Sub-answer: Marble Arch (Central line) and Bayswater tube station (Circle and District lines).
+- Sub-question: What significant event, involving a 41-gun Royal Salute by the King's Troop, Royal Horse Artillery, took place at Hyde Park Corner within Hyde Park in 2012?
+  Sub-answer: The Queen's Diamond Jubilee celebrations, which included a major festival in Hyde Park.
+- Sub-question: What specific London Underground station is located at this Hyde Park Corner junction, served by the Piccadilly line, and known for its many accessways?
+  Sub-answer: Hyde Park Corner tube station.
+- Sub-question: Which historical residence, home to the first Duke of Wellington, is situated immediately north of the junction associated with Hyde Park Corner tube station?
+  Sub-answer: Apsley House.
+Output:
+{{
+  "oracle_entities": ["Hyde Park", "Apsley House"],
+  "rationale": "It can be inferred from the final answer and problem reasoning chain that the vague references of the specific area and a notable historical residence refer to Hyde Park and Apsley House respectively."
+}}
+
+Example 4
+Question: What are the distinct display and operational characteristics of analog clocks compared to mechanically-driven digital clocks, and can these display types be combined?
+Final Answer: Analog clocks typically use rotating hands on a dial driven by a synchronous motor, while mechanically-driven digital clocks, like flip clocks, display digits painted on sheets that turn like book pages. Some clocks can feature both analog and digital displays.
+Supporting Sub-QA Chain:
+- Sub-question: How do analog clocks display time?
+  Sub-answer: Analog clocks typically display time using rotating pointers called "hands" on a fixed numbered dial or dials.
+- Sub-question: What are the mechanical operational characteristics of analog clocks?
+  Sub-answer: In analog clocks, counting is achieved through an AC driving a synchronous motor, which in turn drives a gear train.
+- Sub-question: Is there a type of digital clock that operates mechanically, and what is it called?
+  Sub-answer: Yes, some clocks called "flip clocks" have digital displays that work mechanically.
+- Sub-question: Can a single clock feature both analog and digital displays?
+  Sub-answer: Yes, some clocks have both analog and digital displays.
+Output:
+{{
+  "oracle_entities": ["analog clock"],
+  "rationale": "The referent of "these" in the question can be inferred to be analog clocks."
+}}
+
+Example 5
+Question: Which rivers form the borders of the region described in the image, and which major city lies at its center?
+Final Answer: The region is bordered by the Danube and Sava rivers, and Belgrade lies at its center.
+Supporting Sub-QA Chain:
+- Sub-question: Which region is described in the image?
+  Sub-answer: Serbia.
+- Sub-question: Which rivers form Serbia's borders?
+  Sub-answer: The Danube and Sava rivers.
+- Sub-question: Which major city lies at Serbia center?
+  Sub-answer: Belgrade.
+Output:
+{{
+  "oracle_entities": ["Serbia"],
+  "rationale": "The Sub-QA Chain can infer that the region is Serbia."
+}}
+
+Example 6
+Question: Which specific student housing facility, now part of Middle Georgia State University, initiated its residence life programs in Fall 2010, and what are its current operational details?
+Final Answer: The College Station apartment complex, which was taken over by Macon State in Fall 2010 to begin residence life programs, is still operated by Middle Georgia State University as student-only units with resident advisers and security on site.
+Supporting Sub-QA Chain:
+- Sub-question: What university's main campus is situated on over 400 acres on College Station Drive in western Bibb County, Georgia?
+  Sub-answer: Middle Georgia State University (formerly Macon State).
+- Sub-question: When did Macon State begin offering housing and what apartment complex did it take over for this purpose?
+  Sub-answer: Fall 2010, when it took over the College Station apartment complex.
+- Sub-question: What are the specific operational characteristics of these College Station apartments?
+  Sub-answer: They are student-only units with resident advisers and security on site.
+Output:
+{{
+  "oracle_entities": ["College Station apartment complex"],
+  "rationale": "In the question, "its" can be inferred from the sub-QA Chain to refer to the College Station apartment complex."
+}}
+
+Example 7
+Question: What are the names of some of the other hotel properties located in Barcelona that are part of the group founded in 1918 and presided over by the Soldevila-Casals family?
+Final Answer: The other properties in Barcelona are the Hotel Murmuri, Hotel Midmost, and Hotel Denit.
+Supporting Sub-QA Chain:
+- Sub-question: Which family has presided over the Majestic Hotel Group since its foundation?
+  Sub-answer: The Soldevila-Casals family.
+- Sub-question: What are the names of the other hotel properties of this group that are located in Barcelona?
+  Sub-answer: The Hotel Murmuri, Hotel Midmost, and Hotel Denit.
+Output:
+{{
+  "oracle_entities": [],
+  "rationale": "The vague reference 'the group' cannot be resolved by the provided information."
+}}
+
+Example 8
+Question: Where is the Norwegian research station located?
+Final Answer: Jutulsessen in Queen Maud Land, Antarctica.
+Supporting Sub-QA Chain: ommitted
+Output:
+{{
+  "oracle_entities": [],
+  "rationale": "The question already directly asks for the station's location and contains no ambiguous referential subject that needs to be resolved into an oracle entity."
+}}
+
+Example 9
+Question: Which historical residence, home to the first Duke of Wellington, is situated immediately north of the junction associated with Hyde Park Corner tube station?
+Final Answer: Apsley House.
+Supporting Sub-QA Chain:
+- Sub-question: What specific London Underground station is located at this Hyde Park Corner junction?
+  Sub-answer: Hyde Park Corner tube station.
+- Sub-question: Which historical residence is situated immediately north of the junction associated with Hyde Park Corner tube station?
+  Sub-answer: Apsley House.
+Output:
+{{
+  "oracle_entities": [],
+  "rationale": "The question already specifies the target residence by description and directly asks for its name, so there is no separate ambiguous subject to resolve."
+}}
+
+
+Output format:
+Return exactly one JSON object with this schema:
+```json
+{{
+  "oracle_entities": [],
+  "rationale": ""
+}}
+```
+
+Now extract the oracle entity or entities for the following item.
+
+Question: {question}
+Final Answer: {answer}
+Supporting Sub-QA Chain: {subqa_chain}
+'''

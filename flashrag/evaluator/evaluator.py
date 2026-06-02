@@ -11,7 +11,18 @@ class Evaluator:
 
         self.save_metric_flag = config["save_metric_score"]
         self.save_data_flag = config["save_intermediate_data"]
-        self.metrics = [metric.lower() for metric in self.config["metrics"]]
+        metric_alias = {
+            "gpt_acc": "llm",
+        }
+        normalized_metrics = []
+        seen = set()
+        for metric in self.config["metrics"]:
+            normalized_metric = metric_alias.get(metric.lower(), metric.lower())
+            if normalized_metric in seen:
+                continue
+            normalized_metrics.append(normalized_metric)
+            seen.add(normalized_metric)
+        self.metrics = normalized_metrics
 
         self.avaliable_metrics = self._collect_metrics()
 

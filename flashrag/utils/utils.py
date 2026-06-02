@@ -84,6 +84,8 @@ def get_retriever(config):
         return getattr(importlib.import_module("flashrag.retriever"), "MultiRetrieverRouter")(config)
     if config["retrieval_method"] == "crag":
         return getattr(importlib.import_module("flashrag.retriever"), "CRAGRetriever")(config)
+    if config["retrieval_method"] == "mcsearch":
+        return getattr(importlib.import_module("flashrag.retriever"), "MCSearchRetriever")(config)
     if config["retrieval_method"] == "bm25":
         return getattr(importlib.import_module("flashrag.retriever"), "BM25Retriever")(config)
     elif config["retrieval_method"] == "splade":

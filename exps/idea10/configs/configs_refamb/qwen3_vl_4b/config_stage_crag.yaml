@@ -1,0 +1,87 @@
+data_dir: data/datasets/
+dataset_name: RefAmb
+source: crag
+split:
+  - task_balanced_analysis_subset
+test_sample_num: ~
+random_sample: false
+seed: 2024
+save_intermediate_data: true
+save_dir: data/result/
+save_note: refamb_crag_stage
+save_new_dir: true
+gpt_acc_setting:
+    model_name: Pro/deepseek-ai/DeepSeek-V3
+    api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
+    base_url: https://api.siliconflow.cn/v1
+
+gpu_id:
+  - "0"
+framework: vllm
+generator_model: Qwen3-VL-4B-Instruct
+generator_model_path: /mnt/data/you/modelscope/Qwen3-VL-4B-Instruct
+generator_max_input_len: 2048
+max_model_len: 22500
+generator_batch_size: 4
+generation_params:
+  max_tokens: 20000
+  do_sample: false
+  temperature: 0.1
+  top_p: 1.0
+
+retrieval_method: crag
+retrieval_model_path: /mnt/data/you/modelscope/clip-vit-large-patch14
+corpus_path: /home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/crag_corpus/corpus.jsonl
+index_path: null
+multimodal_index_path_dict:
+  text: null
+  image: null
+faiss_gpu: false
+instruction: null
+text_retrieval_topk: 5
+image_retrieval_topk: 2
+retrieval_batch_size: 16
+retrieval_use_fp16: true
+retrieval_query_max_length: 64
+save_retrieval_cache: false
+use_retrieval_cache: false
+retrieval_pooling_method: cls
+bm25_backend: bm25s
+use_sentence_transformer: false
+silent_retrieval: false
+use_reranker: false
+use_multi_retriever: false
+image_retrieval_target_modal: text
+
+metrics:
+  - em
+  - f1
+  - acc
+  - precision
+  - recall
+  - llm
+save_metric_score: true
+
+roi_preprocess_config:
+  enabled: false
+  python_bin: /home/you/miniconda3/envs/dino/bin/python3.11
+  script_path: /home/you/FlashRAG/exps/idea10/scripts/groundingdino_roi_worker.py
+  groundingdino_root: /home/you/GroundingDINO
+  config_file: /home/you/GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py
+  checkpoint_path: /home/you/GroundingDINO/weights/groundingdino_swint_ogc.pth
+  device: cpu
+  box_threshold: 0.35
+  text_threshold: 0.25
+  expand_ratio: 0.08
+  output_dir: /tmp/omnisearch_roi_cache
+
+crag_search_device: cpu
+crag_text_model_name: /mnt/data/you/modelscope/bge-large-en-v1.5
+crag_hf_home: /mnt/data/you/huggingface
+crag_offline: true
+omni_retrieval_char_limit: 8500
+omni_retrieved_doc_char_limit: 6000
+crag_image_attr_max_chars: 500
+crag_image_entity_max_chars: 1200
+omni_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/omni_prompt.toml
+omni_prompt_version: system_prompt

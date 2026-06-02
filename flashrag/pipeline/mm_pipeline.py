@@ -31,18 +31,100 @@ class BasicMultiModalPipeline:
         """The overall inference process of a RAG framework."""
         pass
 
+    def _normalize_generation_stats(self, stats, sample_count):
+        if not stats or sample_count <= 0:
+            return None
+
+        if isinstance(stats, dict):
+            summary = dict(stats)
+        elif isinstance(stats, list):
+            total_samples = 0
+            total_input_tokens = 0.0
+            total_output_tokens = 0.0
+            total_tokens = 0.0
+            total_latency = 0.0
+
+            for item in stats:
+                if not isinstance(item, dict):
+                    continue
+                batch_size = int(item.get("batch_size", item.get("total_samples", 1)) or 1)
+                total_samples += batch_size
+                total_input_tokens += float(item.get("input_tokens", 0.0))
+                total_output_tokens += float(item.get("output_tokens", 0.0))
+                total_tokens += float(item.get("total_tokens", total_input_tokens + total_output_tokens))
+                total_latency += float(item.get("latency_seconds", item.get("total_latency_seconds", 0.0)))
+
+            if total_samples <= 0:
+                total_samples = len(stats)
+            summary = {
+                "total_samples": int(total_samples),
+                "total_input_tokens": int(total_input_tokens),
+                "total_output_tokens": int(total_output_tokens),
+                "total_tokens": int(total_tokens),
+                "total_latency_seconds": float(total_latency),
+            }
+        else:
+            return None
+
+        total_samples = int(summary.get("total_samples", sample_count) or sample_count)
+        total_input_tokens = float(summary.get("total_input_tokens", summary.get("input_tokens", 0.0)))
+        total_output_tokens = float(summary.get("total_output_tokens", summary.get("output_tokens", 0.0)))
+        total_tokens = float(summary.get("total_tokens", total_input_tokens + total_output_tokens))
+        total_latency = float(summary.get("total_latency_seconds", summary.get("latency_seconds", 0.0)))
+
+        compact_summary = {
+            "total_samples": total_samples,
+            "input_tokens": total_input_tokens,
+            "output_tokens": total_output_tokens,
+            "total_tokens": total_tokens,
+            "latency_seconds": total_latency,
+            "avg_input_tokens_per_sample": (total_input_tokens / total_samples) if total_samples > 0 else 0.0,
+            "avg_output_tokens_per_sample": (total_output_tokens / total_samples) if total_samples > 0 else 0.0,
+            "avg_total_tokens_per_sample": (total_tokens / total_samples) if total_samples > 0 else 0.0,
+            "avg_latency_seconds_per_sample": (total_latency / total_samples) if total_samples > 0 else 0.0,
+            "input_tokens_per_second": (total_input_tokens / total_latency) if total_latency > 0 else 0.0,
+            "output_tokens_per_second": (total_output_tokens / total_latency) if total_latency > 0 else 0.0,
+            "total_tokens_per_second": (total_tokens / total_latency) if total_latency > 0 else 0.0,
+        }
+        return [compact_summary for _ in range(sample_count)]
+
+    def _attach_generation_stats(self, dataset):
+        generator = getattr(self, "generator", None)
+        if generator is None:
+            return
+
+        stats = None
+        for method_name in ("get_generation_stats", "get_performance_stats", "cost_stats"):
+            if not hasattr(generator, method_name):
+                continue
+            method = getattr(generator, method_name)
+            try:
+                stats = method(reset=True)
+            except TypeError:
+                stats = method()
+            except Exception:
+                stats = None
+            if stats:
+                break
+
+        normalized_stats = self._normalize_generation_stats(stats, len(dataset))
+        if normalized_stats is not None:
+            dataset.update_output("generation_stats", normalized_stats)
+
     def evaluate(self, dataset, do_eval=True, pred_process_func=None):
         """The evaluation process after finishing overall generation"""
 
         if pred_process_func is not None:
             dataset = pred_process_func(dataset)
 
+        self._attach_generation_stats(dataset)
+
         if do_eval:
             # evaluate & save result
             eval_result = self.evaluator.evaluate(dataset)
             print(eval_result)
 
-        return 
+        return dataset
 
 
 class MMSequentialPipeline(BasicMultiModalPipeline):

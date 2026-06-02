@@ -9,7 +9,7 @@ import re
 import sys
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, TimeoutError, wait
 from pathlib import Path
 from statistics import mean
 from string import Formatter
@@ -35,35 +35,67 @@ for k in [
     os.environ.pop(k, None)
 
 
-DEFAULT_INPUT = Path(
-    "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_04_16_10_21_api_experiment/omnisearch_trajectories.jsonl"
-)
-DEFAULT_OUTPUT_DIR = Path(
-    "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_04_16_10_21_api_experiment/trajectory_quality_eval_whole_delta_F"
-)
+DEFAULT_INPUT = None
+DEFAULT_OUTPUT_DIR = None
+DEFAULT_BATCH_PARENT_DIRS = [
+    Path(
+        "/home/you/FlashRAG/exps/idea10/data/result/scaling_qwen3_5/4b/crag"
+    ),
+    Path(
+        "/home/you/FlashRAG/exps/idea10/data/result/scaling_qwen3_5/4b/infoseek"
+    ),
+    Path(
+        "/home/you/FlashRAG/exps/idea10/data/result/scaling_qwen3_5/4b/mcsearch"
+    ),
+    Path(
+        "/home/you/FlashRAG/exps/idea10/data/result/scaling_qwen3_5/4b/oven"
+    ),
+    Path(
+        "/home/you/FlashRAG/exps/idea10/data/result/scaling_qwen3_5/9b/crag"
+    ),
+    Path(
+        "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-8b/RefAmb_2026_05_23_12_10_refamb_infoseek_qwen3_vl_8b_stage"
+    ),
+    Path(
+        "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-8b/RefAmb_2026_05_23_12_53_refamb_mcsearch_qwen3_vl_8b_stage"
+    ),
+    Path(
+        "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-8b/RefAmb_2026_05_23_14_07_refamb_crag_qwen3_vl_8b_stage"
+    ),
+
+]
+DEFAULT_BATCH_OUTPUT_DIR_NAME = "trajectory_quality_eval_whole_delta_F_updated"
+DEFAULT_BATCH_INPUT_FILENAME = "omnisearch_trajectories.jsonl"
 DEFAULT_FACT_PROMPT = Path(
     "/home/you/FlashRAG/exps/idea10/prompts/extract_atomic_fact_set.toml"
 )
 DEFAULT_UTILITY_PROMPT = Path(
-    "/home/you/FlashRAG/exps/idea10/prompts/select_helpful_facts_for_utility.toml"
+    "/home/you/FlashRAG/exps/idea10/prompts/label_iteration_utility.toml"
 )
-DEFAULT_MODEL = os.environ.get("TRAJECTORY_EVAL_MODEL", "Pro/deepseek-ai/DeepSeek-R1")
+DEFAULT_MODEL = os.environ.get("TRAJECTORY_EVAL_MODEL", "Pro/deepseek-ai/DeepSeek-V3")
 DEFAULT_FACT_API_MODEL = os.environ.get(
     "TRAJECTORY_EVAL_FACT_MODEL", "Qwen/Qwen2.5-7B-Instruct"
 )
 DEFAULT_BASE_URL = os.environ.get("TRAJECTORY_EVAL_BASE_URL", "https://api.siliconflow.cn/v1")
 DEFAULT_API_KEY_ENV = "SILICONFLOW_API_KEY"
-DEFAULT_FACT_EXTRACTOR = "api"  # "api" or "local_qwen"
+DEFAULT_FACT_EXTRACTOR = "local_qwen"  # "api" or "local_qwen"
 DEFAULT_LOCAL_FACT_MODEL = "Qwen2.5-7B-Instruct"
 DEFAULT_LOCAL_FACT_MODEL_PATH = Path("/mnt/data/you/modelscope/Qwen2.5-7B-Instruct")
-DEFAULT_WORKERS = 2
+DEFAULT_LOCAL_FACT_BATCH_SIZE = 8
+# Default local setup:
+# - facts: local Qwen2.5-7B-Instruct
+# - utility judge: reuse local Qwen2.5-7B-Instruct
+DEFAULT_UTILITY_JUDGE_BACKEND = "vllm_qwen25_7b"  # "api" or "vllm_qwen25_7b"
+DEFAULT_LOCAL_UTILITY_MODEL = DEFAULT_LOCAL_FACT_MODEL
+DEFAULT_LOCAL_UTILITY_MODEL_PATH = DEFAULT_LOCAL_FACT_MODEL_PATH
+DEFAULT_WORKERS = 1
 DEFAULT_TIMEOUT = 120.0
 DEFAULT_RETRIES = 2
-DEFAULT_SIM_THRESHOLD = 2.0
+DEFAULT_SIM_THRESHOLD = 1.0
 DEFAULT_FACT_SIM_THRESHOLD = 0.9
 DEFAULT_EMBED_BATCH_SIZE = 64
 DEFAULT_EPSILON = 1e-8
-DEFAULT_MAX_DOCS_PER_ITERATION = 1
+DEFAULT_MAX_DOCS_PER_ITERATION = 10
 DEFAULT_CACHE_FLUSH_EVERY = 200
 
 UTILITY_TO_SCORE = {
@@ -84,6 +116,10 @@ UTILITY_LABEL_ALIASES = {
 
 
 class InvalidUtilityLabelError(ValueError):
+    pass
+
+
+class UtilityOutputParseError(RuntimeError):
     pass
 
 
@@ -109,6 +145,17 @@ def parse_args() -> argparse.Namespace:
         description="Evaluate trajectory quality with Information Increment, Iteration Utility, and TQS."
     )
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
+    parser.add_argument(
+        "--input-parent-dir",
+        type=Path,
+        action="append",
+        default=None,
+        help=(
+            "Parent directory of a single run. The script will read "
+            "`<parent>/omnisearch_trajectories.jsonl` and write results under that parent. "
+            "Can be passed multiple times."
+        ),
+    )
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--fact-prompt", type=Path, default=DEFAULT_FACT_PROMPT)
     parser.add_argument("--utility-prompt", type=Path, default=DEFAULT_UTILITY_PROMPT)
@@ -122,8 +169,20 @@ def parse_args() -> argparse.Namespace:
         choices=("api", "local_qwen"),
         default=DEFAULT_FACT_EXTRACTOR,
     )
+    parser.add_argument(
+        "--utility-judge-backend",
+        type=str,
+        choices=("api", "vllm_qwen25_7b"),
+        default=DEFAULT_UTILITY_JUDGE_BACKEND,
+    )
     parser.add_argument("--local-fact-model", type=str, default=DEFAULT_LOCAL_FACT_MODEL)
     parser.add_argument("--local-fact-model-path", type=Path, default=DEFAULT_LOCAL_FACT_MODEL_PATH)
+    parser.add_argument("--local-utility-model", type=str, default=DEFAULT_LOCAL_UTILITY_MODEL)
+    parser.add_argument(
+        "--local-utility-model-path",
+        type=Path,
+        default=DEFAULT_LOCAL_UTILITY_MODEL_PATH,
+    )
     parser.add_argument("--workers", type=int, default=DEFAULT_WORKERS)
     parser.add_argument("--timeout", type=float, default=DEFAULT_TIMEOUT)
     parser.add_argument("--retries", type=int, default=DEFAULT_RETRIES)
@@ -214,6 +273,18 @@ def parse_search_query(content: str) -> str:
     return normalize_whitespace(text.strip().strip('"'))
 
 
+def parse_retrieval_action(content: str) -> str | None:
+    text = normalize_whitespace(strip_trailing_tag(content))
+    lowered = text.lower()
+    if lowered.startswith("text retrieval"):
+        return "text_retrieval_result"
+    if lowered.startswith("image retrieval"):
+        return "image_retrieval_result"
+    if lowered.startswith("no retrieval"):
+        return "no_retrieval_result"
+    return None
+
+
 def extract_json_block(text: str) -> dict:
     start = text.find("{")
     end = text.rfind("}")
@@ -223,11 +294,75 @@ def extract_json_block(text: str) -> dict:
     try:
         return json.loads(payload)
     except json.JSONDecodeError as exc:
+        def collapse_repetitive_content(raw: str) -> str:
+            cleaned = raw
+            comma_repeat_patterns = [
+                re.compile(
+                    r"(?P<item>[A-Za-z][A-Za-z0-9./\'-]*(?:\s+[A-Za-z][A-Za-z0-9./\'-]*){0,5})"
+                    r"(?:,\s*(?P=item)){3,}"
+                ),
+                re.compile(
+                    r"(?P<item>[A-Za-z][A-Za-z0-9./\'-]*)"
+                    r"(?:\s+(?P=item)){5,}"
+                ),
+            ]
+            changed = True
+            while changed:
+                changed = False
+                for pattern in comma_repeat_patterns:
+                    updated = pattern.sub(lambda m: m.group("item"), cleaned)
+                    if updated != cleaned:
+                        cleaned = updated
+                        changed = True
+            return cleaned
+
+        def sanitize_unescaped_inner_quotes(raw: str) -> str:
+            chars: list[str] = []
+            in_string = False
+            i = 0
+            length = len(raw)
+            while i < length:
+                ch = raw[i]
+                if ch == '"':
+                    backslash_count = 0
+                    j = i - 1
+                    while j >= 0 and raw[j] == "\\":
+                        backslash_count += 1
+                        j -= 1
+                    escaped = (backslash_count % 2) == 1
+                    if escaped:
+                        chars.append(ch)
+                    elif not in_string:
+                        in_string = True
+                        chars.append(ch)
+                    else:
+                        k = i + 1
+                        while k < length and raw[k].isspace():
+                            k += 1
+                        next_char = raw[k] if k < length else ""
+                        if next_char in {",", "}", "]", ":"}:
+                            in_string = False
+                            chars.append(ch)
+                        else:
+                            chars.append('\\"')
+                    i += 1
+                    continue
+                chars.append(ch)
+                i += 1
+            return "".join(chars)
+
         print(
             "[JSON Parse Error] Failed to parse model output as strict JSON. "
             f"Raw payload:\n{payload}",
             flush=True,
         )
+        cleaned_payload = collapse_repetitive_content(payload)
+        sanitized_payload = sanitize_unescaped_inner_quotes(cleaned_payload)
+        if sanitized_payload != payload:
+            try:
+                return json.loads(sanitized_payload)
+            except json.JSONDecodeError:
+                pass
         try:
             parsed = ast.literal_eval(payload)
         except Exception:
@@ -274,9 +409,7 @@ def split_evidence_into_docs(evidence: str) -> list[str]:
 
 
 def resolve_retriever_config_path(args: argparse.Namespace) -> Path:
-    if args.retriever_config is not None:
-        return args.retriever_config
-    candidate = args.input.parent / "config.yaml"
+    candidate = Path("/home/you/FlashRAG/exps/idea10/configs/config.yaml")
     if candidate.exists():
         return candidate
     raise FileNotFoundError(
@@ -285,7 +418,7 @@ def resolve_retriever_config_path(args: argparse.Namespace) -> Path:
 
 
 def resolve_run_config_path(args: argparse.Namespace) -> Path:
-    candidate = args.input.parent / "config.yaml"
+    candidate = Path("/home/you/FlashRAG/exps/idea10/configs/config.yaml")
     if candidate.exists():
         return candidate
     raise FileNotFoundError(
@@ -305,7 +438,7 @@ def build_local_fact_generator(args: argparse.Namespace, run_config_path: Path):
             "generator_model": args.local_fact_model,
             "generator_model_path": str(args.local_fact_model_path),
             "generator_max_input_len": 8192,
-            "generator_batch_size": 1,
+            "generator_batch_size": DEFAULT_LOCAL_FACT_BATCH_SIZE,
             "framework": "hf",
             "gpu_id": "0",
             "generation_params": {
@@ -317,6 +450,98 @@ def build_local_fact_generator(args: argparse.Namespace, run_config_path: Path):
         },
     )
     return get_generator(config)
+
+
+def build_local_utility_judge_generator(args: argparse.Namespace, run_config_path: Path):
+    if not args.local_utility_model_path.exists():
+        raise FileNotFoundError(
+            f"Local utility judge model path does not exist: {args.local_utility_model_path}"
+        )
+    config = Config(
+        str(run_config_path),
+        config_dict={
+            "disable_save": True,
+            "generator_model": args.local_utility_model,
+            "generator_model_path": str(args.local_utility_model_path),
+            "generator_max_input_len": 8192,
+            "generator_batch_size": 1,
+            "framework": "vllm",
+            "gpu_id": "0",
+            "generation_params": {
+                "max_new_tokens": 1024,
+                "do_sample": False,
+                "temperature": 0.0,
+                "top_p": 1.0,
+            },
+        },
+    )
+    return get_generator(config)
+
+
+def build_evaluation_jobs(args: argparse.Namespace) -> list[tuple[Path, Path]]:
+    if args.input is not None:
+        input_path = args.input
+        output_dir = args.output_dir or (input_path.parent / DEFAULT_BATCH_OUTPUT_DIR_NAME)
+        return [(input_path, output_dir)]
+
+    def resolve_parent_dirs(parent_dirs: list[Path]) -> list[tuple[Path, Path]]:
+        jobs: list[tuple[Path, Path]] = []
+        seen_inputs: set[Path] = set()
+        for parent_dir in parent_dirs:
+            input_path = parent_dir / DEFAULT_BATCH_INPUT_FILENAME
+            if not input_path.exists():
+                raise FileNotFoundError(f"Batch input file does not exist: {input_path}")
+            resolved_input = input_path.resolve()
+            if resolved_input in seen_inputs:
+                continue
+            seen_inputs.add(resolved_input)
+            jobs.append((input_path, parent_dir / DEFAULT_BATCH_OUTPUT_DIR_NAME))
+        return jobs
+
+    if args.input_parent_dir:
+        return resolve_parent_dirs(args.input_parent_dir)
+
+    jobs = resolve_parent_dirs(discover_default_batch_parent_dirs())
+    if not jobs:
+        raise ValueError("No batch inputs discovered. Set --input or --input-parent-dir.")
+    return jobs
+
+
+def discover_default_batch_parent_dirs() -> list[Path]:
+    parent_dirs: list[Path] = []
+    seen: set[Path] = set()
+
+    def add_parent_dir(path: Path) -> None:
+        resolved = path.resolve()
+        if resolved in seen:
+            return
+        seen.add(resolved)
+        parent_dirs.append(path)
+
+    for path in DEFAULT_BATCH_PARENT_DIRS:
+        if path.exists():
+            add_parent_dir(path)
+
+    qwen4b_root = Path(
+        "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-4B"
+    )
+    if qwen4b_root.exists():
+        source_names = ("oven", "infoseek", "mcsearch", "crag")
+        round_names = (
+            "first_round_disturb_rewrite_static_prefix_whole",
+            "first_round_oracle_rewrite",
+        )
+        for source_name in source_names:
+            run_dirs = sorted(qwen4b_root.glob(f"*/**/*refamb_{source_name}_*stage"))
+            for run_dir in run_dirs:
+                if not run_dir.is_dir():
+                    continue
+                for round_name in round_names:
+                    parent_dir = run_dir / round_name
+                    if parent_dir.exists():
+                        add_parent_dir(parent_dir)
+
+    return parent_dirs
 
 
 class DenseSimilarity:
@@ -394,52 +619,67 @@ class DenseSimilarity:
 
 def build_iterations(trajectory: list[dict]) -> list[dict]:
     iterations = []
-    pending_search = None
+    latest_sub_question = ""
     for idx, step in enumerate(trajectory):
         action = step.get("action")
+        if action == "sub-question":
+            latest_sub_question = normalize_whitespace(step.get("content", ""))
+            latest_sub_question = re.sub(r"</[^>]+>\s*$", "", latest_sub_question).strip()
+            continue
         if action == "search":
-            pending_search = {
-                "search_index": idx,
-                "query": parse_search_query(step.get("content", "")),
-            }
+            retrieval_action = None
+            query = parse_search_query(step.get("content", ""))
+            retrieval_index = idx
+            retrieval_content = step.get("content", "") or ""
+            retrieval_mode = step.get("mode")
+            reaction_index = None
+            reaction_action = None
+            reaction_text = ""
+            for later_idx in range(idx + 1, len(trajectory)):
+                later = trajectory[later_idx]
+                later_action = later.get("action")
+                if later_action in {
+                    "text_retrieval_result",
+                    "image_retrieval_result",
+                    "no_retrieval_result",
+                } and retrieval_action is None:
+                    retrieval_action = later_action
+                    retrieval_index = later_idx
+                    retrieval_content = later.get("content", "") or ""
+                    retrieval_mode = later.get("mode")
+                    if not query:
+                        query = normalize_whitespace(str(later.get("query", "") or ""))
+                    continue
+                if later_action in {"thought", "final_answer"}:
+                    reaction_index = later_idx
+                    reaction_action = later_action
+                    reaction_text = later.get("content", "")
+                    break
+                if later_action == "search":
+                    break
+            if retrieval_action is None:
+                retrieval_action = parse_retrieval_action(step.get("content", ""))
+                if retrieval_action is None:
+                    continue
+
+            sub_question = normalize_whitespace(latest_sub_question) or query
+            iterations.append(
+                {
+                    "iteration_index": len(iterations) + 1,
+                    "search_index": idx,
+                    "retrieval_index": retrieval_index,
+                    "retrieval_action": retrieval_action,
+                    "mode": retrieval_mode,
+                    "query": query,
+                    "sub_question": sub_question,
+                    "retrieval_content": retrieval_content,
+                    "reaction_index": reaction_index,
+                    "reaction_action": reaction_action,
+                    "reaction_text": reaction_text,
+                }
+            )
             continue
 
-        if action not in {"text_retrieval_result", "image_retrieval_result", "no_retrieval_result"}:
-            continue
-
-        query = normalize_whitespace(step.get("query") or "")
-        if not query and pending_search:
-            query = pending_search["query"]
-
-        reaction_index = None
-        reaction_action = None
-        reaction_text = ""
-        for later_idx in range(idx + 1, len(trajectory)):
-            later = trajectory[later_idx]
-            later_action = later.get("action")
-            if later_action in {"thought", "final_answer"}:
-                reaction_index = later_idx
-                reaction_action = later_action
-                reaction_text = later.get("content", "")
-                break
-            if later_action == "search":
-                break
-
-        iterations.append(
-            {
-                "iteration_index": len(iterations) + 1,
-                "search_index": pending_search["search_index"] if pending_search else None,
-                "retrieval_index": idx,
-                "retrieval_action": action,
-                "mode": step.get("mode"),
-                "query": query,
-                "retrieval_content": step.get("content", "") or "",
-                "reaction_index": reaction_index,
-                "reaction_action": reaction_action,
-                "reaction_text": reaction_text,
-            }
-        )
-        pending_search = None
     return iterations
 
 
@@ -663,7 +903,7 @@ def build_sample_id(sample: dict) -> str:
 class LLMJudge:
     def __init__(
         self,
-        client: OpenAI,
+        client: OpenAI | None,
         model: str,
         fact_api_model: str,
         timeout: float,
@@ -671,6 +911,8 @@ class LLMJudge:
         max_docs_per_iteration: int,
         fact_extractor: str,
         local_fact_generator,
+        utility_judge_backend: str,
+        local_utility_generator,
         fact_prompt: str,
         utility_prompt: str,
         fact_cache_path: Path,
@@ -686,6 +928,9 @@ class LLMJudge:
         self.fact_extractor = fact_extractor
         self.local_fact_generator = local_fact_generator
         self.local_fact_generator_lock = threading.Lock()
+        self.utility_judge_backend = utility_judge_backend
+        self.local_utility_generator = local_utility_generator
+        self.local_utility_generator_lock = threading.Lock()
         self.fact_prompt = fact_prompt
         self.utility_prompt = utility_prompt
         self.fact_cache_path = fact_cache_path
@@ -726,6 +971,8 @@ class LLMJudge:
         self._maybe_flush_utility_cache(force=True)
 
     def _chat_json(self, system_prompt: str, user_prompt: str, model: str | None = None) -> dict:
+        if self.client is None:
+            raise RuntimeError("OpenAI client is not initialized for API-based inference.")
         last_error = None
         for attempt in range(self.retries + 1):
             try:
@@ -747,9 +994,17 @@ class LLMJudge:
                     time.sleep(min(2**attempt, 4))
         raise RuntimeError(f"LLM request failed: {last_error}") from last_error
 
-    def _local_generate_json(self, system_prompt: str, user_prompt: str) -> dict:
-        if self.local_fact_generator is None:
-            raise RuntimeError("Local fact generator is not initialized.")
+    def _local_generate_json_with_generator(
+        self,
+        generator,
+        generator_lock: threading.Lock,
+        system_prompt: str,
+        user_prompt: str,
+        generator_name: str,
+        max_new_tokens: int,
+    ) -> dict:
+        if generator is None:
+            raise RuntimeError(f"{generator_name} is not initialized.")
         last_error = None
         messages = [
             {"role": "system", "content": system_prompt},
@@ -757,33 +1012,112 @@ class LLMJudge:
         ]
         for attempt in range(self.retries + 1):
             try:
-                with self.local_fact_generator_lock:
-                    with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                        response = self.local_fact_generator.generate([messages], max_new_tokens=1024)
-                if isinstance(response, list):
-                    content = response[0]
-                else:
-                    content = response
-                return extract_json_block(content or "")
+                acquired = generator_lock.acquire(timeout=self.timeout)
+                if not acquired:
+                    raise TimeoutError(
+                        f"Timed out while waiting for {generator_name} lock. "
+                        "A previous local generation call may still be running."
+                    )
+                try:
+                    with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(
+                        io.StringIO()
+                    ):
+                        response = generator.generate(
+                            [messages],
+                            max_new_tokens=max_new_tokens,
+                        )
+                finally:
+                    generator_lock.release()
+                content = response[0] if isinstance(response, list) else response
+                try:
+                    return extract_json_block(content or "")
+                except ValueError as exc:
+                    raise RuntimeError(
+                        f"{generator_name} returned malformed JSON. "
+                        "Aborting retries for this request to avoid wedging the local generator. "
+                        f"Raw content: {content!r}"
+                    ) from exc
+            except Exception as exc:  # noqa: BLE001
+                last_error = exc
+                if isinstance(exc, RuntimeError) and "returned malformed JSON" in str(exc):
+                    break
+                if attempt < self.retries:
+                    time.sleep(min(2**attempt, 4))
+        raise RuntimeError(f"{generator_name} request failed: {last_error}") from last_error
+
+    def _local_generate_json(self, system_prompt: str, user_prompt: str) -> dict:
+        return self._local_generate_json_with_generator(
+            generator=self.local_fact_generator,
+            generator_lock=self.local_fact_generator_lock,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            generator_name="Local fact extraction",
+            max_new_tokens=1024,
+        )
+
+    def _local_utility_generate_json(self, system_prompt: str, user_prompt: str) -> dict:
+        return self._local_generate_json_with_generator(
+            generator=self.local_utility_generator,
+            generator_lock=self.local_utility_generator_lock,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            generator_name="Local utility judge",
+            max_new_tokens=1024,
+        )
+
+    def _local_generate_json_batch(
+        self,
+        prompt_pairs: list[tuple[str, str]],
+        generator,
+        generator_lock: threading.Lock,
+        generator_name: str,
+        max_new_tokens: int,
+    ) -> list[dict | Exception]:
+        if generator is None:
+            raise RuntimeError(f"{generator_name} is not initialized.")
+        messages_batch = [
+            [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ]
+            for system_prompt, user_prompt in prompt_pairs
+        ]
+        last_error = None
+        for attempt in range(self.retries + 1):
+            try:
+                acquired = generator_lock.acquire(timeout=self.timeout)
+                if not acquired:
+                    raise TimeoutError(
+                        f"Timed out while waiting for {generator_name} lock. "
+                        "A previous local generation call may still be running."
+                    )
+                try:
+                    with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(
+                        io.StringIO()
+                    ):
+                        responses = generator.generate(
+                            messages_batch,
+                            max_new_tokens=max_new_tokens,
+                        )
+                finally:
+                    generator_lock.release()
+
+                if not isinstance(responses, list):
+                    responses = [responses]
+                parsed_outputs: list[dict | Exception] = []
+                for response in responses:
+                    try:
+                        parsed_outputs.append(extract_json_block(response or ""))
+                    except Exception as exc:  # noqa: BLE001
+                        parsed_outputs.append(exc)
+                return parsed_outputs
             except Exception as exc:  # noqa: BLE001
                 last_error = exc
                 if attempt < self.retries:
                     time.sleep(min(2**attempt, 4))
-        raise RuntimeError(f"Local fact extraction request failed: {last_error}") from last_error
+        raise RuntimeError(f"{generator_name} batch request failed: {last_error}") from last_error
 
-    def _extract_facts_from_single_evidence(self, query: str, evidence: str) -> list[str]:
-        user_prompt = render_prompt(self.fact_prompt, query=query, evidence=evidence)
-        if self.fact_extractor == "local_qwen":
-            data = self._local_generate_json(
-                "You extract atomic fact sets for trajectory-level evaluation.",
-                user_prompt,
-            )
-        else:
-            data = self._chat_json(
-                "You extract atomic fact sets for trajectory-level evaluation.",
-                user_prompt,
-                model=self.fact_api_model,
-            )
+    def _normalize_extracted_facts(self, data: dict) -> list[str]:
         raw_facts = data.get("facts", [])
         if not isinstance(raw_facts, list):
             raise ValueError(f"`facts` must be a list: {data!r}")
@@ -807,6 +1141,21 @@ class LLMJudge:
             facts.append(fact)
         return facts
 
+    def _extract_facts_from_single_evidence(self, query: str, evidence: str) -> list[str]:
+        user_prompt = render_prompt(self.fact_prompt, query=query, evidence=evidence)
+        if self.fact_extractor == "local_qwen":
+            data = self._local_generate_json(
+                "You extract atomic fact sets for trajectory-level evaluation.",
+                user_prompt,
+            )
+        else:
+            data = self._chat_json(
+                "You extract atomic fact sets for trajectory-level evaluation.",
+                user_prompt,
+                model=self.fact_api_model,
+            )
+        return self._normalize_extracted_facts(data)
+
     def extract_facts(self, query: str, evidence: str, retrieval_type: str) -> list[str]:
         cache_key = json.dumps(
             {"query": query, "evidence": evidence, "retrieval_type": retrieval_type},
@@ -826,19 +1175,84 @@ class LLMJudge:
 
         facts = []
         seen = set()
-        for evidence_chunk in evidence_chunks:
-            chunk_facts = self._extract_facts_from_single_evidence(query=query, evidence=evidence_chunk)
-            for fact in chunk_facts:
-                key = normalize_fact(fact)
-                if not key or key in seen:
+        skipped_chunks = 0
+        total_chunks = len(evidence_chunks)
+        if self.fact_extractor == "local_qwen":
+            prompt_pairs = [
+                (
+                    "You extract atomic fact sets for trajectory-level evaluation.",
+                    render_prompt(self.fact_prompt, query=query, evidence=evidence_chunk),
+                )
+                for evidence_chunk in evidence_chunks
+            ]
+            parsed_outputs = self._local_generate_json_batch(
+                prompt_pairs=prompt_pairs,
+                generator=self.local_fact_generator,
+                generator_lock=self.local_fact_generator_lock,
+                generator_name="Local fact extraction",
+                max_new_tokens=1024,
+            )
+            for chunk_idx, (evidence_chunk, parsed_output) in enumerate(
+                zip(evidence_chunks, parsed_outputs, strict=False), start=1
+            ):
+                try:
+                    if isinstance(parsed_output, Exception):
+                        raise RuntimeError(
+                            "Local fact extraction returned malformed JSON in batch mode. "
+                            f"Raw error: {parsed_output}"
+                        ) from parsed_output
+                    chunk_facts = self._normalize_extracted_facts(parsed_output)
+                except Exception as exc:  # noqa: BLE001
+                    skipped_chunks += 1
+                    snippet = normalize_whitespace(evidence_chunk)[:160]
+                    print(
+                        "[Fact Extraction Warning] "
+                        f"retrieval_type={retrieval_type} "
+                        f"chunk={chunk_idx}/{total_chunks} "
+                        f"query={query!r} "
+                        f"error={exc} "
+                        f"evidence_snippet={snippet!r}",
+                        flush=True,
+                    )
                     continue
-                seen.add(key)
-                facts.append(fact)
+                for fact in chunk_facts:
+                    key = normalize_fact(fact)
+                    if not key or key in seen:
+                        continue
+                    seen.add(key)
+                    facts.append(fact)
+        else:
+            for chunk_idx, evidence_chunk in enumerate(evidence_chunks, start=1):
+                try:
+                    chunk_facts = self._extract_facts_from_single_evidence(
+                        query=query,
+                        evidence=evidence_chunk,
+                    )
+                except RuntimeError as exc:
+                    skipped_chunks += 1
+                    snippet = normalize_whitespace(evidence_chunk)[:160]
+                    print(
+                        "[Fact Extraction Warning] "
+                        f"retrieval_type={retrieval_type} "
+                        f"chunk={chunk_idx}/{total_chunks} "
+                        f"query={query!r} "
+                        f"error={exc} "
+                        f"evidence_snippet={snippet!r}",
+                        flush=True,
+                    )
+                    continue
+                for fact in chunk_facts:
+                    key = normalize_fact(fact)
+                    if not key or key in seen:
+                        continue
+                    seen.add(key)
+                    facts.append(fact)
 
         with self.fact_cache_lock:
             self.fact_cache[cache_key] = {
                 "retrieval_type": retrieval_type,
                 "num_evidence_chunks": len(evidence_chunks),
+                "skipped_evidence_chunks": skipped_chunks,
                 "facts": facts,
             }
             self.fact_cache_pending_writes += 1
@@ -847,30 +1261,30 @@ class LLMJudge:
 
     def classify_utility(
         self,
-        query: str,
+        sub_question: str,
         reasoning: str,
         facts: list[str],
-    ) -> tuple[float, str, list[str]]:
+    ) -> tuple[str, str, list[str]]:
         cache_key = json.dumps(
-            {"query": query, "reasoning": reasoning, "facts": facts},
+            {"sub_question": sub_question, "reasoning": reasoning, "facts": facts},
             ensure_ascii=False,
             sort_keys=True,
         )
         with self.utility_cache_lock:
             cached = self.utility_cache.get(cache_key)
         if cached is not None:
-            cached_utility = cached.get("utility_score")
+            cached_label = normalize_utility_label(cached.get("label"))
             cached_reason = cached.get("reason", "")
-            cached_helpful_facts = cached.get("helpful_facts", [])
-            if not isinstance(cached_helpful_facts, list):
-                cached_helpful_facts = []
-            cached_helpful_facts = [
+            cached_filtered_facts = cached.get("filtered_facts", [])
+            if not isinstance(cached_filtered_facts, list):
+                cached_filtered_facts = []
+            cached_filtered_facts = [
                 normalize_whitespace(str(fact))
-                for fact in cached_helpful_facts
+                for fact in cached_filtered_facts
                 if normalize_whitespace(str(fact))
             ]
-            if isinstance(cached_utility, (int, float)):
-                return float(cached_utility), cached_reason, cached_helpful_facts
+            if cached_label:
+                return cached_label, cached_reason, cached_filtered_facts
             # Drop malformed cached entries and recompute.
             with self.utility_cache_lock:
                 self.utility_cache.pop(cache_key, None)
@@ -879,45 +1293,47 @@ class LLMJudge:
 
         user_prompt = render_prompt(
             self.utility_prompt,
-            sub_question=query,
-            thought=reasoning,
-            facts=json.dumps(facts, ensure_ascii=False),
+            sub_question=sub_question,
+            reasoning=reasoning,
         )
-        data = self._chat_json(
-            "You identify which deduplicated facts are helpful for answering the current sub-question.",
-            user_prompt,
-        )
+        try:
+            if self.utility_judge_backend == "vllm_qwen25_7b":
+                data = self._local_utility_generate_json(
+                    "You label iteration utility for trajectory-level evaluation.",
+                    user_prompt,
+                )
+            else:
+                data = self._chat_json(
+                    "You label iteration utility for trajectory-level evaluation.",
+                    user_prompt,
+                )
+        except Exception as exc:  # noqa: BLE001
+            raise UtilityOutputParseError(
+                f"Utility judge output could not be parsed as JSON; skipping iteration. "
+                f"sub_question={sub_question!r}; reasoning={reasoning!r}; error={exc}"
+            ) from exc
+        raw_label = data.get("label")
+        label = normalize_utility_label(raw_label)
         reason = data.get("reason", "")
         if not isinstance(reason, str):
             reason = str(reason)
         reason = normalize_whitespace(reason)
-        raw_helpful_facts = data.get("helpful_facts", [])
-        if not isinstance(raw_helpful_facts, list):
-            raw_helpful_facts = []
-        fact_lookup = {normalize_fact(fact): fact for fact in facts}
-        helpful_facts = []
-        seen_helpful_fact_keys = set()
-        for fact in raw_helpful_facts:
-            fact_text = normalize_whitespace(str(fact))
-            fact_key = normalize_fact(fact_text)
-            if not fact_key or fact_key in seen_helpful_fact_keys:
-                continue
-            original_fact = fact_lookup.get(fact_key)
-            if original_fact is None:
-                continue
-            helpful_facts.append(original_fact)
-            seen_helpful_fact_keys.add(fact_key)
-        utility_score = len(helpful_facts) / (len(facts) + 1e-8)
+        if not label:
+            raise InvalidUtilityLabelError(
+                f"Unsupported utility label: {raw_label!r}; reason={reason!r}; "
+                f"sub_question={sub_question!r}; reasoning={reasoning!r}"
+            )
+        filtered_facts: list[str] = []
 
         with self.utility_cache_lock:
             self.utility_cache[cache_key] = {
-                "utility_score": utility_score,
+                "label": label,
                 "reason": reason,
-                "helpful_facts": helpful_facts,
+                "filtered_facts": filtered_facts,
             }
             self.utility_cache_pending_writes += 1
         self._maybe_flush_utility_cache()
-        return utility_score, reason, helpful_facts
+        return label, reason, filtered_facts
 
 
 def evaluate_sample(
@@ -940,6 +1356,35 @@ def evaluate_sample(
         if iteration["retrieval_action"] == "no_retrieval_result":
             continue
         query = iteration["query"] or sample.get("question", "")
+        sub_question = normalize_whitespace(iteration.get("sub_question", ""))
+        reaction_text = normalize_whitespace(iteration.get("reaction_text", ""))
+        if not sub_question:
+            sub_question = normalize_whitespace(query)
+        force_zero_utility = not reaction_text
+        if force_zero_utility:
+            print(
+                "[Utility Fallback] "
+                f"id={sample_id} "
+                f"iteration={iteration['iteration_index']} "
+                f"retrieval_type={iteration['retrieval_action']} "
+                "missing=reaction_text "
+                "Skip this iteration so it does not contribute to the TQS denominator.",
+                flush=True,
+            )
+            if progress_tracker is not None:
+                progress_tracker.set_stage(
+                    sample_id,
+                    "skipped_missing_reaction",
+                    iteration["iteration_index"],
+                    total_iterations,
+                )
+                progress_tracker.set_metric(
+                    sample_id,
+                    "utility",
+                    0.0,
+                    iteration["iteration_index"],
+                )
+            continue
         use_query_similarity = iteration["retrieval_action"] != "image_retrieval_result"
         retrieval_type = (
             "Image Retrieval"
@@ -967,15 +1412,17 @@ def evaluate_sample(
             )
         if use_query_similarity and query_sim is not None and query_sim > sim_threshold:
             facts = []
-            helpful_facts = []
+            filtered_facts = []
             accepted_facts = []
             fact_match_rows = []
             delta_f = 0.0
             novel_facts = []
             delta_reason = "similarity_gate"
-            label = "no_contribution"
-            label_reason = "Similarity gate triggered because query similarity exceeded the threshold."
             utility = 0.0
+            utility_label = "no_contribution"
+            label_reason = "Similarity gate triggered because query similarity exceeded the threshold."
+            utility_defined = False
+            utility_reason_code = "similarity_gate"
         else:
             if progress_tracker is not None:
                 progress_tracker.set_stage(
@@ -1008,7 +1455,6 @@ def evaluate_sample(
             delta_reason = (
                 "set_difference" if use_query_similarity else "set_difference_no_query_similarity"
             )
-            cumulative_facts.extend(accepted_facts)
             if progress_tracker is not None:
                 progress_tracker.set_stage(
                     sample_id,
@@ -1016,11 +1462,28 @@ def evaluate_sample(
                     iteration["iteration_index"],
                     total_iterations,
                 )
-            utility, label_reason, helpful_facts = judge.classify_utility(
-                query=query,
-                reasoning=iteration["reaction_text"],
-                facts=novel_facts,
-            )
+            try:
+                utility_label, label_reason, filtered_facts = judge.classify_utility(
+                    sub_question=sub_question,
+                    reasoning=reaction_text,
+                    facts=facts,
+                )
+            except UtilityOutputParseError as exc:
+                print(
+                    "[Utility Skip] "
+                    f"id={sample_id} "
+                    f"iteration={iteration['iteration_index']} "
+                    f"retrieval_type={iteration['retrieval_action']} "
+                    f"error={exc}",
+                    flush=True,
+                )
+                if use_query_similarity:
+                    prev_query = query
+                continue
+            utility = UTILITY_TO_SCORE[utility_label]
+            utility_defined = True
+            utility_reason_code = "llm_three_level_utility"
+            cumulative_facts.extend(accepted_facts)
         if progress_tracker is not None:
             progress_tracker.set_metric(
                 sample_id,
@@ -1045,6 +1508,7 @@ def evaluate_sample(
                 "mode": iteration["mode"],
                 "previous_query_for_similarity": prev_query,
                 "query": iteration["query"],
+                "sub_question": sub_question,
                 "query_similarity_enabled": use_query_similarity,
                 "query_similarity_with_previous": query_sim,
                 "similarity_threshold": sim_threshold,
@@ -1052,16 +1516,18 @@ def evaluate_sample(
                 "retrieval_index": iteration["retrieval_index"],
                 "reaction_index": iteration["reaction_index"],
                 "reaction_action": iteration["reaction_action"],
-                "reaction_text": iteration["reaction_text"],
+                "reaction_text": reaction_text,
                 "facts_t": facts,
-                "helpful_facts_t": helpful_facts,
+                "filtered_facts_t": filtered_facts,
                 "accepted_facts_t": accepted_facts,
                 "delta_f": delta_f,
                 "novel_facts": novel_facts,
                 "fact_novelty_matches": fact_match_rows,
                 "cumulative_fact_count_after_dedup": len(cumulative_facts),
                 "delta_reason": delta_reason,
-                "utility_label": "helpful_novel_fact_ratio",
+                "utility_label": utility_label,
+                "utility_defined": utility_defined,
+                "utility_reason_code": utility_reason_code,
                 "utility": utility,
                 "utility_reason": label_reason,
                 "step_score": step_score,
@@ -1102,11 +1568,12 @@ def summarize(results: list[dict], args: argparse.Namespace) -> dict:
             "num_samples": len(results),
             "num_steps": len(steps),
             "definitions": {
-                "delta_f_t": "If cosine_similarity(q_t, q_t-1) > tau, set delta_f_t=0. Otherwise extract facts, compute semantically novel facts against the history, and compute delta_f_t as the number of semantically novel extracted facts divided by (the number of facts extracted from the current retrieval result + epsilon). helpful_facts are logged for analysis but do not affect Delta F. With tau=2.0, the similarity gate is effectively disabled for cosine similarity values.",
+                "delta_f_t": "If cosine_similarity(q_t, q_t-1) > tau, set delta_f_t=0. Otherwise extract facts, compute semantically novel facts against the history, and compute delta_f_t as the number of semantically novel extracted facts divided by (the number of facts extracted from the current retrieval result + epsilon). filtered_facts are logged for analysis but do not affect Delta F. With tau=2.0, the similarity gate is effectively disabled for cosine similarity values.",
                 "query_similarity": "Cosine similarity between dense query embeddings produced by flashrag.retriever.encoder.Encoder using text_retriever_config.",
                 "fact_similarity": "Atomic facts are treated as duplicates if their normalized strings match exactly or their dense embedding cosine similarity is >= fact_similarity_threshold.",
-                "utility_definition": "utility_t is the ratio between the number of LLM-selected helpful facts and the number of novel facts in the current retrieval step.",
-                "utility_filtering": "The utility prompt selects the subset of novel facts that are helpful for answering the current sub-question, based on the post-retrieval Thought. Delta F is computed from extracted facts rather than helpful_facts.",
+                "utility_mapping": UTILITY_TO_SCORE,
+                "utility_definition": "utility_t is an ordinal three-level utility score inferred from the post-retrieval Thought: no_contribution=0, partial_contribution=0.5, full_contribution=1.",
+                "utility_filtering": "The utility prompt predicts a three-level utility label from the current sub-question and the Next Reasoning Text only. filtered_facts are left empty and do not affect Delta F.",
                 "step_score": "S_t = u_t * delta_f_t",
                 "trajectory_quality_score": "TQS = average_t S_t within each trajectory",
             },
@@ -1122,42 +1589,32 @@ def summarize(results: list[dict], args: argparse.Namespace) -> dict:
     }
 
 
-def main() -> None:
-    args = parse_args()
-    args.output_dir.mkdir(parents=True, exist_ok=True)
-    log_path = args.log or (args.output_dir / "evaluate_trajectory_quality.log")
+def run_evaluation_job(
+    args: argparse.Namespace,
+    input_path: Path,
+    output_dir: Path,
+    fact_prompt: str,
+    utility_prompt: str,
+    dense_similarity: DenseSimilarity,
+    client: OpenAI | None,
+    local_fact_generator,
+    local_utility_generator,
+) -> None:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    log_path = args.log or (output_dir / "evaluate_trajectory_quality.log")
     log_file, original_stdout, original_stderr = setup_logging(log_path)
     try:
-        api_key = os.environ.get(args.api_key_env)
-        if not api_key:
-            raise ValueError(f"Set {args.api_key_env} before running.")
-        if not args.input.exists():
-            raise FileNotFoundError(args.input)
+        if not input_path.exists():
+            raise FileNotFoundError(input_path)
 
-        sample_output = args.output_dir / "trajectory_quality_samples.jsonl"
-        summary_output = args.output_dir / "trajectory_quality_summary.json"
-        fact_cache_path = args.output_dir / "fact_cache.json"
-        utility_cache_path = args.output_dir / "utility_cache.json"
+        sample_output = output_dir / "trajectory_quality_samples.jsonl"
+        summary_output = output_dir / "trajectory_quality_summary.json"
+        fact_cache_path = output_dir / "fact_cache.json"
+        utility_cache_path = output_dir / "utility_cache.json"
 
-        fact_prompt = load_prompt(args.fact_prompt)
-        utility_prompt = load_prompt(args.utility_prompt)
-        samples = read_jsonl(args.input)
+        samples = read_jsonl(input_path)
         if args.max_samples is not None:
             samples = samples[: args.max_samples]
-        retriever_config_path = resolve_retriever_config_path(args)
-        run_config_path = resolve_run_config_path(args)
-        dense_similarity = DenseSimilarity(
-            config_path=retriever_config_path,
-            batch_size=args.embed_batch_size,
-        )
-        local_fact_generator = None
-        if args.fact_extractor == "local_qwen":
-            print(
-                f"Loading local fact extractor via FlashRAG generator: {args.local_fact_model_path}",
-                flush=True,
-            )
-            local_fact_generator = build_local_fact_generator(args, run_config_path)
-            print("Finished loading local fact extractor.", flush=True)
 
         existing_results_by_id = {}
         if sample_output.exists() and not args.overwrite:
@@ -1174,7 +1631,6 @@ def main() -> None:
             print(f"Overwriting existing output: {sample_output}", flush=True)
             sample_output.unlink()
 
-        client = OpenAI(api_key=api_key, base_url=args.base_url)
         judge = LLMJudge(
             client=client,
             model=args.model,
@@ -1184,6 +1640,8 @@ def main() -> None:
             max_docs_per_iteration=args.max_docs_per_iteration,
             fact_extractor=args.fact_extractor,
             local_fact_generator=local_fact_generator,
+            utility_judge_backend=args.utility_judge_backend,
+            local_utility_generator=local_utility_generator,
             fact_prompt=fact_prompt,
             utility_prompt=utility_prompt,
             fact_cache_path=fact_cache_path,
@@ -1202,10 +1660,10 @@ def main() -> None:
             else:
                 pending.append((idx, sample))
 
-        print(f"Evaluating {len(samples)} samples from {args.input}", flush=True)
+        print(f"Evaluating {len(samples)} samples from {input_path}", flush=True)
         progress_tracker = ProgressTracker(total=len(samples))
         progress_tracker.resume_completed(completed)
-
+        progress_tracker.refresh()
         stop_event = threading.Event()
 
         def progress_monitor() -> None:
@@ -1216,73 +1674,130 @@ def main() -> None:
 
         monitor_thread = threading.Thread(target=progress_monitor, daemon=True)
         monitor_thread.start()
-        with ThreadPoolExecutor(max_workers=args.workers) as executor:
-            futures = {
-                executor.submit(
-                    evaluate_sample,
-                    sample,
-                    judge,
-                    args.sim_threshold,
-                    args.fact_sim_threshold,
-                    args.epsilon,
-                    dense_similarity,
-                    progress_tracker,
-                ): idx
-                for idx, sample in pending
-            }
-            sample_retry_counts: dict[int, int] = {idx: 0 for idx, _ in pending}
-            for future in as_completed(futures):
-                idx = futures[future]
-                try:
-                    result = future.result()
-                except InvalidUtilityLabelError as exc:
-                    sample_retry_counts[idx] += 1
-                    retry_count = sample_retry_counts[idx]
-                    sample_id = build_sample_id(samples[idx])
-                    progress_tracker.println(
-                        f"[Retry] id={sample_id} invalid utility label, retrying sample "
-                        f"({retry_count}/{args.retries}): {exc}"
+        try:
+            use_serial_execution = args.utility_judge_backend == "vllm_qwen25_7b"
+            if use_serial_execution:
+                print(
+                    "[Execution] utility_judge_backend=vllm_qwen25_7b, running sequentially without multithreading.",
+                    flush=True,
+                )
+                sample_retry_counts: dict[int, int] = {idx: 0 for idx, _ in pending}
+                for idx, sample in pending:
+                    while True:
+                        try:
+                            result = evaluate_sample(
+                                sample,
+                                judge,
+                                args.sim_threshold,
+                                args.fact_sim_threshold,
+                                args.epsilon,
+                                dense_similarity,
+                                progress_tracker,
+                            )
+                            break
+                        except InvalidUtilityLabelError as exc:
+                            sample_retry_counts[idx] += 1
+                            retry_count = sample_retry_counts[idx]
+                            sample_id = build_sample_id(samples[idx])
+                            progress_tracker.println(
+                                f"[Retry] id={sample_id} invalid utility label, retrying sample "
+                                f"({retry_count}/{args.retries}): {exc}"
+                            )
+                            if retry_count > args.retries:
+                                raise
+                    results[idx] = result
+                    append_jsonl(sample_output, result)
+                    completed += 1
+                    progress_tracker.mark_completed(build_sample_id(samples[idx]))
+
+                    partial_results = [item for item in results if item is not None]
+                    partial_mean_tqs = (
+                        mean(item["trajectory_quality_score"] for item in partial_results)
+                        if partial_results
+                        else 0.0
                     )
-                    if retry_count <= args.retries:
-                        new_future = executor.submit(
+                    progress_tracker.println(
+                        "[Stage Result] "
+                        f"id={result['id']} "
+                        f"iters={result['num_iterations']} "
+                        f"total_delta_f={result['total_delta_f']:.4f} "
+                        f"tqs={result['trajectory_quality_score']:.4f} "
+                        f"partial_mean_tqs={partial_mean_tqs:.4f}"
+                    )
+            else:
+                with ThreadPoolExecutor(max_workers=args.workers) as executor:
+                    futures = {
+                        executor.submit(
                             evaluate_sample,
-                            samples[idx],
+                            sample,
                             judge,
                             args.sim_threshold,
                             args.fact_sim_threshold,
                             args.epsilon,
                             dense_similarity,
                             progress_tracker,
-                        )
-                        futures[new_future] = idx
-                        continue
-                    raise
-                results[idx] = result
-                append_jsonl(sample_output, result)
-                completed += 1
-                progress_tracker.mark_completed(build_sample_id(samples[idx]))
+                        ): idx
+                        for idx, sample in pending
+                    }
+                    sample_retry_counts: dict[int, int] = {idx: 0 for idx, _ in pending}
+                    while futures:
+                        done, _ = wait(set(futures), return_when=FIRST_COMPLETED)
+                        for future in done:
+                            idx = futures.pop(future)
+                            try:
+                                result = future.result()
+                            except InvalidUtilityLabelError as exc:
+                                sample_retry_counts[idx] += 1
+                                retry_count = sample_retry_counts[idx]
+                                sample_id = build_sample_id(samples[idx])
+                                progress_tracker.println(
+                                    f"[Retry] id={sample_id} invalid utility label, retrying sample "
+                                    f"({retry_count}/{args.retries}): {exc}"
+                                )
+                                if retry_count <= args.retries:
+                                    new_future = executor.submit(
+                                        evaluate_sample,
+                                        samples[idx],
+                                        judge,
+                                        args.sim_threshold,
+                                        args.fact_sim_threshold,
+                                        args.epsilon,
+                                        dense_similarity,
+                                        progress_tracker,
+                                    )
+                                    futures[new_future] = idx
+                                    continue
+                                raise
+                            results[idx] = result
+                            append_jsonl(sample_output, result)
+                            completed += 1
+                            progress_tracker.mark_completed(build_sample_id(samples[idx]))
 
-                partial_results = [item for item in results if item is not None]
-                partial_mean_tqs = (
-                    mean(item["trajectory_quality_score"] for item in partial_results)
-                    if partial_results
-                    else 0.0
-                )
-                progress_tracker.println(
-                    "[Stage Result] "
-                    f"id={result['id']} "
-                    f"iters={result['num_iterations']} "
-                    f"total_delta_f={result['total_delta_f']:.4f} "
-                    f"tqs={result['trajectory_quality_score']:.4f} "
-                    f"partial_mean_tqs={partial_mean_tqs:.4f}"
-                )
-        stop_event.set()
-        monitor_thread.join()
+                            partial_results = [item for item in results if item is not None]
+                            partial_mean_tqs = (
+                                mean(item["trajectory_quality_score"] for item in partial_results)
+                                if partial_results
+                                else 0.0
+                            )
+                            progress_tracker.println(
+                                "[Stage Result] "
+                                f"id={result['id']} "
+                                f"iters={result['num_iterations']} "
+                                f"total_delta_f={result['total_delta_f']:.4f} "
+                                f"tqs={result['trajectory_quality_score']:.4f} "
+                                f"partial_mean_tqs={partial_mean_tqs:.4f}"
+                            )
+        finally:
+            stop_event.set()
+            monitor_thread.join()
         progress_tracker.println("[Progress] Evaluation completed.")
 
         final_results = [item for item in results if item is not None]
         judge.flush_caches()
-        write_json(summary_output, summarize(final_results, args))
+        summary = summarize(final_results, args)
+        summary["meta"]["input"] = str(input_path)
+        summary["meta"]["output_dir"] = str(output_dir)
+        write_json(summary_output, summary)
         print(f"Saved {sample_output}")
         print(f"Saved {summary_output}")
         print(f"Saved {fact_cache_path}")
@@ -1291,6 +1806,74 @@ def main() -> None:
         sys.stdout = original_stdout
         sys.stderr = original_stderr
         log_file.close()
+
+
+def main() -> None:
+    args = parse_args()
+    jobs = build_evaluation_jobs(args)
+    print(f"[Batch] Discovered {len(jobs)} evaluation job(s).", flush=True)
+    for input_path, output_dir in jobs:
+        print(f"[Batch] input={input_path} output={output_dir}", flush=True)
+
+    needs_api_client = args.fact_extractor == "api" or args.utility_judge_backend == "api"
+    api_key = None
+    if needs_api_client:
+        api_key = os.environ.get(args.api_key_env)
+        if not api_key:
+            raise ValueError(f"Set {args.api_key_env} before running.")
+
+    fact_prompt = load_prompt(args.fact_prompt)
+    utility_prompt = load_prompt(args.utility_prompt)
+    retriever_config_path = resolve_retriever_config_path(args)
+    run_config_path = resolve_run_config_path(args)
+    dense_similarity = DenseSimilarity(
+        config_path=retriever_config_path,
+        batch_size=args.embed_batch_size,
+    )
+
+    local_fact_generator = None
+    if args.fact_extractor == "local_qwen":
+        print(
+            f"Loading local fact extractor via FlashRAG generator: {args.local_fact_model_path}",
+            flush=True,
+        )
+        local_fact_generator = build_local_fact_generator(args, run_config_path)
+        print("Finished loading local fact extractor.", flush=True)
+
+    local_utility_generator = None
+    if args.utility_judge_backend == "vllm_qwen25_7b":
+        if (
+            local_fact_generator is not None
+            and args.local_utility_model == args.local_fact_model
+            and args.local_utility_model_path == args.local_fact_model_path
+        ):
+            print(
+                "Reusing local fact extractor for utility judging; no second model will be initialized.",
+                flush=True,
+            )
+            local_utility_generator = local_fact_generator
+        else:
+            print(
+                f"Loading local utility judge via vLLM generator: {args.local_utility_model_path}",
+                flush=True,
+            )
+            local_utility_generator = build_local_utility_judge_generator(args, run_config_path)
+            print("Finished loading local utility judge.", flush=True)
+
+    client = OpenAI(api_key=api_key, base_url=args.base_url) if needs_api_client else None
+    for job_idx, (input_path, output_dir) in enumerate(jobs, start=1):
+        print(f"[Batch] Starting job {job_idx}/{len(jobs)}: {input_path}", flush=True)
+        run_evaluation_job(
+            args=args,
+            input_path=input_path,
+            output_dir=output_dir,
+            fact_prompt=fact_prompt,
+            utility_prompt=utility_prompt,
+            dense_similarity=dense_similarity,
+            client=client,
+            local_fact_generator=local_fact_generator,
+            local_utility_generator=local_utility_generator,
+        )
 
 
 if __name__ == "__main__":

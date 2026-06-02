@@ -22,16 +22,20 @@ matplotlib.rcParams.update(
 )
 
 BASE_DIR = Path("/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment")
+REFAMB_RESULT_DIR = Path(
+    "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen2.5-vl-7B"
+)
 REPORT_DIR = Path("/home/you/FlashRAG/exps/idea10/idea_reports")
-INTERMEDIATE_PATH = BASE_DIR / "intermediate_data.json"
-TRAJECTORY_PATH = BASE_DIR / "omnisearch_trajectories.jsonl"
-LABEL_PATH = BASE_DIR / "label/qwen/trajectory_annotation.llm_labeled.adjudicated.jsonl"
+INTERMEDIATE_GLOB = "RefAmb_*_refamb_*_stage/intermediate_data.json"
+TRAJECTORY_GLOB = "RefAmb_*_refamb_*_stage/omnisearch_trajectories.jsonl"
+LABEL_GLOB = "RefAmb_*_refamb_*_stage/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl"
 
 JSON_OUTPUT_PATH = REPORT_DIR / "qwen/entity_ambiguity_category_metrics.json"
 CSV_OUTPUT_PATH = REPORT_DIR / "qwen/entity_ambiguity_category_metrics.csv"
 MD_OUTPUT_PATH = REPORT_DIR / "qwen/entity_ambiguity_category_metrics.md"
 HEATMAP_SVG_OUTPUT_PATH = REPORT_DIR / "qwen/entity_ambiguity_accuracy_heatmap.svg"
 HEATMAP_PDF_OUTPUT_PATH = REPORT_DIR / "qwen/entity_ambiguity_accuracy_heatmap.pdf"
+RADAR_PDF_OUTPUT_PATH = REPORT_DIR / "qwen/entity_ambiguity_accuracy_radar.pdf"
 RADAR_ORIGIN_CSV_OUTPUT_PATH = REPORT_DIR / "qwen/entity_ambiguity_accuracy_radar_origin.csv"
 ITERATION_SVG_OUTPUT_PATH = REPORT_DIR / "qwen/entity_ambiguity_iteration_bar.svg"
 ITERATION_PDF_OUTPUT_PATH = REPORT_DIR / "qwen/entity_ambiguity_iteration_bar.pdf"
@@ -115,33 +119,40 @@ def category_from_label(llm_label: dict | None) -> str | None:
 
 def build_sample_categories() -> dict[str, dict]:
     category_map = {}
-    for item in read_jsonl(LABEL_PATH):
-        annotation_id = item["annotation_id"]
-        query_steps = item.get("query_steps", [])
-        first_category = None
-        category_sequence = []
-        unique_non_no = set()
+    for label_path in sorted(REFAMB_RESULT_DIR.glob(LABEL_GLOB)):
+        for item in read_jsonl(label_path):
+            annotation_id = item.get("annotation_id") or item.get("id")
+            query_steps = item.get("query_steps")
+            if query_steps is None:
+                query_steps = [
+                    step
+                    for step in item.get("trajectory", [])
+                    if step.get("action") == "search"
+                ]
+            first_category = None
+            category_sequence = []
+            unique_non_no = set()
 
-        for query_step in query_steps:
-            category = category_from_label(query_step.get("llm_label"))
-            if category is None:
-                continue
-            category_sequence.append(category)
-            if first_category is None:
-                first_category = category
-            if category != "No":
-                unique_non_no.add(category)
+            for query_step in query_steps:
+                category = category_from_label(query_step.get("llm_label"))
+                if category is None:
+                    continue
+                category_sequence.append(category)
+                if first_category is None:
+                    first_category = category
+                if category != "No":
+                    unique_non_no.add(category)
 
-        if len(unique_non_no) > 1:
-            sample_category = "Mixed"
-        else:
-            sample_category = first_category or "No"
+            if len(unique_non_no) > 1:
+                sample_category = "Mixed"
+            else:
+                sample_category = first_category or "No"
 
-        category_map[annotation_id] = {
-            "category": sample_category,
-            "query_count": item.get("query_count", 0),
-            "label_sequence": category_sequence,
-        }
+            category_map[annotation_id] = {
+                "category": sample_category,
+                "query_count": item.get("query_count", 0),
+                "label_sequence": category_sequence,
+            }
 
     return {
         "category_map": category_map,
@@ -150,25 +161,28 @@ def build_sample_categories() -> dict[str, dict]:
 
 def build_iteration_counts() -> dict[str, int]:
     counts = {}
-    for item in read_jsonl(TRAJECTORY_PATH):
-        sample_id = item.get("id")
-        if not sample_id:
-            continue
-        rounds = sum(
-            1
-            for step in item.get("trajectory", [])
-            if step.get("action") in {
-                "text_retrieval_result",
-                "image_retrieval_result",
-                "no_retrieval_result",
-            }
-        )
-        counts[sample_id] = rounds
+    for trajectory_path in sorted(REFAMB_RESULT_DIR.glob(TRAJECTORY_GLOB)):
+        for item in read_jsonl(trajectory_path):
+            sample_id = item.get("id")
+            if not sample_id:
+                continue
+            rounds = sum(
+                1
+                for step in item.get("trajectory", [])
+                if step.get("action") in {
+                    "text_retrieval_result",
+                    "image_retrieval_result",
+                    "no_retrieval_result",
+                }
+            )
+            counts[sample_id] = rounds
     return counts
 
 
 def collect_grouped_rows() -> tuple[dict, dict]:
-    intermediate_items = json.loads(INTERMEDIATE_PATH.read_text(encoding="utf-8"))
+    intermediate_items = []
+    for intermediate_path in sorted(REFAMB_RESULT_DIR.glob(INTERMEDIATE_GLOB)):
+        intermediate_items.extend(json.loads(intermediate_path.read_text(encoding="utf-8")))
     label_info = build_sample_categories()
     category_map = label_info["category_map"]
     iteration_counts = build_iteration_counts()
@@ -814,6 +828,7 @@ def main() -> None:
     write_outputs(stats)
     draw_accuracy_heatmap_pdf(stats)
     draw_iteration_bar_pdf(stats)
+    draw_accuracy_heatmap_pdf_to(controlled_stats, RADAR_PDF_OUTPUT_PATH)
     draw_accuracy_heatmap_pdf_to(controlled_stats, CONTROLLED_RADAR_PDF_OUTPUT_PATH)
     draw_iteration_bar_pdf_to(controlled_stats, CONTROLLED_ITERATION_PDF_OUTPUT_PATH)
     print(f"Saved {JSON_OUTPUT_PATH}")
@@ -821,6 +836,7 @@ def main() -> None:
     print(f"Saved {MD_OUTPUT_PATH}")
     print(f"Saved {HEATMAP_SVG_OUTPUT_PATH}")
     print(f"Saved {HEATMAP_PDF_OUTPUT_PATH}")
+    print(f"Saved {RADAR_PDF_OUTPUT_PATH}")
     print(f"Saved {RADAR_ORIGIN_CSV_OUTPUT_PATH}")
     print(f"Saved {ITERATION_SVG_OUTPUT_PATH}")
     print(f"Saved {ITERATION_PDF_OUTPUT_PATH}")

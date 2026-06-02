@@ -1,0 +1,53 @@
+system_disturb_rewrite_prompt = """
+You are given a retrieval query from an agentic RAG trajectory.
+Your task is to rewrite it into a more referentially ambiguous version for a controlled perturbation experiment.
+
+Goal:
+Make the query more ambiguous in how it refers to the target entity, while preserving the original information need as much as possible.
+
+Requirements:
+1. Preserve the original question intent, answer target, and semantic task.
+2. Only reduce referential clarity of the target entity.
+3. Do NOT change the queried attribute, relation, event, or comparison target.
+4. Do NOT add new facts, hints, or constraints.
+5. Do NOT make the query nonsensical or ungrammatical.
+6. Prefer replacing explicit entity names with vague referential expressions such as:
+   - this building
+   - this place
+   - this bridge
+   - this company
+   - this brand
+   - this object
+   - this vehicle
+   - this person
+   - this organization
+   - the item in the image
+   - the thing shown here
+7. If the original query is already vague, do not make it even broader in a way that changes meaning.
+8. Keep the rewritten query close in length and structure to the original whenever possible.
+9. Do NOT convert the query into a different task type.
+10. Output only the rewritten query.
+
+Disturb types you may use:
+- Explicit entity name -> deictic reference
+- Explicit entity name -> generic nominal
+- Explicit entity name -> underspecified description
+
+Examples:
+
+Original: Great Orme Tramway opening year
+Rewritten: opening year of this building
+
+Original: Michael Kors founding date
+Rewritten: founding date of this brand
+
+Original: What body of water does the Confederation Bridge cross over?
+Rewritten: What body of water does this bridge cross over?
+
+Original: Cockle Bay primary commercial function
+Rewritten: primary commercial function of this area
+
+Now rewrite the following query:
+
+[QUERY]
+"""

@@ -1,0 +1,157 @@
+# Top level dataset configuration
+data_dir: data/datasets/
+dataset_name: EnAmbChallenge
+gpu_id:
+  - "1"
+seed: 2024
+disable_save: true
+
+framework: vllm
+generator_model: Qwen2.5-VL-7B-Instruct
+generator_model_path: /mnt/data/you/modelscope/Qwen2.5-VL-7B-Instruct
+generator_max_input_len: 20000
+generator_batch_size: 4
+generation_params:
+  max_tokens: 512
+  do_sample: false
+  temperature: 0.0
+  top_p: 1.0
+
+# Stage 1: Dim I Labeling
+## Stage 1.1 Text Query Contain
+stage1_q1_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/datasets/stage_1/stage_1_q1.toml
+stage1_input_path: /home/you/FlashRAG/exps/idea10/data/datasets/EnAmbChallenge/stage3--annotaion_Dim2,3/bin/filtered_items_with_null_external_or_text_identify.jsonl
+stage1_image_dir: /home/you/FlashRAG/exps/idea10/data/datasets/EnAmbChallenge/images
+stage1_output_path: /home/you/FlashRAG/exps/idea10/data/datasets/EnAmbChallenge/stage3--annotaion_Dim2,3/bin/filtered_items_with_null_external_or_text_identify.jsonl
+stage1_retries: 2
+stage1_sleep: 0.0
+## Stage 1.2 Extract Evidence and Judge
+ext_ev_framework: api
+# ext_ev_generator_model: Qwen/Qwen2.5-VL-72B-Instruct
+ext_ev_generator_model: Qwen/Qwen3-VL-32B-Instruct
+ext_ev_openai_setting:
+  api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
+  base_url: https://api.siliconflow.cn/v1
+ext_ev_generator_batch_size: 4
+ext_ev_generator_max_input_len: 4096
+ext_ev_generation_params:
+  max_tokens: 1024
+  temperature: 0.0
+  top_p: 1.0
+ext_ev_api_image_max_side: 1024
+ext_ev_api_image_quality: 85
+ext_ev_workers: 4
+ext_ev_stage1_framework: vllm
+ext_ev_stage1_generator_model: Qwen2.5-VL-7B-Instruct
+ext_ev_stage1_generator_model_path: /mnt/data/you/modelscope/Qwen2.5-VL-7B-Instruct
+ext_ev_stage1_generator_batch_size: 4
+ext_ev_stage1_generator_max_input_len: 20000
+ext_ev_stage1_generation_params:
+  max_tokens: 1024
+  do_sample: false
+  temperature: 0.0
+  top_p: 1.0
+ext_ev_stage1_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/datasets/stage_1/external_evidence/stage_1_extract_visual_evidence.toml
+ext_ev_stage2_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/datasets/stage_1/external_evidence/stage_2_judge_dependency.toml
+ext_ev_stage1_input_path: /home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/src/stage2--annotation_oracle_entity/crag_test_multi-hop.filtered.jsonl
+ext_ev_stage1_image_dir: /home/you/FlashRAG/exps/idea10/data/datasets/EnAmbChallenge/images
+ext_ev_stage1_output_path: /home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/src/stage3--annotaion_Dim2,3/crag_test_multi-hop.filtered_stage2_1.jsonl
+ext_ev_stage2_framework: api
+ext_ev_stage2_generator_model: Pro/deepseek-ai/DeepSeek-V3.2
+ext_ev_stage2_openai_setting:
+  api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
+  base_url: https://api.siliconflow.cn/v1
+ext_ev_stage2_generator_batch_size: 4
+ext_ev_stage2_generator_max_input_len: 4096
+ext_ev_stage2_generation_params:
+  max_tokens: 1024
+  temperature: 0.0
+  top_p: 1.0
+ext_ev_stage2_input_path: /home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/src/stage3--annotaion_Dim2,3/crag_test_multi-hop.filtered_stage2_1.jsonl
+ext_ev_stage2_output_path: /home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/src/stage3--annotaion_Dim2,3/crag_test_multi-hop.filtered_stage2_2.jsonl
+ext_ev_retries: 2
+ext_ev_sleep: 0.0
+
+# Stage2 Extract Oracle Entity
+stage1_5_framework: api
+stage1_5_generator_model: Qwen/Qwen2.5-VL-72B-Instruct
+stage1_5_openai_setting:
+  api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
+  base_url: https://api.siliconflow.cn/v1
+stage1_5_generator_batch_size: 4
+stage1_5_generator_max_input_len: 2048
+stage1_5_generation_params:
+  max_tokens: 512
+  temperature: 0.0
+  top_p: 1.0
+stage1_5_api_image_max_side: 1024
+stage1_5_api_image_quality: 85
+stage1_5_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/datasets/stage_1.5/entity_consistency_judge.toml
+stage1_5_input_path: /home/you/FlashRAG/exps/idea10/data/datasets/EnAmbChallenge/stage3--annotaion_Dim2,3/2-candidate_pool_2600.two_labels_with_oracle_entity_append_crag_oven.jsonl
+stage1_5_image_dir: /home/you/FlashRAG/exps/idea10/data/datasets/infoseek_val/images
+stage1_5_output_path: /home/you/FlashRAG/exps/idea10/data/datasets/EnAmbChallenge/stage3--annotaion_Dim2,3/2-candidate_pool_2600.two_labels_with_oracle_entity_append_crag_oven.jsonl
+stage1_5_retries: 2
+stage1_5_sleep: 0.0
+
+infoseek_oracle_entity_input_path: /home/you/FlashRAG/exps/idea10/data/datasets/EnAmbChallenge/stage2--annotation_oracle_entity/3-candidate_pool_2600.two_labels_with_oracle_entity.jsonl
+infoseek_oracle_entity_oven_path: /mnt/data/you/datasets/EnAmbChallenge/stage2--annotation_oracle_entity/bin/oven_entity_val.jsonl
+infoseek_oracle_entity_output_path: /home/you/FlashRAG/exps/idea10/data/datasets/EnAmbChallenge/stage2--annotation_oracle_entity/3-candidate_pool_2600.two_labels_with_oracle_entity.jsonl
+crag_oracle_entity_framework: api
+# crag_oracle_entity_generator_model: Qwen/Qwen2.5-VL-72B-Instruct
+crag_oracle_entity_generator_model: Qwen/Qwen3-VL-32B-Instruct
+crag_oracle_entity_openai_setting:
+  api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
+  base_url: https://api.siliconflow.cn/v1
+crag_oracle_entity_generator_batch_size: 4
+crag_oracle_entity_generator_max_input_len: 2048
+crag_oracle_entity_generation_params:
+  max_tokens: 512
+  temperature: 0.0
+  top_p: 1.0
+crag_oracle_entity_num_workers: 3
+crag_oracle_entity_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/datasets/stage_1.5/extract_crag_oracle_entity.toml
+crag_oracle_entity_input_path: /home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/src/stage0/crag_test_multi-hop.jsonl
+crag_oracle_entity_output_path: /home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/src/stage2--annotation_oracle_entity/crag_test_multi-hop.jsonl
+crag_oracle_entity_retries: 2
+crag_oracle_entity_sleep: 0.0
+
+mcsearch_oracle_entity_framework: api
+mcsearch_oracle_entity_generator_model: Qwen/Qwen3-VL-30B-A3B-Instruct
+mcsearch_oracle_entity_openai_setting:
+  api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
+  base_url: https://api.siliconflow.cn/v1
+mcsearch_oracle_entity_generator_batch_size: 4
+mcsearch_oracle_entity_generator_max_input_len: 20000
+mcsearch_oracle_entity_generation_params:
+  max_tokens: 768
+  temperature: 0.0
+  top_p: 1.0
+mcsearch_oracle_entity_num_workers: 3
+mcsearch_oracle_entity_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/datasets/stage_1.5/extract_mcsearch_oracle_entity.toml
+mcsearch_oracle_entity_input_path: /home/you/FlashRAG/exps/idea10/data/datasets/EnAmbChallenge/stage2--annotation_oracle_entity/3-candidate_pool_2600.two_labels_with_oracle_entity.jsonl
+mcsearch_oracle_entity_image_dir: /home/you/FlashRAG/exps/idea10/data/datasets/mcsearch/images
+mcsearch_oracle_entity_output_path: /home/you/FlashRAG/exps/idea10/data/datasets/EnAmbChallenge/stage2--annotation_oracle_entity/3-candidate_pool_2600.two_labels_with_oracle_entity.jsonl
+mcsearch_oracle_entity_retries: 2
+mcsearch_oracle_entity_sleep: 0.0
+
+
+infoseek_task_type_framework: api
+infoseek_task_type_generator_model: Qwen/Qwen3-VL-30B-A3B-Instruct
+infoseek_task_type_openai_setting:
+  api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
+  base_url: https://api.siliconflow.cn/v1
+infoseek_task_type_generator_batch_size: 4
+infoseek_task_type_generator_max_input_len: 2048
+infoseek_task_type_generation_params:
+  max_tokens: 1024
+  temperature: 0.0
+  top_p: 1.0
+infoseek_task_type_api_image_max_side: 1024
+infoseek_task_type_api_image_quality: 85
+infoseek_task_type_workers: 3
+infoseek_task_type_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/datasets/stage_2/infoseek_three_way_qwen.toml
+infoseek_task_type_input_path: /home/you/FlashRAG/exps/idea10/data/datasets/EnAmbChallenge/stage3--annotaion_Dim2,3/1-candidate_pool_2600.two_labels_with_oracle_entity.jsonl
+infoseek_task_type_image_dir: /home/you/FlashRAG/exps/idea10/data/datasets/EnAmbChallenge/images
+infoseek_task_type_output_path: /home/you/FlashRAG/exps/idea10/data/datasets/EnAmbChallenge/stage3--annotaion_Dim2,3/2-candidate_pool_2600.two_labels_with_oracle_entity.jsonl
+infoseek_task_type_retries: 2
+infoseek_task_type_sleep: 0.0

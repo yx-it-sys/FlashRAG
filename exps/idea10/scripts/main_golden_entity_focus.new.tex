@@ -1,0 +1,471 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\graphicspath{{../refamb_analysis_figs/}{../../scripts/}}
+
+\title{Golden Entity Alignment for Agentic Multimodal Retrieval}
+\author{Anonymous Authors}
+
+\newcommand{\rte}{\mathrm{RTE}}
+\newcommand{\df}{\Delta F}
+\newcommand{\query}{q}
+\newcommand{\entity}{e}
+\newcommand{\gold}{e^\star}
+\newcommand{\facts}{\mathcal{F}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Agentic multimodal retrieval relies on vision-language models (VLMs) to generate the text queries that drive iterative evidence acquisition.
+This makes entity focus a central control variable: the query must expose enough information for the retriever to locate the intended entity, but it need not always be maximally explicit.
+This paper revisits referential ambiguity in agentic RAG and reports a counterintuitive result: referential ambiguity is not a sufficient explanation for trajectory and answer degradation.
+Although entity-ambiguous trajectories are worse in the aggregate, controlled perturbations show that ambiguity can increase information increment and occasionally improve downstream metrics, indicating that ambiguity is sometimes an exploratory relaxation rather than pure noise.
+However, controlled interventions reveal a more stable principle.
+When an ambiguous query is rewritten toward the golden entity, final-answer quality and trajectory state improve: first-round oracle rewriting converts 19.6\% of missing-final-answer cases and 10.0\% of generation-error cases into successful trajectories, and raises macro-average trajectory quality from 0.2799 to 0.3605 on the intervention cohorts.
+These findings motivate \emph{Golden Entity Alignment}, a retrieval-control framework that detects unresolved entity focus, uses visual evidence to ground the intended entity, and rewrites retrieval queries only when the current entity focus is unreliable or low-gain.
+The resulting view reframes referential ambiguity from a binary defect into a calibration problem: ambiguity may help exploration, but movement toward the golden entity provides the most reliable route to answer-quality gains.
+\end{abstract}
+
+\section{Introduction}
+Recent advances in retrieval-augmented generation (RAG) have led to the widespread adoption of \emph{agentic} pipelines, such as ReAct, where visual language models (VLMs) autonomously determine when to query external knowledge sources, how to formulate sub-questions, and how to plan multi-step reasoning trajectories \cite{yao2022react,li2024benchmarking}.
+While this flexibility enables powerful multi-hop reasoning, it also makes model-generated retrieval queries difficult to control.
+The retriever only observes the emitted query string, not the visual context or the latent entity that the VLM intends to ask about.
+Consequently, queries that are natural to the VLM may still be under-specified for retrieval: they may ask for ``this building'', ``the object in the image'', or ``the person related to it'' without exposing the entity-level anchor required by a text retriever.
+
+From a structural linguistic perspective, following Saussure's classic theory \cite{de1916nature}, the relationship between a signifier and its signified is arbitrary and stabilized by context rather than guaranteed by the expression itself.
+In agentic multimodal retrieval, each text query is a signifier intended to denote a particular entity in the image or in the external knowledge space.
+Referential ambiguity arises when this mapping is unstable: a single query may correspond to multiple plausible entities or fail to uniquely identify the intended referent.
+Such ambiguity is especially consequential in agentic pipelines because early retrieval results condition subsequent thoughts, sub-questions, and retrieval actions.
+
+Existing work often treats ambiguity as a uniformly harmful property of a query.
+This assumption is plausible but incomplete.
+In our RefAmb analysis, entity-ambiguous retrieval appears frequently across multi-source VQA trajectories, especially when visual entity grounding and external knowledge lookup are tightly coupled.
+This prevalence makes referential ambiguity a meaningful diagnostic lens, but the more important question is whether ambiguity itself explains trajectory and answer degradation.
+
+However, our controlled interventions reveal a more nuanced mechanism.
+Injecting ambiguity into originally unambiguous queries can sometimes expand the search region and prevent immediate stagnation, but the additional evidence is not always converted into useful reasoning progress.
+By contrast, rewriting ambiguous queries toward the ground-truth entity yields more stable improvements in trajectory state, evidence utility, and answer quality.
+Thus, referential ambiguity is not a monotonic failure variable; the more stable principle is whether the retrieval query is aligned with the \emph{golden entity} required by the task.
+
+This paper therefore shifts the question from ``Is ambiguity bad?'' to ``When does entity focus become unreliable, and how should an agent repair it?''
+We first define referential ambiguity and introduce RefAmb, a 2597-item benchmark constructed from CRAG, InfoSeek, MC-Search, and OVEN, with a task-balanced 1500-item analysis subset.
+We then introduce a trajectory diagnostic framework that combines entity-ambiguity detection, factual information increment ($\Delta F$), Retrieval-involved Trajectory Efficiency (RTE), and state-transition analysis to characterize both retrieval vitality and downstream trajectory recovery.
+Finally, motivated by the strong gains of the oracle intervention, we propose a \emph{Vitality-Aware Oracular Referent Steering} (VORS) pipeline that attempts to approximate oracle entity focus during inference.
+Rather than suppressing ambiguity as a binary defect, VORS monitors trajectory vitality, identifies when the current query path stops producing useful evidence, and steers retrieval toward a more golden-entity-aligned query through visual grounding, ROI-assisted image retrieval, and targeted query rewriting.
+
+Our contributions are:
+\begin{itemize}
+    \item We construct \textbf{RefAmb}, a multi-source benchmark for analyzing referential behavior in agentic multimodal retrieval, with unified golden-entity annotations and five reasoning categories spanning recognition, attribute lookup, multi-hop reasoning, comparison, and subproblem aggregation.
+    \item We develop a \textbf{trajectory diagnostic framework} rather than a single endpoint metric, combining entity-ambiguity detection, factual information increment ($\Delta F$), Retrieval-involved Trajectory Efficiency (RTE), and state-transition analysis to measure retrieval vitality and trajectory recovery.
+    \item We provide controlled evidence that referential ambiguity is \textbf{non-monotonic}: ambiguity can sometimes increase exploration and reduce stagnation, while oracle golden-entity rewriting yields more stable gains in utility, trajectory state, and answer quality.
+    \item We propose \textbf{Vitality-Aware Oracular Referent Steering (VORS)}, a control layer that approximates oracle entity focus during inference by monitoring low-gain trajectories and steering retrieval through targeted rewriting, visual fallback, and ROI-assisted grounding.
+\end{itemize}
+
+\section{Problem Formulation}
+\subsection{Agentic Multimodal Retrieval}
+Given an image $I$ and a question $x$, an agentic multimodal retrieval system produces a trajectory
+\begin{equation}
+    \tau = (a_1, o_1, a_2, o_2, \ldots, a_T, y),
+\end{equation}
+where each action $a_t$ may be a thought, a sub-question, a text retrieval query, an image retrieval query, no retrieval, or a final-answer action.
+For text retrieval actions, the agent emits a query $\query_t$, receives retrieved evidence $o_t$, and conditions later reasoning on the accumulated context.
+The system succeeds only when the trajectory both acquires relevant evidence and converts it into the final answer $y$.
+
+\subsection{Referential Ambiguity}
+Let $s_r(\query_t)$ denote the query expression emitted by the agent and let $\entity^\star$ denote the intended task entity.
+We define the candidate referent set induced by the retriever-facing query as $\mathcal{E}(\query_t)$.
+A query is referentially ambiguous when it does not uniquely identify the intended referent:
+\begin{equation}
+    |\mathcal{E}(\query_t)| > 1
+    \quad \text{or} \quad
+    \entity^\star \notin \operatorname*{arg\,max}_{\entity \in \mathcal{E}(\query_t)} P(\entity \mid \query_t).
+\end{equation}
+This definition is operational rather than purely linguistic.
+A phrase can be understandable to a human who sees the image, yet ambiguous to a text retriever that lacks visual context.
+We therefore judge ambiguity at the query-retriever interface.
+
+\subsection{Golden Entity Alignment}
+For each item, RefAmb annotates one or more golden entities $\gold$ that represent the entity focus required to answer the question.
+Golden Entity Alignment asks whether a retrieval query exposes enough information for the retriever to recover evidence about $\gold$.
+The oracle intervention simulates perfect first-step alignment by replacing an ambiguous first query with $\gold$.
+The VORS pipeline approximates this goal without oracle access by detecting ambiguous or low-gain query paths, using visual grounding when the missing referent is image-dependent, and rewriting only when the current query path is likely to stagnate.
+
+\section{RefAmb Dataset}
+\subsection{Sources and Task Types}
+RefAmb aggregates samples from CRAG \cite{yang2024crag}, InfoSeek \cite{chen2023can}, MC-Search \cite{ning2026mc}, and OVEN \cite{hu2023open}.
+These sources cover complementary failure conditions.
+CRAG provides multi-hop and comparison-style visual questions; InfoSeek emphasizes entity-centric visual information seeking; MC-Search contributes structured subproblem aggregation; and OVEN supplements entity recognition cases.
+After filtering items without a usable ground-truth entity, the full dataset contains 2597 items.
+For the main analysis, we use a 1500-item task-balanced subset with 300 items in each of five task types: Entity Recognition, Single-hop Attribute Query, Multi-hop, Comparison, and Subproblem Aggregation.
+
+\begin{figure}[t]
+    \centering
+    \begin{subfigure}[t]{0.48\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{refamb_task_distribution.pdf}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{refamb_source_task_sankey.pdf}
+    \end{subfigure}
+    \caption{RefAmb composition. The benchmark aggregates multiple VQA-style sources into a shared task taxonomy and provides a task-balanced analysis subset.}
+    \label{fig:dataset-composition}
+\end{figure}
+
+\subsection{Entity and Ambiguity Annotation}
+Each item is annotated with a golden entity, external-evidence dependency, whether the text alone identifies the entity, and task type.
+For InfoSeek, the image entity is recovered through the OVEN/Wikidata entity mapping; for OVEN, the answer entity is used directly; for CRAG and MC-Search, the golden entity is extracted from the question-answer pair and checked for consistency.
+Generated ReAct trajectories are then labeled for entity ambiguity at both item and query scales.
+We use four observable ambiguity categories: underspecified descriptions, object-identification queries, indirect entity references, and non-entity-centric queries.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{llrrr}
+\toprule
+\textbf{Dataset} & \textbf{Scale} & \textbf{Total} & \textbf{Ambiguous} & \textbf{Frequency} \\
+\midrule
+\multirow{2}{*}{Overall}  & Item scale  & 1500 & 462  & 30.80\% \\
+                           & Query scale & 3794 & 1232 & 32.47\% \\
+\multirow{2}{*}{CRAG}     & Item scale  & 818  & 301  & 36.80\% \\
+                           & Query scale & 2134 & 736  & 34.49\% \\
+\multirow{2}{*}{InfoSeek} & Item scale  & 176  & 101  & 57.39\% \\
+                           & Query scale & 558  & 337  & 60.39\% \\
+\multirow{2}{*}{MCSearch} & Item scale  & 300  & 16   & 5.33\% \\
+                           & Query scale & 799  & 29   & 3.63\% \\
+\multirow{2}{*}{OVEN}     & Item scale  & 206  & 44   & 21.36\% \\
+                           & Query scale & 303  & 130  & 42.90\% \\
+\bottomrule
+\end{tabular}
+\caption{Referential ambiguity frequency in RefAmb. Ambiguity is frequent overall and especially prominent when visual entity identification and text retrieval are tightly coupled.}
+\label{tab:ambiguity-frequency}
+\end{table}
+
+\section{Retrieval-involved Trajectory Efficiency}
+Endpoint metrics such as exact match, F1, or GPT-based answer accuracy do not directly explain how a trajectory evolves.
+We therefore define Retrieval-involved Trajectory Efficiency (RTE), a process metric over text-retrieval steps.
+RTE asks two questions: did the current retrieval step introduce new facts, and did the agent's next thought use those facts?
+
+\paragraph{Retrieval-step notation.}
+Let $\mathcal{T}=\{1,\ldots,T\}$ denote the ordered text-retrieval steps extracted from a full ReAct trajectory.
+For each text-retrieval step $t\in\mathcal{T}$, $\query_t$ is the emitted text query and $r_t$ is the retrieved textual evidence.
+We extract from $r_t$ a set of atomic factual units $\facts_t=\{f_{t,1},\ldots,f_{t,n_t}\}$.
+The accumulated fact history before step $t$ is denoted as $\facts_{<t}$, and the updated history is
+\begin{equation}
+    \facts_{\leq t} = \facts_{<t} \cup \facts_t.
+\end{equation}
+In implementation, both within-step and cross-step fact unions are deduplicated by semantic similarity so that near-duplicate retrieved statements are not counted as new evidence.
+
+\paragraph{Query-similarity gate.}
+Before measuring factual novelty, we first check whether the current text query simply repeats the previous text query.
+We define a query-similarity operator
+\begin{equation}
+    \operatorname{sim}(\query_t,\query_{t-1})
+    =
+    \frac{
+    \phi(\query_t)^\top \phi(\query_{t-1})
+    }{
+    \|\phi(\query_t)\|_2 \, \|\phi(\query_{t-1})\|_2
+    },
+\end{equation}
+where $\phi(\cdot)$ is the text-retriever encoder.
+When the encoder is unavailable, we use normalized string similarity as a fallback.
+The binary repetition gate is then
+\begin{equation}
+    G_t = \mathbf{1}\!\left[\operatorname{sim}(\query_t,\query_{t-1}) < 1\right].
+\end{equation}
+Thus $G_t=0$ only for exact repeated queries under the similarity implementation, while non-identical queries are still evaluated by their retrieved factual novelty.
+
+\paragraph{Information Increment.}
+The raw factual increment counts the proportion of retrieved facts at step $t$ that are absent from the previous fact history:
+\begin{equation}
+    \Delta F_t^{\mathrm{raw}}
+    =
+    \frac{|\facts_{\leq t} \setminus \facts_{<t}|}{|\facts_t|+\epsilon}.
+\end{equation}
+Equivalently, using the union update above,
+\begin{equation}
+    \Delta F_t^{\mathrm{raw}}
+    =
+    \frac{|\facts_t \cup \facts_{<t}| - |\facts_{<t}|}{|\facts_t|+\epsilon}.
+\end{equation}
+Here $\epsilon$ is a small constant for numerical stability when no valid factual unit is extracted.
+The final information increment combines the repetition gate and raw factual novelty:
+\begin{equation}
+    \df_t = G_t \cdot \Delta F_t^{\mathrm{raw}}.
+\end{equation}
+This decomposition separates two failure modes: repeated querying is captured by $G_t$, while non-repeated but uninformative retrieval is captured by a low $\Delta F_t^{\mathrm{raw}}$.
+
+\paragraph{Iteration Utility.}
+Information increment alone does not show whether the agent can use the newly retrieved evidence.
+For each retrieval step, we inspect the following \texttt{<Thought>} block, which is conditioned on the retrieval result from the preceding step.
+This post-retrieval thought provides a trajectory-internal signal of whether the agent treats the evidence as irrelevant, partially helpful, or sufficient.
+We map these labels to an ordinal utility variable
+\begin{equation}
+    U_t \in \{0,\;0.5,\;1\},
+\end{equation}
+where $0$ means no contribution, $0.5$ means partial contribution, and $1$ means full contribution.
+The midpoint is used as an interpretable ordinal weight, not as a claim that utility is interval-scaled.
+
+\paragraph{Final RTE score.}
+The retrieval-conditioned contribution of step $t$ is
+\begin{equation}
+    S_t = U_t \cdot \df_t.
+\end{equation}
+The trajectory-level score is the average over text-retrieval steps:
+\begin{equation}
+    \rte(\tau) = \frac{1}{|\mathcal{T}|}\sum_{t\in\mathcal{T}} S_t.
+\end{equation}
+A high RTE therefore requires both factual novelty and reasoning utility.
+Repeated searches, empty retrieval, redundant evidence, and evidence that the model ignores all receive low scores.
+Empirically, RTE is meaningfully associated with answer-quality metrics on the 1500-item analysis set: Spearman correlation is 0.5582 with precision, 0.5255 with F1, and 0.3619 with GPTAcc.
+Thus RTE is not merely a syntactic trajectory statistic; it captures process quality that is related to final generation quality.
+
+\section{Experiments and Findings}
+\subsection{Setup}
+We evaluate a ReAct-style OmniSearch pipeline using Qwen2.5-VL-7B-Instruct as the backbone model.
+For each item, the agent can issue text retrieval, image retrieval, sub-questions, and final answers.
+We compare three settings.
+\textbf{Original} uses the unmodified agent trajectory.
+\textbf{Oracle} replaces the first entity-ambiguous retrieval query with the annotated golden entity.
+\textbf{Disturb} replaces the core entity in originally unambiguous first-round queries with a generic or referential expression.
+The intervention is confined to query formulation; the agent continues reasoning from the modified retrieval evidence.
+
+\subsection{Finding 1: Referential Ambiguity is Common, but Its Effect is Not Monotonic}
+Table~\ref{tab:ambiguity-frequency} shows that 30.80\% of RefAmb items and 32.47\% of text queries contain entity ambiguity.
+If ambiguity were simply a monotonic source of degradation, injecting ambiguity should consistently reduce trajectory quality.
+The data do not support that simple view.
+As shown in Table~\ref{tab:refamb-trajectory-quality-average}, Disturb increases macro-average trajectory quality from 0.2799 to 0.3588 and mean $\df$ from 0.4145 to 0.5269.
+It also increases the informative-step rate from 0.5222 to 0.6367.
+The cost is that trajectories become longer (2.6956 to 3.1244 iterations) and less directly useful (utility drops from 0.4223 to 0.3847).
+This pattern indicates that controlled ambiguity can broaden retrieval and increase factual novelty, but it does not guarantee efficient conversion into answer-supporting evidence.
+
+\input{../refamb_analysis_figs/refamb_trajectory_quality_comparison.tex}
+
+\subsection{Finding 2: Disturb Acts as Exploratory Relaxation, Not Entity Alignment}
+To understand why Disturb sometimes improves outcomes, we further analyze the 300 first-round Disturb intervention items across CRAG, InfoSeek, MCSearch, and OVEN.
+The state transitions reveal a mixed pattern.
+Disturb recovers 43 failed trajectories into OK, including 27 missing-final-answer cases and 16 generation-error cases.
+However, it also degrades 42 originally OK trajectories into failure states, including 23 OK$\rightarrow$missing-final-answer and 19 OK$\rightarrow$generation-error transitions.
+Thus the intervention is not a robust improvement; it is a high-variance perturbation.
+
+The process metrics explain this behavior.
+For OK$\rightarrow$failure cases, total $\Delta F$ increases substantially while utility and answer quality decrease.
+For example, OK$\rightarrow$missing-final-answer cases gain additional factual novelty ($+0.8675$ total $\Delta F$ on average) but lose utility ($-0.3444$) and F1 ($-0.1832$).
+This means that the disturbed query often retrieves many new facts, but the facts are not useful for the intended answer.
+Conversely, failure$\rightarrow$OK cases show the opposite recovery pattern: missing-final-answer$\rightarrow$OK cases reduce trajectory length by 2.59 iterations on average while improving utility and F1.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lrrrrr}
+\hline
+Transition & Count & $\Delta$Total $\Delta F$ & $\Delta$Iter. & $\Delta$Utility & $\Delta$F1 \\
+\hline
+missing\_final\_answer$\rightarrow$ok & 27 & +0.3169 & -2.5926 & +0.0894 & +0.1490 \\
+generation\_error$\rightarrow$ok & 16 & -0.0222 & -1.4375 & +0.2222 & +0.1556 \\
+ok$\rightarrow$missing\_final\_answer & 23 & +0.8675 & +2.8696 & -0.3444 & -0.1832 \\
+ok$\rightarrow$generation\_error & 19 & +0.5957 & +2.6316 & -0.4306 & -0.3399 \\
+ok$\rightarrow$ok & 110 & +0.3658 & +0.3455 & -0.1495 & -0.0148 \\
+\hline
+\end{tabular}
+\caption{Mechanistic summary of first-round Disturb transitions across 300 items from CRAG, InfoSeek, MCSearch, and OVEN. Disturb usually increases factual novelty, but whether the extra facts are useful depends on whether the trajectory can re-anchor to the intended entity.}
+\label{tab:disturb-mechanism-transition}
+\end{table}
+
+The recovered samples are mostly visually grounded and externally knowledge-dependent.
+Among the 43 failure$\rightarrow$OK cases, 38 have \texttt{text\_alone\_identifies\_entity=No}, and 40 require external evidence.
+This suggests that Disturb helps primarily when the original query is an overly rigid textual projection of a visual referent.
+Replacing an entity name with a broader phrase such as ``this animal'', ``that vehicle'', or ``that instrument'' can broaden the first retrieval region, after which the agent sometimes issues a more specific follow-up query and returns to the intended entity.
+For instance, a disturbed query such as ``their collection at that museum'' can fail locally but lead the next step to ask for ``Roman collection at the Yorkshire Museum artifacts'', which is closer to the answer-bearing evidence.
+
+The input questions that benefit from Disturb share a recognizable structure.
+They are usually not pure text lookup questions; instead, they ask for an external attribute, relation, comparison, or taxonomy of a visually presented referent.
+For example, recovered questions include ``How many days does the gestation of this animal take?'', ``what country is the car's license plate from?'', ``does the baroque lute have more or less strings than this?'', and ``where was the founder of this car brand born?''.
+In these cases, the original query may over-commit to a fragile entity name inferred from the image, while the disturbed query preserves the task slot---animal gestation, license-plate country, instrument string count, or company founder---without forcing a brittle first-step entity anchor.
+This explains why Disturb is most helpful for visual-to-text transfer problems: it relaxes the first retrieval constraint, allows the agent to collect broader attribute-level evidence, and sometimes enables a later query to re-anchor to the correct entity or relation.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lrr}
+\hline
+Recovered-item property & Count & Interpretation \\
+\hline
+\texttt{text\_alone\_identifies\_entity=No} & 38 / 43 & Entity focus depends on the image \\
+\texttt{external\_evidence\_dependency=Yes} & 40 / 43 & Answer requires retrieval beyond vision \\
+Single-hop Attribute Query & 12 / 43 & Attribute lookup over a visual referent \\
+Entity Recognition & 10 / 43 & Query benefits from category-level exploration \\
+Multi-hop & 10 / 43 & Disturb can perturb a stale relation chain \\
+Comparison & 7 / 43 & Generic query preserves comparison dimension \\
+Subproblem Aggregation & 4 / 43 & Mixed effect; easily drifts if branches are fragile \\
+\hline
+\end{tabular}
+\caption{Properties of Disturb-recovered items across four sources. Improvements concentrate in visually grounded, external-knowledge-dependent questions where the original text query may over-commit to a fragile entity name.}
+\label{tab:disturb-recovered-item-properties}
+\end{table}
+
+The same mechanism also explains degradation.
+When the original query already has a useful entity anchor, replacing it with a generic phrase can cause topic drift.
+Queries such as ``common names for this plant'' or ``location of the well-known marketplace'' retrieve plausible but wrong-entity evidence.
+Therefore, Disturb should be interpreted as an exploratory relaxation: it can increase retrieval vitality and occasionally rescue stalled trajectories, but reliable answer improvement requires returning to a golden-entity-aligned query.
+
+\subsection{Finding 3: Golden Entity Alignment Gives the Most Reliable Process Gains}
+Oracle rewriting produces the strongest overall trajectory profile.
+Compared with Original, Oracle raises macro-average trajectory quality from 0.2799 to 0.3605, mean $\df$ from 0.4145 to 0.6078, utility from 0.4223 to 0.4604, step score from 0.2367 to 0.3263, and informative-step rate from 0.5222 to 0.7346.
+Unlike Disturb, it also reduces mean iterations from 2.6956 to 2.1746.
+The evidence therefore supports a calibrated view: broad ambiguous queries may help exploration, but golden-entity alignment better balances novelty, utility, and convergence.
+
+\subsection{Finding 4: Oracle Rewriting Recovers Failed Trajectory States}
+The state-transition evidence further supports golden-entity alignment.
+On 460 common Original--Oracle items, 88 missing-final-answer trajectories become OK and 45 generation-error trajectories become OK.
+These correspond to 19.6\% and 10.0\% of all common items, respectively.
+By contrast, 82 items remain OK after Oracle rewriting, showing that the intervention does not generally destroy successful trajectories.
+Disturb also recovers some cases, but it is less stable: on 300 common Original--Disturb items, 27 missing-final-answer cases and 16 generation-error cases become OK, while 23 originally OK cases become missing-final-answer and 19 become generation-error.
+
+\input{refamb_state_transition_table.tex}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.88\linewidth]{first_round_oracle_rewrite_transition_focus.pdf}
+    \caption{First-round oracle rewrite state transitions. Golden-entity rewriting recovers a substantial number of missing-final-answer and generation-error trajectories.}
+    \label{fig:oracle-transition}
+\end{figure}
+
+\subsection{Finding 5: Stagnation is Reduced by Both Exploration and Alignment}
+We next inspect repeated queries and zero-information steps.
+Original trajectories have a 34.6\% exact repeated-query rate and a 46.0\% zero-$\df$ step rate.
+Oracle reduces these rates to 28.5\% and 36.0\%, while Disturb reduces them to 25.4\% and 35.3\%.
+Mean $\df$ increases from 0.3045 in Original to 0.3793 under Oracle and 0.3946 under Disturb.
+The fact that Disturb reduces stagnation slightly more than Oracle is important: it explains why ambiguity is not purely harmful.
+However, the earlier utility and transition results show that reducing stagnation alone is insufficient; the retrieved information must also remain aligned with the intended entity and answer.
+
+\input{refamb_stagnation_table.tex}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.78\linewidth]{refamb_delta_f_stagnation_curve.pdf}
+    \caption{Information increment by retrieval iteration. Later rounds increasingly stagnate, motivating active repair of repeated or low-gain query paths.}
+    \label{fig:stagnation-curve}
+\end{figure}
+
+\subsection{Finding 6: Oracle First-Step Alignment is Helpful but Incomplete}
+Oracle rewriting strongly reduces entity ambiguity, but does not eliminate it.
+On the 369-item oracle cohort, items with at least one entity-ambiguous step drop from 366/369 (99.19\%) to 60/369 (16.26\%), and ambiguous retrieval steps drop from 938/1180 (79.49\%) to 288/1794 (16.05\%).
+The remaining ambiguous steps are dominated by indirect entity ambiguity (149 after rewriting) and object identification (110 after rewriting).
+This residual ambiguity shows why a single first-step rewrite is not enough: later thoughts can reintroduce unresolved references, and some failures arise from reasoning, context overflow, or visual grounding rather than initial query wording alone.
+
+\input{../../scripts/entity_ambiguity_comparison_table.tex}
+
+\subsection{Generation Quality}
+The answer-quality metrics match the process-level picture but are noisier across sources.
+For Oracle cohorts, CRAG improves from GPTAcc 0.0664 to 0.2093 on the paired oracle subset, with F1 increasing by 0.0797 and precision by 0.0834.
+InfoSeek improves more strongly in exact answer-style metrics: accuracy rises by 0.2121, F1 by 0.0743, precision by 0.0486, and recall by 0.1411.
+OVEN gains modestly in F1 and precision under Oracle, while MC-Search has a small oracle subset (16 items) and should be treated as preliminary.
+Disturb improves some subsets such as InfoSeek F1 (+0.0261) and OVEN F1 (+0.0143), but degrades CRAG and MC-Search F1.
+These mixed results are consistent with the main claim: ambiguity can occasionally help exploration, but golden-entity alignment is the more reliable intervention for answer-quality recovery.
+
+\paragraph{Placeholder for additional experiments.}
+The current draft does not claim final VORS gains because the provided result folders contain the method implementation but not a completed VORS-vs-Original aggregate table.
+The camera-ready experimental section should add: (i) VORS trajectory quality and answer metrics on the same RefAmb subsets, (ii) an ablation without ambiguity check, without ROI image retrieval, and without low-gain query diversification, and (iii) a cost table reporting extra calls and latency.
+
+\section{Vitality-Aware Oracular Referent Steering}
+\subsection{Motivation}
+The experiments imply three design requirements.
+First, a repair method should not blindly make every query more specific, because broader queries can sometimes increase information increment.
+Second, it should intervene when the current query path is low-gain, repetitive, or referentially unreliable.
+Third, when the missing referent is visually grounded, the method should switch from text-only reformulation to image retrieval or ROI-guided visual grounding.
+The VORS pipeline implements these requirements as a control layer on top of OmniSearch.
+
+\subsection{VORS Pipeline}
+VORS monitors each retrieval step and logs module-level diagnostics.
+It normalizes text queries, computes query similarity with the previous query, filters invalid retrieved documents, estimates semantic overlap between evidence units, checks whether a query is entity-ambiguous, and rewrites the retrieval action when the path is repeated or low-gain.
+If the query is ambiguous and cannot be safely diversified as text, VORS falls back to image retrieval using the current query as an anchored visual phrase.
+When ROI preprocessing is enabled, the pipeline calls a GroundingDINO-based worker to crop the image region corresponding to the phrase before image retrieval.
+
+\begin{algorithm}[t]
+\small
+\KwIn{Image $I$, question $x$, trajectory history $H$, previous text query $\query_{t-1}$}
+\KwOut{Next retrieval action or final answer}
+Generate candidate ReAct action from the VLM\;
+\If{action is text retrieval with query $\query_t$}{
+    Sanitize retrieved documents and compute query similarity $\operatorname{sim}(\query_t,\query_{t-1})$\;
+    Extract VLM feedback from the post-retrieval thought\;
+    \If{retrieval is empty, repeated, or low-gain}{
+        Ask the rewrite module for a query targeting a missing entity, relation, time, location, or attribute\;
+        \If{rewritten query is specific and sufficiently different}{
+            replace the action with the rewritten text retrieval query\;
+        }
+        \ElseIf{ambiguity checker labels $\query_t$ as entity-ambiguous}{
+            switch to image retrieval with an anchored phrase; optionally crop ROI before retrieval\;
+        }
+        \Else{
+            issue a fallback diversified query or no-retrieval action\;
+        }
+    }
+}
+\If{generation terminates without a clean final answer}{
+    finalize from the last valid reasoning state using a concise answer finalizer\;
+}
+\caption{Vitality-Aware Oracular Referent Steering (VORS) control layer.}
+\label{alg:eao}
+\end{algorithm}
+
+\subsection{Core Modules}
+\paragraph{Ambiguity check.}
+VORS loads a dedicated ambiguity-check prompt and asks the generator to return a JSON label for whether the current text query is entity-ambiguous.
+Invalid JSON or generation failures default to non-ambiguous, which prevents the control layer from over-triggering on uncertain labels.
+
+\paragraph{Low-gain query diversification.}
+When a query is repeated or too similar to the previous query, VORS first tries a model-generated rewrite.
+The rewrite is accepted only if its similarity to the previous query is below the configured threshold and it introduces informative new terms rather than filler such as ``more details'' or ``exact value''.
+If the model rewrite is rejected, VORS extracts candidate missing clues from the VLM feedback and applies the same specificity test.
+
+\paragraph{Visual fallback and ROI grounding.}
+If the query remains unresolved and is judged ambiguous, VORS switches to image retrieval.
+When ROI preprocessing is enabled, it runs a configured worker on the current image and phrase, saves a debug crop, and sends the cropped image to the retriever.
+This directly targets the setting where the VLM knows the visual referent but the text query cannot name it.
+
+\paragraph{Answer finalization.}
+For trajectories that hit malformed termination or context-window failure, VORS constructs a finalization prompt from the question, last thought, and last model state.
+This module is conservative: it asks for one concise final answer and strips ReAct tags from the output.
+
+\section{Discussion}
+The central empirical lesson is that referential ambiguity should be treated as a retrieval-control variable, not a binary defect.
+Disturb experiments show that a less specific query can reduce stagnation and increase factual novelty.
+This happens because broader retrieval sometimes exposes alternative evidence that the original narrow query missed.
+But these gains are unstable: the retrieved facts may not be useful for the final answer, and trajectories often become longer.
+Golden-entity alignment is different.
+It raises information increment while also improving utility, step score, state transitions, and several answer-quality metrics.
+
+The remaining failure cases also matter.
+Oracle rewriting leaves 16.26\% of items with downstream ambiguity and does not eliminate generation errors.
+This indicates that the problem is not reducible to first-query wording.
+Robust agentic retrieval requires continuous monitoring: later queries can drift away from the entity, visual references may need image retrieval rather than text retrieval, and repeated searches should trigger repair rather than simple continuation.
+
+\section{Conclusion}
+We studied referential ambiguity in agentic multimodal retrieval through RefAmb, RTE, and controlled Original/Oracle/Disturb interventions.
+The data do not support a simplistic claim that ambiguity always harms retrieval trajectories.
+Injected ambiguity can increase factual exploration and reduce stagnation, but it also weakens utility and convergence.
+Golden-entity alignment provides the more reliable principle: oracle first-step rewriting improves trajectory quality, recovers failed states, reduces residual ambiguity, and improves answer quality on key subsets.
+These findings motivate VORS, a practical control layer that repairs ambiguous, repeated, or low-gain query paths through selective rewriting and visual fallback.
+Future experiments should complete the VORS aggregate evaluation and ablations before making final claims about method-level gains.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

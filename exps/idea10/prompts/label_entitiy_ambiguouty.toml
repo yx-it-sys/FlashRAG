@@ -8,6 +8,11 @@ You will receive:
 Annotation goal:
 Determine whether the Text Query identifies a retrievable target entity on its own, or whether it still depends on the image or missing context to know what entity should be retrieved.
 
+Retriever assumption:
+The retriever only receives the Text Query at search time.
+It cannot see the image, the original question, grounding evidence, or any other context beyond the Query itself.
+Therefore, if the Query uses pronouns or other referring expressions whose target can only be resolved from the image or hidden context, the retriever cannot know what entity to retrieve.
+
 Core criterion:
 Mark `"entity_ambiguous": "Yes"` only when a text-only retriever would NOT know what exact entity or target to retrieve from the Text Query alone.
 

@@ -1,6 +1,8 @@
 import re
+import os
 import json
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import numpy as np
 import warnings
 from collections import Counter
@@ -250,8 +252,8 @@ class Sub_ExactMatch(BaseMetric):
 
         return {"acc": sub_em_score}, metric_score_list
 
-class GPTAcc(BaseMetric):
-    metric_name = "gpt"
+class LLMAcc(BaseMetric):
+    metric_name = "llm"
 
     def __init__(self, config):
         super().__init__(config)
@@ -267,20 +269,32 @@ class GPTAcc(BaseMetric):
             "4. Output exactly one token: yes or no.\n"
             "5. Do not output any explanation, punctuation, or extra words."
         )
-        gpt_acc_setting = config["gpt_acc_setting"]
-        self.api_model = gpt_acc_setting["model_name"]
-        api_key = gpt_acc_setting["api_key"]
-        base_url = gpt_acc_setting["base_url"]
-        self.max_retries = 5
-        self.retry_sleep_seconds = 5
 
-        assert api_key, "GPTAcc requires gpt_acc_setting.api_key for API judge."
-        assert base_url, "GPTAcc requires gpt_acc_setting.base_url for API judge."
+        llm_setting = config.get("llm_acc_setting", None) or config.get("gpt_acc_setting", None)
+        assert llm_setting is not None, "LLMAcc requires llm_acc_setting or gpt_acc_setting."
+
+        self.api_model = llm_setting["model_name"]
+        api_key = llm_setting["api_key"]
+        base_url = llm_setting["base_url"]
+        self.max_retries = int(llm_setting.get("max_retries", 5))
+        self.retry_sleep_seconds = int(llm_setting.get("retry_sleep_seconds", 5))
+        self.max_workers = int(llm_setting.get("max_workers", 10))
+
+        assert api_key, "LLMAcc requires llm_acc_setting.api_key (or gpt_acc_setting.api_key) for API judge."
+        assert base_url, "LLMAcc requires llm_acc_setting.base_url (or gpt_acc_setting.base_url) for API judge."
 
         self.client = OpenAI(
             api_key=api_key,
             base_url=base_url,
         )
+
+    @staticmethod
+    def _extract_final_answer(text):
+        if not isinstance(text, str):
+            return ""
+        if "Final Answer:" in text:
+            return text.split("Final Answer:", 1)[1].split("</End>", 1)[0].strip()
+        return text.strip()
 
     def _parse_judge_text(self, judge_text: str):
         judge_text = (judge_text or "").strip().lower()
@@ -327,13 +341,13 @@ class GPTAcc(BaseMetric):
 
                 last_error = ValueError(f"Response cannot be parsed: {judge_text}")
                 print(
-                    f"ERROR judge with GPT API! Response cannot be parsed "
+                    f"ERROR judge with LLM API! Response cannot be parsed "
                     f"(attempt {attempt}/{self.max_retries}): {judge_text}"
                 )
             except Exception as exc:
                 last_error = exc
                 print(
-                    f"ERROR judge with GPT API! Request failed "
+                    f"ERROR judge with LLM API! Request failed "
                     f"(attempt {attempt}/{self.max_retries}): {type(exc).__name__}: {exc}"
                 )
 
@@ -341,17 +355,50 @@ class GPTAcc(BaseMetric):
                 time.sleep(self.retry_sleep_seconds * attempt)
 
         raise last_error
-    
+
+    def _score_one_with_index(self, idx, sample):
+        score = self.calculate_acc(sample["pred"], sample["golden_answers"])
+        return idx, score
+
     def calculate_metric(self, data):
         golden_answers_list = self.get_dataset_answer(data)
-        pred_list = data.pred
+        pred_list = [self._extract_final_answer(pred) for pred in data.pred]
+        question_list = data.question
 
-        metric_score_list = [
-            self.calculate_acc(pred, golden_answers) for pred, golden_answers in tqdm(zip(pred_list, golden_answers_list), total=len(pred_list), desc="Calculating GPTAcc")
+        samples = [
+            {
+                "id": getattr(item, "id", None),
+                "question": question,
+                "pred": pred,
+                "golden_answers": golden_answers,
+            }
+            for item, question, pred, golden_answers in zip(data.data, question_list, pred_list, golden_answers_list)
         ]
-        gpt_acc_score = sum(metric_score_list) / len(metric_score_list)
 
-        return {"gpt_acc": gpt_acc_score}, metric_score_list
+        metric_score_list = [None] * len(samples)
+        pending_indices = list(range(len(samples)))
+
+        progress = tqdm(total=len(samples), desc="Calculating LLMAcc")
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            future_to_idx = {
+                executor.submit(self._score_one_with_index, idx, samples[idx]): idx
+                for idx in pending_indices
+            }
+
+            for future in as_completed(future_to_idx):
+                idx = future_to_idx[future]
+                _, score = future.result()
+                metric_score_list[idx] = score
+                data[idx].update_evaluation_score(self.metric_name, score)
+                progress.update(1)
+
+        progress.close()
+
+        llm_acc_score = sum(metric_score_list) / len(metric_score_list) if metric_score_list else 0.0
+        return {"llm": llm_acc_score}, metric_score_list
+
+
+GPTAcc = LLMAcc
 
 
 
@@ -716,7 +763,8 @@ class CountToken(BaseMetric):
 
     def __init__(self, config):
         super().__init__(config)
-        tokenizer_name = config["metric_setting"].get("tokenizer_name", None)
+        metric_setting = config.get("metric_setting", {})
+        tokenizer_name = metric_setting.get("tokenizer_name", None)
         is_hf_tokenizer = True
         from flashrag.utils.constants import OPENAI_MODEL_DICT
 
@@ -756,7 +804,26 @@ class CountToken(BaseMetric):
 
         return str(prompt)
 
+    def _get_generation_stats_list(self, data):
+        try:
+            stats_list = data.generation_stats
+        except AttributeError:
+            return None
+        if not isinstance(stats_list, list):
+            return None
+        filtered = [stats for stats in stats_list if isinstance(stats, dict) and stats]
+        return filtered or None
+
     def calculate_metric(self, data):
+        stats_list = self._get_generation_stats_list(data)
+        if stats_list is not None:
+            token_counts = [
+                float(stats.get("avg_input_tokens_per_sample", stats.get("input_tokens", 0.0)))
+                for stats in stats_list
+            ]
+            avg_tokens = sum(token_counts) / len(token_counts) if len(token_counts) > 0 else 0.0
+            return {"avg_input_tokens": avg_tokens}, token_counts
+
         try:
             input_prompts = data.prompt
         except AttributeError:
@@ -770,6 +837,98 @@ class CountToken(BaseMetric):
         avg_tokens = sum(token_counts) / len(token_counts) if len(token_counts) > 0 else 0.0
 
         return {"avg_input_tokens": avg_tokens}, token_counts
+
+
+class OutputTokenCount(BaseMetric):
+    metric_name = "output_tokens"
+
+    def __init__(self, config):
+        super().__init__(config)
+        metric_setting = config.get("metric_setting", {})
+        tokenizer_name = metric_setting.get("tokenizer_name", None)
+        is_hf_tokenizer = True
+        from flashrag.utils.constants import OPENAI_MODEL_DICT
+
+        if tokenizer_name is None or tokenizer_name in OPENAI_MODEL_DICT:
+            import tiktoken
+
+            if tokenizer_name is None:
+                tokenizer_name = "gpt-4"
+            tokenizer = tiktoken.encoding_for_model(tokenizer_name)
+            is_hf_tokenizer = False
+        else:
+            from transformers import AutoTokenizer
+
+            tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+
+        self.tokenizer = tokenizer
+        self.is_hf_tokenizer = is_hf_tokenizer
+
+    def _get_generation_stats_list(self, data):
+        try:
+            stats_list = data.generation_stats
+        except AttributeError:
+            return None
+        if not isinstance(stats_list, list):
+            return None
+        filtered = [stats for stats in stats_list if isinstance(stats, dict) and stats]
+        return filtered or None
+
+    def calculate_metric(self, data):
+        stats_list = self._get_generation_stats_list(data)
+        if stats_list is not None:
+            token_counts = [
+                float(stats.get("avg_output_tokens_per_sample", stats.get("output_tokens", 0.0)))
+                for stats in stats_list
+            ]
+            avg_tokens = sum(token_counts) / len(token_counts) if len(token_counts) > 0 else 0.0
+            return {"avg_output_tokens": avg_tokens}, token_counts
+
+        try:
+            pred_list = data.pred
+        except AttributeError:
+            return {"avg_output_tokens": 0.0}, [0.0 for _ in data]
+
+        if self.is_hf_tokenizer:
+            token_counts = [len(self.tokenizer.tokenize(str(pred))) for pred in pred_list]
+        else:
+            token_counts = [len(self.tokenizer.encode(str(pred))) for pred in pred_list]
+        avg_tokens = sum(token_counts) / len(token_counts) if len(token_counts) > 0 else 0.0
+        return {"avg_output_tokens": avg_tokens}, token_counts
+
+
+class Latency_Seconds(BaseMetric):
+    metric_name = "latency_seconds"
+
+    def __init__(self, config):
+        super().__init__(config)
+
+    def _get_generation_stats_list(self, data):
+        try:
+            stats_list = data.generation_stats
+        except AttributeError:
+            return None
+        if not isinstance(stats_list, list):
+            return None
+        filtered = [stats for stats in stats_list if isinstance(stats, dict) and stats]
+        return filtered or None
+
+    def calculate_metric(self, data):
+        stats_list = self._get_generation_stats_list(data)
+        if stats_list is not None:
+            latency_list = [
+                float(stats.get("avg_latency_seconds_per_sample", stats.get("latency_seconds", 0.0)))
+                for stats in stats_list
+            ]
+            avg_latency = sum(latency_list) / len(latency_list) if len(latency_list) > 0 else 0.0
+            return {"avg_latency_seconds": avg_latency}, latency_list
+
+        try:
+            latency_list = [float(x or 0.0) for x in data.duration_seconds]
+        except AttributeError:
+            latency_list = [0.0 for _ in data]
+        avg_latency = sum(latency_list) / len(latency_list) if len(latency_list) > 0 else 0.0
+        return {"avg_latency_seconds": avg_latency}, latency_list
 
 class GAOKAOMM_Accuracy(BaseMetric):
     metric_name = 'gaokao_acc'

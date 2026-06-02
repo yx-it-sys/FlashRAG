@@ -1,0 +1,309 @@
+{
+  "result_root": "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen2.5-vl-7B",
+  "stage_counts": {
+    "RefAmb_2026_05_01_11_26_refamb_mcsearch_stage": 287,
+    "RefAmb_2026_05_01_13_28_refamb_oven_stage": 93,
+    "RefAmb_2026_05_02_13_50_refamb_infoseek_stage": 152,
+    "RefAmb_2026_05_02_14_22_refamb_crag_stage": 790
+  },
+  "total_records": 1322,
+  "task_order": [
+    "Entity Recognition",
+    "Single-hop Attribute Query",
+    "Multi-hop",
+    "Comparison",
+    "Subproblem Aggregation"
+  ],
+  "correctness_levels": [
+    "Correct",
+    "Incorrect"
+  ],
+  "ambiguity_levels": [
+    "Ambiguous",
+    "Non-ambiguous"
+  ],
+  "summary": {
+    "tasks": {
+      "Entity Recognition": {
+        "Correct": {
+          "Ambiguous": {
+            "n": 12,
+            "rte": "0.614",
+            "iter": "1.083",
+            "delta_f_avg": "0.859",
+            "u_avg": "0.667",
+            "lj_score": "1.000",
+            "disturb_flip_ratio": "",
+            "oracle_flip_ratio": "0.250"
+          },
+          "Non-ambiguous": {
+            "n": 27,
+            "rte": "0.700",
+            "iter": "1.148",
+            "delta_f_avg": "0.850",
+            "u_avg": "0.824",
+            "lj_score": "1.000",
+            "disturb_flip_ratio": "0.296",
+            "oracle_flip_ratio": ""
+          }
+        },
+        "Incorrect": {
+          "Ambiguous": {
+            "n": 65,
+            "rte": "0.257",
+            "iter": "3.431",
+            "delta_f_avg": "0.496",
+            "u_avg": "0.451",
+            "lj_score": "0.000",
+            "disturb_flip_ratio": "0.000",
+            "oracle_flip_ratio": "0.338"
+          },
+          "Non-ambiguous": {
+            "n": 63,
+            "rte": "0.235",
+            "iter": "3.429",
+            "delta_f_avg": "0.445",
+            "u_avg": "0.483",
+            "lj_score": "0.000",
+            "disturb_flip_ratio": "0.159",
+            "oracle_flip_ratio": "0.000"
+          }
+        }
+      },
+      "Single-hop Attribute Query": {
+        "Correct": {
+          "Ambiguous": {
+            "n": 2,
+            "rte": "0.603",
+            "iter": "2.000",
+            "delta_f_avg": "0.970",
+            "u_avg": "0.625",
+            "lj_score": "1.000",
+            "disturb_flip_ratio": "0.000",
+            "oracle_flip_ratio": "0.500"
+          },
+          "Non-ambiguous": {
+            "n": 36,
+            "rte": "0.738",
+            "iter": "1.306",
+            "delta_f_avg": "0.810",
+            "u_avg": "0.930",
+            "lj_score": "1.000",
+            "disturb_flip_ratio": "0.389",
+            "oracle_flip_ratio": ""
+          }
+        },
+        "Incorrect": {
+          "Ambiguous": {
+            "n": 135,
+            "rte": "0.128",
+            "iter": "4.096",
+            "delta_f_avg": "0.383",
+            "u_avg": "0.270",
+            "lj_score": "0.000",
+            "disturb_flip_ratio": "0.031",
+            "oracle_flip_ratio": "0.148"
+          },
+          "Non-ambiguous": {
+            "n": 101,
+            "rte": "0.348",
+            "iter": "3.248",
+            "delta_f_avg": "0.483",
+            "u_avg": "0.572",
+            "lj_score": "0.000",
+            "disturb_flip_ratio": "0.109",
+            "oracle_flip_ratio": "0.250"
+          }
+        }
+      },
+      "Multi-hop": {
+        "Correct": {
+          "Ambiguous": {
+            "n": 8,
+            "rte": "0.601",
+            "iter": "2.375",
+            "delta_f_avg": "0.786",
+            "u_avg": "0.760",
+            "lj_score": "1.000",
+            "disturb_flip_ratio": "0.125",
+            "oracle_flip_ratio": "0.250"
+          },
+          "Non-ambiguous": {
+            "n": 28,
+            "rte": "0.696",
+            "iter": "1.571",
+            "delta_f_avg": "0.792",
+            "u_avg": "0.848",
+            "lj_score": "1.000",
+            "disturb_flip_ratio": "0.286",
+            "oracle_flip_ratio": "0.000"
+          }
+        },
+        "Incorrect": {
+          "Ambiguous": {
+            "n": 110,
+            "rte": "0.197",
+            "iter": "3.500",
+            "delta_f_avg": "0.467",
+            "u_avg": "0.315",
+            "lj_score": "0.000",
+            "disturb_flip_ratio": "0.049",
+            "oracle_flip_ratio": "0.118"
+          },
+          "Non-ambiguous": {
+            "n": 152,
+            "rte": "0.289",
+            "iter": "2.934",
+            "delta_f_avg": "0.498",
+            "u_avg": "0.471",
+            "lj_score": "0.000",
+            "disturb_flip_ratio": "0.066",
+            "oracle_flip_ratio": "0.167"
+          }
+        }
+      },
+      "Comparison": {
+        "Correct": {
+          "Ambiguous": {
+            "n": 5,
+            "rte": "0.273",
+            "iter": "1.200",
+            "delta_f_avg": "0.752",
+            "u_avg": "0.694",
+            "lj_score": "1.000",
+            "disturb_flip_ratio": "0.667",
+            "oracle_flip_ratio": "0.600"
+          },
+          "Non-ambiguous": {
+            "n": 42,
+            "rte": "0.675",
+            "iter": "1.500",
+            "delta_f_avg": "0.818",
+            "u_avg": "0.827",
+            "lj_score": "1.000",
+            "disturb_flip_ratio": "0.476",
+            "oracle_flip_ratio": "0.000"
+          }
+        },
+        "Incorrect": {
+          "Ambiguous": {
+            "n": 80,
+            "rte": "0.149",
+            "iter": "3.525",
+            "delta_f_avg": "0.426",
+            "u_avg": "0.257",
+            "lj_score": "0.000",
+            "disturb_flip_ratio": "0.043",
+            "oracle_flip_ratio": "0.175"
+          },
+          "Non-ambiguous": {
+            "n": 169,
+            "rte": "0.255",
+            "iter": "2.976",
+            "delta_f_avg": "0.490",
+            "u_avg": "0.425",
+            "lj_score": "0.000",
+            "disturb_flip_ratio": "0.118",
+            "oracle_flip_ratio": "0.077"
+          }
+        }
+      },
+      "Subproblem Aggregation": {
+        "Correct": {
+          "Ambiguous": {
+            "n": 1,
+            "rte": "0.486",
+            "iter": "2.000",
+            "delta_f_avg": "0.699",
+            "u_avg": "0.750",
+            "lj_score": "1.000",
+            "disturb_flip_ratio": "0.000",
+            "oracle_flip_ratio": "0.000"
+          },
+          "Non-ambiguous": {
+            "n": 180,
+            "rte": "0.570",
+            "iter": "2.300",
+            "delta_f_avg": "0.697",
+            "u_avg": "0.859",
+            "lj_score": "1.000",
+            "disturb_flip_ratio": "0.339",
+            "oracle_flip_ratio": "0.000"
+          }
+        },
+        "Incorrect": {
+          "Ambiguous": {
+            "n": 4,
+            "rte": "0.201",
+            "iter": "3.000",
+            "delta_f_avg": "0.668",
+            "u_avg": "0.306",
+            "lj_score": "0.000",
+            "disturb_flip_ratio": "0.000",
+            "oracle_flip_ratio": "0.250"
+          },
+          "Non-ambiguous": {
+            "n": 102,
+            "rte": "0.385",
+            "iter": "3.216",
+            "delta_f_avg": "0.555",
+            "u_avg": "0.629",
+            "lj_score": "0.000",
+            "disturb_flip_ratio": "0.284",
+            "oracle_flip_ratio": "0.667"
+          }
+        }
+      }
+    },
+    "macro_average": {
+      "Correct": {
+        "Ambiguous": {
+          "tasks_covered": 5,
+          "n": 28,
+          "rte": "0.515",
+          "iter": "1.732",
+          "delta_f_avg": "0.813",
+          "u_avg": "0.699",
+          "lj_score": "1.000",
+          "disturb_flip_ratio": "0.198",
+          "oracle_flip_ratio": "0.320"
+        },
+        "Non-ambiguous": {
+          "tasks_covered": 5,
+          "n": 313,
+          "rte": "0.676",
+          "iter": "1.565",
+          "delta_f_avg": "0.793",
+          "u_avg": "0.858",
+          "lj_score": "1.000",
+          "disturb_flip_ratio": "0.357",
+          "oracle_flip_ratio": "0.000"
+        }
+      },
+      "Incorrect": {
+        "Ambiguous": {
+          "tasks_covered": 5,
+          "n": 394,
+          "rte": "0.186",
+          "iter": "3.510",
+          "delta_f_avg": "0.488",
+          "u_avg": "0.320",
+          "lj_score": "0.000",
+          "disturb_flip_ratio": "0.025",
+          "oracle_flip_ratio": "0.206"
+        },
+        "Non-ambiguous": {
+          "tasks_covered": 5,
+          "n": 587,
+          "rte": "0.302",
+          "iter": "3.161",
+          "delta_f_avg": "0.494",
+          "u_avg": "0.516",
+          "lj_score": "0.000",
+          "disturb_flip_ratio": "0.147",
+          "oracle_flip_ratio": "0.232"
+        }
+      }
+    }
+  }
+}

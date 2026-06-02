@@ -29,7 +29,9 @@ FIGURE_PATH = BASE_DIR / "first_round_oracle_rewrite_summary.pdf"
 TABLE_PATH = BASE_DIR / "first_round_oracle_rewrite_main_results.tex"
 MAIN_FIGURE_PATH = BASE_DIR / "first_round_oracle_rewrite_main_bar.pdf"
 TEXT_SNIPPET_PATH = BASE_DIR / "first_round_oracle_rewrite_paper_snippets.tex"
-TRANSITION_FIGURE_PATH = BASE_DIR / "first_round_oracle_rewrite_transition_focus.pdf"
+TRANSITION_FIGURE_PATH = Path(
+    "/home/you/FlashRAG/exps/idea10/idea_reports/refamb_analysis_figs/first_round_oracle_rewrite_transition_focus.pdf"
+)
 ITERATION_PALETTE = ["#F4A261", "#F6C177", "#FFD089", "#CFE8F3", "#A8D0E6"]
 
 
@@ -248,56 +250,63 @@ def plot_summary_figure() -> None:
 
 def plot_transition_figure() -> None:
     labels = [
-        "Missing Final Answer → OK",
-        "Generation Error → OK",
+        "MTR → OK",
+        "GE → OK",
+        "GE → MTR",
         "OK → OK",
-        "Missing Final Answer → Missing Final Answer",
-        "OK → Missing Final Answer",
+        "MTR → MTR",
+        "GE → GE",
+        "MTR → GE",
+        "OK → MTR",
+        "OK → GE",
     ]
-    # counts = np.array([130, 30, 74, 81, 34])
-    counts = np.array([130, 30, 74, 81, 34])
+    counts = np.array([88, 45, 27, 82, 69, 55, 46, 22, 16])
+    total = float(counts.sum())
+    percentages = counts / total * 100.0
     colors = [
-        ITERATION_PALETTE[0],
-        ITERATION_PALETTE[1],
-        ITERATION_PALETTE[4],
-        ITERATION_PALETTE[3],
-        ITERATION_PALETTE[2],
+        "#6EA6D7",
+        "#6EA6D7",
+        "#6EA6D7",
+        "#F6C177",
+        "#F6C177",
+        "#F2C0C0",
+        "#E08A8A",
+        "#B54B4B",
+        "#B54B4B",
     ]
 
-    fig, ax = plt.subplots(figsize=(7.4, 3.6))
+    fig, ax = plt.subplots(figsize=(6.8, 6.2))
     y = np.arange(len(labels))
-    bars = ax.barh(y, counts, color=colors, height=0.64)
+    bars = ax.barh(y, percentages, color=colors, height=0.64)
     ax.set_yticks(y)
-    ax.set_yticklabels(labels, fontweight="bold", fontsize=11)
+    ax.set_yticklabels(labels, fontweight="bold", fontsize=13)
     ax.invert_yaxis()
-    ax.set_xlabel("Number of Samples", fontweight="bold", fontsize=11)
+    ax.set_xlabel("Share of Samples (%)", fontweight="bold", fontsize=13)
     ax.grid(axis="x", linestyle="--", linewidth=0.6, alpha=0.35)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    for tick in ax.get_xticklabels():
-        tick.set_fontweight("bold")
-        tick.set_fontsize(10.5)
+    for spine in ["top", "right", "left", "bottom"]:
+        ax.spines[spine].set_visible(True)
+        ax.spines[spine].set_linewidth(1.0)
+        ax.spines[spine].set_color("#222222")
+    ax.set_xlim(0, 20)
+    ax.set_xticks([0, 5, 10, 15, 20])
+    ax.set_xticklabels([f"{tick}%" for tick in [0, 5, 10, 15, 20]], fontweight="bold", fontsize=12)
 
-    for bar, count, label in zip(bars, counts, labels):
+    for bar, pct, count in zip(bars, percentages, counts):
+        if pct >= 4.0:
+            text_x = pct - 0.35
+            text_ha = "right"
+        else:
+            text_x = pct + 0.35
+            text_ha = "left"
         ax.text(
-            bar.get_width() + 2,
+            text_x,
             bar.get_y() + bar.get_height() / 2,
-            str(int(count)),
+            f"{pct:.1f}%",
             va="center",
-            fontsize=10,
+            ha=text_ha,
+            fontsize=12,
             fontweight="bold",
         )
-        if label == "Missing Final Answer → OK":
-            ax.text(
-                bar.get_width() * 0.55,
-                bar.get_y() + bar.get_height() / 2,
-                "key recovery path",
-                ha="center",
-                va="center",
-                fontsize=9.5,
-                color="#3B2A1A",
-                fontweight="bold",
-            )
 
     fig.savefig(TRANSITION_FIGURE_PATH)
     plt.close(fig)

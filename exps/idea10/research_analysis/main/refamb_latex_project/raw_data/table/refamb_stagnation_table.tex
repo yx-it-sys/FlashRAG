@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lccc}
+\hline
+Setting & Query similarity $=1$ & $\Delta F=0$ & Mean $\Delta F$ \\
+\hline
+Original & 34.6\% (841/2428) & 46.0\% (1861/4049) & 0.3045 \\
+Oracle & 28.5\% (196/687) & 36.0\% (429/1192) & 0.3793 \\
+Disturb & 25.4\% (150/591) & 35.3\% (324/918) & 0.3946 \\
+\hline
+\end{tabular}
+\caption{Across four sources and all iterations, the overall ratio of repeated queries (query similarity with previous query equals 1) and zero-information steps ($\Delta F=0$), together with the mean $\Delta F$. This summarizes the global stagnation pattern.}
+\label{tab:refamb-stagnation-ratios}
+\end{table}

@@ -1,0 +1,41 @@
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\caption{Main baselines grouped by inference style across task types.}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{l|cc|cc|cc|cc|cc|cc}
+\toprule
+\multirow{2}{*}{\textbf{Method}} & \multicolumn{2}{c|}{\textbf{EntityRecognition}} & \multicolumn{2}{c|}{\textbf{SinglehopAttributeQuery}} & \multicolumn{2}{c|}{\textbf{Multihop}} & \multicolumn{2}{c|}{\textbf{Comparison}} & \multicolumn{2}{c|}{\textbf{SubproblemAggregation}} & \multicolumn{2}{c}{\textbf{Overall}} \\
+\cmidrule(lr){2-3}
+\cmidrule(lr){4-5}
+\cmidrule(lr){6-7}
+\cmidrule(lr){8-9}
+\cmidrule(lr){10-11}
+\cmidrule(lr){12-13}
+ & \textbf{RTE} & \textbf{LJ} & \textbf{RTE} & \textbf{LJ} & \textbf{RTE} & \textbf{LJ} & \textbf{RTE} & \textbf{LJ} & \textbf{RTE} & \textbf{LJ} & \textbf{RTE} & \textbf{LJ} \\
+\midrule
+\multicolumn{13}{c}{\textit{\textbf{ReAct-style RAG}}} \\
+\midrule
+Qwen2.5-VL-7B & 0.21 & 0.38 & 0.27 & 0.13 & 0.30 & 0.12 & 0.28 & 0.16 & 0.48 & 0.64 & 0.31 & 0.28 \\
+InternVL3.5 & 0.13 & 0.27 & 0.08 & 0.03 & 0.03 & 0.01 & 0.02 & 0.00 & 0.46 & 0.33 & 0.14 & 0.13 \\
+Qwen3.5-VL & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\multicolumn{13}{c}{\textit{\textbf{Prompt Optimization of ReAct}}} \\
+\midrule
+Qwen2.5-VL-7B & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\multicolumn{13}{c}{\textit{\textbf{Ambiguity / Retrieval Control Baselines}}} \\
+\midrule
+Self-Ask + Search & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+FLARE & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+AmbigPrompt & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+DWE & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+AMELI & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\textbf{ATL-CI} & \textcolor{red}{0.29} & \textcolor{red}{0.47} & \textcolor{red}{0.40} & \underline{0.21} & \underline{0.42} & \underline{0.19} & \textcolor{red}{0.38} & \textcolor{red}{0.27} & \underline{0.53} & 0.65 & \textcolor{red}{0.41} & \underline{0.36} \\
+\quad -w/o Entity Tightening & \underline{0.28} & 0.44 & \underline{0.37} & \underline{0.21} & \textcolor{red}{0.43} & \textcolor{red}{0.20} & \textcolor{red}{0.38} & \textcolor{red}{0.27} & \textcolor{red}{0.54} & \textcolor{red}{0.69} & \underline{0.40} & \textcolor{red}{0.36} \\
+\quad -w/o Exploration Activity & 0.26 & \underline{0.46} & 0.36 & 0.19 & 0.38 & 0.17 & 0.33 & 0.21 & 0.51 & \underline{0.67} & 0.37 & 0.34 \\
+\quad -w/o ROI & \textcolor{red}{0.29} & 0.43 & \textcolor{red}{0.40} & \textcolor{red}{0.23} & \underline{0.42} & 0.19 & \underline{0.37} & \underline{0.25} & \underline{0.53} & 0.66 & \underline{0.40} & 0.35 \\
+\bottomrule
+\end{tabular}%
+}
+\label{tab:main-baselines-tasktype-rte-lj}
+\end{table}

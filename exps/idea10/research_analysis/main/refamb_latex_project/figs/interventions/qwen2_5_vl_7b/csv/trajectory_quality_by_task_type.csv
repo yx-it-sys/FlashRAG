@@ -1,0 +1,16 @@
+task_type,setting,rte,mean_tqs,lj_score,llm
+Entity Recognition,Original,0.208,0.208,0.380,0.380
+Entity Recognition,Disturb,0.322,0.322,0.293,0.293
+Entity Recognition,Oracle,0.399,0.399,0.392,0.392
+Single-hop Attribute Query,Original,0.271,0.271,0.130,0.130
+Single-hop Attribute Query,Disturb,0.381,0.381,0.206,0.206
+Single-hop Attribute Query,Oracle,0.318,0.318,0.156,0.156
+Multi-hop,Original,0.300,0.300,0.120,0.120
+Multi-hop,Disturb,0.378,0.378,0.170,0.170
+Multi-hop,Oracle,0.327,0.327,0.168,0.168
+Comparison,Original,0.283,0.283,0.157,0.157
+Comparison,Disturb,0.315,0.315,0.186,0.186
+Comparison,Oracle,0.297,0.297,0.182,0.182
+Subproblem Aggregation,Original,0.477,0.477,0.637,0.637
+Subproblem Aggregation,Disturb,0.458,0.458,0.525,0.525
+Subproblem Aggregation,Oracle,0.528,0.528,0.750,0.750

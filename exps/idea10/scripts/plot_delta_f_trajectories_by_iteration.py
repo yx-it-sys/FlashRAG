@@ -7,18 +7,22 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-
-INPUT_PATH_1 = Path(
-    "/home/you/FlashRAG/exps/idea10/data/result/"
-    "crag_mm_2026_03_31_14_06_experiment/trajectory_quality_eval/"
-    "trajectory_quality_samples.jsonl"
+RESULT_ROOT = Path(
+    "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen2.5-vl-7B"
 )
-INPUT_PATH_2 = Path(
-    "/home/you/FlashRAG/exps/idea10/data/result/"
-    "crag_mm_2026_04_16_10_21_api_experiment/trajectory_quality_eval/"
-    "trajectory_quality_samples.jsonl"
-)
-OUT_DIR = INPUT_PATH_1.parent
+INPUT_PATHS_7B = [
+    RESULT_ROOT
+    / "RefAmb_2026_05_01_11_26_refamb_mcsearch_stage/trajectory_quality_eval_whole_delta_F/trajectory_quality_samples.jsonl",
+    RESULT_ROOT
+    / "RefAmb_2026_05_01_13_28_refamb_oven_stage/trajectory_quality_eval_whole_delta_F/trajectory_quality_samples.jsonl",
+    RESULT_ROOT
+    / "RefAmb_2026_05_02_13_50_refamb_infoseek_stage/trajectory_quality_eval_whole_delta_F/trajectory_quality_samples.jsonl",
+    RESULT_ROOT
+    / "RefAmb_2026_05_02_14_22_refamb_crag_stage/trajectory_quality_eval_whole_delta_F/trajectory_quality_samples.jsonl",
+]
+# Qwen2.5-VL-72B-Instruct results are not available for this refreshed plot yet.
+# INPUT_PATHS_72B = []
+OUT_DIR = RESULT_ROOT / "stats"
 BOOTSTRAP_SAMPLES = 2000
 
 
@@ -45,6 +49,13 @@ def load_trajectories(path: Path) -> list[dict]:
                     "y": [by_iteration[idx] for idx in range(1, 6)],
                 }
             )
+    return trajectories
+
+
+def load_trajectories_from_paths(paths: list[Path]) -> list[dict]:
+    trajectories: list[dict] = []
+    for path in paths:
+        trajectories.extend(load_trajectories(path))
     return trajectories
 
 
@@ -91,8 +102,24 @@ def build_summary(trajectories: list[dict]) -> dict:
 
 
 def plot(series: list[dict], png_path: Path, pdf_path: Path) -> None:
-    plt.style.use("seaborn-v0_8-whitegrid")
-    fig, ax = plt.subplots(figsize=(8.6, 5.6), constrained_layout=True)
+    plt.rcParams.update(
+        {
+            "font.size": 10,
+            "font.family": "serif",
+            "font.serif": ["Times New Roman", "Times", "DejaVu Serif"],
+            "axes.labelsize": 10,
+            "axes.titlesize": 11,
+            "xtick.labelsize": 9,
+            "ytick.labelsize": 9,
+            "legend.fontsize": 8.5,
+            "savefig.dpi": 300,
+            "savefig.bbox": "tight",
+            "savefig.pad_inches": 0.05,
+            "axes.spines.top": False,
+        }
+    )
+    fig, ax = plt.subplots(figsize=(6.2, 3.6))
+    ax_top = ax.twiny()
 
     x_rounds = np.array([1, 2, 3, 4, 5], dtype=float)
     for item in series:
@@ -114,51 +141,55 @@ def plot(series: list[dict], png_path: Path, pdf_path: Path) -> None:
             x_rounds,
             mean_y,
             color=item["line_color"],
-            linewidth=2.5,
-            marker="o",
-            markersize=5,
+            linewidth=1.4,
+            marker=item["marker"],
+            markersize=item["markersize"],
             label=item["label"],
             zorder=2,
         )
 
-    ax.set_xlabel("Iteration Round", fontsize=13)
-    ax.set_ylabel("Delta F", fontsize=13)
+    ax.set_xlabel("Iteration Round")
+    ax.set_ylabel(r"$\Delta\mathcal{F}$")
     ax.set_xticks([1, 2, 3, 4, 5])
     ax.set_xlim(0.75, 5.25)
-    ax.set_ylim(bottom=-0.01)
-    ax.grid(True, linestyle="--", linewidth=0.8, alpha=0.55)
-    ax.legend(loc="upper right", frameon=True, fontsize=10.5)
-    # ax.set_title("Delta F Decays Rapidly Across Iterations", fontsize=14.5)
+    ax.set_ylim(0.0, 1.00)
+    ax.grid(axis="y", linestyle=":", linewidth=0.8, alpha=0.6)
 
-    fig.savefig(png_path, dpi=250)
+    ax_top.set_xlim(ax.get_xlim())
+    ax_top.set_xticks([])
+    ax_top.set_xlabel("")
+    ax_top.spines["top"].set_visible(True)
+    ax_top.spines["bottom"].set_visible(False)
+    ax_top.spines["left"].set_visible(False)
+    ax_top.spines["right"].set_visible(False)
+    ax_top.tick_params(axis="x", which="both", top=False, bottom=False, labeltop=False)
+
+    ax.legend(loc="upper right", frameon=False, ncol=1)
+
+    fig.tight_layout()
     fig.savefig(pdf_path)
+    fig.savefig(png_path)
     plt.close(fig)
 
 
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    trajectories_1 = load_trajectories(INPUT_PATH_1)
-    trajectories_2 = load_trajectories(INPUT_PATH_2)
+    trajectories_1 = load_trajectories_from_paths(INPUT_PATHS_7B)
 
     png_path = OUT_DIR / "delta_f_trajectories_by_iteration.png"
     pdf_path = OUT_DIR / "delta_f_trajectories_by_iteration.pdf"
     json_path = OUT_DIR / "delta_f_trajectories_by_iteration.json"
 
     summary_1 = build_summary(trajectories_1)
-    summary_2 = build_summary(trajectories_2)
     plot(
         [
             {
-                "label": "CRAG-MM Mar 31",
-                "line_color": "#D62828",
-                "shadow_color": "#F4A6A6",
+                "label": "Qwen2.5-VL-7B-Instruct",
+                "line_color": "#1f77b4",
+                "shadow_color": "#A9C8EB",
+                "marker": "s",
+                "markersize": 3.8,
                 "summary": summary_1,
-            },
-            {
-                "label": "CRAG-MM Apr 16 API",
-                "line_color": "#1D4ED8",
-                "shadow_color": "#93C5FD",
-                "summary": summary_2,
             },
         ],
         png_path,
@@ -166,7 +197,7 @@ def main() -> None:
     )
 
     payload = {
-        "input_paths": [str(INPUT_PATH_1), str(INPUT_PATH_2)],
+        "input_paths": [str(path) for path in INPUT_PATHS_7B],
         "output_png": str(png_path),
         "output_pdf": str(pdf_path),
         "paper_style": {
@@ -175,7 +206,6 @@ def main() -> None:
         },
         "series": [
             {"label": "Qwen2.5-VL-7B-Instruct", "summary": summary_1},
-            {"label": "Qwen2.5-VL-72B-Instruct", "summary": summary_2},
         ],
     }
     json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")

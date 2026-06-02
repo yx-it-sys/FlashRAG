@@ -1,0 +1,10 @@
+from_status,to_status,label,count,percentage,total_paired
+missing_final_answer,ok,MTR → OK,73,7.163886,1019
+generation_error,ok,GE → OK,84,8.243376,1019
+generation_error,missing_final_answer,GE → MTR,22,2.158979,1019
+ok,ok,OK → OK,421,41.315015,1019
+missing_final_answer,missing_final_answer,MTR → MTR,122,11.972522,1019
+generation_error,generation_error,GE → GE,144,14.131501,1019
+missing_final_answer,generation_error,MTR → GE,28,2.747792,1019
+ok,missing_final_answer,OK → MTR,75,7.360157,1019
+ok,generation_error,OK → GE,50,4.906771,1019

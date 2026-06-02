@@ -1,0 +1,13 @@
+original_state,oracle_state,count
+generation_error,generation_error,55
+generation_error,missing_final_answer,27
+generation_error,ok,45
+missing_final_answer,generation_error,46
+missing_final_answer,missing_final_answer,79
+missing_final_answer,ok,88
+ok,generation_error,16
+ok,missing_final_answer,22
+ok,ok,82
+col_total,generation_error,117
+col_total,missing_final_answer,128
+col_total,ok,215

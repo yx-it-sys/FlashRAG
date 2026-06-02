@@ -1,9 +1,0 @@
-{
-  "input_file": "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment/omnisearch_trajectories.entity_ambiguous_items.jsonl",
-  "output_file": "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment/omnisearch_trajectories.entity_ambiguous_items.ok_with_no_retrieval_result.jsonl",
-  "total_input_items": 399,
-  "status_ok_items_in_input": 108,
-  "items_with_no_retrieval_result_in_input": 31,
-  "filtered_items": 26,
-  "criterion": "Keep items from the entity-ambiguous subset where status == \"ok\" and trajectory contains at least one action == \"no_retrieval_result\"."
-}

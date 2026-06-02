@@ -17,7 +17,7 @@ for k in [
 ]:
     os.environ.pop(k, None)
 
-DEFAULT_RESULT_DIR = Path("/home/you/FlashRAG/exps/idea10/data/result/2026_04_10_12_53_48_first_round_oracle_rewrite_experiment")
+DEFAULT_RESULT_DIR = Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_GPT_5.1/RefAmb_2026_05_30_13_01_refamb_oven_gpt_5_1_ca_stage")
 SAVE_NAME = "gpt_acc_score.json"
 MAX_RETRIES = 5
 RETRY_SLEEP_SECONDS = 10
@@ -134,7 +134,9 @@ def score_one(metric, pred, golden_answers):
     last_error = None
     for attempt in range(1, MAX_RETRIES + 1):
         try:
-            return metric.calculate_acc(pred, golden_answers)
+            result = metric.calculate_acc(pred, golden_answers)
+            # print(f"Score: {result} (attempt {attempt})")
+            return result
         except Exception as exc:
             last_error = exc
             if attempt == MAX_RETRIES:

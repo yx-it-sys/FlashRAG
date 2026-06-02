@@ -498,7 +498,19 @@ class Index_Builder:
         else:
             modal_dict = {self.index_modal: None}
         for modal, _ in modal_dict.items():
-            encode_data = [item[modal] for item in self.corpus]
+            if modal == "text":
+                encode_data = []
+                for item in self.corpus:
+                    if "text" in item and item["text"] is not None:
+                        encode_data.append(item["text"])
+                    elif "contents" in item and item["contents"] is not None:
+                        encode_data.append(item["contents"])
+                    else:
+                        raise KeyError(
+                            "CLIP text index building requires a `text` or `contents` field in the corpus."
+                        )
+            else:
+                encode_data = [item[modal] for item in self.corpus]
             if self.gpu_num > 1:
                 print("Use multi gpu!")
                 self.batch_size = self.batch_size * self.gpu_num

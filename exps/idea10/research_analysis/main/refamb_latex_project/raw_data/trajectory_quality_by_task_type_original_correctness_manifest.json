@@ -1,0 +1,30 @@
+{
+  "correct": {
+    "csv": "/home/you/FlashRAG/exps/idea10/idea_reports/papers/raw_data/trajectory_quality_by_task_type_original_correct.csv",
+    "json": "/home/you/FlashRAG/exps/idea10/idea_reports/papers/raw_data/trajectory_quality_by_task_type_original_correct_summary.json",
+    "tex": "/home/you/FlashRAG/exps/idea10/idea_reports/papers/raw_data/refamb_trajectory_quality_by_task_type_original_correct.tex",
+    "split_sample_count": 427,
+    "records": 791,
+    "tasks": [
+      "Entity Recognition",
+      "Single-hop Attribute Query",
+      "Multi-hop",
+      "Comparison",
+      "Subproblem Aggregation"
+    ]
+  },
+  "incorrect": {
+    "csv": "/home/you/FlashRAG/exps/idea10/idea_reports/papers/raw_data/trajectory_quality_by_task_type_original_incorrect.csv",
+    "json": "/home/you/FlashRAG/exps/idea10/idea_reports/papers/raw_data/trajectory_quality_by_task_type_original_incorrect_summary.json",
+    "tex": "/home/you/FlashRAG/exps/idea10/idea_reports/papers/raw_data/refamb_trajectory_quality_by_task_type_original_incorrect.tex",
+    "split_sample_count": 1073,
+    "records": 2188,
+    "tasks": [
+      "Entity Recognition",
+      "Single-hop Attribute Query",
+      "Multi-hop",
+      "Comparison",
+      "Subproblem Aggregation"
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+task_type,Original_rte,Original_lj_score,Original_iter,Original_delta_f_avg,Original_u_avg,Original_flip_ratio,Disturb_rte,Disturb_lj_score,Disturb_iter,Disturb_delta_f_avg,Disturb_u_avg,Disturb_flip_ratio,Oracle_rte,Oracle_lj_score,Oracle_iter,Oracle_delta_f_avg,Oracle_u_avg,Oracle_flip_ratio
+Entity Recognition,0.405,1.000,1.630,0.702,0.615,--,0.419,0.739,2.870,0.762,0.504,0.261,0.500,0.923,2.769,0.783,0.595,0.077
+Single-hop Attribute Query,0.637,1.000,1.731,0.798,0.765,--,0.501,0.872,2.410,0.844,0.575,0.128,0.364,0.000,2.000,0.772,0.500,1.000
+Multi-hop,0.623,1.000,2.172,0.782,0.754,--,0.523,0.852,2.574,0.815,0.619,0.148,--,--,--,--,--,--
+Comparison,0.489,1.000,2.409,0.737,0.615,--,0.403,0.767,3.070,0.761,0.493,0.233,--,--,--,--,--,--
+Subproblem Aggregation,0.506,1.000,2.566,0.639,0.785,--,0.433,0.847,3.105,0.730,0.617,0.153,0.680,1.000,2.500,0.728,0.917,0.000

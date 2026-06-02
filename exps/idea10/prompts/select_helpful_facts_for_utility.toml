@@ -13,6 +13,8 @@ Return the subset of facts that are helpful for answering the Current Sub-questi
 Core principle:
 - Judge usefulness relative to solving the Current Sub-question.
 - Use the Post-retrieval Thought as evidence of what information the model treats as helpful, usable, or supportive.
+- The Post-retrieval Thought is the highest-priority signal.
+- If the Post-retrieval Thought explicitly says the retrieval result does not provide the needed information, does not help answer the sub-question, is irrelevant, or is insufficient, then you must return "helpful_facts": [].
 - A fact can be helpful even if the sub-question is not fully solved yet.
 - A fact is not helpful if it is irrelevant, off-target, redundant to the sub-question, or explicitly treated as unhelpful by the Thought.
 - Prefer the largest helpful support subset rather than only the smallest directly-answering subset.
@@ -24,7 +26,7 @@ Usefulness rules:
 2. Keep a fact if it supports an intermediate step needed to answer the Current Sub-question.
 3. Keep a fact if the Post-retrieval Thought clearly uses or relies on it.
 4. Remove a fact if it is unrelated to the sub-question, even if it is true.
-5. Remove a fact if the Thought explicitly says the retrieval result does not provide the needed information and the fact does not contribute usable evidence.
+5. If the Thought explicitly says the retrieval result does not provide the needed information, does not help, is irrelevant, or is insufficient, return an empty helpful_facts list immediately.
 6. Be conservative about irrelevant facts, but not about jointly supportive ones.
 
 Grounding rules:

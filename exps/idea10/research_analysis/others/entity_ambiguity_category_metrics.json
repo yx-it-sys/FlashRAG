@@ -1,0 +1,77 @@
+{
+  "meta": {
+    "num_samples": 1199,
+    "missing_category_ids": [],
+    "missing_iteration_ids": [],
+    "mixed_label_samples_under_first_step_rule": 76,
+    "category_rule": "Use the first LLM-labeled text-retrieval query category in each sample; if no labeled text query exists, assign No.",
+    "iteration_rule": "Count retrieval-result turns in omnisearch_trajectories.jsonl, i.e. the number of text_retrieval_result, image_retrieval_result, and no_retrieval_result nodes."
+  },
+  "categories": [
+    {
+      "category": "No",
+      "count": 830,
+      "avg_iterations": 3.0301204819277108,
+      "avg_query_count": 2.480722891566265,
+      "metrics": {
+        "gpt_acc": 0.27349397590361446,
+        "f1": 0.28197250759473536,
+        "recall": 0.43680876626309306,
+        "precision": 0.25662008724654506,
+        "rouge-l": 0.21190887361607977
+      }
+    },
+    {
+      "category": "Object Identification",
+      "count": 209,
+      "avg_iterations": 4.138755980861244,
+      "avg_query_count": 2.9665071770334928,
+      "metrics": {
+        "gpt_acc": 0.04784688995215311,
+        "f1": 0.1489475625715426,
+        "recall": 0.2708892551978412,
+        "precision": 0.1256893061692598,
+        "rouge-l": 0.14725714555751052
+      }
+    },
+    {
+      "category": "Indirect Entity Ambiguity",
+      "count": 68,
+      "avg_iterations": 4.044117647058823,
+      "avg_query_count": 3.9558823529411766,
+      "metrics": {
+        "gpt_acc": 0.029411764705882353,
+        "f1": 0.16437899754417634,
+        "recall": 0.3568025464766723,
+        "precision": 0.1277010785572882,
+        "rouge-l": 0.1503236941187974
+      }
+    },
+    {
+      "category": "Description",
+      "count": 87,
+      "avg_iterations": 3.7126436781609193,
+      "avg_query_count": 3.1954022988505746,
+      "metrics": {
+        "gpt_acc": 0.06896551724137931,
+        "f1": 0.18425384918153007,
+        "recall": 0.32095593524893196,
+        "precision": 0.17285886254196697,
+        "rouge-l": 0.1634954442261376
+      }
+    },
+    {
+      "category": "No Object Involved",
+      "count": 5,
+      "avg_iterations": 3.2,
+      "avg_query_count": 2.6,
+      "metrics": {
+        "gpt_acc": 0.2,
+        "f1": 0.26828457820121415,
+        "recall": 0.48655677655677654,
+        "precision": 0.21292055897319054,
+        "rouge-l": 0.1239417954480983
+      }
+    }
+  ]
+}

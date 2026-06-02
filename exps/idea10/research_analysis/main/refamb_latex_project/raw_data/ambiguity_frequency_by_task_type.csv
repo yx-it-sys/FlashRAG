@@ -1,0 +1,13 @@
+task_type,scale,total,ambiguous,frequency
+Overall,Item scale,1500,460,30.67%
+Overall,Query scale,4433,1412,31.85%
+Entity Recognition,Item scale,300,79,26.33%
+Entity Recognition,Query scale,534,235,44.01%
+Single-hop Attribute Query,Item scale,300,141,47.00%
+Single-hop Attribute Query,Query scale,999,474,47.45%
+Multi-hop,Item scale,300,125,41.67%
+Multi-hop,Query scale,1070,361,33.74%
+Comparison,Item scale,300,99,33.00%
+Comparison,Query scale,1031,313,30.36%
+Subproblem Aggregation,Item scale,300,16,5.33%
+Subproblem Aggregation,Query scale,799,29,3.63%

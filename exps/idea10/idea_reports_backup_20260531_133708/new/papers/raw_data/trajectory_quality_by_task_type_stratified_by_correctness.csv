@@ -1,0 +1,25 @@
+task_type,correctness,ambiguity,n,rte,iter,delta_f_avg,u_avg,lj_score,disturb_flip_ratio,oracle_flip_ratio
+Entity Recognition,Correct,Ambiguous,12,0.614,1.083,0.859,0.667,1.000,,0.250
+Entity Recognition,Correct,Non-ambiguous,27,0.700,1.148,0.850,0.824,1.000,0.296,
+Entity Recognition,Incorrect,Ambiguous,65,0.257,3.431,0.496,0.451,0.000,0.000,0.338
+Entity Recognition,Incorrect,Non-ambiguous,63,0.235,3.429,0.445,0.483,0.000,0.159,0.000
+Single-hop Attribute Query,Correct,Ambiguous,2,0.603,2.000,0.970,0.625,1.000,0.000,0.500
+Single-hop Attribute Query,Correct,Non-ambiguous,36,0.738,1.306,0.810,0.930,1.000,0.389,
+Single-hop Attribute Query,Incorrect,Ambiguous,135,0.128,4.096,0.383,0.270,0.000,0.031,0.148
+Single-hop Attribute Query,Incorrect,Non-ambiguous,101,0.348,3.248,0.483,0.572,0.000,0.109,0.250
+Multi-hop,Correct,Ambiguous,8,0.601,2.375,0.786,0.760,1.000,0.125,0.250
+Multi-hop,Correct,Non-ambiguous,28,0.696,1.571,0.792,0.848,1.000,0.286,0.000
+Multi-hop,Incorrect,Ambiguous,110,0.197,3.500,0.467,0.315,0.000,0.049,0.118
+Multi-hop,Incorrect,Non-ambiguous,152,0.289,2.934,0.498,0.471,0.000,0.066,0.167
+Comparison,Correct,Ambiguous,5,0.273,1.200,0.752,0.694,1.000,0.667,0.600
+Comparison,Correct,Non-ambiguous,42,0.675,1.500,0.818,0.827,1.000,0.476,0.000
+Comparison,Incorrect,Ambiguous,80,0.149,3.525,0.426,0.257,0.000,0.043,0.175
+Comparison,Incorrect,Non-ambiguous,169,0.255,2.976,0.490,0.425,0.000,0.118,0.077
+Subproblem Aggregation,Correct,Ambiguous,1,0.486,2.000,0.699,0.750,1.000,0.000,0.000
+Subproblem Aggregation,Correct,Non-ambiguous,180,0.570,2.300,0.697,0.859,1.000,0.339,0.000
+Subproblem Aggregation,Incorrect,Ambiguous,4,0.201,3.000,0.668,0.306,0.000,0.000,0.250
+Subproblem Aggregation,Incorrect,Non-ambiguous,102,0.385,3.216,0.555,0.629,0.000,0.284,0.667
+Macro-average,Correct,Ambiguous,28,0.515,1.732,0.813,0.699,1.000,0.198,0.320
+Macro-average,Correct,Non-ambiguous,313,0.676,1.565,0.793,0.858,1.000,0.357,0.000
+Macro-average,Incorrect,Ambiguous,394,0.186,3.510,0.488,0.320,0.000,0.025,0.206
+Macro-average,Incorrect,Non-ambiguous,587,0.302,3.161,0.494,0.516,0.000,0.147,0.232

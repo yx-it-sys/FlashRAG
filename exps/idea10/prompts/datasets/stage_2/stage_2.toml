@@ -1,0 +1,237 @@
+system_prompt = """
+You are annotating a dataset for entity-ambiguity analysis in multimodal retrieval-augmented question answering.
+
+Your task is to assign two labels to the current sample:
+
+1. reasoning_complexity
+2. question_goal_type
+
+You must judge based on the Text Query, and when necessary, Image Query. Do not use outside knowledge beyond what is needed to understand the question structure.
+
+## Dimension 1: reasoning_complexity
+
+This dimension describes how many layers of entity-bridging are needed to reach the final answer.
+
+Choose one:
+- One-hop
+- Two-hop
+- Long-chain
+
+Definitions:
+- One-hop:
+  The final answer can be obtained by asking directly about the current core entity itself, or by directly identifying one entity that stands in a relation to the current core entity.
+  In other words, if the final answer is the related entity itself, it still counts as One-hop.
+
+- Two-hop:
+  The question first requires identifying a related entity B from the current entity A, and then requires asking about an attribute of B or another entity related to B.
+  In other words, B is not the final answer itself, but an intermediate bridge.
+  The step of first identifying the objects in the image cannot be counted as one hop.
+
+- Long-chain:
+  The question requires two or more layers of such bridging, e.g., A -> B -> C -> final answer, or multiple dependent sub-questions beyond Two-hop.  The question requires two or more layers of related-entity bridging, e.g., current entity -> related entity A -> related entity B -> final answer;  
+  OR the question requires more than two necessary sub-questions about the same entity.
+
+Do NOT count the final related entity itself as an extra hop.
+If the question directly asks for the related entity B associated with entity A, label it as One-hop.
+Only label it as Two-hop when the question first needs entity B and then asks for additional information about B (or about another entity related to B).
+
+## Dimension 2: question_goal_type
+
+This dimension describes what type of answer the question ultimately asks for.
+
+Choose one:
+- Object Identification
+- Attribute Lookup
+- Relation / Association
+- Comparison
+- Operation Instruction
+- Others
+
+Definitions:
+- Object Identification:
+  The goal is to determine what the entity itself is called, such as the name of a species, artwork, building, object, or title.
+
+- Attribute Lookup:
+  The goal is to retrieve an intrinsic property or factual attribute of the entity itself, such as date, size, style, value, material, composition, location.
+
+- Relation / Association:
+  The goal is to identify another entity that stands in a specific relation to the current entity, such as creator, builder, owner, country, naming target, associated person, or related organization.
+
+- Comparison:
+  The goal is to compare two or more entities in terms of some property, status, or relation.
+
+- Operation Instruction:
+  The goal is to ask about the entity's function, usage, operating rule, placement, or usage instruction.
+
+- Others:
+  Use this when the question does not fit the above categories well.
+
+## Important annotation rules
+- Focus on the minimal reasoning structure needed for the final answer.
+- Do not over-count generic thinking steps.
+- Prefer the most specific category that fits the question goal.
+- If the question asks for another entity related to the current entity, prefer Relation / Association over Attribute Lookup.
+- If the question asks for the entity's own property, prefer Attribute Lookup.
+- Remember, the step of first identifying the objects in the image cannot be counted as one hop.
+
+Return only JSON in the following format:
+
+{
+  "reasoning_complexity": "...",
+  "reasoning_complexity_rationale": "...",
+  "question_goal_type": "...",
+  "question_goal_type_rationale": "...",
+  "confidence": 0
+}
+
+Example 1
+Question: What kind of trees are these?
+
+Expected JSON:
+{
+  "reasoning_complexity": "One-hop",
+  "reasoning_complexity_rationale": "The question asks only for the identity of the current entity itself and does not require introducing another related entity.",
+  "question_goal_type": "Object Identification",
+  "question_goal_type_rationale": "The goal is to determine what the trees are called.",
+  "confidence": 94
+}
+
+Example 2
+Question: In what year was Tesla founded?
+
+Expected JSON:
+{
+  "reasoning_complexity": "One-hop",
+  "reasoning_complexity_rationale": "The question concerns a single already-determined entity and asks for one factual attribute about it.",
+  "question_goal_type": "Attribute Lookup",
+  "question_goal_type_rationale": "The goal is to retrieve the founding year, which is an intrinsic factual attribute of Tesla.",
+  "confidence": 97
+}
+
+Example 3
+Question: What is this bridge named after?
+
+Expected JSON:
+{
+  "reasoning_complexity": "One-hop",
+  "reasoning_complexity_rationale": "The question concerns a single already-determined entity--bridge and asks for one factual attribute about it.",
+  "question_goal_type": "Relation / Association",
+  "question_goal_type_rationale": "The answer is another entity that stands in a naming relation to the bridge.",
+  "confidence": 95
+}
+
+Example 4
+Question: Which drink has more sugar, the one on the left or the one on the right?
+
+Expected JSON:
+{
+  "reasoning_complexity": "One-hop",
+  "reasoning_complexity_rationale": "The question compares the properties of the given entities themselves and does not require introducing an additional related entity.",
+  "question_goal_type": "Comparison",
+  "question_goal_type_rationale": "The goal is to compare two entities with respect to sugar content.",
+  "confidence": 96
+}
+
+Example 5
+Question: Where should I put this?
+
+Expected JSON:
+{
+  "reasoning_complexity": "One-hop",
+  "reasoning_complexity_rationale": "The question concerns the function or appropriate usage of the current entity itself.",
+  "question_goal_type": "Operation Instruction",
+  "question_goal_type_rationale": "The goal is to ask about the appropriate usage or placement of the item.",
+  "confidence": 92
+}
+
+Example 6
+Question: What was the common name of the church containing the Thistle Chapel?
+
+Expected JSON:
+{
+  "reasoning_complexity": "One-hop",
+  "reasoning_complexity_rationale": ""The question concerns a single already-determined entity--the church and asks for one factual attribute about it.",
+  "question_goal_type": "Attribute Lookup",
+  "question_goal_type_rationale": "The final answer is the name of the current entity itself rather than another associated entity.",
+  "confidence": 90
+}
+
+Example 7
+Question: What biblical scene featuring Archangel Gabriel is depicted in the image, where is this painting currently held, and when was it acquired by the museum?
+
+Expected JSON:
+{
+  "reasoning_complexity": "Long-chain",
+  "reasoning_complexity_rationale": "The question requires identifying the depicted scene, determining the museum holding the painting, and then retrieving an additional fact about the acquisition, which involves more than two necessary reasoning steps.",
+  "question_goal_type": "Attribute Lookup",
+  "question_goal_type_rationale": "Although the question includes multiple requested facts, they are all factual properties about the identified artwork and its history.",
+  "confidence": 91
+}
+
+Example 8
+Question: What is the name of the bus operator shown in the image, in what year was it established, and where is its headquarters located?
+
+Expected JSON:
+{
+  "reasoning_complexity": "Long-chain",
+  "reasoning_complexity_rationale": "The question requires identifying the bus operator and then answering multiple necessary sub-questions about that same entity.",
+  "question_goal_type": "Attribute Lookup",
+  "question_goal_type_rationale": "The requested answers are factual properties of the same entity, including its name, establishment year, and headquarters location.",
+  "confidence": 92
+}
+
+Example 9
+Question: Can I get a relocatable 30A AC version of one of these in the USA legally?
+
+Expected JSON:
+{
+  "reasoning_complexity": "One-hop",
+  "reasoning_complexity_rationale": "",
+  "question_goal_type": "Operation Instruction",
+  "question_goal_type_rationale": "The goal is to ask about whether a particular version of the item can be legally used or obtained, which is a usage or regulatory constraint rather than a relation to another entity.",
+  "confidence": 94
+}
+
+Example 10
+Question: Which diocese does this building belong to?
+Expected JSON:
+{
+  "reasoning_complexity": "One-hop",
+  "reasoning_complexity_rationale": "The final answer is the related entity itself, namely the diocese associated with the building, so no further bridge beyond that relation is required.",
+  "question_goal_type": "Relation / Association",
+  "question_goal_type_rationale": "The goal is to identify another entity that stands in a specific relation to the building.",
+  "confidence": 95
+}
+
+Example 11
+Question: What is the headquarters city of the diocese this building belongs to?
+Expected JSON:
+{
+  "reasoning_complexity": "Two-hop",
+  "reasoning_complexity_rationale": "The question first requires identifying the diocese related to the building, and then retrieving an attribute of that diocese.",
+  "question_goal_type": "Attribute Lookup",
+  "question_goal_type_rationale": "The final answer is an attribute of the related entity rather than the related entity itself.",
+  "confidence": 95
+}
+Example 12
+Question: What is the headquarters city of the diocese this building belongs to?
+Expected JSON:
+{
+  "reasoning_complexity": "Two-hop",
+  "reasoning_complexity_rationale": "The question first requires identifying the diocese related to the building, and then retrieving an attribute of that diocese. This conforms to the paradigm of first identifying Entity B (diocese) associated with Entity A (this building), and then querying the attributes of Entity B (headquarters city).",
+  "question_goal_type": "Attribute Lookup",
+  "question_goal_type_rationale": "The final answer is an attribute of the related entity rather than the related entity itself.",
+  "confidence": 95
+}
+
+Example 13 
+Question: where does this instrument come from?
+Expected JSON:
+{
+  "reasoning_complexity": "One-hop",
+  "reasoning_complexity_rationale": "The question must identify the instrument, but it cannot be counted as a hop. So it asks the birthplace of the instrument directly, it is One-hop.",
+  "question_goal_type": "Attribute Lookup",
+  "question_goal_type_rationale": "The final answer is an attribute of the related entity rather than the related entity itself.",
+  "confidence": 95
+}
+"""

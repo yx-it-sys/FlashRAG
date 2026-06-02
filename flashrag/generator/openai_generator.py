@@ -22,6 +22,15 @@ def get_background_loop():
 class OpenaiGenerator:
     """Class for api-based openai models"""
 
+    RETRYABLE_API_ERROR_NAMES = {
+        "RateLimitError",
+        "APIConnectionError",
+        "APITimeoutError",
+        "APIStatusError",
+        "InternalServerError",
+    }
+    RETRYABLE_API_STATUS_CODES = {408, 409, 425, 429, 500, 502, 503, 504}
+
     def __init__(self, config):
         self._config = config
         self.update_config()
@@ -58,28 +67,47 @@ class OpenaiGenerator:
 
         self.openai_setting = self._config["openai_setting"]
         if self.openai_setting["api_key"] is None:
-            self.openai_setting["api_key"] = os.getenv("OPENAI_API_KEY")
+            self.openai_setting["api_key"] = os.getenv("SILICONFLOW_API_KEY")
 
     def update_additional_setting(self):
         pass
+
+    def _is_retryable_api_error(self, exc):
+        if not isinstance(exc, Exception):
+            return False
+        if exc.__class__.__name__ in self.RETRYABLE_API_ERROR_NAMES:
+            return True
+        status_code = getattr(exc, "status_code", None)
+        if status_code in self.RETRYABLE_API_STATUS_CODES:
+            return True
+        cause = getattr(exc, "__cause__", None)
+        if cause is not None and self._is_retryable_api_error(cause):
+            return True
+        return False
     
     async def _get_response(self, messages: Union[list, str], mode: str = 'chat', **params):
-        print(messages)
-        print("----asd-asd-a--------")
-        if mode == 'chat':
-            response = await self.client.chat.completions.create(
-                model=self.model_name, messages=messages, **params
-            )
-            if not response.choices:
-                raise ValueError("No choices returned from API.")
-            return response.choices[0]
-        else:
-            response = await self.client.completions.create(
-                model=self.model_name, prompt=messages, **params
-            )
-            if not response.choices:
-                raise ValueError("No choices returned from API.")
-            return response.choices[0]
+        delay = 2
+        max_retries = 5
+        for attempt in range(max_retries):
+            try:
+                if mode == 'chat':
+                    response = await self.client.chat.completions.create(
+                        model=self.model_name, messages=messages, **params
+                    )
+                    if not response.choices:
+                        raise ValueError("No choices returned from API.")
+                    return response.choices[0]
+                response = await self.client.completions.create(
+                    model=self.model_name, prompt=messages, **params
+                )
+                if not response.choices:
+                    raise ValueError("No choices returned from API.")
+                return response.choices[0]
+            except Exception as e:
+                if not self._is_retryable_api_error(e) or attempt == max_retries - 1:
+                    raise
+                await asyncio.sleep(delay)
+                delay *= 2
 
     async def _get_batch_response(self, input_list: List[List], batch_size, mode, **params):
         tasks = [self._get_response(messages, mode, **params) for messages in input_list]

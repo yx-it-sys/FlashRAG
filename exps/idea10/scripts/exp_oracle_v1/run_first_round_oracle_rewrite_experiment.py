@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 import argparse
 import csv
+import gc
 import json
 import os
 import re
+import subprocess
 import sys
 import time
 from collections import Counter
@@ -25,21 +27,39 @@ for k in [
 ROOT = Path("/home/you/FlashRAG")
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+PROJECT_ROOT = ROOT / "exps" / "idea10"
 
 from flashrag.config import Config
 from flashrag.dataset.dataset import Dataset
 from flashrag.pipeline import OmniSearchPipeline
-from flashrag.utils import get_dataset, get_generator
+from flashrag.utils import get_generator
 
 
-DEFAULT_CONFIG = Path("/home/you/FlashRAG/exps/idea10/configs/config.yaml")
+DEFAULT_CONFIG = Path("/home/you/FlashRAG/exps/idea10/configs/configs_refamb/intervl3_5_8b/config_stage_crag.yaml")
 DEFAULT_BASELINE_RESULT_DIR = Path(
-    "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_03_31_14_06_experiment"
+    "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_InternVL3.5-8B/RefAmb_2026_05_09_15_53_refamb_oven_intervl3_5_8b_stage"
 )
 DEFAULT_REWRITE_LABEL_PATH = (
-    DEFAULT_BASELINE_RESULT_DIR / "label/deepseek/trajectory_annotation.llm_labeled.rewrite_deepseek.jsonl"
+    DEFAULT_BASELINE_RESULT_DIR
+    / "label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.rewrite.jsonl"
 )
+ROOT_RESULT_DIRS = [
+    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_qwen3_vl_32b"),
+    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-8b"),
+    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-4B"),
+]
+ORACLE_REWRITE_LABEL_REL_PATH = Path(
+    "label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.rewrite.jsonl"
+)
+MULTI_SOURCE_OUTPUT_DIR_NAME = "first_round_oracle_rewrite"
+SLEEP_AFTER_CLEANUP_SECONDS = 3
+PKILL_PATTERNS = [
+    "vllm",
+    "api_server",
+    "openai.api_server",
+]
 DEFAULT_MAX_TURNS = 5
+SUBSET_SPLIT_NAME = "task_balanced_analysis_subset"
 
 
 class FrameworkConfig(dict):
@@ -57,8 +77,8 @@ class FrameworkConfig(dict):
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Replay OmniSearch on the subset whose first text-retrieval query is entity-ambiguous, "
-            "forcing the first retrieval query to the oracle rewrite and leaving later turns untouched."
+            "Replay OmniSearch on the subset whose first entity-ambiguous text-retrieval query "
+            "is rewritten with the oracle query, while preserving subsequent turns."
         )
     )
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
@@ -71,6 +91,49 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skip-eval", action="store_true")
     parser.add_argument("--max-turns", type=int, default=DEFAULT_MAX_TURNS)
     return parser.parse_args()
+
+
+def discover_source_dirs() -> list[Path]:
+    source_dirs: list[Path] = []
+    for root_dir in ROOT_RESULT_DIRS:
+        if not root_dir.exists():
+            raise FileNotFoundError(f"Root result dir not found: {root_dir}")
+        for child in sorted(root_dir.iterdir()):
+            if not child.is_dir() or not child.name.endswith("_stage"):
+                continue
+            config_path = child / "config_oracle.yaml"
+            rewrite_label_path = child / ORACLE_REWRITE_LABEL_REL_PATH
+            if config_path.exists() and rewrite_label_path.exists():
+                source_dirs.append(child)
+
+    if not source_dirs:
+        raise RuntimeError(
+            "No runnable source dirs found under ROOT_RESULT_DIRS; "
+            "expected *_stage directories with config_oracle.yaml and oracle rewrite label file."
+        )
+    return source_dirs
+
+
+def cleanup_gpu_processes() -> None:
+    gc.collect()
+    try:
+        import torch  # type: ignore
+
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            torch.cuda.ipc_collect()
+    except Exception as exc:  # noqa: BLE001
+        print(f"[Cleanup] torch cleanup skipped: {exc}", flush=True)
+
+    for pattern in PKILL_PATTERNS:
+        subprocess.run(
+            ["pkill", "-f", pattern],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+
+    time.sleep(SLEEP_AFTER_CLEANUP_SECONDS)
 
 
 def read_jsonl(path: Path) -> list[dict]:
@@ -131,6 +194,61 @@ def build_framework_config(config: Config) -> FrameworkConfig:
     return FrameworkConfig(deepcopy(config.final_config))
 
 
+def resolve_data_root(config: FrameworkConfig) -> Path:
+    data_dir = Path(config["data_dir"])
+    if not data_dir.is_absolute():
+        data_dir = (PROJECT_ROOT / data_dir).resolve()
+    return data_dir
+
+
+def sample_id_of(item: dict) -> str:
+    for key in ("id", "annotation_id", "data_id"):
+        value = item.get(key)
+        if isinstance(value, str) and value.strip():
+            return value
+    return ""
+
+
+def iter_labeled_query_steps(item: dict):
+    query_steps = item.get("query_steps")
+    if isinstance(query_steps, list):
+        for ordinal, step in enumerate(query_steps, start=1):
+            if not isinstance(step, dict):
+                continue
+            yield {
+                "ordinal": ordinal,
+                "step_id": step.get("step_index", ordinal),
+                "text_query": step.get("text_query"),
+                "rewrite_query": step.get("rewrite_query"),
+                "sub_question": step.get("sub_question"),
+                "llm_label": step.get("llm_label"),
+            }
+        return
+
+    trajectory = item.get("trajectory")
+    if not isinstance(trajectory, list):
+        return
+
+    ordinal = 0
+    for step_idx, step in enumerate(trajectory):
+        if not isinstance(step, dict):
+            continue
+        if step.get("action") != "search":
+            continue
+        text_query = parse_text_retrieval_query(step.get("content", ""))
+        if not text_query:
+            continue
+        ordinal += 1
+        yield {
+            "ordinal": ordinal,
+            "step_id": step_idx + 1,
+            "text_query": text_query,
+            "rewrite_query": step.get("rewrite_query"),
+            "sub_question": "",
+            "llm_label": step.get("llm_label"),
+        }
+
+
 def build_rewrite_map(
     rewrite_label_path: Path,
     selected_ids: set[str] | None = None,
@@ -143,10 +261,10 @@ def build_rewrite_map(
 
     for item in read_jsonl(rewrite_label_path):
         total += 1
-        annotation_id = item.get("annotation_id")
+        annotation_id = sample_id_of(item)
         if not annotation_id:
             continue
-        query_steps = item.get("query_steps", [])
+        query_steps = list(iter_labeled_query_steps(item))
         any_flag = any(
             (step.get("llm_label") or {}).get("entity_ambiguous") == "Yes"
             for step in query_steps
@@ -154,10 +272,14 @@ def build_rewrite_map(
         if any_flag:
             any_yes += 1
 
-        first_step = next((step for step in query_steps if isinstance(step, dict)), None)
+        first_step = next(
+            (
+                step for step in query_steps
+                if (step.get("llm_label") or {}).get("entity_ambiguous") == "Yes"
+            ),
+            None,
+        )
         if not first_step:
-            continue
-        if (first_step.get("llm_label") or {}).get("entity_ambiguous") != "Yes":
             continue
         first_yes += 1
 
@@ -173,20 +295,21 @@ def build_rewrite_map(
             "annotation_id": annotation_id,
             "question": item.get("question"),
             "status": item.get("status"),
-            "query_count": item.get("query_count"),
+            "query_count": item.get("query_count") or len(query_steps),
             "oracle_first_query": rewrite_query,
             "original_labeled_first_query": first_step.get("text_query"),
             "sub_question": first_step.get("sub_question"),
-            "rewrite_query_step_index": first_step.get("step_index"),
+            "rewrite_query_step_index": first_step.get("step_id"),
+            "rewrite_query_ordinal": first_step.get("ordinal"),
             "llm_label": deepcopy(first_step.get("llm_label")),
-            "answers": deepcopy(item.get("Answers")),
+            "answers": deepcopy(item.get("Answers") or item.get("answer")),
         }
 
     summary = {
         "total_items": total,
         "items_with_any_entity_ambiguity": any_yes,
-        "items_with_first_step_entity_ambiguity": first_yes,
-        "items_with_first_step_entity_ambiguity_and_rewrite": first_yes_with_rewrite,
+        "items_with_first_ambiguous_text_query": first_yes,
+        "items_with_first_ambiguous_text_query_and_rewrite": first_yes_with_rewrite,
         "selected_after_optional_id_filter": len(rewrite_map),
     }
     return rewrite_map, summary
@@ -203,20 +326,39 @@ def load_baseline_maps(result_dir: Path) -> tuple[dict[str, dict], dict[str, dic
     return trajectory_map, intermediate_map
 
 
-def get_validation_dataset(all_split: dict) -> Dataset:
-    dataset = all_split.get("validation")
-    if dataset is None:
-        available = sorted(all_split.keys())
-        raise ValueError(
-            f"Validation dataset is missing from get_dataset(config). Available splits: {available}"
-        )
-    if not isinstance(dataset, Dataset):
-        raise TypeError(f"Expected Dataset for validation split, got {type(dataset).__name__}")
-    return dataset
+def load_source_subset_rows(config: FrameworkConfig) -> list[dict]:
+    data_dir = Path(config["data_dir"])
+    if not data_dir.is_absolute():
+        data_dir = (PROJECT_ROOT / data_dir).resolve()
+    subset_path = data_dir / config["dataset_name"] / f"{SUBSET_SPLIT_NAME}.jsonl"
+    source = str(config.get("source") or "").strip()
+    if not source:
+        raise ValueError("Config is missing `source`, which is required for source-based subset filtering.")
+    if not subset_path.exists():
+        raise FileNotFoundError(f"Subset file not found: {subset_path}")
+
+    selected_rows = []
+    for row in read_jsonl(subset_path):
+        if row.get("source") == source:
+            selected_rows.append(row)
+    if not selected_rows:
+        raise ValueError(f"No items with source `{source}` found in {subset_path}")
+    print(
+        f"[Dataset] Loaded {len(selected_rows)} rows for source `{source}` from {subset_path}",
+        flush=True,
+    )
+    return selected_rows
 
 
-def build_subset_dataset(full_dataset: Dataset, rewrite_map: dict[str, dict], max_samples: int | None) -> Dataset:
-    selected_items = [item for item in full_dataset.data if item.id in rewrite_map]
+def build_subset_dataset(
+    full_dataset: Dataset,
+    rewrite_map: dict[str, dict],
+    max_samples: int | None,
+) -> Dataset:
+    selected_items = [
+        item for item in full_dataset.data
+        if item.id in rewrite_map
+    ]
     selected_items.sort(key=lambda item: item.id)
     if max_samples is not None:
         selected_items = selected_items[:max_samples]
@@ -238,6 +380,18 @@ def replace_first_text_retrieval_query(response: str, new_query: str) -> str:
         return response
     prefix = match.group(1)
     return response[: match.start()] + f"{prefix}{new_query}" + response[match.end() :]
+
+
+def render_action_node(action: str, content: str) -> str:
+    if action == "thought":
+        return f"<Thought>\n{content}\n"
+    if action == "sub-question":
+        return f"<Sub-Question>\n{content}\n"
+    if action == "search":
+        return f"<Search>\n{content}\n</Search>"
+    if action == "final_answer":
+        return f"<Final Answer>\n{content}\n</Final Answer>"
+    raise ValueError(f"Unsupported trajectory action for assistant reconstruction: {action}")
 
 
 def extract_final_answer_text(response: str) -> str | None:
@@ -264,6 +418,72 @@ def build_initial_messages(pipeline: OmniSearchPipeline, question: str, image_pa
         },
     ]
     return img, messages
+
+
+def reconstruct_messages_before_target(
+    pipeline: OmniSearchPipeline,
+    question: str,
+    image_path: Path,
+    baseline_trajectory: list[dict],
+    target_query_ordinal: int,
+) -> tuple[Image.Image, list[dict], str, list[dict]]:
+    img, messages = build_initial_messages(pipeline, question, image_path)
+    assistant_buffer: list[dict] = []
+    prefix_trajectory: list[dict] = []
+    text_query_ordinal = 0
+
+    for step in baseline_trajectory:
+        if not isinstance(step, dict):
+            continue
+        action = step.get("action")
+        if action in {"thought", "sub-question", "search", "final_answer"}:
+            assistant_buffer.append(step)
+            if action != "search":
+                continue
+
+            search_content = str(step.get("content") or "")
+            if not search_content.startswith("Text Retrieval"):
+                continue
+            text_query_ordinal += 1
+            if text_query_ordinal == target_query_ordinal:
+                assistant_response = "".join(
+                    render_action_node(node["action"], str(node.get("content") or ""))
+                    for node in assistant_buffer
+                )
+                return img, messages, assistant_response, prefix_trajectory
+            continue
+
+        if action in {"text_retrieval_result", "image_retrieval_result", "no_retrieval_result"}:
+            if assistant_buffer:
+                assistant_response = "".join(
+                    render_action_node(node["action"], str(node.get("content") or ""))
+                    for node in assistant_buffer
+                )
+                messages.append({"role": "assistant", "content": assistant_response})
+                prefix_trajectory.extend(deepcopy(assistant_buffer))
+                assistant_buffer = []
+
+            retrieval_mode = str(step.get("mode") or "")
+            retrieval_content = step.get("content")
+            prefix_trajectory.append(deepcopy(step))
+            messages.append(
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": pipeline._build_followup_message(
+                                retrieval_mode, retrieval_content
+                            ),
+                        }
+                    ],
+                }
+            )
+
+    raise ValueError(
+        f"Failed to reconstruct prefix: target text retrieval ordinal {target_query_ordinal} "
+        "was not found in baseline trajectory."
+    )
 
 
 def log_sample_header(item_id: str, question: str) -> None:
@@ -298,10 +518,10 @@ def replay_one_sample(
     item,
     rewrite_meta: dict,
     max_turns: int,
+    data_root: Path,
+    baseline_trajectory_record: dict,
 ) -> dict:
-    image_path = (
-        Path(pipeline.data_dir) / pipeline.dataset_name / "images" / f"{item.image_id}.jpg"
-    )
+    image_path = data_root / pipeline.dataset_name / "images" / f"{item.image_id}.jpg"
     start_time = time.time()
     if not image_path.exists():
         return {
@@ -325,30 +545,57 @@ def replay_one_sample(
             },
         }
 
-    img, messages = build_initial_messages(pipeline, item.question, image_path)
+    baseline_trajectory = baseline_trajectory_record.get("trajectory")
+    if not isinstance(baseline_trajectory, list):
+        return {
+            "id": item.id,
+            "question": item.question,
+            "pred": "",
+            "status": "missing_baseline_trajectory",
+            "duration_seconds": 0.0,
+            "trajectory_record": {
+                "question": item.question,
+                "id": item.id,
+                "final_answer": "",
+                "status": "missing_baseline_trajectory",
+                "duration_seconds": 0.0,
+                "trajectory": [],
+            },
+            "run_meta": {
+                "oracle_rewrite_applied": False,
+                "oracle_rewrite_attempted": False,
+                "error": f"Missing baseline trajectory for {item.id}",
+            },
+        }
+
     trajectory: list[dict] = []
     oracle_rewrite_applied = False
     original_first_query = None
     oracle_first_query = rewrite_meta["oracle_first_query"]
     first_turn_expected_step_index = rewrite_meta["rewrite_query_step_index"]
+    target_query_ordinal = int(rewrite_meta.get("rewrite_query_ordinal") or 1)
     log_sample_header(item.id, item.question)
 
     try:
-        response = pipeline._generate_text(messages)
+        img, messages, response, prefix_trajectory = reconstruct_messages_before_target(
+            pipeline=pipeline,
+            question=item.question,
+            image_path=image_path,
+            baseline_trajectory=baseline_trajectory,
+            target_query_ordinal=target_query_ordinal,
+        )
+        trajectory = deepcopy(prefix_trajectory)
         response = pipeline._truncate_after_search(response)
-        log_generation_response("First Response", response)
-        if "Text Retrieval" in response:
-            generated_query = parse_text_retrieval_query(response)
-            if generated_query:
-                original_first_query = generated_query
-                response = replace_first_text_retrieval_query(response, oracle_first_query)
-                oracle_rewrite_applied = True
-                log_oracle_rewrite(original_first_query, oracle_first_query, True)
-                log_generation_response("First Response After Oracle Rewrite", response)
-            else:
-                log_oracle_rewrite(None, oracle_first_query, False)
-        else:
-            print("Oracle Rewrite: skipped because first response did not request text retrieval.")
+        original_first_query = parse_text_retrieval_query(response)
+        if original_first_query:
+            response = replace_first_text_retrieval_query(response, oracle_first_query)
+            oracle_rewrite_applied = True
+            log_oracle_rewrite(original_first_query, oracle_first_query, True)
+            print(
+                f"Rewrite baseline assistant query and retrieval query at targeted ambiguous step: "
+                f"generated={original_first_query!r}, retrieval={oracle_first_query!r}"
+            )
+        log_generation_response("Replayed Target Response", response)
         pipeline._record_response_actions(trajectory, response)
         messages.append({"role": "assistant", "content": response})
 
@@ -378,6 +625,7 @@ def replay_one_sample(
                         "original_first_query": original_first_query,
                         "oracle_first_query": oracle_first_query,
                         "rewrite_query_step_index": first_turn_expected_step_index,
+                        "rewrite_query_ordinal": target_query_ordinal,
                     },
                 }
 
@@ -393,8 +641,6 @@ def replay_one_sample(
             if need_txt_ret:
                 retrieval_mode = "text_retrieval"
                 query_txt = parse_text_retrieval_query(response)
-                if conversation_num == 0:
-                    query_txt = oracle_first_query
                 log_retrieval_step(retrieval_mode, query_txt)
                 retrieved_docs = pipeline._search_text_docs(query_txt)
                 retrieval_content = pipeline._format_retrieval_content(retrieved_docs)
@@ -406,12 +652,9 @@ def replay_one_sample(
                 retrieval_mode = "image_retrieval"
                 log_retrieval_step(retrieval_mode, query_txt)
                 retrieved_docs = pipeline._search_image_docs(img)
-                image_return_field = pipeline.config["image_retriever_config"].get(
-                    "image_retrieval_return_field", "title"
-                )
                 retrieval_content = pipeline._format_retrieval_content(
                     retrieved_docs,
-                    preferred_field=image_return_field,
+                    preferred_field="title",
                 )
                 retrieval_content = pipeline._clip_text(
                     retrieval_content, pipeline.retrieval_char_limit
@@ -475,22 +718,27 @@ def replay_one_sample(
                 "original_first_query": original_first_query,
                 "oracle_first_query": oracle_first_query,
                 "rewrite_query_step_index": first_turn_expected_step_index,
+                "rewrite_query_ordinal": target_query_ordinal,
             },
         }
     except Exception as exc:  # noqa: BLE001
         duration = time.time() - start_time
-        print(f"Inference error, hidden states ignored: {exc}")
+        error_text = f"{exc.__class__.__name__}: {exc}"
+        print(f"Inference error, hidden states ignored: {error_text}")
+        trajectory.append({"action": "error", "content": error_text})
         return {
             "id": item.id,
             "question": item.question,
             "pred": response if "response" in locals() else "",
             "status": "generation_error",
+            "error": error_text,
             "duration_seconds": duration,
             "trajectory_record": {
                 "question": item.question,
                 "id": item.id,
                 "final_answer": response if "response" in locals() else "",
                 "status": "generation_error",
+                "error": error_text,
                 "duration_seconds": duration,
                 "trajectory": trajectory,
             },
@@ -500,6 +748,7 @@ def replay_one_sample(
                 "original_first_query": original_first_query,
                 "oracle_first_query": oracle_first_query,
                 "rewrite_query_step_index": first_turn_expected_step_index,
+                "rewrite_query_ordinal": target_query_ordinal,
                 "error": f"{type(exc).__name__}: {exc}",
             },
         }
@@ -607,8 +856,7 @@ def build_paired_comparison(
     return comparison
 
 
-def main() -> None:
-    args = parse_args()
+def run_single_source(args: argparse.Namespace) -> None:
     output_dir = make_output_dir(args)
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -623,9 +871,14 @@ def main() -> None:
     }
     raw_config = Config(str(args.config), config_dict=config_override)
     config = build_framework_config(raw_config)
-    all_split = get_dataset(config)
-    full_dataset = get_validation_dataset(all_split)
-    subset_dataset = build_subset_dataset(full_dataset, rewrite_map, args.max_samples)
+    data_root = resolve_data_root(config)
+    source_subset_rows = load_source_subset_rows(config)
+    full_dataset = Dataset(config=config, data=source_subset_rows)
+    subset_dataset = build_subset_dataset(
+        full_dataset,
+        rewrite_map,
+        args.max_samples,
+    )
 
     subset_ids = {item.id for item in subset_dataset}
     rewrite_map = {sample_id: meta for sample_id, meta in rewrite_map.items() if sample_id in subset_ids}
@@ -664,6 +917,8 @@ def main() -> None:
             item=item,
             rewrite_meta=rewrite_map[item.id],
             max_turns=args.max_turns,
+            data_root=data_root,
+            baseline_trajectory_record=baseline_trajectory_map.get(item.id, {}),
         )
         predictions.append(result["pred"])
         run_results.append(result)
@@ -703,6 +958,42 @@ def main() -> None:
     write_json(output_dir / "run_summary.json", run_summary)
 
     print(json.dumps(run_summary, ensure_ascii=False, indent=2))
+
+
+def _run_multi_source(args: argparse.Namespace) -> None:
+    source_dirs = discover_source_dirs()
+    total = len(source_dirs)
+    for idx, source_dir in enumerate(source_dirs, start=1):
+        source_args = deepcopy(args)
+        source_args.config = source_dir / "config_oracle.yaml"
+        source_args.baseline_result_dir = source_dir
+        source_args.rewrite_label_path = source_dir / ORACLE_REWRITE_LABEL_REL_PATH
+        source_args.output_dir = source_dir / MULTI_SOURCE_OUTPUT_DIR_NAME
+
+        if not source_args.config.exists():
+            raise FileNotFoundError(f"Missing config: {source_args.config}")
+        if not source_args.rewrite_label_path.exists():
+            raise FileNotFoundError(f"Missing oracle rewrite label file: {source_args.rewrite_label_path}")
+
+        print(f"\n===== [{idx}/{total}] Start Oracle Replay Experiment =====", flush=True)
+        print(f"[Run] source_dir={source_dir}", flush=True)
+        print(f"[Run] config={source_args.config}", flush=True)
+        print(f"[Run] baseline_result_dir={source_args.baseline_result_dir}", flush=True)
+        print(f"[Run] rewrite_label_path={source_args.rewrite_label_path}", flush=True)
+        print(f"[Run] output_dir={source_args.output_dir}", flush=True)
+        try:
+            run_single_source(source_args)
+        finally:
+            print("[Cleanup] Releasing vLLM / CUDA-related resources.", flush=True)
+            cleanup_gpu_processes()
+        print(f"===== [{idx}/{total}] Done =====", flush=True)
+
+    print(f"\nAll {total} oracle replay experiments completed.", flush=True)
+
+
+def main() -> None:
+    args = parse_args()
+    _run_multi_source(args)
 
 
 if __name__ == "__main__":

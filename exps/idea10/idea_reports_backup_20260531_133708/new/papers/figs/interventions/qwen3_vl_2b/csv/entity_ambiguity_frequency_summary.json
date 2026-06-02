@@ -1,0 +1,19 @@
+{
+  "model": "Qwen3-vl-2B",
+  "result_dir": "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-2b",
+  "label_file_count": 0,
+  "source_file_count": 0,
+  "overall": {
+    "model": "Qwen3-vl-2B",
+    "source": "Overall",
+    "label_file": "aggregate",
+    "total_labels": 0,
+    "ambiguous_labels": 0,
+    "not_ambiguous_labels": 0,
+    "other_labels": 0,
+    "ambiguity_rate": null,
+    "ambiguity_percent": "NA"
+  },
+  "sources": [],
+  "missing_label_files": true
+}

@@ -1,5 +1,9 @@
 **/.history
 exps/data
+data/result/
+data/result/run_logs/
+exps/idea10/data/result/
+exps/idea10/data/result/run_logs/
 *.pyc
 *.egg-info
 build/

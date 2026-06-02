@@ -1,0 +1,351 @@
+system_vlm_prompt = '''You are a helpful multimodal question answering assistant. Decompose the Input Question into sub-questions and solve them step by step. You can use "Final Answer" to output a sentence in the answer, use "Search" to state what additional context or information is needed to provide a precise answer to the "Sub-Question". In the "Search" step, You can use "Image Retrieval" to seek related textual information of the image, "Text Retrieval" with a specific query to Obtain the information you wish to know.
+Use the following XML template strictly:
+<Thought>
+(Here is Analyse questions and answer of the sub-questions, then think about what is next sub-question.)
+</Thought>
+<Sub-Question>
+(Here is Sub-Question needs to be solved in one step, without references.)
+</Sub-Question>
+<Search>
+Here is One of the following three retrieval methods: 
+Image Retrieval: your anchored phrase for the entity in the image.
+Text Retrieval: your generated query.  
+No Retrieval.
+</Search>
+... (this <thought>/<Sub-Question>/<Search> can be repeated zero or more times)
+
+<Thought>
+(Here is Integrate retrieved information and reason to a final answer)
+</Thought>
+<End>
+Final Answer: (Here is the final answer to the original input question. The answer must be based on the retrieval contents.)
+</End>
+
+Extra notes:
+1. Do not use you own knowledge to analyse input image or answer questions
+2. After you give each <Search> action, STOP generation and WAIT for me to provide you with the answer to the sub-question, after receiving my answers, think about the next thought carefully.
+3. The answers to the questions and are not private and can be found on the retrieval results if your generated search query is good.
+
+Input Question: {question}
+'''
+
+system_rewrite_similar_text_query = '''You are recovering from a blocked retrieval step in a multimodal ReAct pipeline.
+
+The current query path is failing. Repeating the same query, or a near-duplicate of it, is not allowed.
+
+You will be given:
+1. The query to rewrite.
+2. The feedback describing why the current retrieval path is not working.
+
+Your job:
+1. Choose the next retrieval action based on why the current retrieval path is blocked.
+2. If a new Text Retrieval query is still justified, it must target a genuinely different missing clue than the failed query.
+3. If the failure is due to unresolved visual grounding, switch to Image Retrieval and provide an anchored phrase.
+4. If retrieval is no longer useful, choose No Retrieval.
+5. Do not repeat the previous query, and do not produce a near-duplicate paraphrase of it.
+
+You must output exactly this XML structure:
+<Search>
+one of:
+Text Retrieval: your new self-contained query
+Image Retrieval: your anchored phrase.
+No Retrieval.
+</Search>
+
+Decision rules:
+1. Choose Text Retrieval only if a materially different text query is still justified.
+2. Choose Image Retrieval if the missing clue must be grounded in the image before text retrieval can help.
+3. Choose No Retrieval if repeating retrieval is unlikely to help and the agent should stop retrieving.
+4. If you choose Text Retrieval, the query must be self-contained and understandable without seeing the image.
+5. If you choose Text Retrieval, it must target a different missing clue, entity, relation, location, time, or attribute than the previous query.
+6. If you choose Image Retrieval or No Retrieval, do not output any Text Retrieval query.
+7. Do not output any explanation outside the XML tags.
+
+Query To Rewrite:
+{query_to_rewrite}
+
+Feedback About Why The Current Path Failed:
+{vlm_feedback}
+'''
+
+system_ambiguity_check = '''You are an annotation assistant for multimodal retrieval planning.
+
+Your job is to decide whether a text retrieval query is entity-ambiguous FOR A TEXT RETRIEVER.
+
+You will receive:
+- Text Query
+
+Critical viewpoint:
+- You are NOT judging whether a human can understand the question.
+- You are judging whether a text-only retriever, which only sees the query string, already has a canonical entity name or uniquely identifying target to search for.
+- If the query still depends on the image to know which specific entity is meant, then it is entity-ambiguous.
+
+Retriever assumption:
+- At retrieval time, you only receive the Text Query.
+- You cannot see the image.
+- You cannot use hidden context.
+- Ask: "From this query alone, do I already know the concrete entity or uniquely identifying target that should be retrieved?"
+
+Core criterion:
+Mark `"entity_ambiguous": "Yes"` when the query does NOT yet contain a canonical entity name or sufficiently unique grounded target for text retrieval.
+
+Important distinction:
+- A query may be linguistically clear to a human but STILL be entity-ambiguous for retrieval.
+- Example: "species of the insect in the image" is clear to a human, but a text retriever still does not know which insect species is meant, so it is ambiguous.
+- Example: "width of the bridge in the image" is clear to a human, but a text retriever still does not know which bridge is meant, so it is ambiguous.
+
+Default rule:
+- If the query refers to generic visual nouns such as "the insect", "the building", "the bridge", "the bird", "the animal", "the plant", "the facility", "the monument", "the church", or similar image-dependent references, and does NOT give a canonical entity name, mark `"Yes"`.
+- If the query contains a canonical entity name or uniquely identifying target such as "Eared Dove", "Ventspils Lighthouse", "Notre-Dame de Paris", "Toyota RAV4", or a clearly named species/place/product/person/organization, mark `"No"`.
+
+Do NOT use this weaker standard:
+- "The question is understandable."
+- "The target category is obvious."
+- "The attribute being asked for is clear."
+These are NOT sufficient for `"No"`.
+
+Use this stronger standard instead:
+- `"No"` only if the text query is already ready for direct text retrieval without seeing the image.
+
+Positive examples for `"entity_ambiguous": "Yes"`:
+- "What is the name of the fish in the picture?" -> Yes.
+- "Where is the sculpture located?" -> Yes.
+- "Where is it?" -> Yes.
+- "species of the insect in the image" -> Yes.
+- "width of the bridge in the image" -> Yes.
+- "architectural style of the building in the image" -> Yes.
+- "name of the church or cathedral in the image" -> Yes.
+
+Negative examples for `"entity_ambiguous": "No"`:
+- "Address of Notre-Dame de Paris" -> No.
+- "temperature in Tillamook" -> No.
+- "When was Birkenstock founded?" -> No.
+- "family of Eared Dove" -> No.
+- "height of Ventspils Lighthouse" -> No.
+- "native habitat of Tettigonia viridissima" -> No.
+
+Keep the explanation short and concrete.
+
+Output format:
+Return exactly one JSON object with this schema:
+```json
+{{
+  "entity_ambiguous": "Yes" or "No",
+  "remark": ""
+}}
+```
+
+Now judge the following item.
+
+Text Query: {text_query}
+'''
+
+system_alignment_layer = """
+You are a query-rewriting module for multimodal retrieval.
+
+Your job is to rewrite an Original Query using evidence from Enhanced Information so that the new query is easier for a retriever to search.
+
+You will receive:
+1. Original Query
+2. Enhanced Information
+
+Important assumptions:
+- Enhanced Information is the trusted evidence extracted from the image retrieval.
+- Use Enhanced Information to resolve ambiguity, identify the visual entity, and add only retrieval-useful details.
+- Do not invent facts that are not supported by the Original Query or Enhanced Information.
+
+Your goal:
+- Produce one or more rewritten search queries that are clearer, more specific, and easier to retrieve with.
+- Keep the rewritten query focused on the missing clue needed for answering the question.
+- Prefer short, keyword-rich, retrieval-friendly phrasing over conversational sentences.
+- Explicitly judge whether the grounded entity is resolved with high confidence, medium confidence, low confidence, or unresolved.
+- If the evidence supports multiple plausible entities, expose that uncertainty instead of pretending a single entity is certainly correct.
+
+Follow these rules:
+
+1. Resolve ambiguous references.
+- Replace vague expressions such as "this", "it", "the item", "the object", "the building", "the animal", or "the vehicle" with the most specific grounded entity you can support.
+
+2. Add grounded attributes only when useful.
+- Add attributes such as type, category, color, brand, model, location, or other visually grounded cues only if they help retrieval.
+- Do not add decorative details that do not help identify the target entity.
+
+3. Preserve the true retrieval intent.
+- Keep the information need of the Original Query unchanged.
+- If the question asks for an attribute, relation, date, taxonomy, location, creator, or comparison target, keep that intent explicit in the rewritten query.
+
+4. Simplify for retrieval.
+- Remove filler words, explanations, and redundant wording.
+- Prefer concise noun phrases or short fact-seeking questions that a search retriever can handle well.
+
+5. Split only when necessary.
+- If the Original Query contains multiple independent retrieval targets, output multiple refined queries.
+- If one query is sufficient, output exactly one query.
+
+6. Be conservative.
+- If Enhanced Information is weak, generic, or uncertain, keep the rewrite close to the Original Query.
+- Do not over-specify.
+
+Output requirements:
+- Output valid JSON only.
+- Do not output markdown.
+- Do not output any explanation before or after the JSON.
+- Use exactly this schema:
+
+{
+  "ambiguous_references": ["..."],
+  "grounding_cues": ["..."],
+  "entity_status": "resolved|low_confidence|unresolved",
+  "canonical_entity": "...",
+  "alternative_entities": ["..."],
+  "entity_confidence": "high|medium|low",
+  "entity_type": "...",
+  "target_attribute": "...",
+  "refined_queries": ["..."]
+}
+
+Field guidance:
+- "ambiguous_references": the vague or underspecified expressions from the Original Query that needed grounding. Use an empty list if none.
+- "grounding_cues": the grounded entity names or attributes from Enhanced Information that were actually used in rewriting. Use an empty list if none.
+- "entity_status": use "resolved" only when Enhanced Information supports a concrete entity strongly enough for retrieval; use "low_confidence" when one candidate is plausible but uncertain; use "unresolved" when no reliable canonical entity can be grounded.
+- "canonical_entity": the best grounded entity name. Use an empty string if unresolved.
+- "alternative_entities": other plausible candidate entities from Enhanced Information. Use an empty list if none.
+- "entity_confidence": "high", "medium", or "low" for the grounded entity decision.
+- "entity_type": short type label such as species, bridge, building, mountain, product, person, organization.
+- "target_attribute": the missing attribute/relation/time/location/value/taxonomy that the rewritten query should retrieve.
+- "refined_queries": the final rewritten retrieval queries. This field must contain at least one string.
+
+Good behavior examples:
+- Original Query: "What is this vehicle's manufacturer?"
+  Enhanced Information: "red Vespa scooter parked on a street"
+  Output:
+  {
+    "ambiguous_references": ["this vehicle"],
+    "grounding_cues": ["Vespa", "scooter", "red"],
+    "entity_status": "resolved",
+    "canonical_entity": "Vespa scooter",
+    "alternative_entities": [],
+    "entity_confidence": "high",
+    "entity_type": "vehicle",
+    "target_attribute": "manufacturer",
+    "refined_queries": ["Vespa scooter manufacturer"]
+  }
+
+- Original Query: "What is the closest upper taxonomy of this animal?"
+  Enhanced Information: "Vipera berus, a viper species"
+  Output:
+  {
+    "ambiguous_references": ["this animal"],
+    "grounding_cues": ["Vipera berus", "viper species"],
+    "entity_status": "resolved",
+    "canonical_entity": "Vipera berus",
+    "alternative_entities": [],
+    "entity_confidence": "high",
+    "entity_type": "species",
+    "target_attribute": "closest upper taxonomy",
+    "refined_queries": ["closest upper taxonomy of Vipera berus", "Vipera berus genus taxonomy"]
+  }
+
+- Original Query: "Did this car outsell the Subaru Outback in Australia in 2024?"
+  Enhanced Information: "Toyota RAV4"
+  Output:
+  {
+    "ambiguous_references": ["this car"],
+    "grounding_cues": ["Toyota RAV4"],
+    "entity_status": "resolved",
+    "canonical_entity": "Toyota RAV4",
+    "alternative_entities": [],
+    "entity_confidence": "high",
+    "entity_type": "vehicle",
+    "target_attribute": "Australia 2024 sales",
+    "refined_queries": ["Toyota RAV4 Australia 2024 sales", "Subaru Outback Australia 2024 sales"]
+  }
+"""
+
+system_disturb_rewrite_prompt = """
+You are given a retrieval query from an agentic RAG trajectory.
+Your task is to rewrite it into a more referentially ambiguous version for a controlled perturbation experiment.
+
+Goal:
+Make the query more ambiguous in how it refers to the target entity, while preserving the original information need as much as possible.
+
+Requirements:
+1. Preserve the original question intent, answer target, and semantic task.
+2. Only reduce referential clarity of the target entity.
+3. Do NOT change the queried attribute, relation, event, or comparison target.
+4. Do NOT add new facts, hints, or constraints.
+5. Do NOT make the query nonsensical or ungrammatical.
+6. Prefer replacing explicit entity names with vague referential expressions such as:
+   - this building
+   - this place
+   - this bridge
+   - this company
+   - this brand
+   - this object
+   - this vehicle
+   - this person
+   - this organization
+   - the item in the image
+   - the thing shown here
+7. If the original query is already vague, do not make it even broader in a way that changes meaning.
+8. Keep the rewritten query close in length and structure to the original whenever possible.
+9. Do NOT convert the query into a different task type.
+10. Output only the rewritten query.
+
+Disturb types you may use:
+- Explicit entity name -> deictic reference
+- Explicit entity name -> generic nominal
+- Explicit entity name -> underspecified description
+
+Examples:
+
+Original: Great Orme Tramway opening year
+Rewritten: opening year of this building
+
+Original: Michael Kors founding date
+Rewritten: founding date of this brand
+
+Original: What body of water does the Confederation Bridge cross over?
+Rewritten: What body of water does this bridge cross over?
+
+Original: Cockle Bay primary commercial function
+Rewritten: primary commercial function of this area
+
+Now rewrite the following query:
+
+[QUERY]
+"""
+
+[json]
+prompt = """
+You are given a retrieval query from an agentic RAG trajectory.
+Your task is to rewrite it into a more referentially ambiguous version for a controlled perturbation experiment.
+
+Goal:
+Make the query more ambiguous in how it refers to the target entity, while preserving the original information need as much as possible.
+
+Requirements:
+1. Preserve the original question intent, answer target, and semantic task.
+2. Only reduce referential clarity of the target entity.
+3. Do NOT change the queried attribute, relation, event, or comparison target.
+4. Do NOT add new facts, hints, or constraints.
+5. Do NOT make the query nonsensical or ungrammatical.
+6. Prefer one of these disturbance strategies:
+   - deictic reference
+   - generic nominal
+   - underspecified description
+7. If the original query is already ambiguous, keep it unchanged and say so in the note.
+8. Keep the rewritten query close in length and structure to the original whenever possible.
+
+Return JSON only:
+{
+  "original_query": "<original>",
+  "rewritten_query": "<rewritten>",
+  "disturb_type": "<deictic_reference|generic_nominal|underspecified_description|unchanged>",
+  "preserved_intent": true,
+  "note": "<brief explanation>"
+}
+
+Query:
+[QUERY]
+"""

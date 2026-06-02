@@ -10,7 +10,7 @@ from flashrag.evaluator.evaluator import Evaluator
 
 
 DEFAULT_INTERMEDIATE_PATH = Path(
-    "/home/you/FlashRAG/exps/idea10/data/result/2026_04_10_12_53_48_first_round_oracle_rewrite_experiment/intermediate_data.json"
+    "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen2.5-vl-7B/RefAmb_2026_05_02_14_22_refamb_crag_stage/first_round_oracle_rewrite/intermediate_data.json"
 )
 DEFAULT_CONFIG_PATH = Path("/home/you/FlashRAG/exps/idea10/configs/config.yaml")
 
@@ -35,7 +35,7 @@ def load_config(config_path: Path, save_dir: Path) -> dict:
     config = dict(config)
     config["save_dir"] = str(save_dir)
     config["save_intermediate_data"] = True
-    config["save_metric_score"] = True
+    config["save_metric_score"] = False
     config["metrics"] = ["rouge-l"]
     return config
 
@@ -45,9 +45,37 @@ def load_data(intermediate_path: Path) -> list[dict]:
         return json.load(f)
 
 
+def load_metric_score(metric_score_path: Path) -> dict:
+    summary = {}
+    if not metric_score_path.exists():
+        return summary
+    with metric_score_path.open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or ":" not in line:
+                continue
+            key, value = line.split(":", 1)
+            key = key.strip()
+            value = value.strip()
+            try:
+                summary[key] = float(value)
+            except ValueError:
+                summary[key] = value
+    return summary
+
+
+def dump_metric_score(metric_score_path: Path, result: dict) -> None:
+    summary = load_metric_score(metric_score_path)
+    summary.update(result)
+    with metric_score_path.open("w", encoding="utf-8") as f:
+        for key, value in summary.items():
+            f.write(f"{key}: {value}\n")
+
+
 def main() -> None:
     args = parse_args()
     intermediate_path = args.intermediate.resolve()
+    metric_score_path = intermediate_path.parent / "metric_score.txt"
     config = load_config(args.config.resolve(), intermediate_path.parent)
     raw_data = load_data(intermediate_path)
     dataset = Dataset(config=config, data=raw_data)
@@ -56,8 +84,10 @@ def main() -> None:
     rouge_l = result.get("rouge-l")
     if rouge_l is None:
         raise RuntimeError("Evaluator did not return rouge-l.")
+    dump_metric_score(metric_score_path, result)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     print(f"Updated {intermediate_path}")
+    print(f"Updated {metric_score_path}")
     print(f"Overall ROUGE-L: {rouge_l:.12f}")
 
 

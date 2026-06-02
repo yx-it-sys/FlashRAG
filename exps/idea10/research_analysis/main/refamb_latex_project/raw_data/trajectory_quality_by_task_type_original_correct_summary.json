@@ -1,0 +1,225 @@
+{
+  "correctness": "correct",
+  "stage_stats": {
+    "RefAmb_2026_05_01_11_26_refamb_mcsearch_stage": {
+      "original_total": 300,
+      "original_correct": 191,
+      "original_incorrect": 109,
+      "disturb_available": 284,
+      "oracle_available": 16,
+      "disturb_oracle_overlap": 13,
+      "selected_samples": 191
+    },
+    "RefAmb_2026_05_01_13_28_refamb_oven_stage": {
+      "original_total": 206,
+      "original_correct": 87,
+      "original_incorrect": 119,
+      "disturb_available": 54,
+      "oracle_available": 44,
+      "disturb_oracle_overlap": 5,
+      "selected_samples": 87
+    },
+    "RefAmb_2026_05_02_13_50_refamb_infoseek_stage": {
+      "original_total": 176,
+      "original_correct": 11,
+      "original_incorrect": 165,
+      "disturb_available": 73,
+      "oracle_available": 99,
+      "disturb_oracle_overlap": 20,
+      "selected_samples": 11
+    },
+    "RefAmb_2026_05_02_14_22_refamb_crag_stage": {
+      "original_total": 818,
+      "original_correct": 138,
+      "original_incorrect": 680,
+      "disturb_available": 608,
+      "oracle_available": 301,
+      "disturb_oracle_overlap": 119,
+      "selected_samples": 138
+    }
+  },
+  "split_sample_count": 427,
+  "summary": {
+    "task_types_present": [
+      "Entity Recognition",
+      "Single-hop Attribute Query",
+      "Multi-hop",
+      "Comparison",
+      "Subproblem Aggregation"
+    ],
+    "per_task_summary": {
+      "Entity Recognition": {
+        "Original": {
+          "n": 114,
+          "rte": "0.266",
+          "iter": "0.447",
+          "delta_f_avg": "0.839",
+          "u_avg": "0.755",
+          "lj_score": "1.000",
+          "flip_ratio": "--"
+        },
+        "Disturb": {
+          "n": 27,
+          "rte": "0.446",
+          "iter": "2.000",
+          "delta_f_avg": "0.765",
+          "u_avg": "0.528",
+          "lj_score": "0.704",
+          "flip_ratio": "0.296"
+        },
+        "Oracle": {
+          "n": 12,
+          "rte": "0.494",
+          "iter": "1.500",
+          "delta_f_avg": "0.741",
+          "u_avg": "0.833",
+          "lj_score": "0.750",
+          "flip_ratio": "0.250"
+        }
+      },
+      "Single-hop Attribute Query": {
+        "Original": {
+          "n": 39,
+          "rte": "0.712",
+          "iter": "1.308",
+          "delta_f_avg": "0.819",
+          "u_avg": "0.913",
+          "lj_score": "1.000",
+          "flip_ratio": "--"
+        },
+        "Disturb": {
+          "n": 37,
+          "rte": "0.549",
+          "iter": "2.243",
+          "delta_f_avg": "0.797",
+          "u_avg": "0.686",
+          "lj_score": "0.622",
+          "flip_ratio": "0.378"
+        },
+        "Oracle": {
+          "n": 2,
+          "rte": "0.461",
+          "iter": "3.000",
+          "delta_f_avg": "0.691",
+          "u_avg": "0.550",
+          "lj_score": "0.500",
+          "flip_ratio": "0.500"
+        }
+      },
+      "Multi-hop": {
+        "Original": {
+          "n": 36,
+          "rte": "0.675",
+          "iter": "1.750",
+          "delta_f_avg": "0.791",
+          "u_avg": "0.829",
+          "lj_score": "1.000",
+          "flip_ratio": "--"
+        },
+        "Disturb": {
+          "n": 36,
+          "rte": "0.618",
+          "iter": "2.278",
+          "delta_f_avg": "0.845",
+          "u_avg": "0.716",
+          "lj_score": "0.750",
+          "flip_ratio": "0.250"
+        },
+        "Oracle": {
+          "n": 9,
+          "rte": "0.606",
+          "iter": "2.111",
+          "delta_f_avg": "0.723",
+          "u_avg": "0.806",
+          "lj_score": "0.778",
+          "flip_ratio": "0.222"
+        }
+      },
+      "Comparison": {
+        "Original": {
+          "n": 47,
+          "rte": "0.632",
+          "iter": "1.468",
+          "delta_f_avg": "0.814",
+          "u_avg": "0.819",
+          "lj_score": "1.000",
+          "flip_ratio": "--"
+        },
+        "Disturb": {
+          "n": 45,
+          "rte": "0.526",
+          "iter": "2.333",
+          "delta_f_avg": "0.727",
+          "u_avg": "0.686",
+          "lj_score": "0.511",
+          "flip_ratio": "0.489"
+        },
+        "Oracle": {
+          "n": 6,
+          "rte": "0.496",
+          "iter": "2.833",
+          "delta_f_avg": "0.577",
+          "u_avg": "0.667",
+          "lj_score": "0.500",
+          "flip_ratio": "0.500"
+        }
+      },
+      "Subproblem Aggregation": {
+        "Original": {
+          "n": 191,
+          "rte": "0.540",
+          "iter": "2.178",
+          "delta_f_avg": "0.697",
+          "u_avg": "0.858",
+          "lj_score": "1.000",
+          "flip_ratio": "--"
+        },
+        "Disturb": {
+          "n": 181,
+          "rte": "0.498",
+          "iter": "2.818",
+          "delta_f_avg": "0.734",
+          "u_avg": "0.667",
+          "lj_score": "0.663",
+          "flip_ratio": "0.337"
+        },
+        "Oracle": {
+          "n": 9,
+          "rte": "0.557",
+          "iter": "2.556",
+          "delta_f_avg": "0.725",
+          "u_avg": "0.875",
+          "lj_score": "1.000",
+          "flip_ratio": "0.000"
+        }
+      }
+    },
+    "macro_average": {
+      "Original": {
+        "rte": "0.565",
+        "iter": "1.430",
+        "delta_f_avg": "0.792",
+        "u_avg": "0.835",
+        "lj_score": "1.000",
+        "flip_ratio": "--"
+      },
+      "Disturb": {
+        "rte": "0.527",
+        "iter": "2.334",
+        "delta_f_avg": "0.774",
+        "u_avg": "0.657",
+        "lj_score": "0.650",
+        "flip_ratio": "0.350"
+      },
+      "Oracle": {
+        "rte": "0.523",
+        "iter": "2.400",
+        "delta_f_avg": "0.691",
+        "u_avg": "0.746",
+        "lj_score": "0.706",
+        "flip_ratio": "0.294"
+      }
+    },
+    "records": 791
+  }
+}

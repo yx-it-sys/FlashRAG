@@ -1,103 +1,105 @@
-# ---- Environment Settings ----
-gpu_id: ["0"]
-dataset_name: "infoseek_val"
-split: ["validation"]
-
-# Sampling configs
-test_sample_num: 200
-random_sample: True
-save_intermediate_data: True
-save_note: "llava15_7b_experiment"
+data_dir: data/datasets/
+save_dir: data/result/
+gpu_id:
+  - "1"
+dataset_name: crag_mm
+split:
+  - validation
+test_sample_num: ~
+random_sample: true
 seed: 2024
+save_intermediate_data: true
+save_note: llava15_7b_experiment
+save_new_dir: true
 
-# Data/output paths
-data_dir: "data/datasets/"
-save_new_dir: True
-save_dir: "data/result/"
-
-# ---- Retrieval Settings ----
-retrieval_method: "bge"
-save_retrieval_cache: True
-use_retrieval_cache: false
-retrieval_cache_path: "./output/retrieval_cache.json"
-silent_retrieval: True
-corpus_path: "/mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl"
-index_path: "/mnt/data/you/datasets/infoseek_val/indexes/bge_Flat.index"
-
-retrieval_query_max_length: 64
-omni_retrieval_char_limit: 12000
-retrieval_pooling_method: "cls"
-retrieval_use_fp16: True
+retrieval_method: crag
+retrieval_model_path: /mnt/data/you/modelscope/clip-vit-large-patch14
+index_path: null
+multimodal_index_path_dict:
+  text: /mnt/data/you/datasets/infoseek_val/indexes/clip_Flat_text.index
+  image: null
+corpus_path: /mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl
+instruction: null
+text_retrieval_topk: 5
+image_retrieval_topk: 2
 retrieval_batch_size: 16
-retrieval_topk: 5
-faiss_gpu: false
+retrieval_use_fp16: true
+retrieval_query_max_length: 64
+save_retrieval_cache: true
+use_retrieval_cache: false
+retrieval_cache_path: ./output/retrieval_cache.json
+retrieval_pooling_method: cls
+bm25_backend: bm25s
+use_sentence_transformer: false
+silent_retrieval: false
+use_reranker: false
 use_multi_retriever: false
 retrieval_device: cpu
-retrieval_model_path: "/mnt/data/you/modelscope/bge-large-en-v1.5"
-multimodal_index_path_dict:
-  text: "/mnt/data/you/datasets/infoseek_val/indexes/clip_Flat_text.index"
-  image: ~
 
 text_retriever_config:
-  retrieval_method: "bge"
+  retrieval_method: bge
   retrieval_device: cpu
-  retrieval_model_path: "/mnt/data/you/modelscope/bge-large-en-v1.5"
-  corpus_path: "/mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl"
-  index_path: "/mnt/data/you/datasets/infoseek_val/indexes/bge_Flat.index"
+  retrieval_model_path: /mnt/data/you/modelscope/bge-large-en-v1.5
+  corpus_path: /mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl
+  index_path: /mnt/data/you/datasets/infoseek_val/indexes/bge_Flat.index
   retrieval_topk: 5
-  retrieval_pooling_method: "cls"
+  retrieval_pooling_method: cls
 
 image_retriever_config:
-  retrieval_method: "clip"
+  retrieval_method: crag
   retrieval_device: cpu
-  retrieval_model_path: "/mnt/data/you/modelscope/clip-vit-large-patch14"
-  corpus_path: "/mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl"
-  retrieval_topk: 5
+  retrieval_model_path: /mnt/data/you/modelscope/clip-vit-large-patch14
+  corpus_path: /mnt/data/you/datasets/infoseek_val/wiki_100k_flatten.jsonl
+  retrieval_topk: 2
   multimodal_index_path_dict:
-    text: "/mnt/data/you/datasets/infoseek_val/indexes/clip_Flat_text.index"
-    image: ~
+    text: /mnt/data/you/datasets/infoseek_val/indexes/clip_Flat_text.index
+    image: null
 
-crag_text_model_name: "/mnt/data/you/modelscope/bge-large-en-v1.5"
-crag_hf_home: "/mnt/data/you/huggingface"
-crag_offline: True
-crag_search_device: cpu
+roi_preprocess_config:
+  enabled: false
+  python_bin: /home/you/miniconda3/envs/dino/bin/python3.11
+  script_path: /home/you/FlashRAG/exps/idea10/scripts/groundingdino_roi_worker.py
+  groundingdino_root: /home/you/GroundingDINO
+  config_file: /home/you/GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py
+  checkpoint_path: /home/you/GroundingDINO/weights/groundingdino_swint_ogc.pth
+  device: cpu
+  box_threshold: 0.35
+  text_threshold: 0.25
+  expand_ratio: 0.08
+  output_dir: /tmp/omnisearch_roi_cache
 
-use_reranker: False
-
-# ---- Generator Settings ----
 framework: vllm
-
-## API Settings
-api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
-max_tokens: 2048
-temperature: 0.0
-top_p: 0.0
-
-## vllm Settings
-generator_model: "llava-hf/llava-1.5-7b-hf"
-generator_model_path: "/mnt/data/you/modelscope/llava-1.5-7b-hf"
+generator_model: llava-hf/llava-1.5-7b-hf
+generator_model_path: /mnt/data/you/modelscope/llava-1.5-7b-hf
 generator_max_input_len: 2048
 generator_batch_size: 1
 generation_params:
-  do_sample: False
   max_tokens: 1024
+  do_sample: false
   temperature: 0.0
   top_p: 1.0
-
 vllm_gpu_memory_utilization: 0.88
 tensor_parallel_size: 1
 max_model_len: 4096
 vllm_enforce_eager: true
-vllm_max_num_batched_tokens: 4096
-vllm_max_num_seqs: 64
-vllm_max_num_seqs_kv: 64
 
-# ---- Evaluation Settings ----
-metrics: ["em", "f1", "acc", "precision", "recall"]
+metrics:
+  - em
+  - f1
+  - acc
+  - precision
+  - recall
 metric_setting:
   retrieval_recall_topk: 5
-  tokenizer_name: "qwen2"
-save_metric_score: True
+  tokenizer_name: qwen2
+save_metric_score: true
 
-# ---- Prompt Settings ----
+crag_text_model_name: /mnt/data/you/modelscope/bge-large-en-v1.5
+crag_hf_home: /mnt/data/you/huggingface
+crag_offline: true
+crag_search_device: cpu
+omni_retrieval_char_limit: 12000
+crag_image_attr_max_chars: 500
+crag_image_entity_max_chars: 1200
 omni_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/omni_prompt.toml
+omni_prompt_version: system_prompt_llava_v1

@@ -13,10 +13,10 @@ DEFAULT_HUMAN = Path(
 )
 DEFAULT_METRIC = Path(
     "/home/you/FlashRAG/exps/idea10/data/result/"
-    "crag_mm_2026_03_31_14_06_experiment/trajectory_quality_eval/trajectory_quality_samples.jsonl"
+    "crag_mm_2026_03_31_14_06_experiment/trajectory_quality_final_use_new_delta_f/trajectory_quality_samples.jsonl"
 )
 DEFAULT_OUTPUT = Path(
-    "/home/you/FlashRAG/exps/idea10/idea_reports/docs/7-human_alignment_consistency.md"
+    "/home/you/FlashRAG/exps/idea10/idea_reports/docs/7-1-human_alignment_consistency_new.md"
 )
 
 TRAJECTORY_QUALITY_MAP = {

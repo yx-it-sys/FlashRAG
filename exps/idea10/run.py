@@ -14,7 +14,7 @@ from flashrag.utils import get_dataset, get_generator, get_retriever
 from flashrag.pipeline import OmniSearchPipeline
 
 EXISTING_TRAJECTORY_PATH = Path(
-    "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_04_17_16_52_experiment/omnisearch_trajectories.jsonl"
+    "/home/you/FlashRAG/exps/idea10/data/result/crag_mm_2026_04_experiment/omnisearch_trajectories.jsonl"
 )
 
 
@@ -33,9 +33,9 @@ def load_existing_ids(path: Path) -> set[str]:
 
 
 def main():
-    config = Config("/home/you/FlashRAG/exps/idea10/configs/config.yaml")
+    config = Config("/home/you/FlashRAG/exps/idea10/configs/config_llava15_7b.yaml")
     all_split = get_dataset(config)
-    test_data = all_split["public_test"]
+    test_data = all_split["validation"]
     existing_ids = load_existing_ids(EXISTING_TRAJECTORY_PATH)
     if existing_ids:
         original_count = len(test_data)
@@ -54,7 +54,7 @@ def main():
     print(f"Begin loading generator...")
     generator = get_generator(config)
     print("Finished!")
-    if "text_retriever_config" in config or "image_retriever_config" in config:
+    if "text_retriever_config" in config:
         print("Skip eager retriever loading; OmniSearchPipeline will lazy-load configured retrievers.")
         retriever = None
     else:

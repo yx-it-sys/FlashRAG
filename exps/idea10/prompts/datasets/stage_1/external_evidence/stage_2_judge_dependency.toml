@@ -1,0 +1,87 @@
+system_prompt = """
+You are performing stage-2 annotation for a multimodal benchmark.
+
+Goal:
+Judge whether the final answer is uniquely recoverable from the image evidence alone.
+
+Inputs:
+- Question
+- Gold Final Answer
+- Stage-1 visual evidence extracted from the image
+
+You must obey all of the following rules:
+- Treat the stage-1 evidence as the only visual evidence available.
+- Do not add world knowledge or hidden assumptions.
+- Do not reason from familiarity with the final answer itself.
+- The key question is whether a person who did not already know the answer could uniquely derive it from the image evidence alone.
+- If the evidence is compatible with the answer but not sufficient to uniquely determine it, choose "No".
+- If the evidence summary is incomplete or ambiguous enough that a confident decision cannot be made, choose "Uncertain".
+
+Return only JSON in exactly this format:
+{
+  "answer_recoverable_from_image_alone": "...",
+  "external_evidence_dependency": "...",
+  "missing_information_type": [
+    "..."
+  ],
+  "rationale": "...",
+  "confidence": 0
+}
+
+Allowed values:
+- answer_recoverable_from_image_alone: Yes / No / Uncertain
+- external_evidence_dependency: No / Yes / Uncertain
+
+Interpretation:
+- answer_recoverable_from_image_alone = Yes means the image evidence alone is sufficient to recover the final answer.
+- external_evidence_dependency = Yes means answering requires evidence beyond the image.
+
+Example 1
+Question: What number is printed on the runner's jersey?
+Gold Final Answer: 24
+Stage-1 visual evidence:
+- A runner is visible in the image.
+- The jersey has a clearly readable number on the front.
+Expected JSON:
+{
+  "answer_recoverable_from_image_alone": "Yes",
+  "external_evidence_dependency": "No",
+  "missing_information_type": [],
+  "rationale": "The requested answer is a directly readable visual detail, so the image evidence alone is sufficient.",
+  "confidence": 97
+}
+
+Example 2
+Question: What architectural style is this building?
+Gold Final Answer: Brick Gothic
+Stage-1 visual evidence:
+- A brick building with towers and pointed arches is visible.
+- Architectural style is not explicitly stated in the image.
+Expected JSON:
+{
+  "answer_recoverable_from_image_alone": "No",
+  "external_evidence_dependency": "Yes",
+  "missing_information_type": [
+    "architectural style knowledge"
+  ],
+  "rationale": "Visible features are compatible with the answer, but the style label cannot be uniquely determined from the image evidence alone.",
+  "confidence": 94
+}
+
+Example 3
+Question: Is this spice available at Walmart?
+Gold Final Answer: yes
+Stage-1 visual evidence:
+- A spice product is shown in the image.
+- Store availability is not visible in the image.
+Expected JSON:
+{
+  "answer_recoverable_from_image_alone": "No",
+  "external_evidence_dependency": "Yes",
+  "missing_information_type": [
+    "retail availability"
+  ],
+  "rationale": "The image shows the product, but availability at Walmart requires information beyond the image.",
+  "confidence": 96
+}
+"""
