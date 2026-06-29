@@ -5,6 +5,8 @@ import os
 import pickle
 import re
 import time
+
+import torch
 from io import BytesIO
 from pathlib import Path
 
@@ -56,13 +58,30 @@ class MMSearchR1Pipeline(BasicMultiModalPipeline):
             after_text_search_prompt = pickle.load(f).strip()
         return round_1_prompt, after_image_search_prompt, after_text_search_prompt
 
+    def _resolve_torch_dtype(self):
+        dtype_name = str(self._config_value(self.config, "mmsearch_r1_torch_dtype", "bf16")).strip().lower()
+        dtype_map = {
+            "auto": "auto",
+            "bf16": torch.bfloat16,
+            "bfloat16": torch.bfloat16,
+            "fp16": torch.float16,
+            "float16": torch.float16,
+        }
+        if dtype_name not in dtype_map:
+            raise ValueError(
+                f"Unsupported mmsearch_r1_torch_dtype={dtype_name!r}. "
+                "Use one of: auto, bf16, bfloat16, fp16, float16."
+            )
+        return dtype_map[dtype_name]
+
     def _load_official_model(self):
         from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
 
         model_path = self.config["generator_model_path"]
+        torch_dtype = self._resolve_torch_dtype()
         model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
             model_path,
-            torch_dtype="auto",
+            torch_dtype=torch_dtype,
             device_map="auto",
         )
         processor = AutoProcessor.from_pretrained(model_path)
@@ -175,9 +194,50 @@ class MMSearchR1Pipeline(BasicMultiModalPipeline):
             return json.dumps(doc, ensure_ascii=False)
         return str(doc)
 
+    @staticmethod
+    def _truncate_crag_image_text(value, max_chars):
+        text = str(value)
+        if len(text) <= max_chars:
+            return text
+        return text[:max_chars].rstrip() + " ..."
+
+    def _is_crag_image_result(self, doc):
+        return isinstance(doc, dict) and "entities" in doc
+
+    def _format_crag_image_retrieval_content(self, retrieved_docs):
+        max_attr_chars = int(self._config_value(self.config, "crag_image_attr_max_chars", 400))
+        max_entity_chars = int(self._config_value(self.config, "crag_image_entity_max_chars", 4000))
+        chunks = []
+        for i, item in enumerate(retrieved_docs, 1):
+            lines = [f"{i}."]
+            entities = item.get("entities", [])
+            if not entities:
+                lines.append("- entities: []")
+            else:
+                for entity_idx, ent in enumerate(entities, 1):
+                    lines.append(f"- entity_{entity_idx}_name: {ent.get('entity_name', 'Unknown')}")
+                    attrs = ent.get("entity_attributes", {}) or {}
+                    for key in sorted(attrs.keys()):
+                        value = attrs[key]
+                        if value is None or value == "":
+                            continue
+                        lines.append(f"  {key}: {self._truncate_crag_image_text(value, max_attr_chars)}")
+
+            entity_text = "\n".join(lines)
+            chunks.append(self._truncate_crag_image_text(entity_text, max_entity_chars))
+
+        return "\n\n".join(chunks)
+
     def _format_retrieval_content(self, retrieved_docs, preferred_field=None):
         if not retrieved_docs:
             return ""
+        if preferred_field is None:
+            if isinstance(retrieved_docs, str):
+                return retrieved_docs
+            if not isinstance(retrieved_docs, list):
+                retrieved_docs = [retrieved_docs]
+            if retrieved_docs and all(self._is_crag_image_result(doc) for doc in retrieved_docs):
+                return self._format_crag_image_retrieval_content(retrieved_docs)
         if not isinstance(retrieved_docs, list):
             retrieved_docs = [retrieved_docs]
         per_doc_limit = max(0, self.retrieved_doc_char_limit)
@@ -421,7 +481,7 @@ class MMSearchR1Pipeline(BasicMultiModalPipeline):
         })
         return final_answer, messages
 
-    def run(self, dataset, do_eval=True, pred_process_fun=None):
+    def run(self, dataset, do_eval=True, pred_process_func=None):
         prediction_list = []
         original_count = len(dataset.data)
         selected_items = [item for item in dataset.data if self._source_matches_target(self._get_item_source(item))]
@@ -439,7 +499,7 @@ class MMSearchR1Pipeline(BasicMultiModalPipeline):
             prediction_list.append(answer)
 
         dataset.update_output("pred", prediction_list)
-        dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_fun=pred_process_fun)
+        dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_func=pred_process_func)
 
         total_duration = time.time() - start_time
         count = len(dataset.data)

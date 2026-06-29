@@ -8,9 +8,10 @@ from pathlib import Path
 
 
 ROOT_RESULT_DIRS = [
-    # Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_qwen3_vl_32b"),
-    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-4B"),
-    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-8b"),
+    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-4B/RefAmb_2026_06_15_12_27_refamb_mcsearch_qwen3_vl_4b_stage"),
+    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-8b/RefAmb_2026_05_23_12_53_refamb_mcsearch_qwen3_vl_8b_stage"),
+    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen2.5-vl-7B/RefAmb_2026_05_01_11_26_refamb_mcsearch_stage"),
+    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_InternVL3.5-8B/RefAmb_2026_05_09_16_39_refamb_mcsearch_intervl3_5_8b_stage"),
 ]
 EXPERIMENT_SCRIPT = Path(
     "/home/you/FlashRAG/exps/idea10/scripts/exp_oracle_v1/run_first_round_disturb_rewrite_experiment.py"
@@ -32,18 +33,15 @@ def discover_source_dirs() -> list[Path]:
     for root_dir in ROOT_RESULT_DIRS:
         if not root_dir.exists():
             raise FileNotFoundError(f"Root result dir not found: {root_dir}")
-        for child in sorted(root_dir.iterdir()):
-            if not child.is_dir() or not child.name.endswith("_stage"):
-                continue
-            config_path = child / "config.yaml"
-            rewrite_label_path = child / REWRITE_LABEL_REL_PATH
-            if config_path.exists() and rewrite_label_path.exists():
-                source_dirs.append(child)
+        config_path = root_dir / "config.yaml"
+        rewrite_label_path = root_dir / REWRITE_LABEL_REL_PATH
+        if config_path.exists() and rewrite_label_path.exists():
+            source_dirs.append(root_dir)
 
     if not source_dirs:
         raise RuntimeError(
             "No runnable source dirs found under ROOT_RESULT_DIRS; "
-            "expected *_stage directories with config.yaml and disturb rewrite label file."
+            "expected mcsearch stage directories with config.yaml and disturb rewrite label file."
         )
     return source_dirs
 

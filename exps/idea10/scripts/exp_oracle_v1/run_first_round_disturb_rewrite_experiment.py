@@ -44,7 +44,7 @@ DEFAULT_REWRITE_LABEL_PATH = (
     / "label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.disturb_rewrite.jsonl"
 )
 DEFAULT_SUBSET_PATH = Path(
-    "/home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/task_balanced_analysis_subset.jsonl"
+    "/home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/new/task_balanced.jsonl"
 )
 DEFAULT_MAX_TURNS = 5
 
@@ -777,7 +777,15 @@ def build_paired_comparison(
     comparison["mean_metric_delta"] = delta_means
 
     write_json(output_dir / "paired_comparison.json", comparison)
-    fieldnames = list(paired_rows[0].keys()) if paired_rows else ["id"]
+    fieldnames = []
+    seen_fields = set()
+    for row in paired_rows:
+        for key in row.keys():
+            if key not in seen_fields:
+                seen_fields.add(key)
+                fieldnames.append(key)
+    if not fieldnames:
+        fieldnames = ["id"]
     write_csv(output_dir / "paired_comparison.csv", paired_rows, fieldnames)
     return comparison
 

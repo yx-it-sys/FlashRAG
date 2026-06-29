@@ -61,7 +61,12 @@ metrics:
   - acc
   - precision
   - recall
+  - llm
 save_metric_score: true
+gpt_acc_setting:
+    model_name: Pro/deepseek-ai/DeepSeek-V3
+    api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
+    base_url: https://api.siliconflow.cn/v1
 
 roi_preprocess_config:
   enabled: false
@@ -85,4 +90,4 @@ omni_retrieved_doc_char_limit: 2000
 crag_image_attr_max_chars: 500
 crag_image_entity_max_chars: 1200
 omni_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/omni_prompt.toml
-omni_prompt_version: system_prompt1
+omni_prompt_version: system_prompt

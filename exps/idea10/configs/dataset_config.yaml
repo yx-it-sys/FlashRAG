@@ -28,7 +28,7 @@ stage1_sleep: 0.0
 ## Stage 1.2 Extract Evidence and Judge
 ext_ev_framework: api
 # ext_ev_generator_model: Qwen/Qwen2.5-VL-72B-Instruct
-ext_ev_generator_model: Qwen/Qwen3-VL-32B-Instruct
+ext_ev_generator_model: deepseek-ai/DeepSeek-V4-Pro
 ext_ev_openai_setting:
   api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
   base_url: https://api.siliconflow.cn/v1
@@ -57,7 +57,7 @@ ext_ev_stage1_input_path: /home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/sr
 ext_ev_stage1_image_dir: /home/you/FlashRAG/exps/idea10/data/datasets/EnAmbChallenge/images
 ext_ev_stage1_output_path: /home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/src/stage3--annotaion_Dim2,3/crag_test_multi-hop.filtered_stage2_1.jsonl
 ext_ev_stage2_framework: api
-ext_ev_stage2_generator_model: Pro/deepseek-ai/DeepSeek-V3.2
+ext_ev_stage2_generator_model: deepseek-ai/DeepSeek-V4-Pro
 ext_ev_stage2_openai_setting:
   api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
   base_url: https://api.siliconflow.cn/v1
@@ -74,7 +74,7 @@ ext_ev_sleep: 0.0
 
 # Stage2 Extract Oracle Entity
 stage1_5_framework: api
-stage1_5_generator_model: Qwen/Qwen2.5-VL-72B-Instruct
+stage1_5_generator_model: deepseek-ai/DeepSeek-V4-Pro
 stage1_5_openai_setting:
   api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
   base_url: https://api.siliconflow.cn/v1

@@ -1,6 +1,0 @@
-model,source,label_file,total_labels,ambiguous_labels,not_ambiguous_labels,other_labels,ambiguity_rate,ambiguity_percent
-Qwen3-vl-32B,OVEN,/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_qwen3_vl_32b/RefAmb_2026_05_19_12_24_refamb_oven_qwen3_vl_32b_stage/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl,415,32,383,0,0.07710843373493977,7.71%
-Qwen3-vl-32B,InfoSeek,/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_qwen3_vl_32b/RefAmb_2026_05_19_15_53_refamb_infoseek_qwen3_vl_32b_stage/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl,709,84,625,0,0.11847672778561354,11.85%
-Qwen3-vl-32B,MCSearch,/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_qwen3_vl_32b/RefAmb_2026_05_19_21_03_refamb_mcsearch_qwen3_vl_32b_stage/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl,1597,12,1585,0,0.007514088916718848,0.75%
-Qwen3-vl-32B,CRAG,/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_qwen3_vl_32b/RefAmb_2026_05_20_02_27_refamb_crag_qwen3_vl_32b_stage/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl,4074,160,3914,0,0.039273441335297005,3.93%
-Qwen3-vl-32B,Overall,aggregate,6795,288,6507,0,0.0423841059602649,4.24%

@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import yaml
+from typing import Iterable
 
 for k in [
     "http_proxy",
@@ -15,7 +16,7 @@ for k in [
     os.environ.pop(k, None)
 
 
-REFAMB_TRAIN_PATH = Path("/home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/task_balanced_analysis_subset_query_type_stratified_500.jsonl")
+REFAMB_TRAIN_PATH = Path("/home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/new/task_balanced.jsonl")
 PROJECT_ROOT = Path("/home/you/FlashRAG/exps/idea10")
 MODEL_TO_SOURCE_CONFIG = {
     "default": {
@@ -190,6 +191,12 @@ def parse_args() -> argparse.Namespace:
         help="Path to RefAmb train.jsonl.",
     )
     parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="Optional existing or target stage directory. When set, reuse this directory in place and do not create a new timestamped result subdirectory.",
+    )
+    parser.add_argument(
         "--disable-incremental",
         action="store_true",
         help="Do not skip items that already appear in the trajectory file.",
@@ -198,6 +205,28 @@ def parse_args() -> argparse.Namespace:
         "--disable-resume",
         action="store_true",
         help="Do not skip items that already appear in the configured historical result directory.",
+    )
+    parser.add_argument(
+        "--disable-auto-history-resume",
+        action="store_true",
+        help="Do not auto-scan historical result directories with the same save_note.",
+    )
+    parser.add_argument(
+        "--history-root",
+        action="append",
+        default=None,
+        help="Optional extra root to scan for historical result directories. Can be repeated.",
+    )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Optional cap on the number of remaining items to run after filtering.",
+    )
+    parser.add_argument(
+        "--disable-eval",
+        action="store_true",
+        help="Skip FlashRAG evaluation and metric writing; only run inference and trajectory logging.",
     )
     return parser.parse_args()
 
@@ -264,6 +293,44 @@ def load_existing_ids_from_result_dir(result_dir: Path) -> set[str]:
     return load_existing_ids(trajectory_path)
 
 
+def iter_history_roots(extra_roots: list[str] | None) -> list[Path]:
+    roots = [PROJECT_ROOT / "data/result"]
+    if extra_roots:
+        roots.extend(Path(item) for item in extra_roots if item)
+    unique_roots = []
+    seen = set()
+    for root in roots:
+        resolved = root.resolve()
+        if resolved in seen or not resolved.exists():
+            continue
+        seen.add(resolved)
+        unique_roots.append(resolved)
+    return unique_roots
+
+
+def discover_historical_result_dirs(
+    save_note: str,
+    roots: Iterable[Path],
+    exclude_dirs: Iterable[Path] | None = None,
+) -> list[Path]:
+    exclude_resolved = {path.resolve() for path in (exclude_dirs or []) if path.exists()}
+    matches: list[Path] = []
+    suffix = f"_{save_note}"
+    for root in roots:
+        for candidate in root.rglob(f"*{suffix}"):
+            if not candidate.is_dir():
+                continue
+            if candidate.resolve() in exclude_resolved:
+                continue
+            if not candidate.name.startswith("RefAmb_"):
+                continue
+            if not (candidate / "omnisearch_trajectories.jsonl").exists():
+                continue
+            matches.append(candidate)
+    matches.sort()
+    return matches
+
+
 def load_source_subset(dataset_path: Path, source: str) -> list[dict]:
     rows = []
     with dataset_path.open("r", encoding="utf-8") as f:
@@ -276,7 +343,7 @@ def load_source_subset(dataset_path: Path, source: str) -> list[dict]:
     return rows
 
 
-def build_config(model: str, source: str, Config) -> "Config":
+def build_config(model: str, source: str, Config, output_dir: Path | None = None) -> "Config":
     config_path = resolve_config_path(model, source)
     gpu_id = os.environ.get("CUDA_VISIBLE_DEVICES", "")
     override = {
@@ -289,6 +356,9 @@ def build_config(model: str, source: str, Config) -> "Config":
         # Keep GPU selection consistent with launcher script (GPU_ID/CUDA_VISIBLE_DEVICES).
         "gpu_id": gpu_id if gpu_id != "" else None,
     }
+    if output_dir is not None:
+        override["save_dir"] = str(output_dir.resolve())
+        override["save_new_dir"] = False
     return Config(config_path, config_dict=override)
 
 
@@ -298,7 +368,12 @@ def main():
     model = args.model
     preload_cuda_visible_devices(model, source)
     Config, Dataset, get_generator, get_retriever, OmniSearchPipeline, MMSearchR1Pipeline = import_flashrag_modules()
-    config = build_config(model, source, Config)
+    config = build_config(model, source, Config, output_dir=args.output_dir)
+
+    if args.output_dir is not None:
+        # When resuming in-place, only the current output directory should be consulted.
+        args.disable_resume = True
+        args.disable_auto_history_resume = True
 
     subset_rows = load_source_subset(args.train_path, source)
     if not subset_rows:
@@ -308,6 +383,7 @@ def main():
     trajectory_path = Path(config["save_dir"]) / "omnisearch_trajectories.jsonl"
     existing_ids = set()
     resume_ids = set()
+    auto_history_ids = set()
 
     if not args.disable_resume:
         resume_dir = resolve_resume_dir(model, source)
@@ -320,6 +396,22 @@ def main():
                 f"in {resume_dir / 'omnisearch_trajectories.jsonl'}."
             )
 
+    if not args.disable_auto_history_resume:
+        history_dirs = discover_historical_result_dirs(
+            save_note=resolve_save_note(model, source),
+            roots=iter_history_roots(args.history_root),
+            exclude_dirs=[Path(config["save_dir"])],
+        )
+        if history_dirs:
+            for history_dir in history_dirs:
+                auto_history_ids.update(load_existing_ids_from_result_dir(history_dir))
+            print(
+                f"Auto history resume for `{source}`: found {len(auto_history_ids)} existing ids "
+                f"across {len(history_dirs)} historical runs."
+            )
+        else:
+            print(f"Auto history resume for `{source}`: no matching historical runs found.")
+
     if not args.disable_incremental:
         existing_ids = load_existing_ids(trajectory_path)
         if existing_ids:
@@ -330,7 +422,7 @@ def main():
         else:
             print(f"Incremental rerun for `{source}`: no existing trajectory ids found.")
 
-    skip_ids = existing_ids | resume_ids
+    skip_ids = existing_ids | resume_ids | auto_history_ids
     if skip_ids:
         original_count = len(subset_rows)
         subset_rows = [row for row in subset_rows if row.get("id") not in skip_ids]
@@ -345,6 +437,16 @@ def main():
     if not subset_rows:
         print("No remaining items to run. Exit without launching OmniSearchPipeline.")
         return
+
+    if args.limit is not None:
+        if args.limit <= 0:
+            print(f"`--limit` must be positive, got {args.limit}. Exit without launching OmniSearchPipeline.")
+            return
+        original_count = len(subset_rows)
+        subset_rows = subset_rows[: args.limit]
+        print(
+            f"Applied --limit={args.limit}: running {len(subset_rows)} of {original_count} remaining items."
+        )
 
     test_data = Dataset(config=config, data=subset_rows)
 
@@ -374,7 +476,7 @@ def main():
             "run_refamb_by_source.py must use the plain OmniSearchPipeline, but an EAO/VORS-like "
             f"pipeline was instantiated: {pipeline.__class__.__module__}.{pipeline.__class__.__name__}"
         )
-    pipeline.run(test_data, do_eval=True)
+    pipeline.run(test_data, do_eval=not args.disable_eval)
 
 
 if __name__ == "__main__":

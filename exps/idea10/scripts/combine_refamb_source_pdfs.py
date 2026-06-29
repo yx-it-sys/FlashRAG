@@ -5,7 +5,6 @@ import importlib.util
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
 
 
 PROJECT_ROOT = Path("/home/you/FlashRAG/exps/idea10")
@@ -45,33 +44,18 @@ def main() -> None:
 
     module.apply_serif_style()
 
-    # Start with an approximate canvas, draw once, then resize from the actual rendered bounds.
-    fig = plt.figure(figsize=(26.0, 8.8), facecolor="white")
-    gs = GridSpec(1, 2, figure=fig, width_ratios=[1.0, 1.9], wspace=0.16)
-    ax_pie = fig.add_subplot(gs[0, 0])
-    ax_sankey = fig.add_subplot(gs[0, 1])
+    fig = plt.figure(figsize=(19.5, 6.8), facecolor="white")
+    ax_pie = fig.add_axes([0.02, 0.12, 0.47, 0.80])
+    ax_sankey = fig.add_axes([0.51, 0.12, 0.47, 0.80])
 
     module.draw_pie(ax_pie, source_counts, args.fontsize)
     module.draw_sankey(ax_sankey, source_counts, task_counts, pair_counts, args.fontsize)
 
-    # Titles are added after the first draw so their positions are included in the canvas fit.
-    fig.canvas.draw()
-    renderer = fig.canvas.get_renderer()
-    bbox = fig.get_tightbbox(renderer)
-    # Guard against any backend quirks by adding a small padding after measuring.
-    pad_w = 0.35
-    pad_h = 0.35
-    fig.set_size_inches(bbox.width + pad_w, bbox.height + pad_h)
-    fig.canvas.draw()
-    renderer = fig.canvas.get_renderer()
+    pie_center = 0.255
+    sankey_center = 0.745
 
-    pie_bbox = ax_pie.get_tightbbox(renderer).transformed(fig.transFigure.inverted())
-    sankey_bbox = ax_sankey.get_tightbbox(renderer).transformed(fig.transFigure.inverted())
-    pie_center = pie_bbox.x0 + pie_bbox.width / 2.0
-    sankey_center = sankey_bbox.x0 + sankey_bbox.width / 2.0
-
-    fig.text(pie_center, 0.02, "(a) RefAmb source distribution", ha="center", va="bottom", fontsize=args.fontsize, family="serif", weight="bold")
-    fig.text(sankey_center, 0.02, "(b) Source-task Sankey diagram", ha="center", va="bottom", fontsize=args.fontsize, family="serif", weight="bold")
+    fig.text(pie_center, 0.03, "(a) RefAmb source distribution", ha="center", va="bottom", fontsize=args.fontsize, family="serif", weight="bold")
+    fig.text(sankey_center, 0.03, "(b) Source-task Sankey diagram", ha="center", va="bottom", fontsize=args.fontsize, family="serif", weight="bold")
 
     fig.canvas.draw()
     args.out.parent.mkdir(parents=True, exist_ok=True)

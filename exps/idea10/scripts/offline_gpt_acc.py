@@ -17,7 +17,7 @@ for k in [
 ]:
     os.environ.pop(k, None)
 
-DEFAULT_RESULT_DIR = Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_GPT_5.1/RefAmb_2026_05_30_13_01_refamb_oven_gpt_5_1_ca_stage")
+DEFAULT_RESULT_DIR = Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_ours_Qwen2.5-vl-7B/failure_threshold_0.20/mcsearch")
 SAVE_NAME = "gpt_acc_score.json"
 MAX_RETRIES = 5
 RETRY_SLEEP_SECONDS = 10

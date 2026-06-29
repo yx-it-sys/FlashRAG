@@ -355,11 +355,14 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         return self.retriever.search(query, **kwargs)
 
     def _extract_retrieval_query(self, response, retrieval_label):
-        pattern = rf'{re.escape(retrieval_label)}[:\s"]*(.*?)(?=<|$)'
-        match = re.search(pattern, response, re.DOTALL)
-        if not match:
+        action_mode, query_txt = self._parse_search_action(response)
+        expected_mode = {
+            "Text Retrieval": "text_retrieval",
+            "Image Retrieval": "image_retrieval",
+        }.get(retrieval_label)
+        if action_mode != expected_mode:
             return ""
-        return match.group(1).strip()
+        return query_txt
 
     def _extract_search_body(self, response):
         if not response:
@@ -467,6 +470,10 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         env.pop("VIRTUAL_ENV", None)
         env.pop("ALL_PROXY", None)
         env.pop("all_proxy", None)
+        env.pop("HTTP_PROXY", None)
+        env.pop("HTTPS_PROXY", None)
+        env.pop("http_proxy", None)
+        env.pop("https_proxy", None)
 
         try:
             completed = self._run_roi_preprocess_command(
@@ -513,6 +520,10 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         env.pop("VIRTUAL_ENV", None)
         env.pop("ALL_PROXY", None)
         env.pop("all_proxy", None)
+        env.pop("HTTP_PROXY", None)
+        env.pop("HTTPS_PROXY", None)
+        env.pop("http_proxy", None)
+        env.pop("https_proxy", None)
         return env
 
     def _build_roi_worker_command(self, serve=False):

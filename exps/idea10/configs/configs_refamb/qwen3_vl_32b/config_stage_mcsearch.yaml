@@ -13,7 +13,7 @@ save_new_dir: true
 
 gpu_id: ~
 framework: api
-generator_model: Qwen/Qwen3.5-27B
+generator_model: Qwen/Qwen3-VL-32B-Instruct
 openai_setting:
   api_key: ~
   base_url: https://api.siliconflow.cn/v1
@@ -61,6 +61,7 @@ metrics:
   - acc
   - precision
   - recall
+  - llm
 save_metric_score: true
 gpt_acc_setting:
     model_name: Pro/deepseek-ai/DeepSeek-V3
@@ -88,5 +89,16 @@ omni_retrieval_char_limit: 12000
 omni_retrieved_doc_char_limit: 2000
 crag_image_attr_max_chars: 500
 crag_image_entity_max_chars: 1200
-omni_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/omni_prompt.toml
-omni_prompt_version: system_prompt
+all_prompts_path: /home/you/FlashRAG/exps/idea10/prompts/new_method/prompt_books.toml
+omni_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/new_method/prompt_books.toml
+omni_prompt_version: system_vlm_prompt
+
+# Experiments Hyper-parameters
+omni_query_similarity_threshold: 0.9
+omni_failure_threshold: 0.05
+omni_max_repair_count: 2
+omni_max_turns: 5
+omni_min_effective_retrieval_chars: 10
+omni_info_gain_similarity_threshold: 0.9
+tightening_module: false
+rebuild_module: true

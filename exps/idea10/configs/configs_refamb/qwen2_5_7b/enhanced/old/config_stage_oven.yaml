@@ -88,6 +88,7 @@ all_prompts_path: /home/you/FlashRAG/exps/idea10/prompts/new_method/prompt_books
 omni_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/new_method/prompt_books.toml
 omni_prompt_version: system_vlm_prompt
 omni_module_log_char_limit: 1200
+omni_controller_trace_filename: controller_actions.jsonl
 omni_experiment_tag: w/o loosening controls
 
 # Experiments Hyper-parameters
@@ -104,6 +105,7 @@ omni_min_effective_retrieval_chars: 10
 # 计算信息增量时的Facts去重阈值
 omni_info_gain_similarity_threshold: 0.9
 tightening_module: true
+rebuild_module: true
 # 消融 Missing-info Repair Module
 missing_info_repair_module: true
 # 消融 Reflection Recovery Module

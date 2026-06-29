@@ -32,21 +32,22 @@ TASK_LABELS = [
 ]
 
 SOURCE_COLORS = {
-    "infoseek": (73 / 255, 134 / 255, 183 / 255, 0.38),
-    "mcsearch": (86 / 255, 167 / 255, 166 / 255, 0.38),
-    "crag": (223 / 255, 122 / 255, 61 / 255, 0.38),
-    "oven": (136 / 255, 96 / 255, 136 / 255, 0.38),
+    "infoseek": (0x88 / 255, 0xB2 / 255, 0xDC / 255, 0.95),
+    "mcsearch": (0x99 / 255, 0xD0 / 255, 0xC9 / 255, 0.95),
+    "crag": (0xF0 / 255, 0xAE / 255, 0x67 / 255, 0.95),
+    "oven": (0xBE / 255, 0x8C / 255, 0xB8 / 255, 0.95),
 }
 
 TASK_COLORS = {
-    "Single-hop Attribute Query": (142 / 255, 170 / 255, 208 / 255, 0.98),
-    "Entity Recognition": (194 / 255, 203 / 255, 223 / 255, 0.98),
-    "Subproblem Aggregation": (170 / 255, 212 / 255, 207 / 255, 0.98),
-    "Multi-hop": (232 / 255, 182 / 255, 136 / 255, 0.98),
-    "Comparison": (192 / 255, 170 / 255, 199 / 255, 0.98),
+    "Single-hop Attribute Query": (0xB9 / 255, 0xCF / 255, 0xE8 / 255, 1.0),
+    "Entity Recognition": (0xCB / 255, 0xD5 / 255, 0xE6 / 255, 1.0),
+    "Subproblem Aggregation": (0xC3 / 255, 0xDE / 255, 0xD8 / 255, 1.0),
+    "Multi-hop": (0xEC / 255, 0xCA / 255, 0x9E / 255, 1.0),
+    "Comparison": (0xDC / 255, 0xC8 / 255, 0xDE / 255, 1.0),
 }
 
 TEXT_COLOR = "black"
+NODE_EDGE = (0.25, 0.25, 0.25, 0.85)
 
 
 def load_counts(path: Path):
@@ -112,25 +113,31 @@ def add_ribbon(ax, x0, x1, y0_bottom, y0_top, y1_bottom, y1_top, color):
 
 def task_label_display(task: str) -> str:
     if task == "Single-hop Attribute Query":
-        return "Single-hop\nAttribute Query"
+        return "S.A.Q."
+    if task == "Entity Recognition":
+        return "E.R."
     if task == "Subproblem Aggregation":
-        return "Subproblem\nAggregation"
-    return task.replace(" ", "\n")
+        return "C.C.Q."
+    if task == "Multi-hop":
+        return "M.H."
+    if task == "Comparison":
+        return "Comp."
+    return task
 
 
 def build_figure(source_counts: Counter, task_counts: Counter, pair_counts: Counter):
-    fig, ax = plt.subplots(figsize=(12.4, 5.7))
+    fig, ax = plt.subplots(figsize=(10.8, 4.8))
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
 
-    left_x0, left_x1 = 0.14, 0.24
-    right_x0, right_x1 = 0.76, 0.86
-    top, bottom = 0.90, 0.12
+    left_x0, left_x1 = 0.035, 0.15
+    right_x0, right_x1 = 0.85, 0.965
+    top, bottom = 0.93, 0.08
 
     source_order = [k for k, _ in SOURCE_LABELS]
     task_order = TASK_LABELS
-    source_pos, _ = build_layout(source_counts, source_order, top=top, bottom=bottom, gap=0.028)
-    task_pos, _ = build_layout(task_counts, task_order, top=top, bottom=bottom, gap=0.028)
+    source_pos, _ = build_layout(source_counts, source_order, top=top, bottom=bottom, gap=0.022)
+    task_pos, _ = build_layout(task_counts, task_order, top=top, bottom=bottom, gap=0.022)
 
     source_offsets = {k: source_pos[k][0] for k in source_order}
     task_offsets = {k: task_pos[k][0] for k in task_order}
@@ -144,15 +151,15 @@ def build_figure(source_counts: Counter, task_counts: Counter, pair_counts: Coun
             ty0 = task_offsets[task]
             ty1 = ty0 + value * (task_pos[task][1] - task_pos[task][0]) / task_counts[task]
             add_ribbon(
-                ax,
-                left_x1,
-                right_x0,
-                sy0,
-                sy1,
-                ty0,
-                ty1,
-                SOURCE_COLORS[source_key],
-            )
+            ax,
+            left_x1,
+            right_x0,
+            sy0,
+            sy1,
+            ty0,
+            ty1,
+            (SOURCE_COLORS[source_key][0], SOURCE_COLORS[source_key][1], SOURCE_COLORS[source_key][2], 0.58),
+        )
             source_offsets[source_key] = sy1
             task_offsets[task] = ty1
 
@@ -165,23 +172,57 @@ def build_figure(source_counts: Counter, task_counts: Counter, pair_counts: Coun
     right_node_width = right_x1 - right_x0
     for source_key, display_name in SOURCE_LABELS:
         y0, y1 = source_pos[source_key]
-        rect = Rectangle((left_x0, y0), node_width, y1 - y0, facecolor=SOURCE_COLORS[source_key], edgecolor="none", linewidth=0.0)
+        rect = Rectangle(
+            (left_x0, y0),
+            node_width,
+            y1 - y0,
+            facecolor=SOURCE_COLORS[source_key],
+            edgecolor="none",
+            linewidth=0.0,
+        )
         ax.add_patch(rect)
-        ax.text(left_x0 - 0.03, (y0 + y1) / 2, display_name, ha="right", va="center", fontsize=15, family="serif", weight="bold", color=TEXT_COLOR)
+        ax.text(
+            (left_x0 + left_x1) / 2,
+            (y0 + y1) / 2,
+            display_name,
+            ha="center",
+            va="center",
+            fontsize=11.5,
+            family="serif",
+            weight="bold",
+            color=TEXT_COLOR,
+        )
 
     for task in task_order:
         y0, y1 = task_pos[task]
-        rect = Rectangle((right_x0, y0), right_node_width, y1 - y0, facecolor=TASK_COLORS[task], edgecolor="none", linewidth=0.0)
+        rect = Rectangle(
+            (right_x0, y0),
+            right_node_width,
+            y1 - y0,
+            facecolor=TASK_COLORS[task],
+            edgecolor="none",
+            linewidth=0.0,
+        )
         ax.add_patch(rect)
-        ax.text(right_x1 + 0.03, (y0 + y1) / 2, task_label_display(task), ha="left", va="center", fontsize=15, family="serif", weight="bold", color=TEXT_COLOR)
+        ax.text(
+            (right_x0 + right_x1) / 2,
+            (y0 + y1) / 2,
+            task_label_display(task),
+            ha="center",
+            va="center",
+            fontsize=12.2,
+            family="serif",
+            weight="bold",
+            color=TEXT_COLOR,
+        )
 
-    ax.text(0.03, 0.97, "Source", ha="left", va="top", fontsize=18, family="serif", weight="bold")
-    ax.text(0.97, 0.97, "Task Type", ha="right", va="top", fontsize=18, family="serif", weight="bold")
+    ax.text(0.03, 0.985, "Source", ha="left", va="top", fontsize=16, family="serif", weight="bold")
+    ax.text(0.97, 0.985, "Task Type", ha="right", va="top", fontsize=16, family="serif", weight="bold")
 
     ax.set_xlim(0.0, 1.0)
     ax.set_ylim(0.0, 1.0)
     ax.axis("off")
-    fig.subplots_adjust(left=0.02, right=0.98, top=0.96, bottom=0.06)
+    fig.subplots_adjust(left=0.005, right=0.995, top=0.985, bottom=0.02)
     return fig
 
 
@@ -189,8 +230,9 @@ def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     source_counts, task_counts, pair_counts = load_counts(DATA_PATH)
     fig = build_figure(source_counts, task_counts, pair_counts)
-    fig.savefig(OUT_PDF, format="pdf")
-    fig.savefig(OUT_PNG, format="png", dpi=300)
+    fig.text(0.5, 0.005, "(b) Source-to-task Sankey Flow", ha="center", va="bottom", fontsize=13.0, family="serif", weight="bold")
+    fig.savefig(OUT_PDF, format="pdf", bbox_inches="tight", pad_inches=0.01)
+    fig.savefig(OUT_PNG, format="png", dpi=300, bbox_inches="tight", pad_inches=0.01)
     print(f"Saved {OUT_PDF}")
     print(f"Saved {OUT_PNG}")
 

@@ -1,6 +1,0 @@
-model,source,label_file,total_labels,ambiguous_labels,not_ambiguous_labels,other_labels,ambiguity_rate,ambiguity_percent
-InternVL3.5-8B,OVEN,/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_InternVL3.5-8B/RefAmb_2026_05_09_15_53_refamb_oven_intervl3_5_8b_stage/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl,597,314,283,0,0.525963149078727,52.60%
-InternVL3.5-8B,InfoSeek,/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_InternVL3.5-8B/RefAmb_2026_05_09_16_13_refamb_infoseek_intervl3_5_8b_stage/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl,1157,821,336,0,0.7095937770095073,70.96%
-InternVL3.5-8B,MCSearch,/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_InternVL3.5-8B/RefAmb_2026_05_09_16_39_refamb_mcsearch_intervl3_5_8b_stage/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl,1438,66,1372,0,0.0458970792767733,4.59%
-InternVL3.5-8B,CRAG,/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_InternVL3.5-8B/RefAmb_2026_05_09_17_28_refamb_crag_intervl3_5_8b_stage/label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl,1925,889,1036,0,0.4618181818181818,46.18%
-InternVL3.5-8B,Overall,aggregate,5117,2090,3027,0,0.40844244674614033,40.84%

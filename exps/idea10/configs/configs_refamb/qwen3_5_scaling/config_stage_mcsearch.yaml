@@ -8,7 +8,7 @@ random_sample: false
 seed: 2024
 save_intermediate_data: true
 save_dir: data/result/
-save_note: refamb_mcsearch_72b_stage
+save_note: refamb_mcsearch_stage
 save_new_dir: true
 
 gpu_id: ~

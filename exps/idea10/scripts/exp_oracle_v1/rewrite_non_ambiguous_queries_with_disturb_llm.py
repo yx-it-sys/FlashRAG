@@ -28,20 +28,15 @@ DEFAULT_PROMPT_PATH = Path(
     "/home/you/FlashRAG/exps/idea10/prompts/disturb_rewrite_prompt.toml"
 )
 DEFAULT_SUBSET_PATH = Path(
-    "/home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/task_balanced_analysis_subset.jsonl"
+    "/home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/new/task_balanced.jsonl"
 )
-ROOT_RESULT_DIR = Path(
-    "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-8b"
-)
-SOURCE_DIRS = [
-    ROOT_RESULT_DIR / "RefAmb_2026_05_23_11_40_refamb_oven_qwen3_vl_8b_stage",
-    ROOT_RESULT_DIR / "RefAmb_2026_05_23_12_10_refamb_infoseek_qwen3_vl_8b_stage",
-    ROOT_RESULT_DIR / "RefAmb_2026_05_23_12_53_refamb_mcsearch_qwen3_vl_8b_stage",
-    ROOT_RESULT_DIR / "RefAmb_2026_05_23_14_07_refamb_crag_qwen3_vl_8b_stage",
+ROOT_RESULT_DIRS = [
+    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_GPT_5.1/RefAmb_2026_05_29_11_04_refamb_mcsearch_gpt_5_1_ca_stage"),
+    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_qwen3_vl_32b/RefAmb_2026_05_19_21_03_refamb_mcsearch_qwen3_vl_32b_stage"),
+    # Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-8b/RefAmb_2026_05_23_12_53_refamb_mcsearch_qwen3_vl_8b_stage"),
+    # Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_InternVL3.5-8B/RefAmb_2026_05_09_16_39_refamb_mcsearch_intervl3_5_8b_stage"),
 ]
-MULTI_INPUT_REL_PATH = Path(
-    "label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl"
-)
+MULTI_INPUT_REL_PATH = Path("label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl")
 MULTI_OUTPUT_REL_PATH = Path(
     "label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.disturb_rewrite.jsonl"
 )
@@ -355,7 +350,7 @@ def filter_items_by_allowed_ids(items: list[dict], allowed_ids: set[str] | None)
 
 def build_multi_source_paths() -> list[tuple[Path, Path, Path]]:
     runs: list[tuple[Path, Path, Path]] = []
-    for source_dir in SOURCE_DIRS:
+    for source_dir in ROOT_RESULT_DIRS:
         input_path = source_dir / MULTI_INPUT_REL_PATH
         output_path = source_dir / MULTI_OUTPUT_REL_PATH
         log_path = default_log_path(output_path)

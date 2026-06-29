@@ -17,12 +17,12 @@ framework: vllm
 generator_model: MMSearch-R1-7B
 generator_model_path: /mnt/data/you/modelscope/MMSearch-R1-7B
 generator_max_input_len: 2048
-max_model_len: 20500
+max_model_len: 10000
 generator_batch_size: 4
 generation_params:
   max_tokens: 2048
   do_sample: false
-  temperature: 0.1
+  temperature: 0.0
   top_p: 1.0
 
 retrieval_method: clip

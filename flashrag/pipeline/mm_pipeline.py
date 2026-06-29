@@ -10,6 +10,7 @@ from tqdm import tqdm
 import json
 import time
 from itertools import islice
+import inspect
 
 
 class BasicMultiModalPipeline:
@@ -110,6 +111,253 @@ class BasicMultiModalPipeline:
         normalized_stats = self._normalize_generation_stats(stats, len(dataset))
         if normalized_stats is not None:
             dataset.update_output("generation_stats", normalized_stats)
+
+    def parse_response(self, response):
+        return response
+    
+    def _truncate_after_search(self, response):
+        if not response or "<Search>" not in response:
+            return response
+
+        search_start = response.find("<Search>")
+        search_end = response.find("</Search>", search_start)
+        if search_end != -1:
+            search_end += len("</Search>")
+            tail = response[search_end:]
+            next_markers = [
+                "<Thought>",
+                "</Thought>",
+                "<Sub-Question>",
+                "</Sub-Question>",
+                "<Search>",
+                "<End>",
+                "<Final Answer>",
+                "Final Answer:",
+            ]
+
+            next_positions = []
+            for marker in next_markers:
+                pos = tail.find(marker)
+                if pos != -1:
+                    next_positions.append(pos)
+
+            if not next_positions:
+                return response[:search_end].rstrip()
+
+            cut_pos = search_end + min(next_positions)
+            return response[:cut_pos].rstrip()
+
+        search_body_start = search_start + len("<Search>")
+        tail = response[search_body_start:]
+        next_markers = [
+            "<Thought>",
+            "</Thought>",
+            "<Sub-Question>",
+            "</Sub-Question>",
+            "<Search>",
+            "<End>",
+            "<Final Answer>",
+            "Final Answer:",
+        ]
+
+        next_positions = []
+        for marker in next_markers:
+            pos = tail.find(marker)
+            if pos != -1:
+                next_positions.append(pos)
+
+        if not next_positions:
+            return response
+
+        cut_pos = search_body_start + min(next_positions)
+        return response[:cut_pos].rstrip()
+    
+    def _source_matches_target(self, item_source):
+        if self.target_source is None:
+            return True
+        if item_source == self.target_source:
+            return True
+        if self.target_source == "infoseek" and item_source == "oven":
+            return True
+        return False
+    
+    def _clip_text(self, text, limit):
+        if text is None:
+            return None
+        text = str(text)
+        if len(text) <= limit:
+            return text
+        clipped = text[:limit]
+        return clipped + "\n\n[Truncated due to prompt length limit]"
+
+    def _format_retrieval_content(self, retrieved_docs, preferred_field=None):
+        if not retrieved_docs:
+            return ""
+        if preferred_field is None:
+            return self._format_image_retrieval_content(retrieved_docs)
+        if not isinstance(retrieved_docs, list):
+            retrieved_docs = [retrieved_docs]
+        per_doc_limit = max(0, self.retrieved_doc_char_limit)
+        return "\n\n".join(
+            [
+                f"Doc{i+1}:\n{self._clip_text(self._format_retrieved_doc(doc, preferred_field=preferred_field), per_doc_limit)}"
+                for i, doc in enumerate(retrieved_docs)
+            ]
+        )
+
+    def _extract_retrieval_query(self, response, retrieval_label):
+        pattern = rf'{re.escape(retrieval_label)}[:\s"]*(.*?)(?=<|$)'
+        match = re.search(pattern, response, re.DOTALL)
+        if not match:
+            return ""
+        return match.group(1).strip()
+
+    def _extract_search_body(self, response):
+        if not response:
+            return ""
+
+        match = re.search(r"<Search>\s*(.*?)\s*</Search>", response, re.DOTALL | re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+
+        search_start = response.find("<Search>")
+        if search_start == -1:
+            return ""
+
+        tail = response[search_start + len("<Search>") :]
+        next_markers = [
+            "<Thought>",
+            "</Thought>",
+            "<Sub-Question>",
+            "</Sub-Question>",
+            "<Search>",
+            "<End>",
+            "<Final Answer>",
+            "Final Answer:",
+        ]
+        next_positions = [pos for marker in next_markers if (pos := tail.find(marker)) != -1]
+        if not next_positions:
+            return tail.strip()
+        return tail[: min(next_positions)].strip()
+    
+    def _extract_action_nodes(self, response):
+        if not response:
+            return []
+
+        nodes = []
+        tag_pattern = re.compile(r"<Thought>|<Sub-Question>|<Search>|<End>")
+        matches = list(tag_pattern.finditer(response))
+        action_name_map = {
+            "<Thought>": "thought",
+            "<Sub-Question>": "sub-question",
+            "<Search>": "search",
+        }
+
+        for idx, match in enumerate(matches):
+            tag = match.group(0)
+            start = match.end()
+            end = matches[idx + 1].start() if idx + 1 < len(matches) else len(response)
+            content = response[start:end].strip()
+
+            if tag in action_name_map and content:
+                nodes.append({
+                    "action": action_name_map[tag],
+                    "content": content,
+                })
+            elif tag == "<End>":
+                final_answer_match = re.search(r"Final Answer:\s*(.*?)(?=$)", content, re.DOTALL)
+                if final_answer_match:
+                    final_answer = final_answer_match.group(1).strip().replace("\n", "")
+                    if final_answer:
+                        nodes.append({
+                            "action": "final_answer",
+                            "content": final_answer,
+                        })
+
+        final_answer_match = re.search(r"(?:<Final Answer>|Final Answer:)\s*(.*?)(?=<|$)", response, re.DOTALL)
+        if final_answer_match:
+            final_answer = final_answer_match.group(1).strip().replace("\n", "")
+            if final_answer and not any(node.get("action") == "final_answer" for node in nodes):
+                nodes.append({
+                    "action": "final_answer",
+                    "content": final_answer,
+                })
+        return nodes
+    
+    def _search_with_main_retriever(self, query, query_kind):
+            search_callable = getattr(self.retriever, "_search", self.retriever.search)
+            search_signature = inspect.signature(search_callable)
+            search_params = search_signature.parameters
+            supports_kwargs = any(
+                param.kind == inspect.Parameter.VAR_KEYWORD for param in search_params.values()
+            )
+            kwargs = {}
+
+            if query_kind == "image":
+                topk = self.config["image_retrieval_topk"]
+            else:
+                topk = self.config["text_retrieval_topk"]
+
+            if topk is not None and ("num" in search_params or supports_kwargs):
+                kwargs["num"] = topk
+            if "query_type" in search_params or supports_kwargs:
+                kwargs["query_type"] = query_kind
+            if query_kind == "image" and ("target_modal" in search_params or supports_kwargs):
+                kwargs["target_modal"] = self.config["image_retrieval_target_modal"]
+
+            return self.retriever.search(query, **kwargs)    
+        
+    def _generate_text(self, messages):
+        delay = 2
+        max_retries = 5
+        for attempt in range(max_retries):
+            try:
+                raw_response = self.generator.generate([messages])
+                return self._normalize_generation_output(raw_response)
+            except Exception as e:
+                if not self._is_retryable_api_error(e):
+                    raise
+                if attempt == max_retries - 1:
+                    raise
+                print(
+                    f"Transient API error ({e.__class__.__name__}), retrying in {delay}s ..."
+                )
+                time.sleep(delay)
+                delay *= 2
+        raw_response = self.generator.generate([messages])
+        return self._normalize_generation_output(raw_response)
+
+    def _log_retrieval_preview(self, retrieval_content):
+        if retrieval_content is None:
+            print("Retrieval result: None")
+            return
+        preview_limit = min(self.retrieval_char_limit, 500)
+        preview = str(retrieval_content)
+        if len(preview) > preview_limit:
+            preview = preview[:preview_limit] + "\n\n[Preview truncated in log]"
+        print(f"Retrieval result:\n{preview}")
+
+    def _record_response_actions(self, trajectory, response):
+        trajectory.extend(self._extract_action_nodes(response))
+
+    def _search_text_docs(self, query_txt):
+        return self._search_with_main_retriever(query_txt, query_kind="text")
+
+    def _record_retrieval_result(self, trajectory, retrieval_mode, query_txt, retrieval_content):
+        mode_name_map = {
+            "text_retrieval": "text_retrieval_result",
+            "image_retrieval": "image_retrieval_result",
+            "no_retrieval": "no_retrieval_result",
+        }
+        trajectory.append({
+            "action": mode_name_map.get(retrieval_mode, "retrieval_result"),
+            "mode": retrieval_mode,
+            "query": query_txt if query_txt else None,
+            "content": retrieval_content,
+        })
+
+    def _write_trajectory(self, record):
+        self.safe_write(self.trajectory_path, self._serialize_for_log(record))
 
     def evaluate(self, dataset, do_eval=True, pred_process_func=None):
         """The evaluation process after finishing overall generation"""

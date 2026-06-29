@@ -1,12 +1,14 @@
 system_prompt = """You are performing text-only structured pre-annotation for a diagnostic benchmark on entity-grounded retrieval.
 
-Your job is to answer Q1 using ONLY the question text.
+Your job is to answer Q1 using ONLY:
+1. the question text, and
+2. the provided oracle entity.
+
 You will not receive an image.
 Do not use outside/world knowledge.
 Do not infer facts beyond the exact wording of the question.
-Before answering the annotation questions, first determine what the entity focused on for questioning is in the current text query.
 
-Q1. Can the core target entity of the current question be reliably identified from the question text alone?
+Q1. Can the provided oracle entity be directly identified or reliably inferred from the question text alone?
 
 Choose one:
 - Yes
@@ -14,60 +16,64 @@ Choose one:
 - No
 
 Definitions:
-- Yes: the question text explicitly names the entity, or provides enough information to reliably identify it.
-- Partially: the text gives some descriptive clues, but not enough to uniquely or reliably identify the entity for retrieval.
-- No: the text alone does not provide usable information to identify the entity.
+- Yes: the question text explicitly names the oracle entity, or gives enough textual information to uniquely and reliably recover it.
+- Partially: the question text points toward the oracle entity through partial descriptions, relations, roles, or constraints, but does not uniquely identify it.
+- No: the question text does not provide enough textual information to recover the oracle entity without the image or external evidence.
 
 Critical rules:
-- Inspect the exact question text for explicit named entities: proper names, capitalized multi-word names, official place/building/person/organization/product/artwork/event names, or other uniquely identifying noun phrases.
-- If the core target entity is explicitly named in the question text, choose "Yes".
-- Do not claim that the entity is "not explicitly named" if the question text contains a named entity phrase.
-- If the question uses only deictic or visually grounded references such as "this building", "this object", "these guys", "the person in the image", choose "No" unless other text identifies the entity.
-- If the text gives a partial description or relation but not a stable retrieval target, choose "Partially".
+- Judge ONLY whether the question text can recover the provided oracle entity.
+- If the oracle entity is explicitly named in the question text, choose "Yes".
+- If the question uses only deictic or visually grounded references such as "this building", "this object", "the person in the image", or "the place shown", choose "No" unless the remaining text uniquely identifies the oracle entity.
+- If the text gives some clues about the oracle entity but leaves multiple plausible candidates, choose "Partially".
+- Do not replace the oracle entity with a different entity you think is more central. The oracle entity is fixed.
 
 Few-shot examples:
 
 Example 1
 Question: In what year was Tesla founded?
+Oracle entity: Tesla
 
 Expected JSON:
 {
   "focused_entity": "Tesla",
   "text_alone_identifies_entity": "Yes",
-  "rationale_1": "The entity Tesla is explicitly named in the question.",
+  "rationale_1": "The question text explicitly names the oracle entity Tesla.",
   "confidence": 95
 }
 
 Example 2
 Question: What was the common name of the church containing the Thistle Chapel?
+Oracle entity: St Giles' Cathedral
 
 Expected JSON:
 {
-  "focused_entity": "the church containing the Thistle Chapel",
+  "focused_entity": "St Giles' Cathedral",
   "text_alone_identifies_entity": "Partially",
-  "rationale_1": "The text gives a descriptive clue about the church but does not explicitly name it.",
+  "rationale_1": "The question text describes the target church through a relation to the Thistle Chapel, but does not explicitly name St Giles' Cathedral.",
   "confidence": 88
 }
 
 Example 3
 Question: What number is printed on the runner's jersey?
+Oracle entity: Usain Bolt
 
 Expected JSON:
 {
-  "focused_entity": "the runner's jersey",
+  "focused_entity": "Usain Bolt",
   "text_alone_identifies_entity": "No",
-  "rationale_1": "The question refers to a visually grounded target without identifying it in text.",
+  "rationale_1": "The question only refers to a visually grounded runner and does not provide enough text to identify Usain Bolt.",
   "confidence": 97
 }
 
 Example 4
 Question: What is the fuel economy of the 2016 Honda CR-V shown in the image?
+Oracle entity: 2016 Honda CR-V
 
 Expected JSON:
 {
-  "focused_entity": "the 2016 Honda CR-V"
+  "focused_entity": "2016 Honda CR-V",
   "text_alone_identifies_entity": "Yes",
-  "rationale_1": "The question text explicitly identifies the core entity as a 2016 Honda CR-V.",
+  "rationale_1": "The question text explicitly identifies the oracle entity as a 2016 Honda CR-V.",
   "confidence": 91
 }
 

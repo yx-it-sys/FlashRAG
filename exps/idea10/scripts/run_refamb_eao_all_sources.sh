@@ -2,27 +2,66 @@
 set -euo pipefail
 
 RUNNER="${RUNNER:-/home/you/FlashRAG/exps/idea10/run_refamb_eao_by_source.py}"
-TRAIN_PATH="${TRAIN_PATH:-/home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/task_balanced_analysis_subset.jsonl}"
-SOURCES=(${SOURCES:-mcsearch crag oven infoseek})
+SOURCE="${SOURCE:-mcsearch crag}"
+MODEL="${MODEL:-qwen2_5_7b}"
+TRAIN_PATH="${TRAIN_PATH:-/home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/task_balanced.jsonl}"
 LIMIT="${LIMIT:-1500}"
-SLEEP_BETWEEN="${SLEEP_BETWEEN:-10}"
-CONTINUE_ON_ERROR="${CONTINUE_ON_ERROR:-0}"
-
-if [[ -n "${MODELS:-}" ]]; then
-    read -r -a MODELS <<< "${MODELS}"
-else
-    MODELS=("GPT-5.1")
-fi
-declare -A CONFIG_ROOT_MAP=(
-    ["GPT-5.1"]="/home/you/FlashRAG/exps/idea10/configs/configs_refamb/gpt/enhanced"
-    # ["InternVL3.5-8B"]="/home/you/FlashRAG/exps/idea10/configs/configs_refamb/intervl3_5_8b"
-    # ["Qwen3-vl-4B"]="/home/you/FlashRAG/exps/idea10/configs/configs_refamb/qwen3_vl_4b"
-    # ["Qwen3-vl-8b"]="/home/you/FlashRAG/exps/idea10/configs/configs_refamb/qwen3_vl_8b"
-)
-
 GPU_ID="${GPU_ID:-${CUDA_VISIBLE_DEVICES:-}}"
-CONFIG_GROUP="${CONFIG_GROUP:-enhanced}"
-LOG_ROOT="${LOG_ROOT:-/home/you/FlashRAG/exps/idea10/data/result/run_logs/refamb_eao_$(date +%Y%m%d_%H%M%S)}"
+SLEEP_BETWEEN="${SLEEP_BETWEEN:-10}"
+POST_RUN_CLEANUP_SLEEP="${POST_RUN_CLEANUP_SLEEP:-5}"
+DISABLE_AUTO_HISTORY_RESUME="${DISABLE_AUTO_HISTORY_RESUME:-1}"
+CONFIG_SNAPSHOT_ROOT="${CONFIG_SNAPSHOT_ROOT:-/tmp/refamb_config_snapshots}"
+DEFAULT_CONFIG_SWEEP_ROOT=""
+DEFAULT_SWEEP_CONFIGS="${SWEEP_CONFIGS:-}"
+if [[ "${MODEL}" == "qwen2_5_7b" ]]; then
+    DEFAULT_CONFIG_SWEEP_ROOT="/home/you/FlashRAG/exps/idea10/configs/configs_refamb/qwen2_5_7b/enhanced"
+    DEFAULT_SWEEP_CONFIGS="${DEFAULT_SWEEP_CONFIGS:-sim/enhanced_thr_090}"
+elif [[ "${MODEL}" == "gpt" ]]; then
+    DEFAULT_CONFIG_SWEEP_ROOT="/home/you/FlashRAG/exps/idea10/configs/configs_refamb/gpt"
+    DEFAULT_SWEEP_CONFIGS="${DEFAULT_SWEEP_CONFIGS:-enhanced}"
+fi
+CONFIG_SWEEP_ROOT="${CONFIG_SWEEP_ROOT:-${DEFAULT_CONFIG_SWEEP_ROOT}}"
+SWEEP_CONFIGS="${SWEEP_CONFIGS:-${DEFAULT_SWEEP_CONFIGS}}"
+read -r -a SOURCES <<< "${SOURCE}"
+
+resolve_config_dir() {
+    local sweep_root="$1"
+    local config_spec="$2"
+
+    if [[ -z "${config_spec}" ]]; then
+        return 1
+    fi
+
+    if [[ -d "${config_spec}" ]]; then
+        printf '%s\n' "${config_spec}"
+        return 0
+    fi
+
+    if [[ -n "${sweep_root}" && -d "${sweep_root}/${config_spec}" ]]; then
+        printf '%s\n' "${sweep_root}/${config_spec}"
+        return 0
+    fi
+
+    return 1
+}
+
+cleanup_runtime_processes() {
+    pkill -f vllm >/dev/null 2>&1 || true
+    pkill -f api_server >/dev/null 2>&1 || true
+    pkill -f openai.api_server >/dev/null 2>&1 || true
+    sleep "${POST_RUN_CLEANUP_SLEEP}"
+}
+
+create_config_snapshot() {
+    local config_dir="$1"
+    local config_spec="$2"
+    local safe_label="${config_spec//\//_}"
+    local snapshot_dir="${CONFIG_SNAPSHOT_ROOT}/${MODEL}/${safe_label}_$(date +%Y%m%d_%H%M%S)_$$"
+
+    mkdir -p "${CONFIG_SNAPSHOT_ROOT}/${MODEL}"
+    cp -a "${config_dir}" "${snapshot_dir}"
+    printf '%s\n' "${snapshot_dir}"
+}
 
 if [[ -z "${GPU_ID}" ]]; then
     echo "GPU_ID or CUDA_VISIBLE_DEVICES must be set to an absolute CUDA device id, e.g. 1."
@@ -30,134 +69,90 @@ if [[ -z "${GPU_ID}" ]]; then
 fi
 export CUDA_VISIBLE_DEVICES="${GPU_ID}"
 
-mkdir -p "${LOG_ROOT}"
-
 echo "Runner: ${RUNNER}"
-echo "Train path: ${TRAIN_PATH}"
 echo "Sources: ${SOURCES[*]}"
-echo "Models: ${MODELS[*]}"
-echo "Limit: ${LIMIT:-<unset>}"
-echo "Log root: ${LOG_ROOT}"
+echo "Model: ${MODEL}"
+echo "Train path: ${TRAIN_PATH}"
+echo "Limit: ${LIMIT}"
+echo "Config sweep root: ${CONFIG_SWEEP_ROOT:-<disabled>}"
+echo "Config snapshot root: ${CONFIG_SNAPSHOT_ROOT}"
+echo "Sweep configs: ${SWEEP_CONFIGS:-<unset>}"
 echo "CUDA_VISIBLE_DEVICES: ${CUDA_VISIBLE_DEVICES}"
-echo "Config group: ${CONFIG_GROUP}"
+echo "Post-run cleanup sleep: ${POST_RUN_CLEANUP_SLEEP}"
+echo "Disable auto history resume: ${DISABLE_AUTO_HISTORY_RESUME}"
 echo
 
-source_count="${#SOURCES[@]}"
-limit_per_source=()
 if [[ -n "${LIMIT}" ]]; then
     if ! [[ "${LIMIT}" =~ ^[0-9]+$ ]]; then
-        echo "LIMIT must be a non-negative integer or empty, got: ${LIMIT}"
+        echo "LIMIT must be a non-negative integer, got: ${LIMIT}"
         exit 1
     fi
-    if [[ "${LIMIT}" -lt 0 ]]; then
-        echo "LIMIT must be non-negative, got: ${LIMIT}"
-        exit 1
-    fi
-
-    base_limit=$((LIMIT / source_count))
-    remainder=$((LIMIT % source_count))
-    for ((i = 0; i < source_count; i++)); do
-        per_source=$base_limit
-        if [[ "${i}" -lt "${remainder}" ]]; then
-            per_source=$((per_source + 1))
-        fi
-        limit_per_source+=("${per_source}")
-    done
 fi
 
-for model in "${MODELS[@]}"; do
-    config_root="${CONFIG_ROOT_MAP[${model}]:-}"
-    if [[ -z "${config_root}" ]]; then
-        echo "No config root mapping found for model: ${model}"
+if [[ -z "${CONFIG_SWEEP_ROOT}" ]]; then
+    echo "CONFIG_SWEEP_ROOT is empty. Set it explicitly or use MODEL=qwen2_5_7b."
+    exit 1
+fi
+
+if [[ -z "${SWEEP_CONFIGS}" ]]; then
+    echo "SWEEP_CONFIGS must be set explicitly when CONFIG_SWEEP_ROOT is enabled."
+    exit 1
+fi
+
+read -r -a SWEEP_CONFIG_ARRAY <<< "${SWEEP_CONFIGS}"
+
+for ((config_idx=0; config_idx<${#SWEEP_CONFIG_ARRAY[@]}; config_idx++)); do
+    config_spec="${SWEEP_CONFIG_ARRAY[config_idx]}"
+    config_dir="$(resolve_config_dir "${CONFIG_SWEEP_ROOT}" "${config_spec}")" || {
+        echo "Config spec not found: ${config_spec}"
         exit 1
-    fi
-    if [[ -d "${config_root}/enhanced" ]]; then
-        config_source_dir="${config_root}/enhanced"
-    else
-        config_source_dir="${config_root}"
-    fi
-    if [[ ! -d "${config_source_dir}" ]]; then
-        echo "Config source directory does not exist: ${config_source_dir}"
-        exit 1
-    fi
+    }
+    snapshot_config_dir="$(create_config_snapshot "${config_dir}" "${config_spec}")"
+    sweep_label="$(basename "${config_dir}")"
 
-    snapshot_suffix="${CONFIG_GROUP}_snapshot_$(date +%Y%m%d_%H%M%S)_$$"
-    config_runtime_dir_base="${CONFIG_RUNTIME_DIR_BASE:-/tmp/refamb_config_snapshots/${model}}"
-    config_runtime_dir="${config_runtime_dir_base}/${snapshot_suffix}"
-    if [[ -e "${config_runtime_dir}" ]]; then
-        echo "Unexpected existing config snapshot path: ${config_runtime_dir}"
-        exit 1
-    fi
+    echo "[$(date '+%F %T')] Start sweep config=${config_spec} (${config_idx} / ${#SWEEP_CONFIG_ARRAY[@]})"
+    echo "[$(date '+%F %T')] Config snapshot dir=${snapshot_config_dir}"
 
-    mkdir -p "${config_runtime_dir_base}"
-    cp -a "${config_source_dir}" "${config_runtime_dir}"
-
-    model_log_dir="${LOG_ROOT}/${model}"
-    mkdir -p "${model_log_dir}"
-
-    echo "============================================================"
-    echo "Model: ${model}"
-    echo "Config source: ${config_source_dir}"
-    echo "Config snapshot dir: ${config_runtime_dir}"
-    echo "Model log dir: ${model_log_dir}"
-    echo "============================================================"
-
-    for idx in "${!SOURCES[@]}"; do
-        source="${SOURCES[$idx]}"
-        source_limit=""
-        if [[ -n "${LIMIT}" ]]; then
-            source_limit="${limit_per_source[$idx]}"
-            if [[ "${source_limit}" -le 0 ]]; then
-                echo "[$(date '+%F %T')] Skip source=${source} because assigned limit is 0."
-                echo
-                continue
-            fi
-        fi
-
-        log_path="${model_log_dir}/${source}.log"
-        if [[ -n "${source_limit}" ]]; then
-            echo "[$(date '+%F %T')] Start model=${model} source=${source} limit=${source_limit}. Log: ${log_path}"
-        else
-            echo "[$(date '+%F %T')] Start model=${model} source=${source}. Log: ${log_path}"
+    for ((i=0; i<${#SOURCES[@]}; i++)); do
+        source="${SOURCES[i]}"
+        config_path="${snapshot_config_dir}/config_stage_${source}.yaml"
+        if [[ ! -f "${config_path}" ]]; then
+            echo "Missing config file for source=${source}: ${config_path}"
+            exit 1
         fi
 
         cmd=(
             python "${RUNNER}"
-            --model "${model}"
             --source "${source}"
+            --model "${MODEL}"
             --train-path "${TRAIN_PATH}"
-            --config-dir "${config_runtime_dir}"
+            --config-path "${config_path}"
+            --save-note-suffix "${sweep_label}"
         )
-        if [[ -n "${source_limit}" ]]; then
-            cmd+=(--limit "${source_limit}")
+        if [[ -n "${LIMIT}" ]]; then
+            cmd+=(--limit "${LIMIT}")
+        fi
+        if [[ "${DISABLE_AUTO_HISTORY_RESUME}" == "1" ]]; then
+            cmd+=(--disable-auto-history-resume)
         fi
 
-        set +e
-        "${cmd[@]}" 2>&1 | tee "${log_path}"
-        status="${PIPESTATUS[0]}"
-        set -e
+        echo "[$(date '+%F %T')] Start source=${source} config=${config_path}"
+        "${cmd[@]}"
+        echo "[$(date '+%F %T')] Finished source=${source} config=${config_path}"
 
-        if [[ "${status}" -ne 0 ]]; then
-            echo "[$(date '+%F %T')] model=${model} source=${source} failed with exit code ${status}." | tee -a "${log_path}"
-            if [[ "${CONTINUE_ON_ERROR}" != "1" ]]; then
-                echo "Stop because CONTINUE_ON_ERROR=${CONTINUE_ON_ERROR}."
-                exit "${status}"
-            fi
-            echo "Continue to next source because CONTINUE_ON_ERROR=1."
-        else
-            echo "[$(date '+%F %T')] Finished model=${model} source=${source}."
+        echo "[$(date '+%F %T')] Cleaning runtime processes before next stage..."
+        cleanup_runtime_processes
+        if (( i + 1 < ${#SOURCES[@]} )); then
+            echo "Waiting ${SLEEP_BETWEEN}s before next stage..."
+            sleep "${SLEEP_BETWEEN}"
         fi
-
-        echo "Waiting ${SLEEP_BETWEEN}s for the Python process to exit cleanly and release GPU memory..."
-        sleep "${SLEEP_BETWEEN}"
-        if command -v nvidia-smi >/dev/null 2>&1; then
-            nvidia-smi || true
-        fi
-        echo
     done
 
-    echo "[$(date '+%F %T')] Finished model=${model}. Logs: ${model_log_dir}"
-    echo
+    echo "[$(date '+%F %T')] Finished sweep config=${config_spec}"
+    if (( config_idx + 1 < ${#SWEEP_CONFIG_ARRAY[@]} )); then
+        echo "Waiting ${SLEEP_BETWEEN}s before next hyperparameter config..."
+        sleep "${SLEEP_BETWEEN}"
+    fi
 done
 
-echo "[$(date '+%F %T')] All requested models and sources finished. Logs: ${LOG_ROOT}"
+echo "[$(date '+%F %T')] Finished all requested sources."

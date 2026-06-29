@@ -55,7 +55,12 @@ metrics:
   - acc
   - precision
   - recall
+  - llm
 save_metric_score: true
+gpt_acc_setting:
+    model_name: Pro/deepseek-ai/DeepSeek-V3
+    api_key: sk-rktafjgbcwlnvuzmrxhkilhyqiirqozafurqyqmorrydylli
+    base_url: https://api.siliconflow.cn/v1
 
 roi_preprocess_config:
   enabled: false

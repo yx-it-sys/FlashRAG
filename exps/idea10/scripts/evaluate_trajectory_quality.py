@@ -19,7 +19,7 @@ import numpy as np
 import yaml
 from openai import OpenAI
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 from flashrag.config import Config
 from flashrag.utils import get_generator
 from flashrag.retriever.encoder import Encoder
@@ -38,31 +38,16 @@ for k in [
 DEFAULT_INPUT = None
 DEFAULT_OUTPUT_DIR = None
 DEFAULT_BATCH_PARENT_DIRS = [
+    # Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_2026_06_27_16_48_refamb_eao_mcsearch_qwen2_5_7b_enhanced_thr_090_stage"),
+    # Path(
+    #     "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_2026_06_27_16_48_refamb_eao_oven_qwen2_5_7b_enhanced_thr_090_stage"
+    # ),
+    # Path(
+    #     "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_2026_06_27_17_13_refamb_eao_infoseek_qwen2_5_7b_enhanced_thr_090_stage"
+    # ),
     Path(
-        "/home/you/FlashRAG/exps/idea10/data/result/scaling_qwen3_5/4b/crag"
-    ),
-    Path(
-        "/home/you/FlashRAG/exps/idea10/data/result/scaling_qwen3_5/4b/infoseek"
-    ),
-    Path(
-        "/home/you/FlashRAG/exps/idea10/data/result/scaling_qwen3_5/4b/mcsearch"
-    ),
-    Path(
-        "/home/you/FlashRAG/exps/idea10/data/result/scaling_qwen3_5/4b/oven"
-    ),
-    Path(
-        "/home/you/FlashRAG/exps/idea10/data/result/scaling_qwen3_5/9b/crag"
-    ),
-    Path(
-        "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-8b/RefAmb_2026_05_23_12_10_refamb_infoseek_qwen3_vl_8b_stage"
-    ),
-    Path(
-        "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-8b/RefAmb_2026_05_23_12_53_refamb_mcsearch_qwen3_vl_8b_stage"
-    ),
-    Path(
-        "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-8b/RefAmb_2026_05_23_14_07_refamb_crag_qwen3_vl_8b_stage"
-    ),
-
+            "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_2026_06_27_17_43_refamb_eao_crag_qwen2_5_7b_enhanced_thr_090_stage"
+        ),
 ]
 DEFAULT_BATCH_OUTPUT_DIR_NAME = "trajectory_quality_eval_whole_delta_F_updated"
 DEFAULT_BATCH_INPUT_FILENAME = "omnisearch_trajectories.jsonl"
@@ -283,6 +268,10 @@ def parse_retrieval_action(content: str) -> str | None:
     if lowered.startswith("no retrieval"):
         return "no_retrieval_result"
     return None
+
+
+def is_search_instruction(content: str) -> bool:
+    return parse_retrieval_action(content) is not None
 
 
 def extract_json_block(text: str) -> dict:
@@ -618,14 +607,89 @@ class DenseSimilarity:
 
 
 def build_iterations(trajectory: list[dict]) -> list[dict]:
+    def parse_assistant_response(content: str) -> dict[str, str | None]:
+        text = content or ""
+
+        def extract_tag(tag: str) -> str:
+            pattern = rf"<{tag}>(.*?)</{tag}>"
+            match = re.search(pattern, text, flags=re.IGNORECASE | re.DOTALL)
+            return normalize_whitespace(match.group(1)) if match else ""
+
+        reason = extract_tag("reason")
+        answer = extract_tag("answer")
+        search_block = ""
+        search_kind = None
+        query = ""
+
+        text_search = re.search(r"<text_search>(.*?)</text_search>", text, flags=re.IGNORECASE | re.DOTALL)
+        if text_search:
+            search_kind = "text_retrieval"
+            query = normalize_whitespace(text_search.group(1))
+            search_block = query
+        else:
+            search_block = extract_tag("search")
+            if search_block:
+                search_kind = "image_retrieval" if re.search(r"<img\b", search_block, flags=re.IGNORECASE) else "text_retrieval"
+                if search_kind == "text_retrieval":
+                    query = search_block
+
+        return {
+            "reason": reason,
+            "answer": answer,
+            "search_kind": search_kind,
+            "query": query,
+            "search_block": search_block,
+            "search_text": search_block,
+        }
+
     iterations = []
     latest_sub_question = ""
+    pending_search: dict | None = None
+    open_iteration: dict | None = None
+
+    def finalize_open_iteration(reaction_index: int, reaction_action: str | None, reaction_text: str) -> None:
+        nonlocal open_iteration
+        if open_iteration is None:
+            return
+        open_iteration["iteration_index"] = len(iterations) + 1
+        open_iteration["reaction_index"] = reaction_index
+        open_iteration["reaction_action"] = reaction_action
+        open_iteration["reaction_text"] = reaction_text
+        iterations.append(open_iteration)
+        open_iteration = None
+
     for idx, step in enumerate(trajectory):
         action = step.get("action")
+
         if action == "sub-question":
             latest_sub_question = normalize_whitespace(step.get("content", ""))
             latest_sub_question = re.sub(r"</[^>]+>\s*$", "", latest_sub_question).strip()
             continue
+
+        if action == "assistant_response":
+            parsed = parse_assistant_response(step.get("content", ""))
+
+            if open_iteration is not None:
+                finalize_open_iteration(idx, action, step.get("content", ""))
+
+            if parsed["search_kind"] is not None:
+                pending_search = {
+                    "search_index": idx,
+                    "retrieval_index": None,
+                    "retrieval_action": None,
+                    "mode": parsed["search_kind"],
+                    "query": parsed["query"] or "",
+                    "sub_question": normalize_whitespace(parsed["reason"]) or latest_sub_question or parsed["query"] or "",
+                    "retrieval_content": "",
+                    "reaction_index": None,
+                    "reaction_action": None,
+                    "reaction_text": "",
+                }
+            elif parsed["answer"]:
+                # Final answer without a new search still closes the previous iteration above.
+                continue
+            continue
+
         if action == "search":
             retrieval_action = None
             query = parse_search_query(step.get("content", ""))
@@ -650,7 +714,7 @@ def build_iterations(trajectory: list[dict]) -> list[dict]:
                     if not query:
                         query = normalize_whitespace(str(later.get("query", "") or ""))
                     continue
-                if later_action in {"thought", "final_answer"}:
+                if later_action in {"thought", "final_answer", "assistant_response"}:
                     reaction_index = later_idx
                     reaction_action = later_action
                     reaction_text = later.get("content", "")
@@ -661,6 +725,11 @@ def build_iterations(trajectory: list[dict]) -> list[dict]:
                 retrieval_action = parse_retrieval_action(step.get("content", ""))
                 if retrieval_action is None:
                     continue
+            has_explicit_retrieval_result = retrieval_index != idx
+            evidence_source = "explicit_retrieval_result"
+            if not has_explicit_retrieval_result and is_search_instruction(step.get("content", "")):
+                retrieval_content = ""
+                evidence_source = "reaction_text_fallback"
 
             sub_question = normalize_whitespace(latest_sub_question) or query
             iterations.append(
@@ -673,11 +742,25 @@ def build_iterations(trajectory: list[dict]) -> list[dict]:
                     "query": query,
                     "sub_question": sub_question,
                     "retrieval_content": retrieval_content,
+                    "evidence_source": evidence_source,
                     "reaction_index": reaction_index,
                     "reaction_action": reaction_action,
                     "reaction_text": reaction_text,
                 }
             )
+            continue
+
+        if action in {"retrieval_result", "text_retrieval_result", "image_retrieval_result", "no_retrieval_result"}:
+            if pending_search is None:
+                continue
+            pending_search["retrieval_index"] = idx
+            pending_search["retrieval_action"] = action
+            pending_search["retrieval_content"] = step.get("content", "") or ""
+            pending_search["mode"] = step.get("mode") or pending_search["mode"]
+            if not pending_search["query"]:
+                pending_search["query"] = normalize_whitespace(str(step.get("query", "") or ""))
+            open_iteration = pending_search
+            pending_search = None
             continue
 
     return iterations
@@ -1358,6 +1441,11 @@ def evaluate_sample(
         query = iteration["query"] or sample.get("question", "")
         sub_question = normalize_whitespace(iteration.get("sub_question", ""))
         reaction_text = normalize_whitespace(iteration.get("reaction_text", ""))
+        evidence_text = normalize_whitespace(iteration.get("retrieval_content", ""))
+        evidence_source = iteration.get("evidence_source", "explicit_retrieval_result")
+        if not evidence_text and reaction_text:
+            evidence_text = reaction_text
+            evidence_source = "reaction_text_fallback"
         if not sub_question:
             sub_question = normalize_whitespace(query)
         force_zero_utility = not reaction_text
@@ -1433,7 +1521,7 @@ def evaluate_sample(
                 )
             facts = judge.extract_facts(
                 query=query,
-                evidence=iteration["retrieval_content"],
+                evidence=evidence_text,
                 retrieval_type=retrieval_type,
             )
 
@@ -1514,6 +1602,8 @@ def evaluate_sample(
                 "similarity_threshold": sim_threshold,
                 "fact_similarity_threshold": fact_sim_threshold,
                 "retrieval_index": iteration["retrieval_index"],
+                "evidence_source": evidence_source,
+                "evidence_text": evidence_text,
                 "reaction_index": iteration["reaction_index"],
                 "reaction_action": iteration["reaction_action"],
                 "reaction_text": reaction_text,

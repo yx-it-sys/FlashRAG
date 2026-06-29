@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from collections import Counter
 from pathlib import Path
 
@@ -22,10 +23,10 @@ SOURCE_DISPLAY_NAMES = {
 }
 
 SOURCE_COLORS = {
-    "infoseek": "#5f96c4",
-    "mcsearch": "#6fb7b7",
-    "crag": "#e4894f",
-    "oven": "#976e97",
+    "infoseek": "#88B2DC",
+    "mcsearch": "#99D0C9",
+    "crag": "#F0AE67",
+    "oven": "#BE8CB8",
 }
 
 TASK_COLORS = {
@@ -96,29 +97,47 @@ def draw_pie(ax, counts: Counter, fontsize: int):
     display_labels = [SOURCE_DISPLAY_NAMES.get(name, name) for name in labels]
 
     ax.set_facecolor("white")
-    _, texts, autotexts = ax.pie(
+    wedges, _ = ax.pie(
         values,
-        labels=display_labels,
         startangle=90,
         counterclock=False,
-        autopct=lambda pct: f"{pct:.1f}%",
-        pctdistance=0.67,
-        labeldistance=1.07,
-        wedgeprops=dict(linewidth=1.0, edgecolor="white"),
+        radius=1.16,
+        wedgeprops=dict(linewidth=1.2, edgecolor="white"),
         colors=[SOURCE_COLORS[name] for name in labels],
     )
 
-    for text in texts:
-        text.set_fontsize(fontsize)
-        text.set_family("serif")
-        text.set_color(TEXT_COLOR)
-        text.set_weight("bold")
-
-    for text in autotexts:
-        text.set_fontsize(max(fontsize - 4, 8))
-        text.set_family("serif")
-        text.set_color(TEXT_COLOR)
-        text.set_weight("bold")
+    total = sum(values)
+    for wedge, label, value in zip(wedges, display_labels, values):
+        theta = (wedge.theta1 + wedge.theta2) / 2.0
+        theta_rad = theta * 3.141592653589793 / 180.0
+        span = abs(wedge.theta2 - wedge.theta1)
+        mid_radius = 0.60 if span >= 80 else 0.56 if span >= 50 else 0.52
+        x = mid_radius * math.cos(theta_rad)
+        y = mid_radius * math.sin(theta_rad)
+        if label == "OVEN":
+            y += 0.06
+        ax.text(
+            x,
+            y + 0.045,
+            label,
+            ha="center",
+            va="center",
+            fontsize=max(fontsize - 2, 11),
+            family="serif",
+            color=TEXT_COLOR,
+            weight="bold",
+        )
+        ax.text(
+            x,
+            y - 0.045,
+            f"{value / total * 100:.1f}%",
+            ha="center",
+            va="center",
+            fontsize=max(fontsize - 4, 9),
+            family="serif",
+            color=TEXT_COLOR,
+            weight="bold",
+        )
 
     ax.set_aspect("equal")
     ax.set_axis_off()
@@ -254,7 +273,18 @@ def build_pie_figure(counts: Counter, fontsize: int):
     apply_serif_style()
     fig, ax = plt.subplots(figsize=(8.8, 6.8), facecolor="white")
     draw_pie(ax, counts, fontsize)
-    fig.tight_layout()
+    fig.subplots_adjust(left=0.01, right=0.99, top=0.995, bottom=0.10)
+    fig.text(
+        0.5,
+        0.02,
+        "(a) RefAmb source distribution",
+        ha="center",
+        va="bottom",
+        fontsize=max(fontsize - 1, 12),
+        family="serif",
+        weight="bold",
+        color=TEXT_COLOR,
+    )
     return fig
 
 

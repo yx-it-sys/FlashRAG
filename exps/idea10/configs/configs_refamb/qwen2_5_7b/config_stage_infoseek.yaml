@@ -79,4 +79,4 @@ omni_retrieved_doc_char_limit: 2000
 crag_image_attr_max_chars: 500
 crag_image_entity_max_chars: 1200
 omni_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/omni_prompt.toml
-omni_prompt_version: system_prompt1
+omni_prompt_version: system_prompt

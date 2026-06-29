@@ -8,6 +8,16 @@ from PIL import Image
 import torch
 from torchvision.ops import box_convert
 
+for k in [
+    "http_proxy",
+    "https_proxy",
+    "HTTP_PROXY",
+    "HTTPS_PROXY",
+    "all_proxy",
+    "ALL_PROXY",
+]:
+    os.environ.pop(k, None)
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="GroundingDINO ROI crop worker")

@@ -1,4 +1,0 @@
-setting,query_similarity_eq_1,delta_f_eq_0,mean_delta_f,query_similarity_count,query_similarity_total,delta_f_count,delta_f_total
-Original,34.6%,46.0%,0.3045,841,2428,1861,4049
-Oracle,28.5%,36.0%,0.3793,196,687,429,1192
-Disturb,25.4%,35.3%,0.3946,150,591,324,918

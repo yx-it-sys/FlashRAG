@@ -23,6 +23,7 @@ generation_params:
   top_p: 1.0
 openai_setting:
   api_key: sk-xJuYONScbEC1D87pNhUB29aj9nSjHo2cgsJk1xCL7DUpxQl8
+  # new api_key: sk-ckI2iw28yckHqJlxTgHVp1EjLnjtBtQT2JANou3sixQP4l8b
   base_url: https://api.chatanywhere.tech/v1/
 
 retrieval_method: clip
@@ -67,7 +68,7 @@ gpt_acc_setting:
 save_metric_score: true
 
 roi_preprocess_config:
-  enabled: false
+  enabled: true
   python_bin: /home/you/miniconda3/envs/dino/bin/python3.11
   script_path: /home/you/FlashRAG/exps/idea10/scripts/groundingdino_roi_worker.py
   groundingdino_root: /home/you/GroundingDINO
@@ -91,12 +92,13 @@ all_prompts_path: /home/you/FlashRAG/exps/idea10/prompts/new_method/prompt_books
 omni_prompt_path: /home/you/FlashRAG/exps/idea10/prompts/new_method/prompt_books.toml
 omni_prompt_version: system_vlm_prompt
 omni_module_log_char_limit: 1200
+omni_controller_trace_filename: controller_actions.jsonl
 
 # Experiments Hyper-parameters
 # 判断检索内容是否相关的相似度阈值，高于该阈值就触发修复
 omni_query_similarity_threshold: 0.9
 # 判断信息增量是否足够的阈值，低于该值说明信息增量不足，需要重写
-omni_failure_threshold: 0.05
+omni_failure_threshold: 0.20
 # 论文算法中的K，允许多少次重写
 omni_max_repair_count: 2
 # 最大迭代次数
@@ -105,5 +107,8 @@ omni_max_turns: 5
 omni_min_effective_retrieval_chars: 10
 # 计算信息增量时的Facts去重阈值
 omni_info_gain_similarity_threshold: 0.9
-tightening_module: false
+tightening_module: true
 rebuild_module: true
+missing_info_repair_module: true
+reflection_recovery_module: true
+pruning_module: true

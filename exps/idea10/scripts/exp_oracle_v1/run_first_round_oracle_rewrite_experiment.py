@@ -35,19 +35,6 @@ from flashrag.pipeline import OmniSearchPipeline
 from flashrag.utils import get_generator
 
 
-DEFAULT_CONFIG = Path("/home/you/FlashRAG/exps/idea10/configs/configs_refamb/intervl3_5_8b/config_stage_crag.yaml")
-DEFAULT_BASELINE_RESULT_DIR = Path(
-    "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_InternVL3.5-8B/RefAmb_2026_05_09_15_53_refamb_oven_intervl3_5_8b_stage"
-)
-DEFAULT_REWRITE_LABEL_PATH = (
-    DEFAULT_BASELINE_RESULT_DIR
-    / "label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.rewrite.jsonl"
-)
-ROOT_RESULT_DIRS = [
-    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_qwen3_vl_32b"),
-    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-8b"),
-    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-4B"),
-]
 ORACLE_REWRITE_LABEL_REL_PATH = Path(
     "label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.rewrite.jsonl"
 )
@@ -59,7 +46,9 @@ PKILL_PATTERNS = [
     "openai.api_server",
 ]
 DEFAULT_MAX_TURNS = 5
-SUBSET_SPLIT_NAME = "task_balanced_analysis_subset"
+TASK_BALANCED_JSONL_PATH = Path(
+    "/home/you/FlashRAG/exps/idea10/data/datasets/RefAmb/task_balanced.jsonl"
+)
 
 
 class FrameworkConfig(dict):
@@ -81,9 +70,13 @@ def parse_args() -> argparse.Namespace:
             "is rewritten with the oracle query, while preserving subsequent turns."
         )
     )
-    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
-    parser.add_argument("--baseline-result-dir", type=Path, default=DEFAULT_BASELINE_RESULT_DIR)
-    parser.add_argument("--rewrite-label-path", type=Path, default=DEFAULT_REWRITE_LABEL_PATH)
+    parser.add_argument(
+        "--source-dir",
+        type=Path,
+        action="append",
+        required=True,
+        help="Result directory containing config.yaml and oracle rewrite labels. Repeat for multiple sources.",
+    )
     parser.add_argument("--output-dir", type=Path, default=None)
     parser.add_argument("--sample-ids-path", type=Path, default=None)
     parser.add_argument("--max-samples", type=int, default=None)
@@ -91,27 +84,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skip-eval", action="store_true")
     parser.add_argument("--max-turns", type=int, default=DEFAULT_MAX_TURNS)
     return parser.parse_args()
-
-
-def discover_source_dirs() -> list[Path]:
-    source_dirs: list[Path] = []
-    for root_dir in ROOT_RESULT_DIRS:
-        if not root_dir.exists():
-            raise FileNotFoundError(f"Root result dir not found: {root_dir}")
-        for child in sorted(root_dir.iterdir()):
-            if not child.is_dir() or not child.name.endswith("_stage"):
-                continue
-            config_path = child / "config_oracle.yaml"
-            rewrite_label_path = child / ORACLE_REWRITE_LABEL_REL_PATH
-            if config_path.exists() and rewrite_label_path.exists():
-                source_dirs.append(child)
-
-    if not source_dirs:
-        raise RuntimeError(
-            "No runnable source dirs found under ROOT_RESULT_DIRS; "
-            "expected *_stage directories with config_oracle.yaml and oracle rewrite label file."
-        )
-    return source_dirs
 
 
 def cleanup_gpu_processes() -> None:
@@ -327,10 +299,7 @@ def load_baseline_maps(result_dir: Path) -> tuple[dict[str, dict], dict[str, dic
 
 
 def load_source_subset_rows(config: FrameworkConfig) -> list[dict]:
-    data_dir = Path(config["data_dir"])
-    if not data_dir.is_absolute():
-        data_dir = (PROJECT_ROOT / data_dir).resolve()
-    subset_path = data_dir / config["dataset_name"] / f"{SUBSET_SPLIT_NAME}.jsonl"
+    subset_path = TASK_BALANCED_JSONL_PATH
     source = str(config.get("source") or "").strip()
     if not source:
         raise ValueError("Config is missing `source`, which is required for source-based subset filtering.")
@@ -861,7 +830,6 @@ def run_single_source(args: argparse.Namespace) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     selected_ids = load_id_filter(args.sample_ids_path)
-    rewrite_map, rewrite_summary = build_rewrite_map(args.rewrite_label_path, selected_ids)
 
     config_override = {
         "save_dir": str(output_dir),
@@ -872,6 +840,12 @@ def run_single_source(args: argparse.Namespace) -> None:
     raw_config = Config(str(args.config), config_dict=config_override)
     config = build_framework_config(raw_config)
     data_root = resolve_data_root(config)
+    baseline_result_dir = Path(args.config).parent
+    rewrite_label_path = baseline_result_dir / ORACLE_REWRITE_LABEL_REL_PATH
+    if not rewrite_label_path.exists():
+        raise FileNotFoundError(f"Missing oracle rewrite label file: {rewrite_label_path}")
+    rewrite_map, rewrite_summary = build_rewrite_map(rewrite_label_path, selected_ids)
+
     source_subset_rows = load_source_subset_rows(config)
     full_dataset = Dataset(config=config, data=source_subset_rows)
     subset_dataset = build_subset_dataset(
@@ -883,7 +857,7 @@ def run_single_source(args: argparse.Namespace) -> None:
     subset_ids = {item.id for item in subset_dataset}
     rewrite_map = {sample_id: meta for sample_id, meta in rewrite_map.items() if sample_id in subset_ids}
 
-    baseline_trajectory_map, baseline_intermediate_map = load_baseline_maps(args.baseline_result_dir)
+    baseline_trajectory_map, baseline_intermediate_map = load_baseline_maps(baseline_result_dir)
 
     generator = get_generator(config)
     pipeline = OmniSearchPipeline(config=config, retriever=None, generator=generator)
@@ -945,8 +919,8 @@ def run_single_source(args: argparse.Namespace) -> None:
     run_summary = {
         "experiment_tag": "first_round_oracle_rewrite",
         "config_path": str(args.config),
-        "baseline_result_dir": str(args.baseline_result_dir),
-        "rewrite_label_path": str(args.rewrite_label_path),
+        "baseline_result_dir": str(baseline_result_dir),
+        "rewrite_label_path": str(rewrite_label_path),
         "output_dir": str(output_dir),
         "max_turns": args.max_turns,
         "skip_eval": args.skip_eval,
@@ -961,25 +935,21 @@ def run_single_source(args: argparse.Namespace) -> None:
 
 
 def _run_multi_source(args: argparse.Namespace) -> None:
-    source_dirs = discover_source_dirs()
+    source_dirs = list(args.source_dir)
+    if not source_dirs:
+        raise ValueError("At least one --source-dir must be provided.")
     total = len(source_dirs)
     for idx, source_dir in enumerate(source_dirs, start=1):
         source_args = deepcopy(args)
-        source_args.config = source_dir / "config_oracle.yaml"
-        source_args.baseline_result_dir = source_dir
-        source_args.rewrite_label_path = source_dir / ORACLE_REWRITE_LABEL_REL_PATH
+        source_args.config = source_dir / "config.yaml"
         source_args.output_dir = source_dir / MULTI_SOURCE_OUTPUT_DIR_NAME
 
         if not source_args.config.exists():
             raise FileNotFoundError(f"Missing config: {source_args.config}")
-        if not source_args.rewrite_label_path.exists():
-            raise FileNotFoundError(f"Missing oracle rewrite label file: {source_args.rewrite_label_path}")
 
         print(f"\n===== [{idx}/{total}] Start Oracle Replay Experiment =====", flush=True)
         print(f"[Run] source_dir={source_dir}", flush=True)
         print(f"[Run] config={source_args.config}", flush=True)
-        print(f"[Run] baseline_result_dir={source_args.baseline_result_dir}", flush=True)
-        print(f"[Run] rewrite_label_path={source_args.rewrite_label_path}", flush=True)
         print(f"[Run] output_dir={source_args.output_dir}", flush=True)
         try:
             run_single_source(source_args)

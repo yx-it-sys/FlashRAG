@@ -1,4 +1,0 @@
-evaluation_level,metric,value
-Trajectory-level,Spearman's rho,0.7061
-Trajectory-level,Kendall's tau,0.6467
-Step-level utility alignment,Cohen's kappa,0.7198

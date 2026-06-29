@@ -1,8 +1,0 @@
-property,count,interpretation
-text_alone_identifies_entity=No,38/43,Entity focus depends on the image
-external_evidence_dependency=Yes,40/43,Answer requires retrieval beyond vision
-Single-hop Attribute Query,12/43,Attribute lookup over a visual referent
-Entity Recognition,10/43,Query benefits from category-level exploration
-Multi-hop,10/43,Disturb can perturb a stale relation chain
-Comparison,7/43,Generic query preserves comparison dimension
-Subproblem Aggregation,4/43,Mixed effect; easily drifts if branches are fragile

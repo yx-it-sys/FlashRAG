@@ -23,16 +23,14 @@ for k in [
 ]:
     os.environ.pop(k, None)
 
-ROOT_RESULT_DIR = Path(
-    "/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_GPT_5.1"
-)
-SOURCE_DIRS = [
-    ROOT_RESULT_DIR / "RefAmb_2026_05_29_10_08_refamb_infoseek_gpt_5_1_ca_stage",
-    ROOT_RESULT_DIR / "RefAmb_2026_05_29_11_04_refamb_mcsearch_gpt_5_1_ca_stage",
-    ROOT_RESULT_DIR / "RefAmb_2026_05_29_13_36_refamb_crag_gpt_5_1_ca_stage",
-    ROOT_RESULT_DIR / "RefAmb_2026_05_30_13_01_refamb_oven_gpt_5_1_ca_stage",
+ROOT_RESULT_DIRS = [
+    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_MMSearch-R1-7B/RefAmb_2026_06_06_14_01_refamb_crag_mmsearch_r1_7b_stage"),
+    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_MMSearch-R1-7B/RefAmb_2026_06_06_16_59_refamb_oven_mmsearch_r1_7b_stage"),
+    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_MMSearch-R1-7B/RefAmb_2026_06_06_17_14_refamb_mcsearch_mmsearch_r1_7b_stage"),
+    Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_MMSearch-R1-7B/RefAmb_2026_06_06_17_52_refamb_infoseek_mmsearch_r1_7b_stage"),
+    # Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_Qwen3-vl-8b/RefAmb_2026_05_23_12_53_refamb_mcsearch_qwen3_vl_8b_stage"),
+    # Path("/home/you/FlashRAG/exps/idea10/data/result/RefAmb_original_qwen3_vl_32b/RefAmb_2026_05_19_21_03_refamb_mcsearch_qwen3_vl_32b_stage"),
 ]
-# SOURCE_DIRS = [ROOT_RESULT_DIR / "RefAmb_2026_05_07_21_29_refamb_oven_llava15_7b_stage"]
 INPUT_REL_PATH = Path("omnisearch_trajectories.jsonl")
 OUTPUT_REL_PATH = Path("label/deepseek/omnisearch_trajectories.entity_ambiguity_labeled.jsonl")
 PROMPT_PATH = Path("/home/you/FlashRAG/exps/idea10/prompts/label_entitiy_ambiguouty.toml")
@@ -180,7 +178,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Label entity ambiguity for text retrieval queries in trajectory annotations "
-            "or omnisearch trajectories across multiple source directories."
+            "or omnisearch trajectories across multiple mcsearch result directories."
         )
     )
     parser.add_argument("--prompt", type=Path, default=PROMPT_PATH)
@@ -284,15 +282,39 @@ def merge_partial_output(source_items: list[dict], existing_items: list[dict]) -
     return merged_items
 
 
-def load_source_jobs() -> list[dict]:
+def resolve_result_dirs() -> list[Path]:
+    root_dirs = ROOT_RESULT_DIRS
+    resolved = []
+    seen = set()
+    for root_dir in root_dirs:
+        path = Path(root_dir)
+        key = str(path.resolve()) if path.exists() else str(path)
+        if key in seen:
+            continue
+        seen.add(key)
+        resolved.append(path)
+    return resolved
+
+
+def resolve_source_dir(result_dir: Path) -> Path:
+    if not result_dir.exists():
+        raise FileNotFoundError(f"Missing result dir: {result_dir}")
+    if (result_dir / INPUT_REL_PATH).exists():
+        return result_dir
+    raise FileNotFoundError(f"Missing input file: {result_dir / INPUT_REL_PATH}")
+
+
+def load_source_jobs(result_dirs: list[Path]) -> list[dict]:
     jobs = []
-    for source_dir in SOURCE_DIRS:
+    for result_dir in result_dirs:
+        source_dir = resolve_source_dir(result_dir)
         input_path = source_dir / INPUT_REL_PATH
         output_path = source_dir / OUTPUT_REL_PATH
         if not input_path.exists():
             raise FileNotFoundError(f"Missing input file: {input_path}")
         jobs.append(
             {
+                "result_dir": result_dir,
                 "source_dir": source_dir,
                 "input_path": input_path,
                 "output_path": output_path,
@@ -416,7 +438,12 @@ def main() -> None:
 
     prompt_path = args.prompt
 
-    source_jobs = load_source_jobs()
+    result_dirs = resolve_result_dirs()
+    print(f"Processing {len(result_dirs)} result dirs", flush=True)
+    for result_dir in result_dirs:
+        print(f"  - {result_dir}", flush=True)
+
+    source_jobs = load_source_jobs(result_dirs)
     items = load_combined_items(source_jobs)
     print(f"Loaded {len(source_jobs)} sources, total items: {len(items)}", flush=True)
 
