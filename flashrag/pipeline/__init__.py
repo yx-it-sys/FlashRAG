@@ -1,5 +1,6 @@
 from flashrag.pipeline.mm_pipeline import *
 from flashrag.pipeline.omni_pipeline import *
+from flashrag.pipeline.amb_rewrite_pipeline import *
 from flashrag.pipeline.atl_ci_ablation import *
 from flashrag.pipeline.iigcr_pipeline import *
 from flashrag.pipeline.pipeline import *

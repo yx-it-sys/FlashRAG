@@ -15,6 +15,7 @@ Primary outputs produced by this module:
 """
 
 from difflib import SequenceMatcher
+from copy import deepcopy
 import json
 import os
 import shutil
@@ -26,8 +27,10 @@ import tomllib
 
 import numpy as np
 from PIL import Image
+from tqdm import tqdm
 
 from flashrag.pipeline.omni_pipeline import OmniSearchPipeline
+from flashrag.utils import get_generator
 
 
 class TerminalPrinter:
@@ -103,15 +106,297 @@ class IIGCR_Pipeline(OmniSearchPipeline):
         self._controller_item_stats_filename = str(
             self.config.get("omni_controller_item_stats_filename", "controller_item_stats.jsonl")
         ).strip() or "controller_item_stats.jsonl"
+        self._module_generators = {}
         self._current_item_id = None
         self._current_question = None
         self._current_item_controller_stats = None
+        self._current_sample_generation_stats = None
+        self._last_sample_generation_stats = None
+        self._sample_generation_stats = []
         self.terminal.info(
             f"[AblationConfig] rebuild_module={self.rebuild_module}, "
             f"missing_info_repair_module={self.missing_info_repair_module}, "
             f"reflection_recovery_module={self.reflection_recovery_module}, "
             f"pruning_module={self.pruning_module}"
         )
+        self._log_controller_generator_routing()
+
+
+    def _get_generator_base_config(self):
+        """Materialize a mutable base config dict for lazily-built auxiliary generators."""
+        if hasattr(self.config, "final_config"):
+            return deepcopy(self.config.final_config)
+        return deepcopy(dict(self.config))
+
+    def _build_module_generator_config(self, module_name):
+        """Resolve optional module-level generator overrides from config.
+
+        Config precedence is:
+        1. `omni_controller_*` shared controller defaults
+        2. `omni_<module_name>_*` module-specific overrides
+        """
+        base_config = self._get_generator_base_config()
+        merged_override = {}
+        override_found = False
+        override_keys = (
+            "framework",
+            "generator_model",
+            "generator_model_path",
+            "generation_params",
+            "generator_batch_size",
+            "generator_max_input_len",
+            "api_key",
+            "api_base_url",
+            "openai_setting",
+            "max_tokens",
+            "temperature",
+            "top_p",
+        )
+        for prefix in ("omni_controller", f"omni_{module_name}"):
+            for key in override_keys:
+                config_key = f"{prefix}_{key}"
+                value = self.config.get(config_key)
+                if value is None:
+                    continue
+                merged_override[key] = deepcopy(value)
+                override_found = True
+        if not override_found:
+            return None
+
+        for key, value in merged_override.items():
+            base_config[key] = value
+
+        generator_model = base_config.get("generator_model")
+        generator_model_path = base_config.get("generator_model_path")
+        if generator_model and not generator_model_path:
+            model2path = base_config.get("model2path", {}) or {}
+            base_config["generator_model_path"] = model2path.get(generator_model, generator_model)
+        return base_config
+
+    def _get_module_generator(self, module_name):
+        """Return the generator assigned to one controller submodule.
+
+        Falls back to the main VLM backbone when no override is configured.
+        """
+        if module_name in self._module_generators:
+            return self._module_generators[module_name]
+
+        generator_config = self._build_module_generator_config(module_name)
+        if generator_config is None:
+            generator = self.generator
+        else:
+            generator = get_generator(generator_config)
+        self._module_generators[module_name] = generator
+        return generator
+
+    def _iter_usage_tracked_generators(self):
+        """Yield all unique generators whose token/latency stats should be tracked."""
+        tracked = []
+        for generator in [getattr(self, "generator", None), *self._module_generators.values()]:
+            if generator is None:
+                continue
+            if any(generator is existing for existing in tracked):
+                continue
+            tracked.append(generator)
+        return tracked
+
+    def _log_controller_generator_routing(self):
+        """Emit a concise summary of configured controller-model routing."""
+        routes = {}
+        for module_name in ("rebuild", "ambiguity_check", "finalize"):
+            generator_config = self._build_module_generator_config(module_name)
+            if generator_config is None:
+                routes[module_name] = {
+                    "generator_model": getattr(self.generator, "model_name", "<unknown>"),
+                    "source": "backbone",
+                }
+            else:
+                routes[module_name] = {
+                    "generator_model": generator_config.get("generator_model", "<unknown>"),
+                    "source": "module_override",
+                    "framework": generator_config.get("framework"),
+                }
+        self.terminal.module("controller_generator_routing", routes)
+
+
+    def _empty_sample_generation_summary(self, latency_seconds=0.0):
+        """Build a sample-level generation summary compatible with evaluator metrics."""
+        latency_seconds = float(latency_seconds or 0.0)
+        return {
+            "total_samples": 1,
+            "input_tokens": 0.0,
+            "output_tokens": 0.0,
+            "total_tokens": 0.0,
+            "latency_seconds": latency_seconds,
+            "avg_input_tokens_per_sample": 0.0,
+            "avg_output_tokens_per_sample": 0.0,
+            "avg_total_tokens_per_sample": 0.0,
+            "avg_latency_seconds_per_sample": latency_seconds,
+            "input_tokens_per_second": 0.0,
+            "output_tokens_per_second": 0.0,
+            "total_tokens_per_second": 0.0,
+        }
+
+    def _coerce_generation_totals(self, stats):
+        """Normalize generator stats objects into aggregate token and latency totals."""
+        totals = {
+            "input_tokens": 0.0,
+            "output_tokens": 0.0,
+            "total_tokens": 0.0,
+            "latency_seconds": 0.0,
+        }
+        if not stats:
+            return totals
+
+        if isinstance(stats, dict):
+            totals["input_tokens"] = float(
+                stats.get("total_input_tokens", stats.get("input_tokens", 0.0))
+            )
+            totals["output_tokens"] = float(
+                stats.get("total_output_tokens", stats.get("output_tokens", 0.0))
+            )
+            totals["total_tokens"] = float(
+                stats.get("total_tokens", totals["input_tokens"] + totals["output_tokens"])
+            )
+            totals["latency_seconds"] = float(
+                stats.get("total_latency_seconds", stats.get("latency_seconds", stats.get("latency(s)", 0.0)))
+            )
+            return totals
+
+        if isinstance(stats, list):
+            for item in stats:
+                if not isinstance(item, dict):
+                    continue
+                item_input_tokens = float(
+                    item.get("total_input_tokens", item.get("input_tokens", 0.0))
+                )
+                item_output_tokens = float(
+                    item.get("total_output_tokens", item.get("output_tokens", 0.0))
+                )
+                totals["input_tokens"] += item_input_tokens
+                totals["output_tokens"] += item_output_tokens
+                totals["total_tokens"] += float(
+                    item.get("total_tokens", item_input_tokens + item_output_tokens)
+                )
+                totals["latency_seconds"] += float(
+                    item.get("total_latency_seconds", item.get("latency_seconds", item.get("latency(s)", 0.0)))
+                )
+        return totals
+
+    def _pop_generator_generation_totals(self, generator=None):
+        """Read and reset stats accumulated on one generator instance."""
+        if generator is None:
+            generator = getattr(self, "generator", None)
+        if generator is None:
+            return self._coerce_generation_totals(None)
+
+        stats = None
+        for method_name in ("get_generation_stats", "get_performance_stats", "cost_stats"):
+            if not hasattr(generator, method_name):
+                continue
+            method = getattr(generator, method_name)
+            try:
+                stats = method(reset=True)
+            except TypeError:
+                stats = method()
+            except Exception:
+                stats = None
+            if stats:
+                break
+        return self._coerce_generation_totals(stats)
+
+    def _accumulate_current_sample_generation_totals(self, totals):
+        """Add one generator call's usage totals into the active sample accumulator."""
+        if self._current_sample_generation_stats is None:
+            return
+        for key in ("input_tokens", "output_tokens", "total_tokens", "latency_seconds"):
+            self._current_sample_generation_stats[key] += float(totals.get(key, 0.0))
+
+    def _start_sample_generation_accounting(self):
+        """Reset generator residue and open a new per-sample accounting window."""
+        for generator in self._iter_usage_tracked_generators():
+            self._pop_generator_generation_totals(generator)
+        self._last_sample_generation_stats = None
+        self._current_sample_generation_stats = {
+            "start_time": time.time(),
+            "input_tokens": 0.0,
+            "output_tokens": 0.0,
+            "total_tokens": 0.0,
+            "latency_seconds": 0.0,
+        }
+
+    def _finish_sample_generation_accounting(self):
+        """Close the active per-sample accounting window and materialize a summary."""
+        if self._current_sample_generation_stats is None:
+            summary = self._empty_sample_generation_summary()
+            self._last_sample_generation_stats = summary
+            return summary
+
+        for generator in self._iter_usage_tracked_generators():
+            self._accumulate_current_sample_generation_totals(
+                self._pop_generator_generation_totals(generator)
+            )
+        current = self._current_sample_generation_stats
+        wall_clock_latency = max(0.0, time.time() - float(current.get("start_time", time.time())))
+        input_tokens = float(current.get("input_tokens", 0.0))
+        output_tokens = float(current.get("output_tokens", 0.0))
+        total_tokens = float(current.get("total_tokens", input_tokens + output_tokens))
+        summary = {
+            "total_samples": 1,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "total_tokens": total_tokens,
+            "latency_seconds": wall_clock_latency,
+            "avg_input_tokens_per_sample": input_tokens,
+            "avg_output_tokens_per_sample": output_tokens,
+            "avg_total_tokens_per_sample": total_tokens,
+            "avg_latency_seconds_per_sample": wall_clock_latency,
+            "input_tokens_per_second": (input_tokens / wall_clock_latency) if wall_clock_latency > 0 else 0.0,
+            "output_tokens_per_second": (output_tokens / wall_clock_latency) if wall_clock_latency > 0 else 0.0,
+            "total_tokens_per_second": (total_tokens / wall_clock_latency) if wall_clock_latency > 0 else 0.0,
+        }
+        self._current_sample_generation_stats = None
+        self._last_sample_generation_stats = summary
+        return summary
+
+    def _generate_text_with_generator(self, messages, generator):
+        """Generate one response with a specific generator and attribute its usage."""
+        delay = 2
+        max_retries = 5
+        for attempt in range(max_retries):
+            try:
+                raw_response = generator.generate([messages])
+                return self._normalize_generation_output(raw_response)
+            except Exception as exc:
+                if not self._is_retryable_api_error(exc):
+                    raise
+                if attempt == max_retries - 1:
+                    raise
+                self.terminal.info(
+                    f"Transient API error ({exc.__class__.__name__}) from controller generator, retrying in {delay}s ..."
+                )
+                time.sleep(delay)
+                delay *= 2
+            finally:
+                self._accumulate_current_sample_generation_totals(
+                    self._pop_generator_generation_totals(generator)
+                )
+
+    def _generate_text(self, messages):
+        """Generate one response with the main backbone generator."""
+        return self._generate_text_with_generator(messages, self.generator)
+
+    def _generate_controller_text(self, messages, module_name):
+        """Generate one text-only controller response with module-specific routing."""
+        generator = self._get_module_generator(module_name)
+        return self._generate_text_with_generator(messages, generator)
+
+    def _attach_generation_stats(self, dataset):
+        """Attach sample-level IIGCR stats instead of broadcasting a run-level average."""
+        if self._sample_generation_stats and len(self._sample_generation_stats) == len(dataset):
+            dataset.update_output("generation_stats", self._sample_generation_stats)
+            return
+        super()._attach_generation_stats(dataset)
 
     def _as_bool(self, value, default=True):
         """Normalize loosely-typed config values into booleans.
@@ -283,6 +568,127 @@ class IIGCR_Pipeline(OmniSearchPipeline):
             saved_path=saved_path,
         )
         return saved_path
+
+    def _resolve_item_image_path(self, item):
+        """Resolve the on-disk image path for one RefAmb sample."""
+        image_id = item.data.get("image_id")
+        if not image_id:
+            raise KeyError(f"Item `{item.id}` is missing `image_id`.")
+
+        candidate_paths = []
+
+        dataset_image_dir = self.config.get("dataset_image_dir")
+        if dataset_image_dir:
+            candidate_paths.append(os.path.join(str(dataset_image_dir), f"{image_id}.jpg"))
+
+        dataset_path = self.config.get("dataset_path")
+        if dataset_path:
+            candidate_paths.append(os.path.join(str(dataset_path), "images", f"{image_id}.jpg"))
+
+        candidate_paths.append(os.path.join(self.data_dir, self.dataset_name, "images", f"{image_id}.jpg"))
+        candidate_paths.append(os.path.join(self.data_dir, "RefAmb", "images", f"{image_id}.jpg"))
+
+        for image_path in candidate_paths:
+            if image_path and os.path.exists(image_path):
+                return image_path
+
+        raise FileNotFoundError(
+            f"Image file not found for item `{item.id}` with image_id `{image_id}`. "
+            f"Tried: {candidate_paths}"
+        )
+
+    def _prepare_naive_prompt(self, item):
+        """Attach the sample image and build the direct-VQA prompt."""
+        image_path = self._resolve_item_image_path(item)
+        question_image = Image.open(image_path).convert("RGB")
+        item.data["image"] = question_image
+        return self.prompt_template.get_string(item)
+
+    def naive_run(self, dataset, do_eval=True, pred_process_fun=None):
+        """Run direct VQA inference without controller logic or retrieval."""
+        prediction_list = []
+        input_prompts = []
+        self._sample_generation_stats = []
+        original_count = len(dataset.data)
+        selected_items = [item for item in dataset.data if self._source_matches_target(self._get_item_source(item))]
+        dataset.data = selected_items
+
+        if self.target_source is not None:
+            print(
+                f"Stage source filter `{self.target_source}` selected {len(selected_items)} / {original_count} items."
+            )
+        if not dataset.data:
+            print("No items matched the configured source filter. Skip inference and evaluation.")
+            return dataset
+
+        start_time = time.time()
+        for item in tqdm(dataset.data, total=len(dataset.data)):
+            self._start_sample_generation_accounting()
+            try:
+                prompt = self._prepare_naive_prompt(item)
+                answer = self._generate_text(prompt)
+            finally:
+                self._finish_sample_generation_accounting()
+            input_prompts.append(prompt)
+            prediction_list.append(answer)
+            self._sample_generation_stats.append(
+                self._last_sample_generation_stats or self._empty_sample_generation_summary()
+            )
+
+        dataset.update_output("prompt", input_prompts)
+        dataset.update_output("pred", prediction_list)
+
+        dataset = self.evaluate(
+            dataset,
+            do_eval=do_eval,
+            pred_process_func=pred_process_fun,
+        )
+        end_time = time.time()
+        total_duration = end_time - start_time
+        count = len(dataset.data)
+        avg_time = total_duration / count if count > 0 else 0
+
+        print(f"\n[Timing] Total: {total_duration:.2f}s | Count: {count} | Avg per item: {avg_time:.4f}s")
+        with open(os.path.join(self.output_dir, "records.txt"), "a", encoding="utf-8") as f:
+            f.write(f"\n[Timing] Total: {total_duration:.2f}s | Count: {count} | Avg per item: {avg_time:.4f}s")
+        return dataset
+
+    def run(self, dataset, do_eval=True, pred_process_fun=None):
+        prediction_list = []
+        self._sample_generation_stats = []
+        original_count = len(dataset.data)
+        selected_items = [item for item in dataset.data if self._source_matches_target(self._get_item_source(item))]
+        dataset.data = selected_items
+
+        if self.target_source is not None:
+            print(
+                f"Stage source filter `{self.target_source}` selected {len(selected_items)} / {original_count} items."
+            )
+        if not dataset.data:
+            print("No items matched the configured source filter. Skip inference and evaluation.")
+            return dataset
+
+        start_time = time.time()
+
+        for item in tqdm(dataset.data, total=len(dataset.data)):
+            answer, context = self.iterative_infer(item.question, item.id, item.image_id)
+            prediction_list.append(answer)
+            self._sample_generation_stats.append(
+                self._last_sample_generation_stats or self._empty_sample_generation_summary()
+            )
+
+        dataset.update_output("pred", prediction_list)
+        dataset = self.evaluate(dataset, do_eval=do_eval)
+        end_time = time.time()
+        total_duration = end_time - start_time
+        count = len(dataset.data)
+
+        avg_time = total_duration / count if count > 0 else 0
+
+        print(f"\n[Timing] Total: {total_duration:.2f}s | Count: {count} | Avg per item: {avg_time:.4f}s")
+        with open(os.path.join(self.output_dir, "records.txt"), "a", encoding="utf-8") as f:
+            f.write(f"\n[Timing] Total: {total_duration:.2f}s | Count: {count} | Avg per item: {avg_time:.4f}s")
+        return dataset
 
     def _is_invalid_retrieved_doc(self, doc):
         """Decide whether a retrieved document is empty, null-like, or unusable."""
@@ -608,11 +1014,12 @@ class IIGCR_Pipeline(OmniSearchPipeline):
             f"Last model state: {('[search state omitted]' if response_is_search_state else (self._clean_final_answer_text(response_text) or '[empty]'))}\n"
         )
         try:
-            finalized = self._generate_text(
+            finalized = self._generate_controller_text(
                 [
                     {"role": "system", "content": [{"type": "text", "text": "You are finalizing a multimodal QA answer. Follow formatting constraints strictly."}]},
                     {"role": "user", "content": [{"type": "text", "text": finalization_prompt}]},
-                ]
+                ],
+                module_name="finalize",
             )
             finalized = self._clean_final_answer_text(finalized)
             if (
@@ -793,10 +1200,10 @@ class IIGCR_Pipeline(OmniSearchPipeline):
             f"query_to_rewrite: {query_to_rewrite or ''}\n"
             f"vlm_feedback: {vlm_feedback or ''}"
         )
-        rewrite_response = self._generate_text([
+        rewrite_response = self._generate_controller_text([
             {"role": "system", "content": [{"type": "text", "text": system_prompt}]},
             {"role": "user", "content": [{"type": "text", "text": user_prompt}]},
-        ])
+        ], module_name="rebuild")
         rewrite_response = self._truncate_after_search(rewrite_response)
         if "<Search>" not in rewrite_response:
             return self._build_search_response("text_retrieval", query_to_rewrite)
@@ -832,11 +1239,12 @@ class IIGCR_Pipeline(OmniSearchPipeline):
             f"Feedback: {vlm_feedback or ''}\n"
         )
         try:
-            rewrite_response = self._generate_text(
+            rewrite_response = self._generate_controller_text(
                 [
                     {"role": "system", "content": [{"type": "text", "text": "You are rewriting a failed text retrieval query. Follow the required output format strictly."}]},
                     {"role": "user", "content": [{"type": "text", "text": diversification_prompt}]},
-                ]
+                ],
+                module_name="rebuild",
             )
             rewrite_response = self._truncate_after_search(rewrite_response)
         except Exception as exc:
@@ -1350,11 +1758,12 @@ class IIGCR_Pipeline(OmniSearchPipeline):
             text_query=query_txt,
         )
         try:
-            response = self._generate_text(
+            response = self._generate_controller_text(
                 [
                     {"role": "system", "content": [{"type": "text", "text": "You are an ambiguity detector. Return strict JSON as required."}]},
                     {"role": "user", "content": [{"type": "text", "text": prompt}]},
-                ]
+                ],
+                module_name="ambiguity_check",
             )
         except Exception as exc:
             self.terminal.info(f"Ambiguity check generation failed, default to non-ambiguous: {exc}")
@@ -1994,164 +2403,313 @@ class IIGCR_Pipeline(OmniSearchPipeline):
         Returns:
             Final answer string for the sample, or ``None`` when the image is missing.
         """
-        img_path = os.path.join(self.data_dir, self.dataset_name, "images", f"{image_id}.jpg")
-        if not os.path.exists(img_path):
-            return None
+        self._start_sample_generation_accounting()
+        try:
+            img_path = os.path.join(self.data_dir, self.dataset_name, "images", f"{image_id}.jpg")
+            if not os.path.exists(img_path):
+                return None
 
-        img = Image.open(img_path).convert("RGB")
-        self._current_image = img
-        self._current_item_id = id
-        self._current_question = question
-        self._init_item_controller_stats(id, question)
-        messages = [
-            {"role": "system", "content": [{"type": "text", "text": self.prompt}]},
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": f"Input Question: {question}"},
-                    {"type": "image", "image": img},
-                ],
-            },
-        ]
-
-        trajectory = []
-        public_trajectory = []
-        last_public_response_span = None
-
-        def append_public_response_actions(response_text):
-            nonlocal last_public_response_span
-            nodes = self._extract_action_nodes(response_text)
-            start = len(public_trajectory)
-            for node in nodes:
-                if node.get("action") in {"thought", "sub-question", "search", "final_answer"}:
-                    public_trajectory.append(dict(node))
-            last_public_response_span = (start, len(public_trajectory))
-
-        def replace_last_public_response_actions(response_text):
-            nonlocal last_public_response_span
-            if last_public_response_span is None:
-                append_public_response_actions(response_text)
-                return
-            start, end = last_public_response_span
-            replacement = []
-            for node in self._extract_action_nodes(response_text):
-                if node.get("action") in {"thought", "sub-question", "search", "final_answer"}:
-                    replacement.append(dict(node))
-            public_trajectory[start:end] = replacement
-            last_public_response_span = (start, start + len(replacement))
-
-        def append_public_retrieval_result(retrieval_mode, query_txt, retrieval_content):
-            mode_name_map = {
-                "text_retrieval": "text_retrieval_result",
-                "image_retrieval": "image_retrieval_result",
-                "no_retrieval": "no_retrieval_result",
-            }
-            public_trajectory.append(
+            img = Image.open(img_path).convert("RGB")
+            self._current_image = img
+            self._current_item_id = id
+            self._current_question = question
+            self._init_item_controller_stats(id, question)
+            messages = [
+                {"role": "system", "content": [{"type": "text", "text": self.prompt}]},
                 {
-                    "action": mode_name_map.get(retrieval_mode, "retrieval_result"),
-                    "mode": retrieval_mode,
-                    "query": query_txt if query_txt else None,
-                    "content": retrieval_content,
-                }
-            )
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": f"Input Question: {question}"},
+                        {"type": "image", "image": img},
+                    ],
+                },
+            ]
 
-        def sync_public_trajectory_from_messages(current_messages):
-            nonlocal last_public_response_span
-            public_trajectory[:] = self._build_effective_trajectory_from_messages(current_messages)
+            trajectory = []
+            public_trajectory = []
             last_public_response_span = None
 
-        start_time = time.time()
-        accepted_query = {"text": None, "source": "original"}
-        attempted_query = {"text": None, "source": "original"}
-        draft_query_source = "original"
-        cumulative_retrieval_units = []
-        conversation_num = 0
-        similar_query_streak = 0
-        low_gain_streak = 0
-        consecutive_image_retrieval_count = 0
-        last_retrieval_mode = None
-        last_image_query = None
-        response = self._generate_text(messages)
-        response = self._truncate_after_search(response)
-        self.terminal.info(f"First Response: {response}")
-        self._record_response_actions(trajectory, response)
-        append_public_response_actions(response)
-        messages.append({"role": "assistant", "content": response})
-        while conversation_num < self.max_turns:
-            if "Final Answer" in response or "<Final Answer>" in response:
-                break
+            def append_public_response_actions(response_text):
+                nonlocal last_public_response_span
+                nodes = self._extract_action_nodes(response_text)
+                start = len(public_trajectory)
+                for node in nodes:
+                    if node.get("action") in {"thought", "sub-question", "search", "final_answer"}:
+                        public_trajectory.append(dict(node))
+                last_public_response_span = (start, len(public_trajectory))
 
-            need_txt_ret = "Text Retrieval" in response
-            need_img_ret = "Image Retrieval" in response
-            need_no_ret = "No Retrieval" in response
+            def replace_last_public_response_actions(response_text):
+                nonlocal last_public_response_span
+                if last_public_response_span is None:
+                    append_public_response_actions(response_text)
+                    return
+                start, end = last_public_response_span
+                replacement = []
+                for node in self._extract_action_nodes(response_text):
+                    if node.get("action") in {"thought", "sub-question", "search", "final_answer"}:
+                        replacement.append(dict(node))
+                public_trajectory[start:end] = replacement
+                last_public_response_span = (start, start + len(replacement))
 
-            if need_txt_ret:
-                retrieval_mode = "text_retrieval"
-                self.terminal.info("Start Text Retrieval...")
-                draft_query = self._extract_retrieval_query(response, "Text Retrieval")
-                self.terminal.info(f"Query Text: {draft_query}")
+            def append_public_retrieval_result(retrieval_mode, query_txt, retrieval_content):
+                mode_name_map = {
+                    "text_retrieval": "text_retrieval_result",
+                    "image_retrieval": "image_retrieval_result",
+                    "no_retrieval": "no_retrieval_result",
+                }
+                public_trajectory.append(
+                    {
+                        "action": mode_name_map.get(retrieval_mode, "retrieval_result"),
+                        "mode": retrieval_mode,
+                        "query": query_txt if query_txt else None,
+                        "content": retrieval_content,
+                    }
+                )
 
-                similarity_anchor = attempted_query if attempted_query["text"] else accepted_query
+            def sync_public_trajectory_from_messages(current_messages):
+                nonlocal last_public_response_span
+                public_trajectory[:] = self._build_effective_trajectory_from_messages(current_messages)
+                last_public_response_span = None
 
-                if similarity_anchor["text"] is not None:
-                    similarity = self._query_similarity(draft_query, similarity_anchor["text"])
-                    self.terminal.info(f"Query similarity with previous query: {similarity:.4f}")
-                    if similarity > self.query_similarity_threshold:
-                        exact_repeat_after_repair = (
-                            similarity_anchor["source"] == "repaired"
-                            and self._normalize_query_text(draft_query) == self._normalize_query_text(similarity_anchor["text"])
-                        )
-                        if similarity_anchor["source"] != "repaired":
-                            similar_query_streak += 1
+            start_time = time.time()
+            accepted_query = {"text": None, "source": "original"}
+            attempted_query = {"text": None, "source": "original"}
+            draft_query_source = "original"
+            cumulative_retrieval_units = []
+            conversation_num = 0
+            similar_query_streak = 0
+            low_gain_streak = 0
+            consecutive_image_retrieval_count = 0
+            last_retrieval_mode = None
+            last_image_query = None
+            response = self._generate_text(messages)
+            response = self._truncate_after_search(response)
+            self.terminal.info(f"First Response: {response}")
+            self._record_response_actions(trajectory, response)
+            append_public_response_actions(response)
+            messages.append({"role": "assistant", "content": response})
+            while conversation_num < self.max_turns:
+                if "Final Answer" in response or "<Final Answer>" in response:
+                    break
+
+                need_txt_ret = "Text Retrieval" in response
+                need_img_ret = "Image Retrieval" in response
+                need_no_ret = "No Retrieval" in response
+
+                if need_txt_ret:
+                    retrieval_mode = "text_retrieval"
+                    self.terminal.info("Start Text Retrieval...")
+                    draft_query = self._extract_retrieval_query(response, "Text Retrieval")
+                    self.terminal.info(f"Query Text: {draft_query}")
+
+                    similarity_anchor = attempted_query if attempted_query["text"] else accepted_query
+
+                    if similarity_anchor["text"] is not None:
+                        similarity = self._query_similarity(draft_query, similarity_anchor["text"])
+                        self.terminal.info(f"Query similarity with previous query: {similarity:.4f}")
+                        if similarity > self.query_similarity_threshold:
+                            exact_repeat_after_repair = (
+                                similarity_anchor["source"] == "repaired"
+                                and self._normalize_query_text(draft_query) == self._normalize_query_text(similarity_anchor["text"])
+                            )
+                            if similarity_anchor["source"] != "repaired":
+                                similar_query_streak += 1
+                            self._log_module_output(
+                                trajectory,
+                                "query_similarity_gate",
+                                query=draft_query,
+                                reference_query=similarity_anchor["text"],
+                                similarity=similarity,
+                                streak=similar_query_streak,
+                                similarity_anchor_source=similarity_anchor["source"],
+                                similarity_anchor_type=("attempted" if attempted_query["text"] else "accepted"),
+                                exact_repeat_after_repair=exact_repeat_after_repair,
+                            )
+                            if self.reflection_recovery_module and similarity_anchor["source"] == "repaired" and exact_repeat_after_repair:
+                                bad_query = draft_query
+                                messages, rebuilt_response = self._rebuild_messages(
+                                    messages,
+                                    mode="reflection",
+                                    reference_query=bad_query,
+                                    vlm_feedback=self._extract_last_missing_info_feedback(messages),
+                                    bad_query=bad_query,
+                                    bad_query_reason="duplicate_prev_query",
+                                    trajectory=trajectory,
+                                )
+                                similar_query_streak = 0
+                                self.terminal.info("Repaired query was repeated exactly; switched to reflection.")
+                                sync_public_trajectory_from_messages(messages)
+                                messages, response = self._run_reflection_step(messages, trajectory)
+                                append_public_response_actions(response)
+                                self._append_controller_action(
+                                    trajectory,
+                                    controller_name="recovery",
+                                    trigger_condition="repaired_query_exact_repeat",
+                                    mode="reflection",
+                                    reference_query=similarity_anchor["text"],
+                                    query_before=bad_query,
+                                    query_after=self._extract_controller_query_after(response),
+                                    reflection_response=response,
+                                    similar_query_streak=similar_query_streak,
+                                )
+                                attempted_query = {"text": None, "source": "original"}
+                                draft_query_source = "original"
+                                conversation_num += 1
+                                continue
+                            if self.missing_info_repair_module:
+                                vlm_feedback = self._extract_last_missing_info_feedback(messages)
+                                original_query = draft_query
+                                messages, rebuilt_response = self._rebuild_messages(
+                                    messages,
+                                    mode="missing_info",
+                                    reference_query=draft_query,
+                                    vlm_feedback=vlm_feedback,
+                                    trajectory=trajectory,
+                                )
+                                rewritten_query = self._extract_text_retrieval_query_from_search(rebuilt_response)
+                                self._append_controller_action(
+                                    trajectory,
+                                    controller_name="repair",
+                                    trigger_condition="similar_query_streak>=1_missing_info",
+                                    mode="missing_info",
+                                    reference_query=draft_query,
+                                    query_before=original_query,
+                                    query_after=rewritten_query,
+                                    similar_query_streak=similar_query_streak,
+                                )
+                                response = rebuilt_response
+                                self._record_response_actions(trajectory, response)
+                                replace_last_public_response_actions(response)
+                                attempted_query = {"text": rewritten_query or None, "source": "repaired"}
+                                draft_query_source = "repaired"
+                                self.terminal.info("Similar query similarity exceeded threshold; rebuilt messages with missing-info rewrite.")
+                                conversation_num += 1
+                                continue
+                        else:
+                            similar_query_streak = 0
+
+                    accepted_draft_query = draft_query
+
+                    retrieved_docs = self._search_text_docs(accepted_draft_query)
+                    retrieval_content = self._format_retrieval_content(retrieved_docs)
+                    retrieval_content = self._clip_text(retrieval_content, self.retrieval_char_limit)
+                    self._log_retrieval_preview(retrieval_content)
+                    self._record_retrieval_result(
+                        trajectory=trajectory,
+                        retrieval_mode=retrieval_mode,
+                        query_txt=accepted_draft_query,
+                        retrieval_content=retrieval_content,
+                    )
+                    append_public_retrieval_result(
+                        retrieval_mode=retrieval_mode,
+                        query_txt=accepted_draft_query,
+                        retrieval_content=retrieval_content,
+                    )
+
+                    info_gain, accepted_units = self._estimate_information_gain(
+                        accepted_draft_query,
+                        accepted_query["text"],
+                        retrieval_content,
+                        cumulative_retrieval_units,
+                    )
+                    self.terminal.info(f"Retrieval information increment: {info_gain:.4f}")
+                    self._log_module_output(
+                        trajectory,
+                        "information_increment",
+                        query=accepted_draft_query,
+                        reference_query=accepted_query["text"],
+                        information_increment=info_gain,
+                    )
+                    if info_gain < self.failure_threshold:
+                        low_gain_streak += 1
                         self._log_module_output(
                             trajectory,
-                            "query_similarity_gate",
-                            query=draft_query,
-                            reference_query=similarity_anchor["text"],
-                            similarity=similarity,
-                            streak=similar_query_streak,
-                            similarity_anchor_source=similarity_anchor["source"],
-                            similarity_anchor_type=("attempted" if attempted_query["text"] else "accepted"),
-                            exact_repeat_after_repair=exact_repeat_after_repair,
+                            "low_gain_gate",
+                            query=accepted_draft_query,
+                            reference_query=accepted_query["text"],
+                            information_increment=info_gain,
+                            streak=low_gain_streak,
+                            accepted_query_source=draft_query_source,
                         )
-                        if self.reflection_recovery_module and similarity_anchor["source"] == "repaired" and exact_repeat_after_repair:
-                            bad_query = draft_query
+                        if self.reflection_recovery_module and draft_query_source == "repaired":
+                            bad_query = accepted_draft_query
                             messages, rebuilt_response = self._rebuild_messages(
                                 messages,
                                 mode="reflection",
                                 reference_query=bad_query,
-                                vlm_feedback=self._extract_last_missing_info_feedback(messages),
+                                vlm_feedback=retrieval_content,
                                 bad_query=bad_query,
-                                bad_query_reason="duplicate_prev_query",
+                                bad_query_reason="delta_f_zero" if info_gain == 0.0 else "",
                                 trajectory=trajectory,
                             )
-                            similar_query_streak = 0
-                            self.terminal.info("Repaired query was repeated exactly; switched to reflection.")
+                            low_gain_streak = 0
+                            self.terminal.info("Repaired query still produced low gain; switched to reflection.")
                             sync_public_trajectory_from_messages(messages)
                             messages, response = self._run_reflection_step(messages, trajectory)
                             append_public_response_actions(response)
                             self._append_controller_action(
                                 trajectory,
                                 controller_name="recovery",
-                                trigger_condition="repaired_query_exact_repeat",
+                                trigger_condition="repaired_query_low_gain",
                                 mode="reflection",
-                                reference_query=similarity_anchor["text"],
+                                reference_query=accepted_query["text"],
                                 query_before=bad_query,
                                 query_after=self._extract_controller_query_after(response),
                                 reflection_response=response,
-                                similar_query_streak=similar_query_streak,
+                                low_gain_streak=low_gain_streak,
+                                information_increment=info_gain,
+                                failure_threshold=self.failure_threshold,
+                                rebuilt_as_search=bool(rebuilt_response.startswith("<Search>")),
+                            )
+                            attempted_query = {"text": None, "source": "original"}
+                            draft_query_source = "original"
+                            conversation_num += 1
+                            continue
+                        if self.reflection_recovery_module and low_gain_streak >= 2:
+                            bad_query = accepted_draft_query
+                            messages, rebuilt_response = self._rebuild_messages(
+                                messages,
+                                mode="reflection",
+                                reference_query=bad_query,
+                                vlm_feedback=retrieval_content,
+                                bad_query=bad_query,
+                                bad_query_reason="delta_f_zero" if info_gain == 0.0 else "",
+                                trajectory=trajectory,
+                            )
+                            low_gain_streak = 0
+                            self.terminal.info("Low-gain streak reached 2; switched to reflection.")
+                            sync_public_trajectory_from_messages(messages)
+                            messages, response = self._run_reflection_step(messages, trajectory)
+                            append_public_response_actions(response)
+                            self._append_controller_action(
+                                trajectory,
+                                controller_name="recovery",
+                                trigger_condition="low_gain_streak>=2",
+                                mode="reflection",
+                                reference_query=accepted_query["text"],
+                                query_before=bad_query,
+                                query_after=self._extract_controller_query_after(response),
+                                reflection_response=response,
+                                low_gain_streak=low_gain_streak,
+                                information_increment=info_gain,
+                                failure_threshold=self.failure_threshold,
+                                rebuilt_as_search=bool(rebuilt_response.startswith("<Search>")),
                             )
                             attempted_query = {"text": None, "source": "original"}
                             draft_query_source = "original"
                             conversation_num += 1
                             continue
                         if self.missing_info_repair_module:
-                            vlm_feedback = self._extract_last_missing_info_feedback(messages)
-                            original_query = draft_query
+                            original_query = accepted_draft_query
+                            vlm_feedback = (
+                                "The latest retrieval brought little or no new information compared with the previous retrieval. "
+                                "Rewrite the query to target the missing clue more explicitly.\n"
+                                f"Latest retrieval content:\n{retrieval_content}"
+                            )
                             messages, rebuilt_response = self._rebuild_messages(
                                 messages,
                                 mode="missing_info",
-                                reference_query=draft_query,
+                                reference_query=accepted_draft_query,
                                 vlm_feedback=vlm_feedback,
                                 trajectory=trajectory,
                             )
@@ -2159,428 +2717,284 @@ class IIGCR_Pipeline(OmniSearchPipeline):
                             self._append_controller_action(
                                 trajectory,
                                 controller_name="repair",
-                                trigger_condition="similar_query_streak>=1_missing_info",
+                                trigger_condition="low_gain_streak>=1_missing_info",
                                 mode="missing_info",
-                                reference_query=draft_query,
+                                reference_query=accepted_query["text"],
                                 query_before=original_query,
                                 query_after=rewritten_query,
-                                similar_query_streak=similar_query_streak,
+                                low_gain_streak=low_gain_streak,
+                                information_increment=info_gain,
+                                failure_threshold=self.failure_threshold,
                             )
                             response = rebuilt_response
                             self._record_response_actions(trajectory, response)
                             replace_last_public_response_actions(response)
                             attempted_query = {"text": rewritten_query or None, "source": "repaired"}
                             draft_query_source = "repaired"
-                            self.terminal.info("Similar query similarity exceeded threshold; rebuilt messages with missing-info rewrite.")
+                            self.terminal.info("Low-gain signal exceeded threshold; rebuilt messages with missing-info rewrite.")
                             conversation_num += 1
                             continue
                     else:
-                        similar_query_streak = 0
-
-                accepted_draft_query = draft_query
-
-                retrieved_docs = self._search_text_docs(accepted_draft_query)
-                retrieval_content = self._format_retrieval_content(retrieved_docs)
-                retrieval_content = self._clip_text(retrieval_content, self.retrieval_char_limit)
-                self._log_retrieval_preview(retrieval_content)
-                self._record_retrieval_result(
-                    trajectory=trajectory,
-                    retrieval_mode=retrieval_mode,
-                    query_txt=accepted_draft_query,
-                    retrieval_content=retrieval_content,
-                )
-                append_public_retrieval_result(
-                    retrieval_mode=retrieval_mode,
-                    query_txt=accepted_draft_query,
-                    retrieval_content=retrieval_content,
-                )
-
-                info_gain, accepted_units = self._estimate_information_gain(
-                    accepted_draft_query,
-                    accepted_query["text"],
-                    retrieval_content,
-                    cumulative_retrieval_units,
-                )
-                self.terminal.info(f"Retrieval information increment: {info_gain:.4f}")
-                self._log_module_output(
-                    trajectory,
-                    "information_increment",
-                    query=accepted_draft_query,
-                    reference_query=accepted_query["text"],
-                    information_increment=info_gain,
-                )
-                if info_gain < self.failure_threshold:
-                    low_gain_streak += 1
-                    self._log_module_output(
-                        trajectory,
-                        "low_gain_gate",
-                        query=accepted_draft_query,
-                        reference_query=accepted_query["text"],
-                        information_increment=info_gain,
-                        streak=low_gain_streak,
-                        accepted_query_source=draft_query_source,
-                    )
-                    if self.reflection_recovery_module and draft_query_source == "repaired":
-                        bad_query = accepted_draft_query
-                        messages, rebuilt_response = self._rebuild_messages(
-                            messages,
-                            mode="reflection",
-                            reference_query=bad_query,
-                            vlm_feedback=retrieval_content,
-                            bad_query=bad_query,
-                            bad_query_reason="delta_f_zero" if info_gain == 0.0 else "",
-                            trajectory=trajectory,
-                        )
                         low_gain_streak = 0
-                        self.terminal.info("Repaired query still produced low gain; switched to reflection.")
-                        sync_public_trajectory_from_messages(messages)
-                        messages, response = self._run_reflection_step(messages, trajectory)
-                        append_public_response_actions(response)
-                        self._append_controller_action(
-                            trajectory,
-                            controller_name="recovery",
-                            trigger_condition="repaired_query_low_gain",
-                            mode="reflection",
-                            reference_query=accepted_query["text"],
-                            query_before=bad_query,
-                            query_after=self._extract_controller_query_after(response),
-                            reflection_response=response,
-                            low_gain_streak=low_gain_streak,
-                            information_increment=info_gain,
-                            failure_threshold=self.failure_threshold,
-                            rebuilt_as_search=bool(rebuilt_response.startswith("<Search>")),
-                        )
-                        attempted_query = {"text": None, "source": "original"}
-                        draft_query_source = "original"
-                        conversation_num += 1
-                        continue
-                    if self.reflection_recovery_module and low_gain_streak >= 2:
-                        bad_query = accepted_draft_query
-                        messages, rebuilt_response = self._rebuild_messages(
-                            messages,
-                            mode="reflection",
-                            reference_query=bad_query,
-                            vlm_feedback=retrieval_content,
-                            bad_query=bad_query,
-                            bad_query_reason="delta_f_zero" if info_gain == 0.0 else "",
-                            trajectory=trajectory,
-                        )
-                        low_gain_streak = 0
-                        self.terminal.info("Low-gain streak reached 2; switched to reflection.")
-                        sync_public_trajectory_from_messages(messages)
-                        messages, response = self._run_reflection_step(messages, trajectory)
-                        append_public_response_actions(response)
-                        self._append_controller_action(
-                            trajectory,
-                            controller_name="recovery",
-                            trigger_condition="low_gain_streak>=2",
-                            mode="reflection",
-                            reference_query=accepted_query["text"],
-                            query_before=bad_query,
-                            query_after=self._extract_controller_query_after(response),
-                            reflection_response=response,
-                            low_gain_streak=low_gain_streak,
-                            information_increment=info_gain,
-                            failure_threshold=self.failure_threshold,
-                            rebuilt_as_search=bool(rebuilt_response.startswith("<Search>")),
-                        )
-                        attempted_query = {"text": None, "source": "original"}
-                        draft_query_source = "original"
-                        conversation_num += 1
-                        continue
-                    if self.missing_info_repair_module:
-                        original_query = accepted_draft_query
-                        vlm_feedback = (
-                            "The latest retrieval brought little or no new information compared with the previous retrieval. "
-                            "Rewrite the query to target the missing clue more explicitly.\n"
-                            f"Latest retrieval content:\n{retrieval_content}"
-                        )
-                        messages, rebuilt_response = self._rebuild_messages(
-                            messages,
-                            mode="missing_info",
-                            reference_query=accepted_draft_query,
-                            vlm_feedback=vlm_feedback,
-                            trajectory=trajectory,
-                        )
-                        rewritten_query = self._extract_text_retrieval_query_from_search(rebuilt_response)
-                        self._append_controller_action(
-                            trajectory,
-                            controller_name="repair",
-                            trigger_condition="low_gain_streak>=1_missing_info",
-                            mode="missing_info",
-                            reference_query=accepted_query["text"],
-                            query_before=original_query,
-                            query_after=rewritten_query,
-                            low_gain_streak=low_gain_streak,
-                            information_increment=info_gain,
-                            failure_threshold=self.failure_threshold,
-                        )
-                        response = rebuilt_response
-                        self._record_response_actions(trajectory, response)
-                        replace_last_public_response_actions(response)
-                        attempted_query = {"text": rewritten_query or None, "source": "repaired"}
-                        draft_query_source = "repaired"
-                        self.terminal.info("Low-gain signal exceeded threshold; rebuilt messages with missing-info rewrite.")
-                        conversation_num += 1
-                        continue
-                else:
-                    low_gain_streak = 0
 
-                accepted_query = {
-                    "text": accepted_draft_query,
-                    "source": draft_query_source,
-                }
-                attempted_query = dict(accepted_query)
-                cumulative_retrieval_units.extend(accepted_units)
-                similar_query_streak = 0
-                consecutive_image_retrieval_count = 0
-                last_retrieval_mode = retrieval_mode
-                last_image_query = None
-                followup_message = {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": self._build_followup_message(retrieval_mode, retrieval_content),
-                        }
-                    ],
-                }
-                messages.append(followup_message)
-
-                try:
-                    response = self._generate_text(messages)
-                    response = self._truncate_after_search(response)
-                    self.terminal.info(f"Response: {response}")
-                    self._record_response_actions(trajectory, response)
-                    append_public_response_actions(response)
-                    messages.append({"role": "assistant", "content": response})
-                    attempted_query = dict(accepted_query) if accepted_query["text"] else {"text": None, "source": "original"}
-                    draft_query_source = "original"
-                except Exception as e:
-                    error_text = f"{e.__class__.__name__}: {e}"
-                    self.terminal.info(f"Inference error, hidden states ignored: {error_text}")
-                    trajectory.append({"action": "error", "content": error_text})
-                    record = {
-                        "question": question,
-                        "id": id,
-                        "final_answer": response,
-                        "status": "generation_error",
-                        "error": error_text,
-                        "duration_seconds": time.time() - start_time,
-                        "trajectory": public_trajectory,
+                    accepted_query = {
+                        "text": accepted_draft_query,
+                        "source": draft_query_source,
                     }
-                    self._write_trajectory(record)
-                    self._write_item_controller_stats(
-                        status="generation_error",
-                        duration_seconds=time.time() - start_time,
-                        final_answer=response,
-                    )
-                    return response, messages
-
-            elif need_img_ret or need_no_ret:
-                retrieval_content = ""
-                retrieval_mode = None
-                query_txt = ""
-
-                if need_img_ret:
-                    retrieval_mode = "image_retrieval"
-                    self.terminal.info("Start Image Retrieval...")
-                    query_txt = self._extract_retrieval_query(response, "Image Retrieval")
-                    self.terminal.info(f"Image Query: {query_txt}")
-                    image_query_similarity = None
-                    if last_retrieval_mode == "image_retrieval":
-                        consecutive_image_retrieval_count += 1
-                        if last_image_query:
-                            image_query_similarity = self._query_similarity(query_txt, last_image_query)
-                            self.terminal.info(
-                                f"Image query similarity with previous image query: {image_query_similarity:.4f}"
-                            )
-                        self._log_module_output(
-                            trajectory,
-                            "image_query_similarity_gate",
-                            query=query_txt,
-                            reference_query=last_image_query,
-                            similarity=image_query_similarity,
-                            consecutive_image_retrieval_count=consecutive_image_retrieval_count,
-                            trigger_condition="consecutive_image_retrieval>=1",
-                        )
-                        if self.reflection_recovery_module and consecutive_image_retrieval_count >= 1:
-                            bad_query = query_txt
-                            image_reflection_feedback = self._extract_last_missing_info_feedback(messages)
-                            messages, rebuilt_response = self._rebuild_messages(
-                                messages,
-                                mode="reflection",
-                                reference_query=bad_query,
-                                vlm_feedback=image_reflection_feedback,
-                                bad_query=bad_query,
-                                reflection_kind="image_retrieval",
-                                trajectory=trajectory,
-                            )
-                            self.terminal.info(
-                                "Consecutive image retrieval detected; rebuilt messages and switched to reflection."
-                            )
-                            sync_public_trajectory_from_messages(messages)
-                            messages, response = self._run_reflection_step(messages, trajectory)
-                            response = self._force_text_retrieval_after_image_reflection(
-                                reference_query=bad_query,
-                                response=response,
-                                vlm_feedback=image_reflection_feedback,
-                                trajectory=trajectory,
-                            )
-                            if messages and messages[-1].get("role") == "assistant":
-                                messages[-1] = {"role": "assistant", "content": response}
-                            self._append_controller_action(
-                                trajectory,
-                                controller_name="recovery",
-                                trigger_condition="consecutive_image_retrieval>=1",
-                                mode="reflection",
-                                reference_query=last_image_query,
-                                query_before=bad_query,
-                                query_after=self._extract_controller_query_after(response),
-                                reflection_response=response,
-                                consecutive_image_retrieval_count=consecutive_image_retrieval_count,
-                                query_similarity=image_query_similarity,
-                            )
-                            self._record_response_actions(trajectory, response)
-                            append_public_response_actions(response)
-                            attempted_query = {"text": None, "source": "original"}
-                            draft_query_source = "original"
-                            conversation_num += 1
-                            continue
-                    else:
-                        consecutive_image_retrieval_count = 0
-
-                    self._log_image_retrieval_pipeline(
-                        trajectory,
-                        stage="main_image_retrieval_before_search",
-                        image_query=query_txt,
-                        query_image=img,
-                        note="about to run main image retrieval",
-                    )
-                    retrieved_docs = self._search_image_docs(img, query_txt, trajectory=trajectory)
-                    self._log_image_retrieval_pipeline(
-                        trajectory,
-                        stage="main_image_retrieval_raw_result",
-                        image_query=query_txt,
-                        query_image=None,
-                        retrieved_docs=retrieved_docs,
-                    )
-                    retrieved_docs = self._sanitize_retrieved_docs(
-                        retrieved_docs,
-                        retrieval_mode=retrieval_mode,
-                        trajectory=trajectory,
-                    )
-                    retrieval_content = self._format_retrieval_content(retrieved_docs)
-                    retrieval_content = self._clip_text(retrieval_content, self.retrieval_char_limit)
-                    self._log_retrieval_preview(retrieval_content)
-                    last_retrieval_mode = retrieval_mode
-                    last_image_query = query_txt
-                else:
-                    retrieval_mode = "no_retrieval"
-                    retrieval_content = None
+                    attempted_query = dict(accepted_query)
+                    cumulative_retrieval_units.extend(accepted_units)
+                    similar_query_streak = 0
                     consecutive_image_retrieval_count = 0
                     last_retrieval_mode = retrieval_mode
                     last_image_query = None
-
-                self._record_retrieval_result(
-                    trajectory=trajectory,
-                    retrieval_mode=retrieval_mode,
-                    query_txt=query_txt,
-                    retrieval_content=retrieval_content,
-                )
-                append_public_retrieval_result(
-                    retrieval_mode=retrieval_mode,
-                    query_txt=query_txt,
-                    retrieval_content=retrieval_content,
-                )
-                followup_message = {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": self._build_followup_message(retrieval_mode, retrieval_content),
-                        }
-                    ],
-                }
-                messages.append(followup_message)
-                try:
-                    response = self._generate_text(messages)
-                    response = self._truncate_after_search(response)
-                    self.terminal.info(f"Response: {response}")
-                    self._record_response_actions(trajectory, response)
-                    append_public_response_actions(response)
-                    messages.append({"role": "assistant", "content": response})
-                    draft_query_source = "original"
-                except Exception as e:
-                    error_text = f"{e.__class__.__name__}: {e}"
-                    self.terminal.info(f"Inference error, hidden states ignored: {error_text}")
-                    trajectory.append({"action": "error", "content": error_text})
-                    record = {
-                        "question": question,
-                        "id": id,
-                        "final_answer": response,
-                        "status": "generation_error",
-                        "error": error_text,
-                        "duration_seconds": time.time() - start_time,
-                        "trajectory": public_trajectory,
+                    followup_message = {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": self._build_followup_message(retrieval_mode, retrieval_content),
+                            }
+                        ],
                     }
-                    self._write_trajectory(record)
-                    self._write_item_controller_stats(
-                        status="generation_error",
-                        duration_seconds=time.time() - start_time,
-                        final_answer=response,
+                    messages.append(followup_message)
+
+                    try:
+                        response = self._generate_text(messages)
+                        response = self._truncate_after_search(response)
+                        self.terminal.info(f"Response: {response}")
+                        self._record_response_actions(trajectory, response)
+                        append_public_response_actions(response)
+                        messages.append({"role": "assistant", "content": response})
+                        attempted_query = dict(accepted_query) if accepted_query["text"] else {"text": None, "source": "original"}
+                        draft_query_source = "original"
+                    except Exception as e:
+                        error_text = f"{e.__class__.__name__}: {e}"
+                        self.terminal.info(f"Inference error, hidden states ignored: {error_text}")
+                        trajectory.append({"action": "error", "content": error_text})
+                        record = {
+                            "question": question,
+                            "id": id,
+                            "final_answer": response,
+                            "status": "generation_error",
+                            "error": error_text,
+                            "duration_seconds": time.time() - start_time,
+                            "trajectory": public_trajectory,
+                        }
+                        self._write_trajectory(record)
+                        self._write_item_controller_stats(
+                            status="generation_error",
+                            duration_seconds=time.time() - start_time,
+                            final_answer=response,
+                        )
+                        return response, messages
+
+                elif need_img_ret or need_no_ret:
+                    retrieval_content = ""
+                    retrieval_mode = None
+                    query_txt = ""
+
+                    if need_img_ret:
+                        retrieval_mode = "image_retrieval"
+                        self.terminal.info("Start Image Retrieval...")
+                        query_txt = self._extract_retrieval_query(response, "Image Retrieval")
+                        self.terminal.info(f"Image Query: {query_txt}")
+                        image_query_similarity = None
+                        if last_retrieval_mode == "image_retrieval":
+                            consecutive_image_retrieval_count += 1
+                            if last_image_query:
+                                image_query_similarity = self._query_similarity(query_txt, last_image_query)
+                                self.terminal.info(
+                                    f"Image query similarity with previous image query: {image_query_similarity:.4f}"
+                                )
+                            self._log_module_output(
+                                trajectory,
+                                "image_query_similarity_gate",
+                                query=query_txt,
+                                reference_query=last_image_query,
+                                similarity=image_query_similarity,
+                                consecutive_image_retrieval_count=consecutive_image_retrieval_count,
+                                trigger_condition="consecutive_image_retrieval>=1",
+                            )
+                            if self.reflection_recovery_module and consecutive_image_retrieval_count >= 1:
+                                bad_query = query_txt
+                                image_reflection_feedback = self._extract_last_missing_info_feedback(messages)
+                                messages, rebuilt_response = self._rebuild_messages(
+                                    messages,
+                                    mode="reflection",
+                                    reference_query=bad_query,
+                                    vlm_feedback=image_reflection_feedback,
+                                    bad_query=bad_query,
+                                    reflection_kind="image_retrieval",
+                                    trajectory=trajectory,
+                                )
+                                self.terminal.info(
+                                    "Consecutive image retrieval detected; rebuilt messages and switched to reflection."
+                                )
+                                sync_public_trajectory_from_messages(messages)
+                                messages, response = self._run_reflection_step(messages, trajectory)
+                                response = self._force_text_retrieval_after_image_reflection(
+                                    reference_query=bad_query,
+                                    response=response,
+                                    vlm_feedback=image_reflection_feedback,
+                                    trajectory=trajectory,
+                                )
+                                if messages and messages[-1].get("role") == "assistant":
+                                    messages[-1] = {"role": "assistant", "content": response}
+                                self._append_controller_action(
+                                    trajectory,
+                                    controller_name="recovery",
+                                    trigger_condition="consecutive_image_retrieval>=1",
+                                    mode="reflection",
+                                    reference_query=last_image_query,
+                                    query_before=bad_query,
+                                    query_after=self._extract_controller_query_after(response),
+                                    reflection_response=response,
+                                    consecutive_image_retrieval_count=consecutive_image_retrieval_count,
+                                    query_similarity=image_query_similarity,
+                                )
+                                self._record_response_actions(trajectory, response)
+                                append_public_response_actions(response)
+                                attempted_query = {"text": None, "source": "original"}
+                                draft_query_source = "original"
+                                conversation_num += 1
+                                continue
+                        else:
+                            consecutive_image_retrieval_count = 0
+
+                        self._log_image_retrieval_pipeline(
+                            trajectory,
+                            stage="main_image_retrieval_before_search",
+                            image_query=query_txt,
+                            query_image=img,
+                            note="about to run main image retrieval",
+                        )
+                        retrieved_docs = self._search_image_docs(img, query_txt, trajectory=trajectory)
+                        self._log_image_retrieval_pipeline(
+                            trajectory,
+                            stage="main_image_retrieval_raw_result",
+                            image_query=query_txt,
+                            query_image=None,
+                            retrieved_docs=retrieved_docs,
+                        )
+                        retrieved_docs = self._sanitize_retrieved_docs(
+                            retrieved_docs,
+                            retrieval_mode=retrieval_mode,
+                            trajectory=trajectory,
+                        )
+                        retrieval_content = self._format_retrieval_content(retrieved_docs)
+                        retrieval_content = self._clip_text(retrieval_content, self.retrieval_char_limit)
+                        self._log_retrieval_preview(retrieval_content)
+                        last_retrieval_mode = retrieval_mode
+                        last_image_query = query_txt
+                    else:
+                        retrieval_mode = "no_retrieval"
+                        retrieval_content = None
+                        consecutive_image_retrieval_count = 0
+                        last_retrieval_mode = retrieval_mode
+                        last_image_query = None
+
+                    self._record_retrieval_result(
+                        trajectory=trajectory,
+                        retrieval_mode=retrieval_mode,
+                        query_txt=query_txt,
+                        retrieval_content=retrieval_content,
                     )
-                    return response, messages
-            else:
-                break
+                    append_public_retrieval_result(
+                        retrieval_mode=retrieval_mode,
+                        query_txt=query_txt,
+                        retrieval_content=retrieval_content,
+                    )
+                    followup_message = {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": self._build_followup_message(retrieval_mode, retrieval_content),
+                            }
+                        ],
+                    }
+                    messages.append(followup_message)
+                    try:
+                        response = self._generate_text(messages)
+                        response = self._truncate_after_search(response)
+                        self.terminal.info(f"Response: {response}")
+                        self._record_response_actions(trajectory, response)
+                        append_public_response_actions(response)
+                        messages.append({"role": "assistant", "content": response})
+                        draft_query_source = "original"
+                    except Exception as e:
+                        error_text = f"{e.__class__.__name__}: {e}"
+                        self.terminal.info(f"Inference error, hidden states ignored: {error_text}")
+                        trajectory.append({"action": "error", "content": error_text})
+                        record = {
+                            "question": question,
+                            "id": id,
+                            "final_answer": response,
+                            "status": "generation_error",
+                            "error": error_text,
+                            "duration_seconds": time.time() - start_time,
+                            "trajectory": public_trajectory,
+                        }
+                        self._write_trajectory(record)
+                        self._write_item_controller_stats(
+                            status="generation_error",
+                            duration_seconds=time.time() - start_time,
+                            final_answer=response,
+                        )
+                        return response, messages
+                else:
+                    break
 
-            conversation_num += 1
+                conversation_num += 1
 
-        pattern = r"(?:<Final Answer>|Final Answer:)\s*(.*?)(?=<|$)"
-        final_answer_match = re.search(pattern, response, re.DOTALL)
-        if final_answer_match:
-            final_answer = final_answer_match.group(1).strip().replace("\n", "")
-            self.terminal.info(f"Final Answer: {final_answer}")
+            pattern = r"(?:<Final Answer>|Final Answer:)\s*(.*?)(?=<|$)"
+            final_answer_match = re.search(pattern, response, re.DOTALL)
+            if final_answer_match:
+                final_answer = final_answer_match.group(1).strip().replace("\n", "")
+                self.terminal.info(f"Final Answer: {final_answer}")
+                record = {
+                    "question": question,
+                    "id": id,
+                    "final_answer": final_answer,
+                    "status": "ok",
+                    "duration_seconds": time.time() - start_time,
+                    "trajectory": public_trajectory,
+                }
+                self._write_trajectory(record)
+                self._write_item_controller_stats(
+                    status="ok",
+                    duration_seconds=time.time() - start_time,
+                    final_answer=final_answer,
+                )
+                return final_answer, messages
+
+            finalized_answer = self._finalize_answer_with_fallback(
+                question,
+                messages,
+                response,
+                trajectory=trajectory,
+            )
+            self.terminal.info(
+                f"Warning: reached end of agent loop for item {conversation_num} without a 'Final Answer'. returning last response"
+            )
             record = {
                 "question": question,
                 "id": id,
-                "final_answer": final_answer,
-                "status": "ok",
+                "final_answer": finalized_answer,
+                "status": "missing_final_answer",
                 "duration_seconds": time.time() - start_time,
                 "trajectory": public_trajectory,
             }
             self._write_trajectory(record)
             self._write_item_controller_stats(
-                status="ok",
+                status="missing_final_answer",
                 duration_seconds=time.time() - start_time,
-                final_answer=final_answer,
+                final_answer=finalized_answer,
             )
-            return final_answer, messages
+            return finalized_answer, messages
 
-        finalized_answer = self._finalize_answer_with_fallback(
-            question,
-            messages,
-            response,
-            trajectory=trajectory,
-        )
-        self.terminal.info(
-            f"Warning: reached end of agent loop for item {conversation_num} without a 'Final Answer'. returning last response"
-        )
-        record = {
-            "question": question,
-            "id": id,
-            "final_answer": finalized_answer,
-            "status": "missing_final_answer",
-            "duration_seconds": time.time() - start_time,
-            "trajectory": public_trajectory,
-        }
-        self._write_trajectory(record)
-        self._write_item_controller_stats(
-            status="missing_final_answer",
-            duration_seconds=time.time() - start_time,
-            final_answer=finalized_answer,
-        )
-        return finalized_answer, messages
+        finally:
+            self._finish_sample_generation_accounting()
 
     def _is_invalid_retrieved_doc(self, doc):
         """Decide whether a retrieved document is empty, null-like, or unusable."""

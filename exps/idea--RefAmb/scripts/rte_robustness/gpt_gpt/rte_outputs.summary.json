@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "facts_input_path": "/home/you/FlashRAG/exps/idea10/scripts/rte_robustness/split/qwen3_32b/fact_outputs.jsonl",
+    "utility_input_path": "/home/you/FlashRAG/exps/idea10/scripts/rte_robustness/split/qwen3_32b/utility_outputs.jsonl",
+    "output_jsonl": "/home/you/FlashRAG/exps/idea10/scripts/rte_robustness/gpt_gpt/rte_outputs.jsonl",
+    "similarity_threshold": 1.0,
+    "fact_similarity_threshold": 0.9,
+    "epsilon": 1e-08,
+    "num_samples": 150,
+    "num_steps": 543,
+    "utility_mapping": {
+      "no_contribution": 0.0,
+      "partial_contribution": 0.5,
+      "full_contribution": 1.0
+    }
+  },
+  "aggregate": {
+    "mean_tqs": 0.23808872245013532,
+    "mean_iterations": 3.62,
+    "mean_delta_f": 0.2822520077086943,
+    "mean_utility": 0.17587476979742173,
+    "mean_step_score": 0.10869473962262882
+  }
+}

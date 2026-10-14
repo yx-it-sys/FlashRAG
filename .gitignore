@@ -1,12 +1,13 @@
 **/.history
-exps/data
-exps/idea10/data/
-exps/idea10/idea_reports/
-exps/idea10/research_analysis/
+exps/data_process
+exps/idea--image-revisit
+exps/idea--RefAmb/data/
+exps/idea--RefAmb/idea_reports/
+exps/idea--RefAmb/research_analysis/
 data/result/
 data/result/run_logs/
-exps/idea10/data/result/
-exps/idea10/data/result/run_logs/
+exps/idea--RefAmb/data/result/
+exps/idea--RefAmb/data/result/run_logs/
 *.pyc
 *.egg-info
 build/
@@ -15,3 +16,4 @@ dist/*
 upload_pypi.sh
 tests/*
 *.whl
+*.log

@@ -15,6 +15,8 @@ import openai
 import inspect
 
 class OmniSearchPipeline(BasicMultiModalPipeline):
+    PROMPT_OPT_PATH = "/home/you/FlashRAG/exps/idea10/prompts/omni_prompt.toml"
+    PROMPT_OPT_VERSION = "system_prompt_query_grounded_v1"
     RETRYABLE_API_ERROR_NAMES = {
         "RateLimitError",
         "APIConnectionError",
@@ -42,8 +44,7 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         self.generator = get_generator(config) if generator is None else generator
         self.retriever = retriever if retriever is not None else get_retriever(config)
         prompt_path = self.config['omni_prompt_path']
-        with open(prompt_path, 'rb') as f:
-            self.prompt = tomllib.load(f)[prompt_version]
+        self.prompt = self._load_prompt_template(prompt_path, prompt_version)
         self.output_dir = self.config['output_dir'] if 'output_dir' in self.config and self.config['output_dir'] else self.config['save_dir']
         os.makedirs(self.output_dir, exist_ok=True)
         self.trajectory_path = os.path.join(self.output_dir, "omnisearch_trajectories.jsonl")
@@ -55,6 +56,16 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         self.target_source = self._normalize_source_name(self._config_value(self.config, "source"))
         self._roi_worker_process = None
         self._roi_worker_exit_registered = False
+        self._current_sample_generation_stats = None
+        self._last_sample_generation_stats = None
+        self._sample_generation_stats = []
+
+    def _load_prompt_template(self, prompt_path, prompt_version):
+        with open(prompt_path, 'rb') as f:
+            prompt_table = tomllib.load(f)
+        if prompt_version not in prompt_table:
+            raise KeyError(f"Prompt version `{prompt_version}` not found in {prompt_path}")
+        return prompt_table[prompt_version]
 
     def _retriever_device_context(self, device):
         if device != "cpu":
@@ -86,6 +97,149 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
                 torch.Tensor.cuda = original_tensor_cuda
 
         return cpu_context()
+
+
+    def _empty_sample_generation_summary(self, latency_seconds=0.0):
+        """Build a sample-level generation summary compatible with evaluator metrics."""
+        latency_seconds = float(latency_seconds or 0.0)
+        return {
+            "total_samples": 1,
+            "input_tokens": 0.0,
+            "output_tokens": 0.0,
+            "total_tokens": 0.0,
+            "latency_seconds": latency_seconds,
+            "avg_input_tokens_per_sample": 0.0,
+            "avg_output_tokens_per_sample": 0.0,
+            "avg_total_tokens_per_sample": 0.0,
+            "avg_latency_seconds_per_sample": latency_seconds,
+            "input_tokens_per_second": 0.0,
+            "output_tokens_per_second": 0.0,
+            "total_tokens_per_second": 0.0,
+        }
+
+    def _coerce_generation_totals(self, stats):
+        """Normalize generator stats objects into aggregate token and latency totals."""
+        totals = {
+            "input_tokens": 0.0,
+            "output_tokens": 0.0,
+            "total_tokens": 0.0,
+            "latency_seconds": 0.0,
+        }
+        if not stats:
+            return totals
+
+        if isinstance(stats, dict):
+            totals["input_tokens"] = float(
+                stats.get("total_input_tokens", stats.get("input_tokens", 0.0))
+            )
+            totals["output_tokens"] = float(
+                stats.get("total_output_tokens", stats.get("output_tokens", 0.0))
+            )
+            totals["total_tokens"] = float(
+                stats.get("total_tokens", totals["input_tokens"] + totals["output_tokens"])
+            )
+            totals["latency_seconds"] = float(
+                stats.get("total_latency_seconds", stats.get("latency_seconds", stats.get("latency(s)", 0.0)))
+            )
+            return totals
+
+        if isinstance(stats, list):
+            for item in stats:
+                if not isinstance(item, dict):
+                    continue
+                item_input_tokens = float(
+                    item.get("total_input_tokens", item.get("input_tokens", 0.0))
+                )
+                item_output_tokens = float(
+                    item.get("total_output_tokens", item.get("output_tokens", 0.0))
+                )
+                totals["input_tokens"] += item_input_tokens
+                totals["output_tokens"] += item_output_tokens
+                totals["total_tokens"] += float(
+                    item.get("total_tokens", item_input_tokens + item_output_tokens)
+                )
+                totals["latency_seconds"] += float(
+                    item.get("total_latency_seconds", item.get("latency_seconds", item.get("latency(s)", 0.0)))
+                )
+        return totals
+
+    def _pop_generator_generation_totals(self):
+        """Read and reset generator-side stats accumulated since the last read."""
+        generator = getattr(self, "generator", None)
+        if generator is None:
+            return self._coerce_generation_totals(None)
+
+        stats = None
+        for method_name in ("get_generation_stats", "get_performance_stats", "cost_stats"):
+            if not hasattr(generator, method_name):
+                continue
+            method = getattr(generator, method_name)
+            try:
+                stats = method(reset=True)
+            except TypeError:
+                stats = method()
+            except Exception:
+                stats = None
+            if stats:
+                break
+        return self._coerce_generation_totals(stats)
+
+    def _accumulate_current_sample_generation_totals(self, totals):
+        """Add one generator call's usage totals into the active sample accumulator."""
+        if self._current_sample_generation_stats is None:
+            return
+        for key in ("input_tokens", "output_tokens", "total_tokens", "latency_seconds"):
+            self._current_sample_generation_stats[key] += float(totals.get(key, 0.0))
+
+    def _start_sample_generation_accounting(self):
+        """Reset generator residue and open a new per-sample accounting window."""
+        self._pop_generator_generation_totals()
+        self._last_sample_generation_stats = None
+        self._current_sample_generation_stats = {
+            "start_time": time.time(),
+            "input_tokens": 0.0,
+            "output_tokens": 0.0,
+            "total_tokens": 0.0,
+            "latency_seconds": 0.0,
+        }
+
+    def _finish_sample_generation_accounting(self):
+        """Close the active per-sample accounting window and materialize a summary."""
+        if self._current_sample_generation_stats is None:
+            summary = self._empty_sample_generation_summary()
+            self._last_sample_generation_stats = summary
+            return summary
+
+        self._accumulate_current_sample_generation_totals(self._pop_generator_generation_totals())
+        current = self._current_sample_generation_stats
+        wall_clock_latency = max(0.0, time.time() - float(current.get("start_time", time.time())))
+        input_tokens = float(current.get("input_tokens", 0.0))
+        output_tokens = float(current.get("output_tokens", 0.0))
+        total_tokens = float(current.get("total_tokens", input_tokens + output_tokens))
+        summary = {
+            "total_samples": 1,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "total_tokens": total_tokens,
+            "latency_seconds": wall_clock_latency,
+            "avg_input_tokens_per_sample": input_tokens,
+            "avg_output_tokens_per_sample": output_tokens,
+            "avg_total_tokens_per_sample": total_tokens,
+            "avg_latency_seconds_per_sample": wall_clock_latency,
+            "input_tokens_per_second": (input_tokens / wall_clock_latency) if wall_clock_latency > 0 else 0.0,
+            "output_tokens_per_second": (output_tokens / wall_clock_latency) if wall_clock_latency > 0 else 0.0,
+            "total_tokens_per_second": (total_tokens / wall_clock_latency) if wall_clock_latency > 0 else 0.0,
+        }
+        self._current_sample_generation_stats = None
+        self._last_sample_generation_stats = summary
+        return summary
+
+    def _attach_generation_stats(self, dataset):
+        """Attach sample-level Omni stats instead of broadcasting a run-level average."""
+        if self._sample_generation_stats and len(self._sample_generation_stats) == len(dataset):
+            dataset.update_output("generation_stats", self._sample_generation_stats)
+            return
+        super()._attach_generation_stats(dataset)
 
     def _normalize_generation_output(self, response):
         if isinstance(response, str):
@@ -135,8 +289,13 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
                 )
                 time.sleep(delay)
                 delay *= 2
-        raw_response = self.generator.generate([messages])
-        return self._normalize_generation_output(raw_response)
+            finally:
+                self._accumulate_current_sample_generation_totals(self._pop_generator_generation_totals())
+        try:
+            raw_response = self.generator.generate([messages])
+            return self._normalize_generation_output(raw_response)
+        finally:
+            self._accumulate_current_sample_generation_totals(self._pop_generator_generation_totals())
 
     def _write_failed_trajectory(self, *, question, id, response, trajectory, start_time, status, error_text):
         trajectory.append({
@@ -775,167 +934,173 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
         return False
     
     def iterative_infer(self, question, id, image_id):
-        img_path = os.path.join(self.data_dir, self.dataset_name, "images", f"{image_id}.jpg")
-        
-        if not os.path.exists(img_path):
-            message = f"Image file not found: {img_path}"
-            print(message)
-            self._write_trajectory({
-                "question": question,
-                "id": id,
-                "final_answer": "",
-                "status": "missing_image",
-                "duration_seconds": 0.0,
-                "trajectory": [
-                    {
-                        "action": "error",
-                        "content": message,
-                    }
-                ],
-            })
-            return "", []
-        
-        img = Image.open(img_path).convert("RGB")
-        system_prompt = self.prompt.format(question=question) if "{question}" in self.prompt else self.prompt
-        messages = [
-            {"role": "system", "content": [
-                {"type": "text", "text": system_prompt},
-            ]},
-            {"role": "user", "content":[
-                {"type": "text", "text": f"Input Question: {question}"},
-                {"type": "image", "image": img}
-            ]}
-
-        ]
-        trajectory = []
-        start_time = time.time()
-        response = ""
+        self._start_sample_generation_accounting()
         try:
-            response = self._generate_text(messages)
-            response = self._truncate_after_search(response)
-            print(f"First Response: {response}")
-            self._record_response_actions(trajectory, response)
-            messages.append({'role': 'assistant', 'content': response})
-        except Exception as e:
-            error_text = self._format_exception(e)
-            status = "api_error" if self._is_retryable_api_error(e) else "generation_error"
-            print("Inference error, hidden states ignored:", error_text)
-            self._write_failed_trajectory(
-                question=question,
-                id=id,
-                response=response,
-                trajectory=trajectory,
-                start_time=start_time,
-                status=status,
-                error_text=error_text,
-            )
-            return response, messages
+            img_path = os.path.join(self.data_dir, self.dataset_name, "images", f"{image_id}.jpg")
         
-        conversation_num, max_turns = 0, 5
-        while conversation_num < max_turns:
-            if "Final Answer" in response or "<Final Answer>" in response:
-                break
-            retrieval_mode, query_txt = self._parse_search_action(response)
-            if retrieval_mode is not None:
-                retrieval_content = ""
-                retrieved_docs = []
-                if retrieval_mode == "text_retrieval":
-                    print("Start Text Retrieval...")
-                    print(f"Query Text: {query_txt}")
-                    if query_txt == "":
-                        print(f"ERROR!!Query_txt is None")
-                        retrieved_docs = self._search_text_docs(query_txt)
-                        retrieval_content = self._format_retrieval_content(retrieved_docs)
-                        retrieval_content = self._clip_text(retrieval_content, self.retrieval_char_limit)
-                        self._log_retrieval_preview(retrieval_content)
-                    else:
-                        retrieved_docs = self._search_text_docs(query_txt)
-                        retrieval_content = self._format_retrieval_content(retrieved_docs)
-                        retrieval_content = self._clip_text(retrieval_content, self.retrieval_char_limit)
-                        self._log_retrieval_preview(retrieval_content)
-                elif retrieval_mode == "image_retrieval":
-                    print("Start Image Retrieval...")
-                    print(f"Image Query: {query_txt}")
-                    retrieved_docs = self._search_image_docs(img, query_txt)
-                    retrieval_content = self._format_retrieval_content(retrieved_docs)
-                    retrieval_content = self._clip_text(retrieval_content, self.retrieval_char_limit)
-                    self._log_retrieval_preview(retrieval_content)
-                elif retrieval_mode == "no_retrieval":
-                    retrieval_content = None
-
-                self._record_retrieval_result(
-                    trajectory=trajectory,
-                    retrieval_mode=retrieval_mode,
-                    query_txt=query_txt,
-                    retrieval_content=retrieval_content,
-                )
-
-                contents = []
-                contents.append({
-                    'type': 'text',
-                    'text': self._build_followup_message(retrieval_mode, retrieval_content),
+            if not os.path.exists(img_path):
+                message = f"Image file not found: {img_path}"
+                print(message)
+                self._write_trajectory({
+                    "question": question,
+                    "id": id,
+                    "final_answer": "",
+                    "status": "missing_image",
+                    "duration_seconds": 0.0,
+                    "trajectory": [
+                        {
+                            "action": "error",
+                            "content": message,
+                        }
+                    ],
                 })
-
-                messages.append({'role': 'user', 'content': contents})
-
-                try:
-                    response = self._generate_text(messages)
-                    response = self._truncate_after_search(response)
-                    print(f"Response: {response}")
-                    self._record_response_actions(trajectory, response)
-                    messages.append({"role":"assistant", "content": response})
-                except Exception as e:
-                    error_text = self._format_exception(e)
-                    status = "api_error" if self._is_retryable_api_error(e) else "generation_error"
-                    print("Inference error, hidden states ignored:", error_text)
-                    self._write_failed_trajectory(
-                        question=question,
-                        id=id,
-                        response=response,
-                        trajectory=trajectory,
-                        start_time=start_time,
-                        status=status,
-                        error_text=error_text,
-                    )
-                    return response, messages
-                       
-            conversation_num += 1
+                return "", []
         
-        pattern = r'(?:<Final Answer>|Final Answer:)\s*(.*?)(?=<|$)'
-        final_answer_match = re.search(pattern, response, re.DOTALL)
+            img = Image.open(img_path).convert("RGB")
+            system_prompt = self.prompt.format(question=question) if "{question}" in self.prompt else self.prompt
+            messages = [
+                {"role": "system", "content": [
+                    {"type": "text", "text": system_prompt},
+                ]},
+                {"role": "user", "content":[
+                    {"type": "text", "text": f"Input Question: {question}"},
+                    {"type": "image", "image": img}
+                ]}
 
-        if final_answer_match:
-            final_answer = final_answer_match.group(1).strip()
-            final_answer = final_answer.replace('\n', '')
-            print(f"Final Answer: {final_answer}")
-            self._write_trajectory({
-                "question": question,
-                "id": id,
-                "final_answer": final_answer,
-                "status": "ok",
-                "duration_seconds": time.time() - start_time,
-                "trajectory": trajectory,
-            })
-            return final_answer, messages
-        else:
-            print(f"Warning: reached end of agent loop for item {conversation_num} without a 'Final Answer'. returning last response")
-            self._write_trajectory({
-                "question": question,
-                "id": id,
-                "final_answer": response,
-                "status": "missing_final_answer",
-                "duration_seconds": time.time() - start_time,
-                "trajectory": trajectory,
-            })
-            return response, messages
+            ]
+            trajectory = []
+            start_time = time.time()
+            response = ""
+            try:
+                response = self._generate_text(messages)
+                response = self._truncate_after_search(response)
+                print(f"First Response: {response}")
+                self._record_response_actions(trajectory, response)
+                messages.append({'role': 'assistant', 'content': response})
+            except Exception as e:
+                error_text = self._format_exception(e)
+                status = "api_error" if self._is_retryable_api_error(e) else "generation_error"
+                print("Inference error, hidden states ignored:", error_text)
+                self._write_failed_trajectory(
+                    question=question,
+                    id=id,
+                    response=response,
+                    trajectory=trajectory,
+                    start_time=start_time,
+                    status=status,
+                    error_text=error_text,
+                )
+                return response, messages
+        
+            conversation_num, max_turns = 0, 5
+            while conversation_num < max_turns:
+                if "Final Answer" in response or "<Final Answer>" in response:
+                    break
+                retrieval_mode, query_txt = self._parse_search_action(response)
+                if retrieval_mode is not None:
+                    retrieval_content = ""
+                    retrieved_docs = []
+                    if retrieval_mode == "text_retrieval":
+                        print("Start Text Retrieval...")
+                        print(f"Query Text: {query_txt}")
+                        if query_txt == "":
+                            print(f"ERROR!!Query_txt is None")
+                            retrieved_docs = self._search_text_docs(query_txt)
+                            retrieval_content = self._format_retrieval_content(retrieved_docs)
+                            retrieval_content = self._clip_text(retrieval_content, self.retrieval_char_limit)
+                            self._log_retrieval_preview(retrieval_content)
+                        else:
+                            retrieved_docs = self._search_text_docs(query_txt)
+                            retrieval_content = self._format_retrieval_content(retrieved_docs)
+                            retrieval_content = self._clip_text(retrieval_content, self.retrieval_char_limit)
+                            self._log_retrieval_preview(retrieval_content)
+                    elif retrieval_mode == "image_retrieval":
+                        print("Start Image Retrieval...")
+                        print(f"Image Query: {query_txt}")
+                        retrieved_docs = self._search_image_docs(img, query_txt)
+                        retrieval_content = self._format_retrieval_content(retrieved_docs)
+                        retrieval_content = self._clip_text(retrieval_content, self.retrieval_char_limit)
+                        self._log_retrieval_preview(retrieval_content)
+                    elif retrieval_mode == "no_retrieval":
+                        retrieval_content = None
+
+                    self._record_retrieval_result(
+                        trajectory=trajectory,
+                        retrieval_mode=retrieval_mode,
+                        query_txt=query_txt,
+                        retrieval_content=retrieval_content,
+                    )
+
+                    contents = []
+                    contents.append({
+                        'type': 'text',
+                        'text': self._build_followup_message(retrieval_mode, retrieval_content),
+                    })
+
+                    messages.append({'role': 'user', 'content': contents})
+
+                    try:
+                        response = self._generate_text(messages)
+                        response = self._truncate_after_search(response)
+                        print(f"Response: {response}")
+                        self._record_response_actions(trajectory, response)
+                        messages.append({"role":"assistant", "content": response})
+                    except Exception as e:
+                        error_text = self._format_exception(e)
+                        status = "api_error" if self._is_retryable_api_error(e) else "generation_error"
+                        print("Inference error, hidden states ignored:", error_text)
+                        self._write_failed_trajectory(
+                            question=question,
+                            id=id,
+                            response=response,
+                            trajectory=trajectory,
+                            start_time=start_time,
+                            status=status,
+                            error_text=error_text,
+                        )
+                        return response, messages
+                       
+                conversation_num += 1
+        
+            pattern = r'(?:<Final Answer>|Final Answer:)\s*(.*?)(?=<|$)'
+            final_answer_match = re.search(pattern, response, re.DOTALL)
+
+            if final_answer_match:
+                final_answer = final_answer_match.group(1).strip()
+                final_answer = final_answer.replace('\n', '')
+                print(f"Final Answer: {final_answer}")
+                self._write_trajectory({
+                    "question": question,
+                    "id": id,
+                    "final_answer": final_answer,
+                    "status": "ok",
+                    "duration_seconds": time.time() - start_time,
+                    "trajectory": trajectory,
+                })
+                return final_answer, messages
+            else:
+                print(f"Warning: reached end of agent loop for item {conversation_num} without a 'Final Answer'. returning last response")
+                self._write_trajectory({
+                    "question": question,
+                    "id": id,
+                    "final_answer": response,
+                    "status": "missing_final_answer",
+                    "duration_seconds": time.time() - start_time,
+                    "trajectory": trajectory,
+                })
+                return response, messages
       
+        finally:
+            self._finish_sample_generation_accounting()
+
     def safe_write(self, file_path: str, data: dict):
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(data, ensure_ascii=False) + "\n")
 
-    def run(self, dataset, do_eval=True, pred_process_fun=None):
+    def _run_with_current_prompt(self, dataset, do_eval=True, pred_process_fun=None):
         prediction_list = []
+        self._sample_generation_stats = []
         original_count = len(dataset.data)
         selected_items = [item for item in dataset.data if self._source_matches_target(self._get_item_source(item))]
         dataset.data = selected_items
@@ -948,22 +1113,35 @@ class OmniSearchPipeline(BasicMultiModalPipeline):
             print("No items matched the configured source filter. Skip inference and evaluation.")
             return dataset
 
-        # 2. 记录开始时间
         start_time = time.time()
 
         for item in tqdm(dataset.data, total=len(dataset.data)):
             answer, context = self.iterative_infer(item.question, item.id, item.image_id)
             prediction_list.append(answer)
+            self._sample_generation_stats.append(
+                self._last_sample_generation_stats or self._empty_sample_generation_summary()
+            )
 
         dataset.update_output("pred", prediction_list)
         dataset = self.evaluate(dataset, do_eval=do_eval)
         end_time = time.time()
         total_duration = end_time - start_time
         count = len(dataset.data)
-        
+
         avg_time = total_duration / count if count > 0 else 0
 
         print(f"\n[Timing] Total: {total_duration:.2f}s | Count: {count} | Avg per item: {avg_time:.4f}s")
         with open(os.path.join(self.output_dir, "records.txt"), "a", encoding="utf-8") as f:
             f.write(f"\n[Timing] Total: {total_duration:.2f}s | Count: {count} | Avg per item: {avg_time:.4f}s")
         return dataset
+
+    def prompt_opt_run(self, dataset, do_eval=True, pred_process_fun=None):
+        original_prompt = self.prompt
+        self.prompt = self._load_prompt_template(self.PROMPT_OPT_PATH, self.PROMPT_OPT_VERSION)
+        try:
+            return self._run_with_current_prompt(dataset, do_eval=do_eval, pred_process_fun=pred_process_fun)
+        finally:
+            self.prompt = original_prompt
+
+    def run(self, dataset, do_eval=True, pred_process_fun=None):
+        return self._run_with_current_prompt(dataset, do_eval=do_eval, pred_process_fun=pred_process_fun)

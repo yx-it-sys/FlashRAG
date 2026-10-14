@@ -1848,13 +1848,30 @@ class MCSearchRetriever(BaseRetriever):
 def main():
     # Example configuration
     from flashrag.config import Config
-    config = Config("/home/you/FlashRAG/exps/idea10/configs/configs_refamb/qwen2_5_7b/config_stage_crag.yaml")
+    from transformers import AutoConfig
+
+    config = Config("/home/you/FlashRAG/exps/idea--RefAmb/configs/configs_refamb/qwen2_5_7b/config_stage_infoseek.yaml")
     config['gpu_id']="1"
-    text = "playwright"
-    retriever = CRAGRetriever(config)
+    text = "Characteristics of a male Red-throated loon."
+
+    retrieval_model_path = config["retrieval_model_path"]
+    is_multimodal = False
+    try:
+        model_config = AutoConfig.from_pretrained(retrieval_model_path)
+        arch = (model_config.architectures or [""])[0]
+        if "clip" in arch.lower(): 
+            retriever = MultiModalRetriever(config)
+            is_multimodal = True
+        else:
+            retriever = DenseRetriever(config)
+    except Exception:
+        retriever = DenseRetriever(config)
 
     # Text search
-    batch_results = retriever.search(text, query_type="text")
+    if is_multimodal:
+        batch_results = retriever.search(text, target_modal="text")
+    else:
+        batch_results = retriever.search(text, query_type="text")
     print(batch_results)
 
 if __name__ == "__main__":

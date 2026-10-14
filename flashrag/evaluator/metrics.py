@@ -279,6 +279,8 @@ class LLMAcc(BaseMetric):
         self.max_retries = int(llm_setting.get("max_retries", 5))
         self.retry_sleep_seconds = int(llm_setting.get("retry_sleep_seconds", 5))
         self.max_workers = int(llm_setting.get("max_workers", 10))
+        self.request_timeout_seconds = float(llm_setting.get("request_timeout_seconds", 30))
+        self.max_total_timeout_seconds = float(llm_setting.get("max_total_timeout_seconds", 120))
 
         assert api_key, "LLMAcc requires llm_acc_setting.api_key (or gpt_acc_setting.api_key) for API judge."
         assert base_url, "LLMAcc requires llm_acc_setting.base_url (or gpt_acc_setting.base_url) for API judge."
@@ -325,7 +327,13 @@ class LLMAcc(BaseMetric):
             },
         ]
         last_error = None
+        start_time = time.monotonic()
         for attempt in range(1, self.max_retries + 1):
+            elapsed = time.monotonic() - start_time
+            remaining_time = self.max_total_timeout_seconds - elapsed
+            if remaining_time <= 0:
+                break
+
             try:
                 response = self.client.chat.completions.create(
                     model=self.api_model,
@@ -333,6 +341,7 @@ class LLMAcc(BaseMetric):
                     stream=False,
                     temperature=0,
                     max_tokens=4,
+                    timeout=min(self.request_timeout_seconds, remaining_time),
                 )
                 judge_text = (response.choices[0].message.content or "").strip()
                 parsed_score = self._parse_judge_text(judge_text)
@@ -352,9 +361,19 @@ class LLMAcc(BaseMetric):
                 )
 
             if attempt < self.max_retries:
-                time.sleep(self.retry_sleep_seconds * attempt)
+                remaining_time = self.max_total_timeout_seconds - (time.monotonic() - start_time)
+                sleep_seconds = min(self.retry_sleep_seconds * attempt, max(0.0, remaining_time))
+                if sleep_seconds > 0:
+                    time.sleep(sleep_seconds)
 
-        raise last_error
+        if last_error is not None:
+            print(
+                "WARNING judge with LLM API! Skip this sample after timeout or repeated failures: "
+                f"{type(last_error).__name__}: {last_error}"
+            )
+        else:
+            print("WARNING judge with LLM API! Skip this sample after timeout.")
+        return None
 
     def _score_one_with_index(self, idx, sample):
         score = self.calculate_acc(sample["pred"], sample["golden_answers"])
@@ -387,14 +406,26 @@ class LLMAcc(BaseMetric):
 
             for future in as_completed(future_to_idx):
                 idx = future_to_idx[future]
-                _, score = future.result()
+                try:
+                    _, score = future.result()
+                except Exception as exc:
+                    print(f"ERROR judge with LLM API! Skip sample {idx}: {type(exc).__name__}: {exc}")
+                    score = None
                 metric_score_list[idx] = score
                 data[idx].update_evaluation_score(self.metric_name, score)
                 progress.update(1)
 
         progress.close()
 
-        llm_acc_score = sum(metric_score_list) / len(metric_score_list) if metric_score_list else 0.0
+        valid_scores = [score for score in metric_score_list if score is not None]
+        skipped_count = len(metric_score_list) - len(valid_scores)
+        if skipped_count > 0:
+            print(
+                f"WARNING judge with LLM API! Skipped {skipped_count}/{len(metric_score_list)} samples "
+                "while calculating llm metric."
+            )
+
+        llm_acc_score = sum(valid_scores) / len(valid_scores) if valid_scores else None
         return {"llm": llm_acc_score}, metric_score_list
 
 

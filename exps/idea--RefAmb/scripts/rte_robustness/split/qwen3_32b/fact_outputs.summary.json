@@ -1,0 +1,12 @@
+{
+  "meta": {
+    "input_path": "/home/you/FlashRAG/exps/idea10/data/result/cross-model-rte/label/human/TQS/human_label_150.trajectories.jsonl",
+    "output_jsonl": "/home/you/FlashRAG/exps/idea10/scripts/rte_robustness/qwen3_32b/fact_outputs.jsonl",
+    "model_mode": "api",
+    "model_ref": "Qwen/Qwen3-VL-32B-Instruct",
+    "resolved_local_model_name": "Qwen/Qwen3-VL-32B-Instruct",
+    "resolved_local_model_path": "",
+    "num_samples": 150,
+    "mean_iterations": 4.266666666666667
+  }
+}

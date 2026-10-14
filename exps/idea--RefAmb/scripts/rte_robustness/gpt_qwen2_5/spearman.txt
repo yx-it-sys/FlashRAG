@@ -1,0 +1,7 @@
+human_path: /home/you/FlashRAG/exps/idea10/data/result/cross-model-rte/label/human/TQS/human_label_150.jsonl
+model_path: /home/you/FlashRAG/exps/idea10/scripts/rte_robustness/gpt_qwen2_5/rte_outputs.jsonl
+human_mapping: Low=1, Medium=2, High=3
+num_pairs: 150
+spearman_rho: 0.836052083031
+missing_human_ids: 0
+missing_model_ids: 0
